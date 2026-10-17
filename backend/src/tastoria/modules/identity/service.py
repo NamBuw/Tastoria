@@ -10,17 +10,18 @@ import logging
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Annotated, Any
+from typing import Any
 
 from email_validator import EmailNotValidError, validate_email
-from fastapi import Depends, Request
-from sqlalchemy import select, update
+from fastapi import Request
+from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from tastoria.core.auth import AuthUser
 from tastoria.core.clock import utcnow
 from tastoria.core.config import Settings
-from tastoria.core.db import UnitOfWork, Uow
+from tastoria.core.db import UnitOfWork
 from tastoria.core.errors import ApiError, ProblemCode
 from tastoria.modules.identity import passwords, tokens
 from tastoria.modules.identity.mailer import Mailer
@@ -41,15 +42,6 @@ class IdentityDeps:
     mailer: Mailer
 
 
-@dataclass(frozen=True)
-class AuthUser:
-    """The caller of a `user` endpoint, after token and token_version checks."""
-
-    id: uuid.UUID
-    role: str
-    email: str
-
-
 def identity_deps(request: Request) -> IdentityDeps:
     st = request.app.state
     return IdentityDeps(st.settings, st.login_throttle, st.mailer)
@@ -58,26 +50,27 @@ def identity_deps(request: Request) -> IdentityDeps:
 # ---------------------------------------------------------------- current user (bearer access token)
 
 
-def current_user(request: Request, uow: Uow) -> AuthUser:
-    """FastAPI dependency for every `auth: user` endpoint. 401 unauthenticated / token_revoked (FR-02-09)."""
-    settings: Settings = request.app.state.settings
-    header = request.headers.get("authorization", "")
-    scheme, _, raw = header.partition(" ")
-    if scheme.lower() != "bearer" or not raw:
-        raise ApiError(401, ProblemCode.unauthenticated, headers={"WWW-Authenticate": "Bearer"})
-    try:
-        claims = tokens.decode_access_token(settings, raw.strip())
-    except tokens.InvalidAccessToken:
-        raise ApiError(401, ProblemCode.unauthenticated, headers={"WWW-Authenticate": "Bearer"}) from None
-    user = uow.session.get(User, claims.user_id)
-    if user is None:
-        raise ApiError(401, ProblemCode.unauthenticated, headers={"WWW-Authenticate": "Bearer"})
-    if claims.token_version != user.token_version or user.status != "active":
-        raise ApiError(401, ProblemCode.token_revoked, headers={"WWW-Authenticate": "Bearer"})
-    return AuthUser(user.id, user.role, user.email)
+class BearerAuthenticator:
+    """Installed by tastoria.app as `app.state.authenticator` (used by tastoria.core.auth.current_user)."""
 
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
 
-CurrentUser = Annotated[AuthUser, Depends(current_user)]
+    def authenticate(self, request: Request, session: Session) -> AuthUser:
+        unauthenticated = ApiError(401, ProblemCode.unauthenticated, headers={"WWW-Authenticate": "Bearer"})
+        scheme, _, raw = request.headers.get("authorization", "").partition(" ")
+        if scheme.lower() != "bearer" or not raw.strip():
+            raise unauthenticated
+        try:
+            claims = tokens.decode_access_token(self.settings, raw.strip())
+        except tokens.InvalidAccessToken:
+            raise unauthenticated from None
+        user = session.get(User, claims.user_id)
+        if user is None:
+            raise unauthenticated
+        if claims.token_version != user.token_version or user.status != "active":
+            raise ApiError(401, ProblemCode.token_revoked, headers={"WWW-Authenticate": "Bearer"})
+        return AuthUser(user.id, user.role, user.email)
 
 
 # ---------------------------------------------------------------- helpers
@@ -421,3 +414,13 @@ def export_subject_data(session: Session, user_id: uuid.UUID) -> dict[str, list[
             for t in rts
         ],
     }
+
+
+def purge_expired(session: Session) -> dict[str, int]:
+    """UC34: delete expired refresh tokens and password-reset tokens (an expired token is useless either way)."""
+    now = utcnow()
+    expired = select(RefreshToken.id).where(RefreshToken.expires_at < now)
+    session.execute(update(RefreshToken).where(RefreshToken.replaced_by_id.in_(expired)).values(replaced_by_id=None))
+    rt = session.execute(delete(RefreshToken).where(RefreshToken.expires_at < now)).rowcount or 0
+    pr = session.execute(delete(PasswordReset).where(PasswordReset.expires_at < now)).rowcount or 0
+    return {"refresh_tokens": rt, "password_resets": pr}

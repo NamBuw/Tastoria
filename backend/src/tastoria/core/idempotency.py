@@ -112,3 +112,12 @@ def finish(
     )
     session.flush()
     return JSONResponse(body, status_code=status_code, headers=headers)
+
+
+def purge_expired(session: Session) -> int:
+    """UC34: drop keys older than 48 hours."""
+    res = session.execute(
+        text("DELETE FROM idempotency_keys WHERE created_at < now() - make_interval(hours => :h)"),
+        {"h": RETENTION_HOURS},
+    )
+    return res.rowcount or 0

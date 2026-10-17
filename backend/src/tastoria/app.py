@@ -18,6 +18,7 @@ from tastoria.core.middleware import RequestContextMiddleware
 from tastoria.modules.identity.dsr import IdentitySubjectData
 from tastoria.modules.identity.mailer import make_mailer
 from tastoria.modules.identity.router import router as identity_router
+from tastoria.modules.identity.service import BearerAuthenticator
 from tastoria.modules.identity.throttle import MemoryLoginThrottle, ValkeyLoginThrottle
 from tastoria.modules.privacy.router import router as privacy_router
 from tastoria.modules.privacy.service import PrivacyDeps, SubjectDataHandler
@@ -70,6 +71,7 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
             max_failures=settings.login_max_failures, lock_s=settings.login_lock_s
         )
     app.state.mailer = make_mailer(settings)
+    app.state.authenticator = BearerAuthenticator(settings)
     app.state.profile = ProfileDeps(settings, make_cipher(settings))
     app.state.privacy = PrivacyDeps(
         settings, app.state.sessionmaker, handlers=build_subject_handlers(app.state.profile)

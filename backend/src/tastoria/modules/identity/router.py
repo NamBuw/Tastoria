@@ -6,6 +6,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request, Response, status
 
+from tastoria.core.auth import CurrentUser
 from tastoria.core.db import Uow
 from tastoria.modules.identity import service
 from tastoria.modules.identity.schemas import (
@@ -17,7 +18,7 @@ from tastoria.modules.identity.schemas import (
     RefreshRequest,
     RegisterRequest,
 )
-from tastoria.modules.identity.service import CurrentUser, IdentityDeps, identity_deps
+from tastoria.modules.identity.service import IdentityDeps, identity_deps
 
 router = APIRouter(prefix="/auth", tags=["identity"])
 

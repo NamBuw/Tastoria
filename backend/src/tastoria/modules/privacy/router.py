@@ -8,8 +8,8 @@ from typing import Annotated
 from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import JSONResponse, Response
 
+from tastoria.core.auth import CurrentUser
 from tastoria.core.db import Uow
-from tastoria.modules.identity.service import CurrentUser
 from tastoria.modules.privacy import service
 from tastoria.modules.privacy.schemas import (
     ConsentDecisionBatch,

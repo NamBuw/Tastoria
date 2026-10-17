@@ -19,11 +19,11 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
+from tastoria.core.auth import AuthUser
 from tastoria.core.clock import local_year, utcnow
 from tastoria.core.config import Settings
 from tastoria.core.errors import ApiError, ProblemCode
 from tastoria.modules.catalog import service as catalog
-from tastoria.modules.identity.service import AuthUser
 from tastoria.modules.privacy import service as privacy
 from tastoria.modules.profile import energy
 from tastoria.modules.profile.crypto import DecryptionFailed, FieldCipher

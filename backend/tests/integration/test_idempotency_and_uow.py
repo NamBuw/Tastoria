@@ -16,10 +16,10 @@ from pydantic import BaseModel
 from sqlalchemy import text
 
 from tastoria.core import idempotency
+from tastoria.core.auth import CurrentUser
 from tastoria.core.db import UnitOfWork, Uow
 from tastoria.core.errors import ApiError, ProblemCode
 from tastoria.core.idempotency import IdempotencyKeyDep
-from tastoria.modules.identity.service import CurrentUser
 
 
 class Thing(BaseModel):
