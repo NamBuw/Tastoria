@@ -180,7 +180,7 @@ tables:
     pk: [ingredient_id, allergen_code]
   - name: ingredient_units
     module: catalog
-    columns: ["ingredient_id uuid NN FK->ingredients(id)", "unit_code text NN (qua|bo|cu|nhanh|mieng|goi|hop)", "grams_per_unit numeric NN CK(>0)", "source text NN"]
+    columns: ["ingredient_id uuid NN FK->ingredients(id)", "unit_code text NN (qua|bo|cu|nhanh|mieng|goi|hop|cay|tep|con)", "grams_per_unit numeric NN CK(>0)", "source text NN"]
     pk: [ingredient_id, unit_code]
   - name: qty_levels
     module: catalog
