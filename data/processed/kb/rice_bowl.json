@@ -1,0 +1,14 @@
+{
+  "cooked_g": 150.0,
+  "raw_rice_g": 50.3,
+  "fct_code": "1004",
+  "cooked_yield": 2.98,
+  "yield_source": "Bognár 2002 BFE-R--02-03 Part 1 Table 29: rice, long corn, polished, boiled 2.98 ± 0.05 (n=140)",
+  "energy_kcal": 173.2,
+  "protein_g": 4.0,
+  "lipid_g": 0.5,
+  "glucid_g": 38.2,
+  "fiber_g": 0.2,
+  "sodium_mg": 2.5,
+  "data_version": "nut-r1+kb1:b591fa77+fct2007:6dbf6d58+usda:1c93c3cb"
+}
