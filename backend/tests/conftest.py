@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import os
 import sys
+import uuid
 from collections.abc import Callable, Iterator
 from pathlib import Path
 
@@ -201,3 +202,111 @@ def insert_recipe(conn, name: str, *, status: str = "published", slot: str = "ma
             {"n": name, "slot": slot, "st": status},
         ).scalar_one()
     )
+
+
+# ---------------------------------------------------------------- catalog databases (slice 2)
+# The main test database above is wiped of recipes after every test (slice-1 tests insert ad-hoc recipes).
+# Tests that need the real catalog use a second database, migrated and loaded with `tastoria catalog import data/kb`
+# once per session; after each test only personal data is wiped there, the catalog stays.
+
+KB_DIR = REPO_ROOT / "data/kb"
+PROCESSED_DIR = REPO_ROOT / "data/processed"
+
+
+def make_database(pg: ds.Container, name: str) -> str:
+    from alembic import command
+
+    from tastoria.migrations import alembic_config
+
+    r = pg.exec("psql", "-v", "ON_ERROR_STOP=1", "-U", ds.PG_USER, "-d", ds.PG_DB, "-c", f"CREATE DATABASE {name}")
+    assert r.returncode == 0, r.stderr
+    url = ds.pg_url(pg, name)
+    command.upgrade(alembic_config(url), "head")
+    return url
+
+
+def drop_database(pg: ds.Container, name: str) -> None:
+    pg.exec("psql", "-U", ds.PG_USER, "-d", ds.PG_DB, "-c", f"DROP DATABASE IF EXISTS {name} WITH (FORCE)")
+
+
+@pytest.fixture(scope="session")
+def kb_database_url(pg: ds.Container) -> str:
+    from tastoria.core.db import make_engine, make_sessionmaker
+    from tastoria.modules.admin.service import import_catalog
+
+    url = make_database(pg, "kb")
+    engine = make_engine(url, pool_size=1)
+    try:
+        res = import_catalog(make_sessionmaker(engine), KB_DIR, PROCESSED_DIR)
+    finally:
+        engine.dispose()
+    assert res.ok, res.errors
+    return url
+
+
+@pytest.fixture(scope="session")
+def kb_engine(kb_database_url: str) -> Iterator[Engine]:
+    eng = create_engine(kb_database_url)
+    yield eng
+    eng.dispose()
+
+
+@pytest.fixture(scope="session")
+def kb_app(kb_database_url: str, valkey: ds.Container, storage_dir: Path):
+    from tastoria.app import create_app
+
+    app = create_app(_settings(kb_database_url, valkey.port, storage_dir), configure_logs=False)
+    yield app
+    app.state.engine.dispose()
+
+
+_KB_TRUNCATE = """
+BEGIN;
+SET LOCAL tastoria.erasure = 'on';
+TRUNCATE users, dsr_requests, audit_log, idempotency_keys, substitution_pairs RESTART IDENTITY CASCADE;
+COMMIT;
+"""
+
+
+@pytest.fixture
+def kb_clean(kb_engine: Engine, valkey: ds.Container) -> Iterator[None]:
+    yield
+    raw = kb_engine.raw_connection()
+    try:
+        with raw.cursor() as cur:
+            cur.execute(_KB_TRUNCATE)
+        raw.commit()
+    finally:
+        raw.close()
+    valkey.exec("valkey-cli", "flushall")
+
+
+@pytest.fixture
+def kb_client(kb_app, kb_clean: None) -> Iterator[object]:
+    from fakes import FakeMailer
+    from fastapi.testclient import TestClient
+
+    kb_app.state.mailer = FakeMailer()
+    with TestClient(kb_app) as c:
+        yield c
+
+
+@pytest.fixture
+def kb_db(kb_engine: Engine, kb_clean: None) -> Iterator[object]:
+    with kb_engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
+        yield conn
+
+
+@pytest.fixture
+def fresh_database(pg: ds.Container) -> Iterator[Callable[[], str]]:
+    """Factory of empty migrated databases (dropped after the test), for import tests that change the catalog."""
+    made: list[str] = []
+
+    def factory() -> str:
+        name = f"t_{uuid.uuid4().hex[:10]}"
+        made.append(name)
+        return make_database(pg, name)
+
+    yield factory
+    for name in made:
+        drop_database(pg, name)

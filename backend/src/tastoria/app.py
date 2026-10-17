@@ -15,13 +15,15 @@ from tastoria.core.health import router as health_router
 from tastoria.core.kv import make_valkey
 from tastoria.core.logging import configure_logging
 from tastoria.core.middleware import RequestContextMiddleware
+from tastoria.modules.catalog.router import router as catalog_router
+from tastoria.modules.catalog.service import CatalogDeps
 from tastoria.modules.identity.dsr import IdentitySubjectData
 from tastoria.modules.identity.mailer import make_mailer
 from tastoria.modules.identity.router import router as identity_router
 from tastoria.modules.identity.service import BearerAuthenticator
 from tastoria.modules.identity.throttle import MemoryLoginThrottle, ValkeyLoginThrottle
 from tastoria.modules.privacy.router import router as privacy_router
-from tastoria.modules.privacy.service import PrivacyDeps, SubjectDataHandler
+from tastoria.modules.privacy.service import PrivacyDeps, SubjectDataHandler, list_purposes
 from tastoria.modules.profile.router import router as profile_router
 from tastoria.modules.profile.service import ProfileDeps, ProfileSubjectData, make_cipher
 
@@ -77,10 +79,13 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
         settings, app.state.sessionmaker, handlers=build_subject_handlers(app.state.profile)
     )
 
+    app.state.catalog = CatalogDeps(consent_purposes=list_purposes)
+
     install_error_handlers(app)
     app.add_middleware(RequestContextMiddleware, min_app_version=settings.min_app_version)
     app.include_router(health_router)
     app.include_router(identity_router, prefix=API_PREFIX)
     app.include_router(privacy_router, prefix=API_PREFIX)
     app.include_router(profile_router, prefix=API_PREFIX)
+    app.include_router(catalog_router, prefix=API_PREFIX)
     return app

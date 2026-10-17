@@ -4,6 +4,8 @@ tastoria db upgrade [REVISION]     apply migrations (default: head)
 tastoria db current                show the applied revision
 tastoria jobs process-dsr          finish open export / delete / withdraw requests (crash recovery; cron-able)
 tastoria jobs sweep                same as `python -m tastoria.jobs.sweep`
+tastoria catalog import BUNDLE_DIR [--processed DIR]
+                                   validate data/kb and upsert the catalog (UC25); JSON report, exit 1 on errors
 """
 
 from __future__ import annotations
@@ -55,6 +57,29 @@ def _jobs(args: argparse.Namespace) -> int:
     return 0
 
 
+def _catalog(args: argparse.Namespace) -> int:
+    from pathlib import Path
+
+    from tastoria.core.db import make_engine, make_sessionmaker
+    from tastoria.modules.admin.service import import_catalog
+
+    settings = get_settings()
+    engine = make_engine(settings.database_url, pool_size=1)
+    try:
+        res = import_catalog(
+            make_sessionmaker(engine), Path(args.bundle_dir), Path(args.processed) if args.processed else None
+        )
+    finally:
+        engine.dispose()
+    out = {"ok": res.ok, **res.report}
+    if res.errors:
+        out["errors"] = res.errors
+        for e in res.errors:
+            print(e, file=sys.stderr)
+    print(json.dumps(out, ensure_ascii=False, indent=2))
+    return 0 if res.ok else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     configure_logging(get_settings().log_level)
     p = argparse.ArgumentParser(prog="tastoria")
@@ -66,6 +91,14 @@ def main(argv: list[str] | None = None) -> int:
     jobs = sub.add_parser("jobs", help="background jobs")
     jobs.add_argument("job", choices=["process-dsr", "sweep"])
     jobs.set_defaults(func=_jobs)
+    cat = sub.add_parser("catalog", help="catalog bundle (UC25)")
+    cat_sub = cat.add_subparsers(dest="catalog_cmd", required=True)
+    imp = cat_sub.add_parser("import", help="validate and import a bundle directory (data/kb)")
+    imp.add_argument("bundle_dir")
+    imp.add_argument(
+        "--processed", default=None, help="processed composition tables (default: BUNDLE_DIR/../processed)"
+    )
+    imp.set_defaults(func=_catalog)
     args = p.parse_args(argv)
     return int(args.func(args))
 

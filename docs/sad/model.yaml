@@ -221,6 +221,12 @@ tables:
     columns: ["recipe_id uuid NN FK->recipes(id)", "nutrient_code text NN FK->nutrients(code)", "per_serving numeric NN", "computed_at timestamptz NN", "data_version text NN"]
     pk: [recipe_id, nutrient_code]
     notes: "PHI CHUẨN HOÁ CÓ KIỂM SOÁT: giá trị dẫn xuất từ recipe_ingredients × food_nutrients × EP; tính lại bằng job khi kho món hoặc bảng thành phần đổi; data_version ghi phiên bản dữ liệu nguồn"
+  - name: recipe_make_ahead
+    module: catalog
+    columns: ["recipe_id uuid PK FK->recipes(id)", "item_ingredient_id uuid NN FK->ingredients(id)", "through_step_no smallint NN CK(>0)"]
+    pk: [recipe_id]
+    fks: ["(recipe_id, through_step_no) -> recipe_steps(recipe_id, step_no)"]
+    notes: "migration 0003 (slice 2, ngoài db/schema.sql đã đóng băng ở 0001): món có bước chờ > 120 phút; bước 1..through_step_no làm từ trước, không vào lịch nấu; món chỉ được đề xuất khi kho có item; bất biến khi món published (trg_recipe_children_guard). Nguồn: data/kb/make_ahead.yaml"
   - name: vision_classes
     module: catalog
     columns: ["id smallint PK", "code text NN UQ", "name_vi text NN", "name_en text NN", "countable bool NN", "instance_def enum(item,group_of,package) NN", "has_freshness_model bool NN D false"]

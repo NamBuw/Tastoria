@@ -4991,6 +4991,10 @@ components:
           - mieng
           - goi
           - hop
+          - cay
+          - tep
+          - con
+          description: data/kb/ref/units.yaml (cay, tep, con thêm cho kho món)
         grams_per_unit:
           type: number
           exclusiveMinimum: 0
@@ -5199,6 +5203,11 @@ components:
             - string
             - 'null'
             description: recipe_nutrition.data_version
+          make_ahead:
+            oneOf:
+            - $ref: '#/components/schemas/MakeAhead'
+            - type: 'null'
+            description: Món làm sẵn (thẻ lam_san, recipe_make_ahead) — null với món nấu trong bữa
         required:
         - status
         - notes
@@ -5209,6 +5218,27 @@ components:
         - nutrition_data_version
       description: Chi tiết món (recipes + recipe_ingredients + recipe_steps + recipe_tags + recipe_sources + recipe_nutrition).
         Món retired vẫn đọc được theo id (BR-CATALOG-01)
+    MakeAhead:
+      type: object
+      description: 'Món có bước chờ > 2 giờ (muối, ngâm, ủ): bước 1..through_step_no làm từ trước, không có trong lịch
+        nấu. whole_dish = true: cả món là đồ làm sẵn, ghép mâm chỉ đề xuất khi kho có item (dưa cải chua, cà pháo muối...)
+        thay cho nguyên liệu tươi'
+      properties:
+        item_ingredient_id:
+          type: string
+          format: uuid
+        item_name_vi:
+          type: string
+        through_step_no:
+          type: integer
+          minimum: 1
+        whole_dish:
+          type: boolean
+      required:
+      - item_ingredient_id
+      - item_name_vi
+      - through_step_no
+      - whole_dish
     CatalogSnapshot:
       type: object
       description: Toàn bộ kho món published để app lưu SQLite, nấu offline

@@ -173,6 +173,11 @@ def _purpose_out(p: ConsentPurpose) -> ConsentPurposeOut:
     )
 
 
+def list_purposes(session: Session) -> list[ConsentPurposeOut]:
+    """The consent purposes (BR-CONSENT-01) for GET /reference."""
+    return [_purpose_out(p) for p in session.scalars(select(ConsentPurpose).order_by(ConsentPurpose.code))]
+
+
 def get_current_policy(session: Session, purpose: str) -> PolicyVersionOut:
     p = _purpose(session, purpose)
     pv = current_policy(session, purpose)

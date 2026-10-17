@@ -56,4 +56,4 @@ def test_upgrade_downgrade_upgrade(pg: ds.Container) -> None:
     command.upgrade(cfg, "head")
     sql = "SELECT count(*) FROM pg_tables WHERE schemaname = 'public' AND tablename <> 'alembic_version'"
     r = pg.exec("psql", "-tA", "-U", ds.PG_USER, "-d", "roundtrip", "-c", sql)
-    assert r.stdout.strip() == "62"
+    assert r.stdout.strip() == "63"  # 62 of db/schema.sql + recipe_make_ahead (0003)

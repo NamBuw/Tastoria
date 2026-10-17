@@ -1,0 +1,67 @@
+# Món làm sẵn (bảng catalog.recipe_make_ahead, migration 0003 của backend).
+#
+# Món có bước chờ (kind: passive) dài hơn 120 phút — muối dưa, ngâm cà, ủ dưa giá, ngâm măng khô — không thể nấu
+# từ nguyên liệu tươi trong bữa tối nay. Lệnh `tastoria catalog import` dùng tệp này để:
+#   - gắn thẻ hệ thống `lam_san` cho món;
+#   - bỏ bước 1..through_step khỏi lịch nấu (through_step = bước chờ dài cuối cùng, do lệnh nhập tự tính);
+#   - chỉ đề xuất món khi kho của người dùng có `item` (đồ đã làm sẵn) ở mức khả dụng.
+#
+# Hai loại:
+#   - làm sẵn cả món (mọi bước đều làm từ trước, ví dụ dưa cải muối): item là thành phẩm; khi ghép mâm, món chỉ cần
+#     item có trong kho (không kiểm lượng, vì chưa có số liệu tỷ lệ thành phẩm/nguyên liệu tươi), nguyên liệu tươi
+#     của công thức không bị kiểm kho và không bị trừ kho; khi nấu xong, kho trừ item một lượng bằng tổng gam
+#     nguyên liệu tươi (không phải gia vị) × n / servings — giả định tỷ lệ 1:1, CHƯA hiệu chỉnh.
+#   - làm sẵn một phần (ví dụ ngâm măng khô từ hôm trước): item là nguyên liệu được sơ chế trước, đã có trong công
+#     thức; kho kiểm và trừ như bình thường, chỉ bỏ các bước làm trước khỏi lịch nấu.
+#
+# Lệnh nhập báo lỗi khi: món có bước chờ > 120 phút mà không có dòng ở đây (hoặc ngược lại); item không có trong
+# ingredients.yaml hay mục `ingredients` dưới đây; với món làm sẵn cả món, item thiếu nhóm dị ứng hoặc nhóm thực phẩm
+# bị chế độ ăn loại trừ mà một nguyên liệu của công thức có (BR-ALG-01, BR-DIET-01); với món làm sẵn một phần, item
+# không phải nguyên liệu của công thức.
+version: 1
+passive_threshold_minutes: 120
+make_ahead:
+  - {recipe: dua-cai-muoi, item: "dưa cải chua"}
+  - {recipe: ca-phao-muoi, item: "cà pháo muối"}
+  - {recipe: dua-gia, item: "dưa giá"}
+  - {recipe: canh-mang-chan-gio, item: "măng khô"}
+
+# Thành phẩm làm sẵn chưa có trong ingredients.yaml (cùng định dạng). Dinh dưỡng của món vẫn tính từ nguyên liệu
+# tươi trong công thức, nên các mục này không cần nguồn thành phần.
+ingredients:
+  - name_vi: cà pháo muối
+    food_group: rau_cu_qua
+    comp_source:
+      source: null
+      reason: Bảng TPTP 2007 và USDA không có cà pháo muối; dinh dưỡng món tính từ nguyên liệu tươi của công thức.
+    is_staple: false
+    countable: false
+    units: []
+    allergens: []
+    synonyms:
+      vi:
+      - cà muối
+      en:
+      - pickled eggplant
+    shelf_life:
+      days: null
+      basis: not_tracked
+      note: Chưa có số liệu hạn dùng của cà đã muối; nhóm cần bổ sung trước khi tính độ gấp.
+  - name_vi: dưa giá
+    food_group: rau_la
+    comp_source:
+      source: null
+      reason: Bảng TPTP 2007 và USDA không có dưa giá; dinh dưỡng món tính từ nguyên liệu tươi của công thức.
+    is_staple: false
+    countable: false
+    units: []
+    allergens: []
+    synonyms:
+      vi:
+      - dưa giá hẹ
+      en:
+      - pickled bean sprouts
+    shelf_life:
+      days: null
+      basis: not_tracked
+      note: Chưa có số liệu hạn dùng của dưa giá; nhóm cần bổ sung trước khi tính độ gấp.
