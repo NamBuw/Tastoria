@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "Tastoria",
+    "slug": "tastoria",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "tastoria",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#F6F0E2",
+    "android": {
+      "package": "net.ctslab.tastoria",
+      "adaptiveIcon": {
+        "backgroundColor": "#F6F0E2",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png",
+      "name": "Tastoria",
+      "lang": "vi",
+      "themeColor": "#A84B26",
+      "backgroundColor": "#F6F0E2"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Tastoria dùng ảnh bạn chọn để nhận ra nguyên liệu trong tủ lạnh.",
+          "cameraPermission": "Tastoria dùng máy ảnh để chụp tủ lạnh hoặc đồ vừa mua."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F6F0E2",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 96,
+          "dark": { "backgroundColor": "#1A1612", "image": "./assets/images/splash-icon.png" }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
