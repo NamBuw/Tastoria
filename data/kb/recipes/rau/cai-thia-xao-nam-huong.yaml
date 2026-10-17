@@ -1,0 +1,24 @@
+slug: cai-thia-xao-nam-huong
+name_vi: "Cải thìa xào nấm hương"
+slot: rau
+servings: 4
+method: xao
+tags: [thanh, thom_toi, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "cải thìa", grams: 400, role: main}
+  - {name: "nấm hương tươi", grams: 150, role: main}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "nước tương", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "bột năng", grams: 3.3, role: seasoning, optional: true, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 3.3 g); pha nước tạo sánh"}
+steps:
+  - {step_no: 1, text_vi: "Cắt gốc cải thìa, chẻ đôi cây lớn, rửa sạch; cắt chân nấm, rửa và thái lát.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Chần cải thìa khoảng 1 phút, vớt ra để ráo.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Phi tỏi, xào nấm với nước tương và đường đến khi nấm mềm.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho cải vào đảo nhanh, thêm chút nước bột năng cho sánh rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://bichcau1.com/3-cach-lam-cai-thia-xao-nam-dong-co-nam-huong-thom-ngon-kho-cuong/", title: "3 Cách làm cải thìa xào nấm đông cô - nấm hương thơm ngon khó cưỡng - Nhà hàng Bích Câu 1", accessed_on: 2026-10-17}
+  - {url: "https://marketplace.tripmap.vn/recipes/cai-thia-xao-nam-huong", title: "Cải thìa xào nấm hương - Món chay nhanh gọn, thơm ngon", accessed_on: 2026-10-17}
+  - {url: "https://afamily.vn/nam-huong-va-rau-cai-thia-4-luu-y-nhat-dinh-phai-biet-de-su-ket-hop-hoan-hao-lam-nen-mon-rau-xao-cuc-dua-com-236260301211839592.chn", title: "Nấm hương và rau cải thìa: 4 lưu ý nhất định phải biết để sự kết hợp hoàn hảo làm nên món rau xào cực đưa cơm", accessed_on: 2026-10-17}
+notes: "Bản chay: không dùng dầu hào."

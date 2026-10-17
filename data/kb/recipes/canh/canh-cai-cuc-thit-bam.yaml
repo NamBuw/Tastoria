@@ -1,0 +1,24 @@
+slug: canh-cai-cuc-thit-bam
+name_vi: "Canh cải cúc thịt băm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, thom_sa_gung, nhieu_nuoc, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "cải cúc", grams: 300, role: main, note: "1 bó (≈ 300 g)"}
+  - {name: "thịt băm", grams: 150, role: main}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+  - {name: "gừng", grams: 10, role: seasoning, note: "1 lát dày"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt cải cúc, bỏ gốc già, rửa sạch, cắt khúc; đập dập gừng.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp thịt băm với hành tím băm, tiêu và một ít nước mắm.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm hành, cho thịt vào xào tơi rồi đổ nước, đun sôi và hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Thả rau vào, nêm phần nước mắm còn lại; nấu đến khi rau vừa chín rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-cai-cuc-tan-o-thit-bam-thanh-mat-ngon-mieng-hao-10293", title: "Cách nấu canh cải cúc - tần ô thịt băm thanh mát, ngon miệng hao cơm", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/canh-cai-cuc-thit-bam-168018", title: "Chia sẻ cách nấu canh cải cúc thịt băm thanh mát, dễ làm cho bữa cơm nhà thêm trọn vị", accessed_on: 2026-10-17}
+  - {url: "https://www.bluestone.com.vn/blogs/vao-bep/canh-cai-cuc-thit-bam", title: "Hướng dẫn nấu canh cải cúc thịt băm thơm nồng đặc trưng, không đắng", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

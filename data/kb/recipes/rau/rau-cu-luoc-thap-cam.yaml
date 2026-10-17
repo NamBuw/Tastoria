@@ -1,0 +1,23 @@
+slug: rau-cu-luoc-thap-cam
+name_vi: "Rau củ luộc thập cẩm"
+slot: rau
+servings: 4
+method: luoc
+tags: [thanh, gion, bua_thuong]
+ingredients:
+  - {name: "su su", grams: 250, role: main, note: "1 quả (1 quả ≈ 250 g)"}
+  - {name: "cà rốt", grams: 200, role: main, note: "2 củ (1 củ ≈ 100 g)"}
+  - {name: "súp lơ xanh", grams: 350, role: main, note: "1 cây (≈ 350 g)"}
+  - {name: "đậu bắp", grams: 100, role: side, optional: true}
+  - {name: "muối", grams: 6, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 6 g); cho vào nước luộc"}
+  - {name: "nước tương", grams: 30, role: seasoning, optional: true, note: "2 muỗng canh (1 muỗng canh ≈ 15 g); chấm"}
+steps:
+  - {step_no: 1, text_vi: "Gọt su su và cà rốt, cắt miếng hoặc tỉa hoa; cắt súp lơ thành bông nhỏ, ngâm nước muối rồi rửa sạch.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun sôi nồi nước với muối.", kind: passive, minutes: 6, uses_burner: true}
+  - {step_no: 3, text_vi: "Luộc lần lượt cà rốt, su su, súp lơ (và đậu bắp), loại nào chín tới thì vớt ra ngâm nước lạnh.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Vớt rau củ ra để ráo, xếp ra đĩa, ăn kèm nước tương.", kind: active, minutes: 2, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/bi-quyet-lam-rau-cu-luoc-thap-cam-xanh-gion-trinh-bay-dep-mat-23906", title: "Bí quyết làm rau củ luộc thập cẩm xanh giòn, trình bày đẹp mắt tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/rau-luoc-204149", title: "Rau luộc đem lại lợi ích sức khỏe gì? Các cách luộc phù hợp cho từng loại rau", accessed_on: 2026-10-17}
+  - {url: "https://hoanghamobile.com/tin-tuc/rau-luoc/", title: "Rau luộc (Hoàng Hà Mobile)", accessed_on: 2026-10-17}
+notes: "Nước luộc, nước pha không ghi thành nguyên liệu. Luộc riêng từng loại vì thời gian chín khác nhau; ngâm nước lạnh giúp rau giữ màu và giòn."

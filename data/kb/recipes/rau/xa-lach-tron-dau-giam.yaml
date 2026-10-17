@@ -1,0 +1,24 @@
+slug: xa-lach-tron-dau-giam
+name_vi: "Xà lách trộn dầu giấm"
+slot: rau
+servings: 4
+method: tron
+tags: [chua_ngot, gion, troi_nong, nau_nhanh]
+ingredients:
+  - {name: "xà lách", grams: 300, role: main, note: "2 cây (1 cây ≈ 150 g)"}
+  - {name: "cà chua", grams: 120, role: main, note: "1 quả (1 quả ≈ 120 g)"}
+  - {name: "hành tây", grams: 110, role: main, note: "1 củ (1 củ ≈ 110 g)"}
+  - {name: "giấm", grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 12, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "dầu ăn", grams: 28, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "dưa chuột", grams: 150, role: side, optional: true, note: "1 quả (1 quả ≈ 150 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, optional: true, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+steps:
+  - {step_no: 1, text_vi: "Tách lá xà lách, ngâm nước muối loãng rồi rửa sạch, để thật ráo; cà chua và hành tây thái lát.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm hành tây vào nước đá cho bớt hăng; pha giấm, đường, muối, dầu ăn và tiêu thành nước trộn.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Trộn nhẹ rau với nước trộn ngay trước khi ăn.", kind: active, minutes: 2, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-xa-lach-salad-tron-dau-giam-vo-cung-don-gian-tai-nha-10752", title: "2 Cách làm xà lách (salad) trộn dầu giấm vô cùng đơn giản tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/xa-lach-tron-dau-giam-cholimex-4606350.html", title: "Xà lách trộn dầu giấm Cholimex - Báo VnExpress Cooking", accessed_on: 2026-10-17}
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/huong-dan-lam-mon-salad-dau-giam-thom-ngon-bo-duong-de-lam-tai-nha-1373466", title: "Hướng dẫn làm món salad dầu giấm thơm ngon bổ dưỡng dễ làm tại nhà", accessed_on: 2026-10-17}

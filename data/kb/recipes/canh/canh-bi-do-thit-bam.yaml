@@ -1,0 +1,26 @@
+slug: canh-bi-do-thit-bam
+name_vi: "Canh bí đỏ thịt băm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, mem, nhieu_nuoc, bua_thuong]
+ingredients:
+  - {name: "bí đỏ", grams: 500, role: main}
+  - {name: "thịt băm", grams: 200, role: main}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt vỏ bí đỏ, bỏ ruột, cắt miếng vừa; thái hành lá.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp thịt băm với hành tím băm, tiêu và một ít nước mắm.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm hành, cho thịt vào xào tơi rồi đổ nước, đun sôi và hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Thả rau củ vào, nêm phần nước mắm còn lại.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 5, text_vi: "Nấu lửa vừa đến khi rau củ chín mềm.", kind: passive, minutes: 8, uses_burner: true}
+  - {step_no: 6, text_vi: "Nêm lại, cho hành lá rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-bi-do-thit-bam-ngon-ngot-hap-dan-cho-bua-com-10185", title: "2 cách nấu canh bí đỏ thịt bằm ngon ngọt hấp dẫn cho bữa cơm gia đình", accessed_on: 2026-10-17}
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/bo-duong-voi-mon-canh-bi-do-thit-bam-thom-mat-1167123", title: "3 cách nấu canh bí đỏ thịt bằm thơm mát, bùi thơm, bổ dưỡng cho gia đình", accessed_on: 2026-10-17}
+  - {url: "https://ngoisao.vnexpress.net/canh-bi-do-nau-voi-thit-nac-bam-2623111.html", title: "Canh bí đỏ nấu với thịt nạc băm - Ngôi sao - Ngoisao.net", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

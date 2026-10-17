@@ -1,0 +1,20 @@
+slug: ngon-su-su-xao-toi
+name_vi: "Ngọn su su xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, gion, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "ngọn su su", grams: 400, role: main, note: "1 bó (≈ 400 g)"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt ngọn su su, tước bớt xơ ở cọng, bẻ khúc và rửa sạch.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Chần nhanh ngọn su su trong nước sôi, vớt ra để ráo.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Phi thơm tỏi, cho rau vào xào lửa lớn, nêm muối và đường, đảo đến khi chín tới.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-lam-ngon-su-su-rau-xu-xu-xao-thom-ngon-don-gian-la-08671", title: "3 cách làm ngọn su su (rau xu xu) xào thơm ngon đơn giản lạ miệng", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/ngon-su-su-xao-170517", title: "Ngọn su su xào chế biến bằng 3 cách đơn giản mà cả nhà đều phải gật gù khen ngon", accessed_on: 2026-10-17}
+  - {url: "https://baomoi.com/dau-bep-mach-cach-xao-rau-su-su-xanh-muot-c45245065.epi", title: "Đầu bếp mách cách xào rau su su xanh mướt", accessed_on: 2026-10-17}

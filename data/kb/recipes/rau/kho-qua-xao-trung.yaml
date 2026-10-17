@@ -1,0 +1,24 @@
+slug: kho-qua-xao-trung
+name_vi: "Khổ qua xào trứng"
+slot: rau
+servings: 4
+method: xao
+tags: [dang, mem, bua_thuong, com_hop, nau_nhanh]
+ingredients:
+  - {name: "mướp đắng", grams: 500, role: main, note: "2 quả (1 quả ≈ 250 g)"}
+  - {name: "trứng gà", grams: 150, role: main, note: "3 quả (1 quả ≈ 50 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 28, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "hành tím", grams: 10, role: seasoning, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: "tiêu", grams: 0.8, role: seasoning, note: "1/3 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "muối", grams: 1.5, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 6 g); ngâm khổ qua"}
+steps:
+  - {step_no: 1, text_vi: "Bổ đôi mướp đắng, bỏ ruột, thái lát mỏng, ngâm nước muối loãng cho bớt đắng.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Đập trứng, đánh tan với một nửa nước mắm và tiêu; băm hành tím, thái hành lá.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi hành tím, xào mướp đắng lửa lớn đến khi chín tới, nêm phần nước mắm còn lại.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Đổ trứng vào, để trứng hơi đông rồi đảo đều; rắc hành lá và tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/cach-lam-kho-qua-xao-trung-ngon-de-an-khong-bi-dang-1158783", title: "2 cách làm khổ qua xào trứng ngon, dễ ăn, không bị đắng", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-kho-qua-xao-trung-beo-thom-thanh-mat-de-lam-11057", title: "Cách làm khổ qua xào trứng béo thơm thanh mát dễ làm", accessed_on: 2026-10-17}
+  - {url: "https://barona.vn/mon-ngon/kho-qua-xao-trung", title: "KHỔ QUA XÀO TRỨNG - Barona", accessed_on: 2026-10-17}

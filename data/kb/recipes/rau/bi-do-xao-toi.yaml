@@ -1,0 +1,20 @@
+slug: bi-do-xao-toi
+name_vi: "Bí đỏ xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, beo, mem, bua_thuong, com_hop, nau_nhanh]
+ingredients:
+  - {name: "bí đỏ", grams: 500, role: main, note: "khoảng nửa quả nhỏ; còn khoảng 400 g sau khi gọt vỏ, bỏ ruột"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt vỏ bí, bỏ ruột, thái miếng mỏng hoặc thái sợi, rửa sạch và để ráo.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi thơm tỏi băm, cho bí vào xào lửa vừa, thêm vài thìa nước.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Đậy vung để bí chín mềm, thỉnh thoảng đảo.", kind: passive, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Nêm muối và đường, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-bi-do-xao-toi-bui-beo-thom-ngon-cuc-don-gian-cho-bua-24295", title: "Cách làm bí đỏ xào tỏi bùi béo, thơm ngon cực đơn giản cho bữa cơm nhà", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-lam-bi-do-xao-toi-trung-tom-don-gian-thom-ngon-04425", title: "3 cách làm bí đỏ xào tỏi, trứng, tôm đơn giản thơm ngon (Điện Máy XANH)", accessed_on: 2026-10-17}

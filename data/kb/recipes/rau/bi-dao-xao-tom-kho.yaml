@@ -1,0 +1,27 @@
+slug: bi-dao-xao-tom-kho
+name_vi: "Bí đao xào tôm khô"
+slot: rau
+servings: 4
+method: xao
+tags: [thanh, mem, bua_thuong, com_hop]
+ingredients:
+  - {name: "bí đao", grams: 600, role: main, note: "còn khoảng 500 g sau khi gọt vỏ, bỏ ruột"}
+  - {name: "tôm khô", grams: 40, role: main}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, optional: true, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "hành tím", grams: 10, role: seasoning, optional: true, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa tôm khô, ngâm nước ấm cho mềm.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm tôm khô.", kind: passive, minutes: 10, uses_burner: false}
+  - {step_no: 3, text_vi: "Gọt vỏ bí đao, bỏ ruột, thái sợi hoặc thái miếng mỏng.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi tỏi và hành tím, cho tôm khô vào xào thơm.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho bí đao vào xào lửa lớn với chút nước ngâm tôm, nêm nước mắm và đường đến khi bí chín trong.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 6, text_vi: "Rắc hành lá rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-bi-dao-xao-toi-thom-ngon-nuc-mui-doi-vi-cho-bua-com-14976", title: "Cách làm bí đao xào tỏi thơm ngon nức mũi, đổi vị cho bữa cơm nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-bi-do-xao-tom-kho-thanh-dam-bat-vi-don-gian-ngay-tai-12119", title: "Cách làm bí đỏ xào tôm khô thanh đạm, bắt vị đơn giản ngay tại nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/canh-bi-xanh-nau-tom-kho-2931464.html", title: "Canh bí xanh nấu tôm khô (VnExpress)", accessed_on: 2026-10-17}
+notes: "Chưa tìm được trang công thức đúng tên món; nguồn ghi dưới đây là các món gần (bí đao xào tỏi, bí đỏ xào tôm khô, canh bí xanh nấu tôm khô); định lượng là của nhóm dựa trên các món đó."

@@ -1,0 +1,19 @@
+slug: cai-ngot-xao-toi
+name_vi: "Cải ngọt xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, thanh, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "cải ngọt", grams: 500, role: main}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt bỏ gốc cải ngọt, cắt khúc 4–5 cm, rửa sạch và để ráo.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Bóc và đập dập tỏi, băm nhỏ.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm một nửa tỏi với dầu, cho rau vào xào lửa lớn, đảo nhanh và nêm gia vị.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho nốt tỏi còn lại, đảo đều rồi tắt bếp, bày ra đĩa.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-cai-ngot-xao-toi-thom-ngon-dan-da-cho-bua-com-gia-08889", title: "2 Cách làm cải ngọt xào tỏi thơm ngon, dân dã cho bữa cơm gia đình", accessed_on: 2026-10-17}

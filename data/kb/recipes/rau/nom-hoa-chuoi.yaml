@@ -1,0 +1,28 @@
+slug: nom-hoa-chuoi
+name_vi: "Nộm hoa chuối"
+slot: rau
+servings: 4
+method: tron
+tags: [chua_ngot, gion, troi_nong, cuoi_tuan]
+ingredients:
+  - {name: "hoa chuối", grams: 500, role: main, note: "khoảng 1 bắp"}
+  - {name: "cà rốt", grams: 100, role: main, note: "1 củ (1 củ ≈ 100 g)"}
+  - {name: "nước mắm", grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "chanh", grams: 100, role: seasoning, note: "2 quả (1 quả ≈ 50 g); 1 quả ngâm hoa chuối, 1 quả pha nước trộn"}
+  - {name: "đường", grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: "lạc", grams: 40, role: seasoning, note: "rang chín, giã dập"}
+  - {name: "húng lủi", grams: 15, role: seasoning}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "ớt", grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, optional: true, note: "2 củ (1 củ ≈ 10 g); phi giòn"}
+steps:
+  - {step_no: 1, text_vi: "Bóc bỏ lá bắc ngoài, thái mỏng hoa chuối, ngâm ngay vào nước có chanh cho khỏi thâm.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm hoa chuối.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Rang lạc, giã dập; cà rốt bào sợi; nhặt rau thơm.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 4, text_vi: "Pha nước trộn từ nước mắm, đường, nước cốt chanh, tỏi ớt băm.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 5, text_vi: "Vớt hoa chuối, vắt ráo, trộn cùng cà rốt và nước trộn; thêm rau thơm và lạc khi dọn.", kind: active, minutes: 4, uses_burner: false}
+sources:
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/cach-lam-nom-hoa-chuoi-voi-tep-thom-ngon-don-gian-tai-nha-1434660", title: "Cách làm nộm hoa chuối với tép thơm ngon, đơn giản tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-nom-hoa-chuoi-chay-thom-ngon-don-gian-d-02222", title: "2 Cách làm nộm hoa chuối chay thơm ngon đơn giản dễ làm cho ngày rằm", accessed_on: 2026-10-17}
+  - {url: "https://kingfoodmart.com/bai-viet/cong-thuc-nau-an/nom-hoa-chuoi", title: "Nộm hoa chuối - Chuỗi siêu thị thực phẩm tươi ngon, chất lượng Kingfoodmart", accessed_on: 2026-10-17}
+notes: "Nhiều nhà thêm tép, thịt gà hoặc tai lợn; bản này giữ phần rau làm chính."

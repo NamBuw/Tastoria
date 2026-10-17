@@ -1,0 +1,23 @@
+slug: canh-rau-ma-tom
+name_vi: "Canh rau má nấu tôm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, nhieu_nuoc, troi_nong, bua_thuong]
+ingredients:
+  - {name: "rau má", grams: 300, role: main}
+  - {name: "tôm", grams: 150, role: main}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt rau má bỏ rễ, rửa sạch, cắt khúc.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Bóc vỏ, rút chỉ tôm, băm hoặc giã dập; ướp với hành tím băm, tiêu và một ít nước mắm.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi hành, xào tôm đến khi đỏ và thơm, đổ nước vào đun sôi.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho rau củ vào, nêm nước mắm, nấu đến khi chín tới; thêm hành lá rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-rau-ma-nau-tom-tuoi-ngot-mat-don-gian-cho-bua-13304", title: "Cách nấu canh rau má nấu tôm tươi ngọt mát đơn giản cho bữa cơm gia đình", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-rau-ma-nau-tom-thanh-mat-cuc-de-lam-cho-bua-com-13407", title: "Cách nấu canh rau má nấu tôm thanh mát cực dễ làm (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/giai-nhiet-voi-canh-rau-ma-2803779.html", title: "Giải nhiệt với canh rau má - Báo VnExpress Đời sống", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

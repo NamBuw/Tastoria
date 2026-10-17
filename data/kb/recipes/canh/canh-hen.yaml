@@ -1,0 +1,31 @@
+slug: canh-hen
+name_vi: "Canh hến nấu chua"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [chua, nhieu_nuoc, troi_nong, bua_thuong]
+ingredients:
+  - {name: "hến", grams: 1000, role: main, note: "cả vỏ; còn khoảng 200 g thịt"}
+  - {name: "cà chua", grams: 240, role: main, note: "2 quả (1 quả ≈ 120 g)"}
+  - {name: "rau răm", grams: 10, role: seasoning}
+  - {name: "thì là", grams: 15, role: seasoning}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "me chua", grams: 20, role: seasoning, optional: true, note: "1 muỗng canh (1 muỗng canh ≈ 20 g); dầm lấy nước"}
+  - {name: "dọc mùng", grams: 100, role: side, optional: true}
+  - {name: "ớt", grams: 5, role: seasoning, optional: true, note: "1 quả (1 quả ≈ 5 g)"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm hến trong nước vo gạo hoặc nước có lát ớt cho nhả bùn, rửa nhiều lần.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm hến nhả bùn.", kind: passive, minutes: 30, uses_burner: false}
+  - {step_no: 3, text_vi: "Cho hến vào nồi với nước, đun sôi đến khi hến há miệng.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Vớt hến, tách lấy ruột; lắng nước luộc để gạn lấy phần trong.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 5, text_vi: "Phi hành tím, xào cà chua (và dọc mùng), cho ruột hến vào đảo nhanh với chút nước mắm.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 6, text_vi: "Đổ nước luộc hến vào, nêm nước mắm và chút nước me cho vừa chua.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 7, text_vi: "Đun sôi lại.", kind: passive, minutes: 3, uses_burner: true}
+  - {step_no: 8, text_vi: "Tắt bếp, rắc rau răm và thì là.", kind: active, minutes: 1, uses_burner: false}
+sources:
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/canh-hen-nau-chua-172872", title: "Cách làm canh hến nấu chua đơn giản, thanh mát giải nhiệt, thơm ngon nức lòng", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-nau-canh-hen-nau-chua-bau-va-rau-muong-thom-ngon-thanh-05409", title: "3 cách nấu canh hến nấu chua, bầu và kim chi thơm ngon thanh mát", accessed_on: 2026-10-17}
+  - {url: "https://dienmaycholon.com/mon-ngon/cach-nau-canh-hen-ca-chua", title: "Cách nấu canh hến cà chua (Điện máy Chợ Lớn)", accessed_on: 2026-10-17}
+notes: "Dùng nước luộc hến làm nước canh, không thêm nước khác."

@@ -1,0 +1,21 @@
+slug: bi-ngoi-xao-toi
+name_vi: "Bí ngòi xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, gion, bua_thuong, com_hop, nau_nhanh]
+ingredients:
+  - {name: "bí ngòi", grams: 600, role: main, note: "3 quả (1 quả ≈ 200 g)"}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, optional: true, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa bí ngòi, cắt bỏ hai đầu, thái lát vát hoặc thái que.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi thơm tỏi, cho bí ngòi vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Rắc hành lá, đảo đều khi bí vừa chín tới thì tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-bi-ngoi-xao-toi-va-bi-ngoi-xao-thit-bo--02529", title: "2 cách làm bí ngòi xào tỏi và bí ngòi xào thịt bò đơn giản, ngon miệng", accessed_on: 2026-10-17}
+  - {url: "https://cookbeo.com/recipes/bi-ngoi-xao-toi", title: "Cách Nấu Bí Ngòi Xanh Xào Tỏi", accessed_on: 2026-10-17}
+  - {url: "https://bepmina.vn/mon-viet/bi-ngoi-xao-toi/", title: "Cách làm bí ngòi xào tỏi, xào tôm Dân giã mà Ngon miệng", accessed_on: 2026-10-17}

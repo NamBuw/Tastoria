@@ -1,0 +1,30 @@
+slug: nom-du-du
+name_vi: "Nộm đu đủ"
+slot: rau
+servings: 4
+method: tron
+tags: [chua_ngot, gion, troi_nong, cuoi_tuan]
+ingredients:
+  - {name: "đu đủ xanh", grams: 700, role: main, note: "khoảng 1 quả nhỏ"}
+  - {name: "cà rốt", grams: 100, role: main, note: "1 củ (1 củ ≈ 100 g)"}
+  - {name: "nước mắm", grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: "chanh", grams: 100, role: seasoning, note: "2 quả (1 quả ≈ 50 g)"}
+  - {name: "lạc", grams: 50, role: seasoning, note: "rang chín, giã dập"}
+  - {name: "húng lủi", grams: 15, role: seasoning}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "ớt", grams: 5, role: seasoning, note: "1 quả (1 quả ≈ 5 g)"}
+  - {name: "muối", grams: 6, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 6 g); bóp đu đủ"}
+  - {name: "rau mùi", grams: 10, role: seasoning, optional: true}
+steps:
+  - {step_no: 1, text_vi: "Gọt vỏ đu đủ, bỏ hạt, bào sợi; cà rốt bào sợi.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Bóp đu đủ với muối, ngâm nước lạnh rồi xả nhiều lần cho hết nhựa, vắt thật ráo.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Ngâm đu đủ trong nước lạnh cho giòn.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 4, text_vi: "Rang lạc, xát vỏ, giã dập; nhặt rau thơm.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 5, text_vi: "Pha nước trộn từ nước mắm, đường, nước cốt chanh, tỏi ớt băm.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 6, text_vi: "Trộn đu đủ, cà rốt với nước trộn, rắc rau thơm và lạc khi dọn.", kind: active, minutes: 3, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-nom-du-du-ngon-gion-don-gian-hap-dan-la-mieng-1577", title: "3 cách làm nộm đu đủ ngon, giòn đơn giản hấp dẫn lạ miệng", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/nom-du-du-mon-ngon-giai-ngan-ngay-tet-4422342.html", title: "Nộm đu đủ - món ngon giải ngán ngày Tết - Báo VnExpress Cooking", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-nom-du-du-ca-rot-chua-ngot-gion-gion-cuc-hap-dan-don-13200", title: "Cách làm nộm đu đủ cà rốt chua ngọt giòn giòn cực hấp dẫn (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nguồn tham khảo có thêm tai lợn và tôm; bản này giữ phần rau làm chính."

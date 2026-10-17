@@ -1,0 +1,28 @@
+slug: canh-kho-qua-nhoi-thit
+name_vi: "Canh khổ qua nhồi thịt"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [dang, thanh, nhieu_nuoc, cuoi_tuan, troi_nong]
+ingredients:
+  - {name: "mướp đắng", grams: 750, role: main, note: "3 quả (1 quả ≈ 250 g)"}
+  - {name: "thịt băm", grams: 250, role: main}
+  - {name: "mộc nhĩ", grams: 10, role: main, note: "khô, ngâm nở"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 1.2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "miến", grams: 20, role: side, optional: true, note: "ngâm mềm, cắt ngắn"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm mộc nhĩ (và miến) cho nở, thái nhỏ.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 2, text_vi: "Chờ mộc nhĩ nở.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Cắt mướp đắng thành khúc 4–5 cm, khoét bỏ ruột, ngâm nước muối loãng.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 4, text_vi: "Trộn thịt băm với mộc nhĩ, hành tím, tiêu, nước mắm; nhồi chặt vào khúc mướp đắng.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 5, text_vi: "Đun sôi nước với phần nhân thừa vo viên, thả khổ qua vào, hạ lửa và hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 6, text_vi: "Nấu nhỏ lửa đến khi khổ qua mềm và nhân chín.", kind: passive, minutes: 20, uses_burner: true}
+  - {step_no: 7, text_vi: "Nêm lại, rắc hành lá và tiêu rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-kho-qua-nhoi-thit-am-nong-ngay-tet-00537", title: "Cách nấu canh khổ qua nhồi thịt không đắng thanh mát ngon ngây ngất ngây", accessed_on: 2026-10-17}
+  - {url: "https://mytour.vn/vi/blog/bai-viet/cach-nau-canh-kho-qua-nhoi-thit-ngon-va-khong-co-vi-dang.html", title: "Cách nấu canh khổ qua nhồi thịt ngon và không có vị đắng (Mytour)", accessed_on: 2026-10-17}
+  - {url: "https://www.huongnghiepaau.com/canh-kho-qua-nhoi-thit", title: "Cách Làm Canh Khổ Qua Nhồi Thịt Thơm Ngon, Không Bị Đắng", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

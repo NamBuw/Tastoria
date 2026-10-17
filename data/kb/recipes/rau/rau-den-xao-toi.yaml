@@ -1,0 +1,21 @@
+slug: rau-den-xao-toi
+name_vi: "Rau dền xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, mem, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "rau dền", grams: 400, role: main, note: "1 bó (≈ 400 g)"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt rau dền lấy ngọn và lá non, rửa sạch, để ráo.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Đập dập và băm tỏi.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm một nửa tỏi với dầu, cho rau vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho nốt tỏi còn lại, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/rau-den-xao-toi-159031", title: "Cách làm rau dền xào tỏi đơn giản tại nhà ai ăn cũng mê", accessed_on: 2026-10-17}
+  - {url: "https://bepcuoi.com/cong-thuc/rau-den-xao-toi", title: "Cách làm RAU DỀN XÀO TỎI cho ngày Tết", accessed_on: 2026-10-17}
+  - {url: "https://yeutre.vn/bai-viet/cach-lam-mon-rau-den-xao-toi-thom-ngon-cho-bua-com-ngay-he.21470/", title: "Cách làm món rau dền xào tỏi thơm ngon cho bữa cơm ngày hè", accessed_on: 2026-10-17}

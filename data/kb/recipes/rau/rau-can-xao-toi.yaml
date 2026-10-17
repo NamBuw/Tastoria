@@ -1,0 +1,21 @@
+slug: rau-can-xao-toi
+name_vi: "Rau cần xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, gion, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "rau cần", grams: 300, role: main, note: "1 bó (≈ 300 g)"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt bỏ lá và rễ rau cần, cắt khúc 4–5 cm, ngâm và rửa sạch.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Đập dập và băm tỏi.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm một nửa tỏi với dầu, cho rau vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho nốt tỏi còn lại, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://tienkhang.com/mon-ngon/rau-can-xao-toi-152381.html", title: "Rau cần xào tỏi", accessed_on: 2026-10-17}
+  - {url: "https://nongsanxanhcantho.com/rau-can-nuoc-xao-toi/", title: "RAU CẦN NƯỚC XÀO TỎI - HTX NÔNG SẢN XANH", accessed_on: 2026-10-17}
+  - {url: "https://kithome.com.vn/2-cach-lam-can-nuoc-xao-toi-va-xao-thit-bo-dan-da/", title: "2 cách làm cần nước xào tỏi và xào thịt bò dân dã, thơm ngon", accessed_on: 2026-10-17}

@@ -1,0 +1,28 @@
+slug: canh-ga-nau-nam
+name_vi: "Canh gà nấu nấm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thom_sa_gung, nhieu_nuoc, troi_lanh, cuoi_tuan]
+ingredients:
+  - {name: "thịt gà", grams: 500, role: main, note: "chặt miếng, cả xương"}
+  - {name: "nấm hương tươi", grams: 200, role: main}
+  - {name: "gừng", grams: 20, role: seasoning, note: "1 nhánh nhỏ"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa gà với muối, chặt miếng; thái lát gừng; cắt chân nấm, rửa sạch.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi hành tím và gừng, xào săn gà với chút nước mắm, đổ nước vào đun sôi, hớt bọt.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 3, text_vi: "Nấu nhỏ lửa đến khi gà mềm.", kind: passive, minutes: 25, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho nấm vào, nêm muối và nước mắm.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 5, text_vi: "Nấu thêm cho nấm chín.", kind: passive, minutes: 5, uses_burner: true}
+  - {step_no: 6, text_vi: "Rắc hành lá và tiêu rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-ga-nam-thom-ngon-hap-dan-cuc-bat-vi-cho-ca-nha-14781", title: "Cách nấu canh gà nấm thơm ngon, hấp dẫn cực bắt vị cho cả nhà", accessed_on: 2026-10-17}
+  - {url: "https://vietnamnet.vn/cach-lam-ga-nau-nam-bo-duong-ma-don-gian-cho-ca-nha-2233714.html", title: "Cách làm gà nấu nấm bổ dưỡng mà đơn giản cho cả nhà (vietnamnet)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-nau-canh-nam-dam-da-thanh-mat-don-gian-de-lam-01596", title: "3 cách nấu canh nấm đậm đà thanh mát đơn giản dễ làm", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

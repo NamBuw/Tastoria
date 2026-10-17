@@ -1,0 +1,28 @@
+slug: rau-cu-xao-thap-cam
+name_vi: "Rau củ xào thập cẩm"
+slot: rau
+servings: 4
+method: xao
+tags: [thanh, gion, bua_thuong, com_hop]
+ingredients:
+  - {name: "súp lơ xanh", grams: 200, role: main}
+  - {name: "cà rốt", grams: 100, role: main, note: "1 củ (1 củ ≈ 100 g)"}
+  - {name: "ngô bao tử", grams: 150, role: main}
+  - {name: "nấm rơm", grams: 150, role: main}
+  - {name: "đậu Hà Lan", grams: 100, role: main}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "nước tương", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 28, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g); chần rau"}
+  - {name: "đường", grams: 2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "bột năng", grams: 3.3, role: seasoning, optional: true, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 3.3 g); pha nước tạo sánh"}
+steps:
+  - {step_no: 1, text_vi: "Cắt súp lơ thành bông nhỏ, cà rốt thái lát, ngô bao tử bổ đôi, nấm gọt chân bổ đôi, đậu Hà Lan tước xơ.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 2, text_vi: "Chần lần lượt súp lơ, cà rốt, ngô bao tử và nấm trong nước sôi có muối, vớt ra để ráo.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 3, text_vi: "Phi tỏi, cho toàn bộ rau củ vào xào lửa lớn, nêm nước tương và đường.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Thêm chút nước bột năng cho sánh, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://monngonmoingay.com/rau-xao-thap-cam/", title: "Rau xào thập cẩm - Món Ngon Mỗi Ngày", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/cach-lam-rau-cu-xao-thap-cam-chay-4603862.html", title: "Cách làm rau củ xào thập cẩm chay - Báo VnExpress Cooking", accessed_on: 2026-10-17}
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/cong-thuc-lam-rau-cu-xao-thap-cam-bo-toi-chinh-phuc-thuc-khach-kho-tinh-1489530", title: "Công thức làm rau củ xào thập cẩm bơ tỏi chinh phục thực khách khó tính", accessed_on: 2026-10-17}
+notes: "Bản chay; nguồn tham khảo có thêm thịt nạc dăm."

@@ -1,0 +1,34 @@
+slug: canh-chua-ca-loc
+name_vi: "Canh chua cá lóc"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [chua_ngot, nhieu_nuoc, troi_nong, cuoi_tuan]
+ingredients:
+  - {name: "cá lóc", grams: 500, role: main, note: "khoảng 4 khúc"}
+  - {name: "cà chua", grams: 240, role: main, note: "2 quả (1 quả ≈ 120 g)"}
+  - {name: "dứa", grams: 200, role: main, note: "khoảng 1/4 quả"}
+  - {name: "đậu bắp", grams: 100, role: main}
+  - {name: "giá đỗ", grams: 100, role: main}
+  - {name: "dọc mùng", grams: 150, role: main, note: "khoảng 1/2 cây"}
+  - {name: "me chua", grams: 50, role: seasoning, note: "2,5 muỗng canh (1 muỗng canh ≈ 20 g); ≈ 50 g me vắt, dầm lấy nước"}
+  - {name: "ngò gai", grams: 10, role: seasoning}
+  - {name: "rau ngổ", grams: 10, role: seasoning}
+  - {name: "nước mắm", grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 6, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "ớt", grams: 5, role: seasoning, optional: true, note: "1 quả (1 quả ≈ 5 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Làm sạch cá, xát muối khử nhớt, cắt khúc; ướp với một ít muối và nước mắm.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm me với nước ấm, dầm lấy nước; dứa thái miếng, cà chua bổ múi, đậu bắp thái xéo, dọc mùng tước vỏ thái xéo bóp muối, nhặt giá và rau thơm.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 3, text_vi: "Đun sôi nước với nước me và dứa, thả cá vào, hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Nấu lửa vừa đến khi cá chín.", kind: passive, minutes: 8, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho cà chua, đậu bắp, dọc mùng; nêm đường, nước mắm, muối cho vừa chua ngọt.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 6, text_vi: "Thêm giá, tắt bếp; rắc ngò gai, rau ngổ, tỏi phi và ớt.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://monngonmoingay.com/canh-chua-ca-loc/", title: "Canh chua cá lóc - Món Ngon Mỗi Ngày", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/doi-song-cooking-canh-chua-ca-loc-4597804.html", title: "Bí quyết nấu canh chua cá lóc chuẩn vị Nam Bộ", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-chua-ca-loc-chuan-nhat-ngon-00828", title: "Cách nấu canh chua cá lóc chuẩn nhất, ngon (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

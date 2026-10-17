@@ -1,0 +1,26 @@
+slug: canh-bap-cai-cuon-thit
+name_vi: "Canh bắp cải cuộn thịt"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, mem, nhieu_nuoc, cuoi_tuan]
+ingredients:
+  - {name: "bắp cải", grams: 400, role: main, note: "khoảng 10–12 lá ngoài to"}
+  - {name: "thịt băm", grams: 250, role: main}
+  - {name: "hành lá", grams: 75, role: main, note: "5 cây (1 cây ≈ 15 g); dùng cả lá để buộc cuộn"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 1.2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g); chần lá"}
+steps:
+  - {step_no: 1, text_vi: "Tách lá bắp cải, rửa sạch; chần lá bắp cải và lá hành cho mềm.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 2, text_vi: "Trộn thịt băm với hành tím băm, tiêu và một ít nước mắm.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Đặt nhân lên lá bắp cải, cuộn chặt và buộc bằng lá hành.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 4, text_vi: "Đun sôi nước, thả cuộn bắp cải vào, hớt bọt.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 5, text_vi: "Nấu lửa nhỏ đến khi nhân chín.", kind: passive, minutes: 12, uses_burner: true}
+  - {step_no: 6, text_vi: "Nêm nước mắm, rắc hành lá thái nhỏ và tiêu rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-bap-cai-cuon-thit-ngot-thanh-don-gian-cho-gia-09282", title: "2 cách nấu canh bắp cải cuốn thịt bằm thanh ngọt, hấp dẫn cực bắt cơm", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-cai-thao-cuon-thit-ga-nam-huong-tuyet-ngon-06736", title: "Cách nấu canh cải thảo cuộn thịt gà nấm hương (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://mytour.vn/vi/blog/bai-viet/7-mon-canh-cai-hap-dan-cho-thuc-don-mua-dong.html", title: "7 món canh cải hấp dẫn cho thực đơn mùa đông (Mytour)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

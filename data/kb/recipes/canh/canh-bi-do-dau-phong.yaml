@@ -1,0 +1,26 @@
+slug: canh-bi-do-dau-phong
+name_vi: "Canh bí đỏ đậu phộng"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [beo, mem, nhieu_nuoc, cuoi_tuan]
+ingredients:
+  - {name: "bí đỏ", grams: 500, role: main}
+  - {name: "lạc", grams: 150, role: main, note: "lạc nhân sống"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "hạt nêm chay", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "rau mùi", grams: 10, role: seasoning}
+  - {name: "hành lá", grams: 15, role: seasoning, optional: true, note: "1 cây (1 cây ≈ 15 g)"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm lạc với nước ấm, có thể bóc bớt vỏ lụa.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm lạc cho mềm.", kind: passive, minutes: 30, uses_burner: false}
+  - {step_no: 3, text_vi: "Cho lạc vào nồi nước, đun sôi rồi hạ lửa.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Nấu lạc nhỏ lửa đến khi bở mềm.", kind: passive, minutes: 25, uses_burner: true}
+  - {step_no: 5, text_vi: "Gọt vỏ bí đỏ, bỏ ruột, cắt miếng vừa; nhặt rau mùi.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 6, text_vi: "Cho bí vào nồi lạc, nêm muối và hạt nêm chay.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 7, text_vi: "Nấu đến khi bí chín mềm.", kind: passive, minutes: 10, uses_burner: true}
+  - {step_no: 8, text_vi: "Rắc rau mùi và hành lá rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-nau-canh-bi-do-ham-xuong-va-nau-dau-phong-thom-ngon-de-04883", title: "Cách nấu canh bí đỏ đậu phộng ngon ngọt béo bùi chay mặn đều dùng được", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/canh-bi-do-dau-phong-158296", title: "Bật mí 2 công thức nấu canh bí đỏ đậu phộng thanh ngọt, bổ dưỡng cho cả nhà", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu. Ngâm lạc trước giúp rút ngắn thời gian nấu."

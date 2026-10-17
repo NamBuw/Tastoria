@@ -1,0 +1,23 @@
+slug: dua-cai-muoi
+name_vi: "Dưa cải muối"
+slot: rau
+servings: 4
+method: muoi_chua
+tags: [chua, gion, bua_thuong, com_hop]
+ingredients:
+  - {name: "cải bẹ xanh", grams: 1500, role: main, note: "3 bó (1 bó ≈ 500 g)"}
+  - {name: "muối", grams: 54, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 18 g)"}
+  - {name: "đường", grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: "hành tím", grams: 50, role: seasoning, note: "5 củ (1 củ ≈ 10 g)"}
+  - {name: "ớt", grams: 10, role: seasoning, optional: true, note: "2 quả (1 quả ≈ 5 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt bỏ gốc và lá già, rửa sạch cải, cắt khúc khoảng 4–5 cm.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 2, text_vi: "Phơi hoặc để cải héo nhẹ cho dưa giòn.", kind: passive, minutes: 180, uses_burner: false}
+  - {step_no: 3, text_vi: "Đun sôi nước với muối và đường, để nguội bớt còn ấm.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Xếp cải và hành tím thái lát vào hũ, đổ nước muối ngập, dằn vỉ nén chặt.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 5, text_vi: "Đậy kín để nơi ấm đến khi dưa vàng và chua.", kind: passive, minutes: 2880, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/h-lam-dua-cai-muoi-vang-gion-chong-ngan-ngay-tet-01251", title: "Cách muối dưa cải (dưa chua) vàng giòn, để lâu không nổi váng", accessed_on: 2026-10-17}
+  - {url: "https://www.pharmacity.vn/cach-muoi-dua-cai-gion-ngon-chuan-vi-viet-bi-quyet-gia-truyen-cho-mon-an-kem-hap-dan.htm", title: "Cách muối dưa cải giòn ngon chuẩn vị việt – bí quyết gia truyền cho món ăn kèm hấp dẫn", accessed_on: 2026-10-17}
+  - {url: "https://hellobacsi.com/song-khoe/dinh-duong/cac-cach-muoi-dua-cai-ngon", title: "Các cách muối dưa cải ngon (Hello Bacsi)", accessed_on: 2026-10-17}
+notes: "Ủ khoảng 2 ngày (2.880 phút); bước chờ không chiếm người nấu."

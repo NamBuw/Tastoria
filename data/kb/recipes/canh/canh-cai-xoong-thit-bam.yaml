@@ -1,0 +1,22 @@
+slug: canh-cai-xoong-thit-bam
+name_vi: "Canh cải xoong thịt băm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, nhieu_nuoc, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "cải xoong", grams: 300, role: main, note: "1 bó (≈ 300 g)"}
+  - {name: "thịt băm", grams: 150, role: main}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt cải xoong, bỏ gốc già, ngâm nước muối và rửa sạch.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp thịt băm với hành tím băm, tiêu và một ít nước mắm.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm hành, cho thịt vào xào tơi rồi đổ nước, đun sôi và hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Thả rau vào, nêm phần nước mắm còn lại; nấu đến khi rau vừa chín rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://voh.com.vn/dinh-duong/rau-cai-xoong-nau-mon-gi-ngon-415543.html", title: "Rau cải xoong nấu món gì ngon? 'Bỏ túi' ngay 7 món ăn đơn giản, hấp dẫn", accessed_on: 2026-10-17}
+  - {url: "https://mytour.vn/vi/blog/bai-viet/tong-hop-8-mon-ngon-tu-xa-lach-xoong-dinh-duong-de-lam.html", title: "Tổng hợp 8 món ngon từ xà lách xoong dinh dưỡng dễ làm (mytour)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

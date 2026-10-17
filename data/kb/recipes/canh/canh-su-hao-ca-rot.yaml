@@ -1,0 +1,22 @@
+slug: canh-su-hao-ca-rot
+name_vi: "Canh su hào cà rốt"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, nhieu_nuoc, bua_thuong]
+ingredients:
+  - {name: "su hào", grams: 450, role: main, note: "1,5 củ (1 củ ≈ 300 g)"}
+  - {name: "cà rốt", grams: 150, role: main, note: "1,5 củ (1 củ ≈ 100 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "hạt nêm chay", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt su hào và cà rốt, thái miếng hoặc thái khúc vừa ăn; thái hành lá.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun sôi nước, cho rau củ vào, nêm muối và hạt nêm chay.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Nấu lửa vừa đến khi rau củ chín.", kind: passive, minutes: 12, uses_burner: true}
+  - {step_no: 4, text_vi: "Nêm lại, rắc hành lá hoặc rau thơm rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/canh-su-hao-xuong-170760", title: "Bí quyết nấu canh su hào xương thanh mát, ngọt tự nhiên cho bữa cơm gia đình", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/cac-mon-canh-cho-mua-dong-4541533.html", title: "Các món canh cho mùa đông", accessed_on: 2026-10-17}
+  - {url: "https://mnphucdong.hanoi.edu.vn/mon-ngon-mua-dich/su-hao-ca-rot-nau-xuong/ctmb/10903/400396", title: "Su hào, cà rốt nấu xương.", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu. Bản chay; nguồn tham khảo ninh với xương lợn."

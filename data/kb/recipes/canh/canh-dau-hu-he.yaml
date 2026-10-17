@@ -1,0 +1,25 @@
+slug: canh-dau-hu-he
+name_vi: "Canh đậu hũ hẹ thịt băm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, mem, nhieu_nuoc, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "đậu phụ", grams: 300, role: main, note: "2 miếng (1 miếng ≈ 150 g)"}
+  - {name: "hẹ", grams: 100, role: main, note: "1 bó (≈ 100 g)"}
+  - {name: "thịt băm", grams: 150, role: main}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "hành tím", grams: 10, role: seasoning, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt đậu phụ miếng vuông nhỏ, hẹ cắt khúc; ướp thịt với hành tím băm, tiêu, chút nước mắm.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi hành, xào thịt tơi, đổ nước vào đun sôi, hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 3, text_vi: "Cho đậu phụ vào, nêm nước mắm.", kind: active, minutes: 1, uses_burner: true}
+  - {step_no: 4, text_vi: "Nấu cho đậu nóng đều.", kind: passive, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Thả hẹ, sôi lại thì tắt bếp, rắc tiêu.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-nau-canh-he-dau-phu-thit-bam-va-hen-thom-ngon-don-gian-05648", title: "3 cách nấu canh hẹ đậu phụ, thịt băm và hến thơm ngon đơn giản dễ làm", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-dau-hu-non-gia-he-thit-bam-thom-ngon-thanh-mat-09766", title: "Cách nấu canh đậu hũ non giá hẹ thịt băm thơm ngon thanh mát", accessed_on: 2026-10-17}
+  - {url: "https://baomoi.com/2-mon-canh-ngon-nhat-tu-dau-phu-ai-an-cung-nghien-c38110871.epi", title: "2 món canh ngon nhất từ đậu phụ ai ăn cũng nghiện", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

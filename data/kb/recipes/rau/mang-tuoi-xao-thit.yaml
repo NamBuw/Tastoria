@@ -1,0 +1,26 @@
+slug: mang-tuoi-xao-thit
+name_vi: "Măng tươi xào thịt ba chỉ"
+slot: rau
+servings: 4
+method: xao
+tags: [dam_da, gion, bua_thuong, com_hop]
+ingredients:
+  - {name: "măng tươi", grams: 400, role: main}
+  - {name: "thịt ba chỉ", grams: 200, role: main}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "tiêu", grams: 1.2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "muối", grams: 6, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 6 g); luộc măng"}
+  - {name: "ớt", grams: 5, role: seasoning, optional: true, note: "1 quả (1 quả ≈ 5 g)"}
+steps:
+  - {step_no: 1, text_vi: "Thái măng lát hoặc thái sợi, cho vào nồi nước lạnh có muối và bắc lên bếp.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 2, text_vi: "Luộc măng, thay nước 2 lần cho hết đắng và mùi hăng.", kind: passive, minutes: 20, uses_burner: true}
+  - {step_no: 3, text_vi: "Thái thịt ba chỉ mỏng, ướp với một ít nước mắm, tiêu và tỏi băm.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi tỏi, xào thịt đến khi ra mỡ và săn.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho măng vào xào cùng, nêm phần nước mắm còn lại, đảo đến khi thấm; thêm hành lá, tiêu.", kind: active, minutes: 5, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-mang-xao-thit-ba-chi-sieu-hap-dan-bat-vi-cho-bua-com-14265", title: "2 cách làm măng xào thịt ba chỉ siêu hấp dẫn, bắt vị cho bữa cơm gia đình", accessed_on: 2026-10-17}
+  - {url: "https://www.bluestone.com.vn/blogs/vao-bep/mang-xao-thit-ba-chi", title: "Hướng dẫn 2 cách làm măng xào thịt ba chỉ đậm đà hương quê", accessed_on: 2026-10-17}
+  - {url: "https://vtcnews.vn/mon-ngon-moi-ngay-thit-ba-chi-xao-mang-tuoi-ar618538.html", title: "Món ngon mỗi ngày: Thịt ba chỉ xào măng tươi", accessed_on: 2026-10-17}

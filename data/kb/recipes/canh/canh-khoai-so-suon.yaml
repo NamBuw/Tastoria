@@ -1,0 +1,28 @@
+slug: canh-khoai-so-suon
+name_vi: "Canh khoai sọ nấu sườn"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [beo, mem, nhieu_nuoc, troi_lanh, bua_thuong]
+ingredients:
+  - {name: "sườn non", grams: 400, role: main}
+  - {name: "khoai sọ", grams: 500, role: main}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "rau mùi", grams: 5, role: seasoning}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa sườn non, chặt miếng; chần qua nước sôi rồi rửa lại cho sạch.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 2, text_vi: "Cho xương vào nồi với nước lạnh và hành tím đập dập, đun sôi rồi hạ lửa, hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 3, text_vi: "Ninh nhỏ lửa cho xương ra ngọt.", kind: passive, minutes: 25, uses_burner: true}
+  - {step_no: 4, text_vi: "Gọt vỏ khoai sọ (đeo găng), xát muối cho bớt nhớt, rửa sạch; củ to cắt đôi.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 5, text_vi: "Cho rau củ vào nồi, nêm muối và nước mắm.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 6, text_vi: "Nấu tiếp đến khi rau củ chín mềm.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 7, text_vi: "Nêm lại, rắc hành lá, rau thơm và tiêu rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-nau-canh-khoai-so-rau-rut-rau-nhut-voi-suon-va-cua-hap-08865", title: "2 cách nấu canh khoai sọ rau rút (rau nhút) với sườn và cua hấp dẫn", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/canh-khoai-so-rau-rut-nau-suon-173551", title: "Bí quyết nấu canh khoai sọ rau rút nấu sườn thơm ngậy, đậm đà lại cực đưa cơm", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/tong-hop-cach-nau-canh-khoai-so-ngot-nuoc-beo-bui-thom-ngon-17949", title: "Tổng hợp cách nấu canh khoai sọ ngọt nước, béo bùi thơm ngon (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

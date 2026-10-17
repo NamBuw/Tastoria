@@ -1,0 +1,23 @@
+slug: nam-rom-xao-toi
+name_vi: "Nấm rơm xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, mem, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "nấm rơm", grams: 400, role: main}
+  - {name: "tỏi", grams: 18, role: seasoning, note: "6 tép (1 tép ≈ 3 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "ớt", grams: 5, role: seasoning, optional: true, note: "1 quả (1 quả ≈ 5 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt chân nấm rơm, ngâm nước muối loãng rồi rửa sạch, bổ đôi.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Chần nấm trong nước sôi khoảng 2 phút, vớt ra để ráo.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Phi tỏi, cho nấm vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Thêm hành lá và ớt, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/nam-rom-xao-toi-173426", title: "Học cách làm nấm rơm xào tỏi siêu đơn giản mà cực hấp dẫn, chiều lòng cả nhà", accessed_on: 2026-10-17}
+  - {url: "https://kingfoodmart.com/bai-viet/cach-lam-nam-rom-xao-toi-cuc-don-gian", title: "Cách làm nấm rơm xào tỏi cực đơn giản - Chuỗi siêu thị thực phẩm tươi ngon, chất lượng Kingfoodmart", accessed_on: 2026-10-17}
+  - {url: "https://mytour.vn/vi/blog/bai-viet/huong-dan-cach-lam-mon-nam-rom-xao-toi-thom-ngon-hap-dan-khong-chan.html", title: "Bí quyết làm món nấm rơm xào tỏi thơm ngon, hấp dẫn không bao giờ làm bạn thất vọng", accessed_on: 2026-10-17}

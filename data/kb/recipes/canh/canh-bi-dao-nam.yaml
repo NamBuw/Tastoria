@@ -1,0 +1,23 @@
+slug: canh-bi-dao-nam
+name_vi: "Canh bí đao nấu nấm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, nhieu_nuoc, troi_nong, bua_thuong]
+ingredients:
+  - {name: "bí đao", grams: 500, role: main, note: "còn khoảng 400 g sau khi gọt"}
+  - {name: "nấm rơm", grams: 200, role: main}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "hạt nêm chay", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt vỏ bí đao, cắt miếng; gọt chân nấm rơm, ngâm nước muối, rửa sạch, bổ đôi; thái hành lá.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun sôi nước, cho rau củ vào, nêm muối và hạt nêm chay.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Nấu lửa vừa đến khi rau củ chín.", kind: passive, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Nêm lại, rắc hành lá hoặc rau thơm rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-bi-dao-nau-nam-bao-ngu-ngon-ngot-chay-man-deu-11913", title: "Cách nấu canh bí đao nấu nấm bào ngư ngon ngọt chay mặn đều dùng được", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-bi-dao-nam-rom-ngot-ngon-chay-man-deu-dung-12989", title: "Cách nấu canh bí đao nấm rơm ngọt ngon chay mặn đều dùng được", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/nau-canh-bi-dao-169484", title: "Nấu canh bí đao thơm ngon, mát bổ với 12 gợi ý hấp dẫn dành cho mọi gia đình", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

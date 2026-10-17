@@ -1,0 +1,32 @@
+slug: goi-ngo-sen-tom-thit
+name_vi: "Gỏi ngó sen tôm thịt"
+slot: rau
+servings: 4
+method: tron
+tags: [chua_ngot, gion, cuoi_tuan, troi_nong]
+ingredients:
+  - {name: "ngó sen", grams: 300, role: main}
+  - {name: "tôm", grams: 200, role: main}
+  - {name: "thịt ba chỉ", grams: 200, role: main}
+  - {name: "cà rốt", grams: 100, role: main, note: "1 củ (1 củ ≈ 100 g)"}
+  - {name: "nước mắm", grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: "chanh", grams: 50, role: seasoning, note: "1 quả (1 quả ≈ 50 g)"}
+  - {name: "rau răm", grams: 20, role: seasoning}
+  - {name: "lạc", grams: 40, role: seasoning, note: "rang chín, giã dập"}
+  - {name: "tỏi", grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: "ớt", grams: 5, role: seasoning, note: "1 quả (1 quả ≈ 5 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, optional: true, note: "2 củ (1 củ ≈ 10 g); phi giòn rắc lên"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, optional: true, note: "1 muỗng canh (1 muỗng canh ≈ 14 g); phi hành"}
+steps:
+  - {step_no: 1, text_vi: "Rửa ngó sen, chẻ đôi cắt khúc, ngâm nước có chanh; cà rốt bào sợi.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Luộc thịt ba chỉ đến chín, thái mỏng; luộc tôm, bóc vỏ, chẻ đôi.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 3, text_vi: "Chờ thịt chín trong nồi.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 4, text_vi: "Rang lạc, xát vỏ và giã dập; phi hành tím (nếu dùng).", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 5, text_vi: "Pha nước trộn từ nước mắm, đường, nước cốt chanh, tỏi ớt băm.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 6, text_vi: "Trộn ngó sen, cà rốt, tôm, thịt với nước trộn, để thấm vài phút, thêm rau răm và lạc khi dọn.", kind: active, minutes: 5, uses_burner: false}
+sources:
+  - {url: "https://mytour.vn/vi/blog/bai-viet/bi-quyet-lam-mon-goi-ngo-sen-tom-thit-gion-ngon.html", title: "Bí quyết làm món gỏi ngó sen tôm thịt giòn ngon", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/tong-hop-7-cach-lam-goi-ngo-sen-ngon-gion-chua-ngot-don-gian-12981", title: "Tổng hợp 7 cách làm gỏi ngó sen ngon giòn chua ngọt đơn giản dễ làm", accessed_on: 2026-10-17}
+  - {url: "https://baomoi.com/cach-lam-goi-ngo-sen-tom-thit-an-mai-khong-ngan-c37477098.epi", title: "Cách làm gỏi ngó sen tôm thịt ăn mãi không ngán", accessed_on: 2026-10-17}
+notes: "Nước luộc, nước pha không ghi thành nguyên liệu."

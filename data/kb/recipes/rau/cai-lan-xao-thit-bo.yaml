@@ -1,0 +1,27 @@
+slug: cai-lan-xao-thit-bo
+name_vi: "Cải làn xào thịt bò"
+slot: rau
+servings: 4
+method: xao
+tags: [dam_da, thom_toi, bua_thuong, com_hop, nau_nhanh]
+ingredients:
+  - {name: "cải làn", grams: 400, role: main}
+  - {name: "thịt bò", grams: 250, role: main}
+  - {name: "tỏi", grams: 18, role: seasoning, note: "6 tép (1 tép ≈ 3 g)"}
+  - {name: "dầu hào", grams: 18, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 18 g)"}
+  - {name: "dầu ăn", grams: 28, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "gừng", grams: 10, role: seasoning, note: "3 lát"}
+  - {name: "nước tương", grams: 5, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 5 g); ướp bò"}
+  - {name: "đường", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "bột năng", grams: 3.3, role: seasoning, optional: true, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 3.3 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt cải làn thành khúc, chẻ đôi phần cọng to, rửa sạch; thái bò mỏng.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp bò với nước tương, tiêu, gừng đập, chút dầu ăn và bột năng.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Chần cải làn khoảng 1 phút, vớt ra để ráo.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi tỏi, xào bò thật nhanh lửa lớn đến khi tái thì trút ra.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 5, text_vi: "Xào cải làn với dầu hào và đường, cho bò vào đảo đều rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://vietgiaitri.com/cai-lan-xao-thit-bo-mon-ngon-khong-the-bo-lo-20200418i4859091/", title: "Cải làn xào thịt bò Món ngon không thể bỏ lỡ - Ẩm thực - Việt Giải Trí", accessed_on: 2026-10-17}
+  - {url: "https://www.dichonhanh.vn/mon-an/thit-bo-xao-cai-lan-cai-ro/", title: "Thịt bò xào cải làn (cải rổ)", accessed_on: 2026-10-17}
+  - {url: "https://kingfoodmart.com/bai-viet/cong-thuc-nau-an/cai-lan-xao-bo-va-hat-macadamia", title: "Cải làn xào bò và hạt macadamia - Chuỗi siêu thị thực phẩm tươi ngon, chất lượng Kingfoodmart", accessed_on: 2026-10-17}

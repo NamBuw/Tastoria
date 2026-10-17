@@ -1,0 +1,19 @@
+slug: rau-lang-xao-toi
+name_vi: "Rau lang xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, mem, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "rau lang", grams: 400, role: main, note: "1 bó (≈ 400 g)"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt lấy ngọn và lá non rau lang, rửa sạch, để ráo.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi thơm tỏi băm, cho rau vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Đảo đến khi rau vừa chín thì tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-rau-lang-xao-toi-dan-da-thom-ngon-don-gian-tai-nha-08268", title: "2 Cách làm rau lang xào tỏi xanh mướt không bị đen, thơm lừng cực đưa cơm", accessed_on: 2026-10-17}
+  - {url: "https://viettimes.vn/rau-lang-xao-toi-mon-ngon-dau-dong-thuoc-quy-cho-ca-nha-371453.html", title: "Rau lang xào tỏi: món ngon đầu đồng, thuốc quý cho cả nhà (VietTimes)", accessed_on: 2026-10-17}

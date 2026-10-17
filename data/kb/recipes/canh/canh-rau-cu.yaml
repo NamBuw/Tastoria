@@ -1,0 +1,24 @@
+slug: canh-rau-cu
+name_vi: "Canh rau củ"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, mem, nhieu_nuoc, bua_thuong]
+ingredients:
+  - {name: "cà rốt", grams: 200, role: main, note: "2 củ (1 củ ≈ 100 g)"}
+  - {name: "khoai tây", grams: 300, role: main, note: "1,5 củ (1 củ ≈ 200 g)"}
+  - {name: "su su", grams: 250, role: main, note: "1 quả (1 quả ≈ 250 g)"}
+  - {name: "bắp cải", grams: 300, role: main}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "hạt nêm chay", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt cà rốt, khoai tây, su su và cắt miếng; thái bắp cải; thái hành lá.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun sôi nước, cho rau củ vào, nêm muối và hạt nêm chay.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Nấu lửa vừa đến khi rau củ chín.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 4, text_vi: "Nêm lại, rắc hành lá hoặc rau thơm rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cac-cong-thuc-canh-rau-cu-thap-cam-thanh-dam-giau-dinh-duong-de-doi-mon-cho-bua-an-gia-dinh-170406", title: "Các công thức canh rau củ thập cẩm thanh đạm, giàu dinh dưỡng để đổi món cho bữa ăn gia đình", accessed_on: 2026-10-17}
+  - {url: "https://saigonesebaguette.vn/cach-nau-canh-rau-cu/", title: "Cách Nấu Canh Rau Củ Thanh Mát, Đậm Đà Chuẩn Vị Gia Đình - Saigonese Baguette", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/canh-rau-cu-ba-roi-xong-khoi/", title: "Canh rau củ ba rọi xông khói - Món Ngon Mỗi Ngày", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu. Bản chay; nhiều nhà ninh thêm xương lợn làm nước dùng."

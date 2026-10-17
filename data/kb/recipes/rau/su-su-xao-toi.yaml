@@ -1,0 +1,20 @@
+slug: su-su-xao-toi
+name_vi: "Su su xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, gion, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "su su", grams: 500, role: main, note: "2 quả (1 quả ≈ 250 g)"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt vỏ su su, bổ đôi bỏ hạt, thái lát hoặc thái sợi, rửa với chút muối cho bớt nhựa.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Đập dập và băm tỏi.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm tỏi, cho su su vào xào lửa lớn, thêm vài thìa nước, nêm muối và đường.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Đảo đến khi su su chín tới còn giòn thì tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/cach-lam-su-su-xao-toi-gion-san-sat-xanh-muot-mat-cuc-de-lam-1588453", title: "2 cách làm su su xào tỏi giòn sần sật, xanh mướt mắt cực dễ làm", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/tong-hop-8-cach-lam-su-su-xao-thom-ngon-hap-dan-de-lam-cho-08986", title: "Tổng hợp 8 cách làm su su xào thơm ngon hấp dẫn dễ làm cho bữa cơm gia đình", accessed_on: 2026-10-17}

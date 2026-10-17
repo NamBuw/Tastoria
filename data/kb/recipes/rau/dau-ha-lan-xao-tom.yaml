@@ -1,0 +1,25 @@
+slug: dau-ha-lan-xao-tom
+name_vi: "Đậu Hà Lan xào tôm"
+slot: rau
+servings: 4
+method: xao
+tags: [thanh, gion, bua_thuong, com_hop]
+ingredients:
+  - {name: "đậu Hà Lan", grams: 300, role: main}
+  - {name: "tôm", grams: 250, role: main}
+  - {name: "cà rốt", grams: 100, role: main, note: "1 củ (1 củ ≈ 100 g)"}
+  - {name: "tỏi", grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "hành tím", grams: 10, role: seasoning, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: "đường", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "tiêu", grams: 0.8, role: seasoning, note: "1/3 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+steps:
+  - {step_no: 1, text_vi: "Tước xơ đậu Hà Lan; bóc vỏ, rút chỉ tôm; cà rốt thái lát.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp tôm với một ít nước mắm, tiêu và hành tím băm.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi tỏi, xào tôm đến khi đỏ thì trút ra.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Xào đậu Hà Lan và cà rốt lửa lớn với chút nước, nêm nước mắm, đường; cho tôm vào đảo đều.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://barona.vn/mon-ngon/dau-ha-lan-xao-tom", title: "ĐẬU HÀ LAN XÀO TÔM - Barona", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/dau-ha-lan-xao-tom-3000833.html", title: "Đậu Hà Lan xào tôm - Báo VnExpress Đời sống", accessed_on: 2026-10-17}
+  - {url: "https://kingfoodmart.com/bai-viet/cong-thuc-nau-an/dau-ha-lan-xao-tom", title: "Đậu Hà Lan xào tôm - Chuỗi siêu thị thực phẩm tươi ngon ...", accessed_on: 2026-10-17}

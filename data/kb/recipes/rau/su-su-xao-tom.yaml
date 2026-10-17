@@ -1,0 +1,25 @@
+slug: su-su-xao-tom
+name_vi: "Su su xào tôm"
+slot: rau
+servings: 4
+method: xao
+tags: [thanh, gion, bua_thuong, com_hop]
+ingredients:
+  - {name: "su su", grams: 500, role: main, note: "2 quả (1 quả ≈ 250 g)"}
+  - {name: "tôm", grams: 200, role: main}
+  - {name: "tỏi", grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "đường", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "tiêu", grams: 0.8, role: seasoning, note: "1/3 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "cà rốt", grams: 50, role: side, optional: true, note: "1/2 củ (1 củ ≈ 100 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt su su, bỏ hạt, thái sợi hoặc lát; bóc vỏ, rút chỉ tôm, ướp với chút nước mắm và tiêu.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi tỏi, xào tôm đến khi đỏ thì trút ra.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Xào su su (và cà rốt) lửa lớn với chút nước, nêm nước mắm còn lại và đường.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho tôm vào đảo đều, rắc hành lá rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/cach-lam-su-su-xao-tom-thom-nuc-mui-gion-ngon-dinh-duong-cho-ca-nha-1549441", title: "Cách làm su su xào tôm thơm nức mũi, giòn ngon dinh dưỡng cho cả nhà", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-su-su-xao-tom-don-gian-gion-ngot-bat-com-cho-ca-nha-11486", title: "Cách làm su su xào tôm đơn giản giòn ngọt bắt cơm cho cả nhà", accessed_on: 2026-10-17}
+  - {url: "https://ngoisao.vnexpress.net/tom-xao-su-su-gion-ngon-3895846.html", title: "Tôm xào su su giòn ngon - Ngôi sao - VnExpress", accessed_on: 2026-10-17}

@@ -1,0 +1,30 @@
+slug: ca-bung
+name_vi: "Cà bung"
+slot: rau
+servings: 4
+method: om
+tags: [dam_da, mam_ruoc, mem, cuoi_tuan, troi_lanh]
+ingredients:
+  - {name: "cà tím", grams: 600, role: main, note: "3 quả (1 quả ≈ 200 g)"}
+  - {name: "đậu phụ", grams: 300, role: main, note: "2 miếng (1 miếng ≈ 150 g)"}
+  - {name: "thịt ba chỉ", grams: 300, role: main}
+  - {name: "cà chua", grams: 240, role: side, note: "2 quả (1 quả ≈ 120 g)"}
+  - {name: "tía tô", grams: 20, role: seasoning}
+  - {name: "mắm tôm", grams: 9, role: seasoning, note: "1/2 muỗng canh (1 muỗng canh ≈ 18 g)"}
+  - {name: "mẻ", grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 42, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 14 g); rán đậu và xào"}
+steps:
+  - {step_no: 1, text_vi: "Cắt cà tím khúc, ngâm nước muối; thái thịt ba chỉ miếng vừa; đậu phụ cắt miếng.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Rán vàng đậu phụ, vớt ra.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 3, text_vi: "Phi hành tím, xào thịt ba chỉ săn lại, cho cà chua vào xào mềm.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho cà tím, mẻ lọc, mắm tôm, nước mắm và đường vào, thêm nước xâm xấp.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Om lửa nhỏ đến khi cà mềm nhừ.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 6, text_vi: "Cho đậu phụ vào om thêm, nêm lại, rắc tía tô và hành lá rồi tắt bếp.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-ca-tim-bung-dau-thit-don-gian-cho-gia-dinh-02094", title: "Cách làm cà tím bung đậu thịt đơn giản, ngon miệng cho bữa ăn gia đình", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/ca-bung-178495", title: "Cà bung (FPT Shop)", accessed_on: 2026-10-17}
+  - {url: "https://baohatinh.vn/nau-ca-bung-dau-thit-chuan-vi-nhu-the-nao-post132490.html", title: "Nấu cà bung đậu thịt chuẩn vị như thế nào?", accessed_on: 2026-10-17}

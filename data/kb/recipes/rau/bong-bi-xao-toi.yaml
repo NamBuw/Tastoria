@@ -1,0 +1,21 @@
+slug: bong-bi-xao-toi
+name_vi: "Bông bí xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, mem, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "bông bí", grams: 400, role: main, note: "2 bó (1 bó ≈ 200 g)"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Tước bỏ xơ ở cuống, ngắt nhụy bông bí, rửa nhẹ và để ráo.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Đập dập và băm tỏi.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm một nửa tỏi với dầu, cho rau vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho nốt tỏi còn lại, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/mach-ban-cach-lam-bong-bi-xao-toi-thom-lung-ca-nha-thich-me-1492404", title: "Mách bạn cách làm bông bí xào tỏi thơm lừng, cả nhà thích mê", accessed_on: 2026-10-17}
+  - {url: "https://ngoisao.vnexpress.net/dan-da-bong-bi-xao-toi-3535694.html", title: "Dân dã bông bí xào tỏi - Ngôi sao - VnExpress", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/nu-hoa-bi-xao-toi-2905872.html", title: "Nụ hoa bí xào tỏi - Báo VnExpress Đời sống", accessed_on: 2026-10-17}

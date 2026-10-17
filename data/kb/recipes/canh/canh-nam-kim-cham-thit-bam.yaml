@@ -1,0 +1,23 @@
+slug: canh-nam-kim-cham-thit-bam
+name_vi: "Canh nấm kim châm thịt băm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, mem, nhieu_nuoc, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "nấm kim châm", grams: 300, role: main, note: "2 gói (1 gói ≈ 150 g)"}
+  - {name: "thịt băm", grams: 150, role: main}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt gốc nấm kim châm, tách sợi, rửa sạch; thái hành lá.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp thịt băm với hành tím băm, tiêu và một ít nước mắm.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm hành, cho thịt vào xào tơi rồi đổ nước, đun sôi và hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Thả rau vào, nêm phần nước mắm còn lại; nấu đến khi rau vừa chín rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-nam-dau-hu-non-voi-he-va-thit-bam-thanh-dam-cho-10086", title: "Cách nấu canh nấm đậu hũ non với hẹ và thịt băm thanh đạm cho cả nhà", accessed_on: 2026-10-17}
+  - {url: "https://www.vinmec.com/vie/bai-viet/cach-nau-canh-tu-nam-tuoi-vi", title: "Cách nấu canh từ nấm tươi (Vinmec)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

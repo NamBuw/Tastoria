@@ -1,0 +1,20 @@
+slug: bap-cai-luoc
+name_vi: "Bắp cải luộc"
+slot: rau
+servings: 4
+method: luoc
+tags: [thanh, mem, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "bắp cải", grams: 600, role: main}
+  - {name: "muối", grams: 6, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 6 g); cho vào nước luộc"}
+  - {name: "nước tương", grams: 30, role: seasoning, optional: true, note: "2 muỗng canh (1 muỗng canh ≈ 15 g); pha nước chấm"}
+  - {name: "ớt", grams: 5, role: seasoning, optional: true, note: "1 quả (1 quả ≈ 5 g)"}
+steps:
+  - {step_no: 1, text_vi: "Bỏ lá ngoài, cắt bắp cải thành miếng to hoặc tách lá, rửa sạch.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun sôi nồi nước với muối.", kind: passive, minutes: 6, uses_burner: true}
+  - {step_no: 3, text_vi: "Cho bắp cải vào luộc lửa lớn, mở vung, đến khi cọng lá vừa mềm thì vớt ra để ráo.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 4, text_vi: "Pha nước tương với ớt để chấm (tuỳ chọn).", kind: active, minutes: 2, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-luoc-rau-bap-cai-ngon-gion-thom-xanh-muot-khong-bi-vun-07681", title: "Cách luộc rau bắp cải ngon, giòn thơm xanh mướt không bị vụn", accessed_on: 2026-10-17}
+  - {url: "https://luatminhkhue.vn/cach-luoc-rau-bap-cai-ngon-va-gion-thom-xanh-muot-khong-bi-vun.aspx", title: "1. Mẹo lựa chọn được bắp cải ngon", accessed_on: 2026-10-17}
+notes: "Nước luộc, nước pha không ghi thành nguyên liệu. Người ăn mặn thường chấm nước mắm hoặc trứng dầm nước mắm; bản này giữ chay."

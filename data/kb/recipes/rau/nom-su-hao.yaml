@@ -1,0 +1,28 @@
+slug: nom-su-hao
+name_vi: "Nộm su hào"
+slot: rau
+servings: 4
+method: tron
+tags: [chua_ngot, gion, troi_nong, bua_thuong]
+ingredients:
+  - {name: "su hào", grams: 600, role: main, note: "2 củ (1 củ ≈ 300 g)"}
+  - {name: "cà rốt", grams: 50, role: main, note: "1/2 củ (1 củ ≈ 100 g)"}
+  - {name: "muối", grams: 6, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 6 g); bóp su hào cho ra nước"}
+  - {name: "nước mắm", grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: "giấm", grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "lạc", grams: 40, role: seasoning, note: "rang chín, giã dập"}
+  - {name: "húng lủi", grams: 15, role: seasoning}
+  - {name: "kinh giới", grams: 10, role: seasoning, optional: true}
+  - {name: "tỏi", grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: "ớt", grams: 5, role: seasoning, note: "1 quả (1 quả ≈ 5 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt su hào và cà rốt, thái sợi, bóp với muối rồi để ra nước.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Để su hào ra bớt nước.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Rang lạc, xát vỏ, giã dập; nhặt rau thơm, thái nhỏ.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 4, text_vi: "Rửa lại su hào, cà rốt và vắt thật ráo; pha nước trộn từ nước mắm, đường, giấm theo tỉ lệ 1:1:1 cùng tỏi ớt băm.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 5, text_vi: "Trộn su hào, cà rốt với nước trộn, để thấm vài phút rồi rắc rau thơm và lạc khi dọn.", kind: active, minutes: 3, uses_burner: false}
+sources:
+  - {url: "https://vnexpress.net/doi-song-cooking-nom-su-hao-ha-noi-4808062.html", title: "Cách làm nộm su hào Hà Nội", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/nom-su-hao-gion-ngon-chong-ngan-ngay-tet-4416941.html", title: "Nộm su hào giòn ngon, chống ngán ngày Tết - Báo VnExpress Cooking", accessed_on: 2026-10-17}
+  - {url: "https://eva.vn/bep-eva/cach-lam-nom-su-hao-don-gian-ma-ngon-ai-an-cung-thich-c162a464124.html", title: "Cách làm nộm su hào đơn giản mà ngon ai ăn cũng thích", accessed_on: 2026-10-17}

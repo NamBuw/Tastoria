@@ -1,0 +1,24 @@
+slug: nam-kim-cham-xao-bo-toi
+name_vi: "Nấm kim châm xào bơ tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [beo, thom_toi, mem, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "nấm kim châm", grams: 300, role: main, note: "2 gói (1 gói ≈ 150 g)"}
+  - {name: "bơ", grams: 20, role: seasoning}
+  - {name: "tỏi", grams: 18, role: seasoning, note: "6 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, optional: true, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt bỏ gốc nấm, tách sợi, rửa nhanh và để ráo; băm tỏi, thái hành lá.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun chảy bơ, phi thơm tỏi.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 3, text_vi: "Cho nấm vào xào lửa lớn khoảng 2 phút, nêm muối và đường.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Rắc hành lá và tiêu rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://loihaogia.vn/nam-kim-cham-xao-bo-toi/", title: "Nấm kim châm xào bơ tỏi béo thơm khó cưỡng - Lợi Hào Gia - Lợi Hào Gia", accessed_on: 2026-10-17}
+  - {url: "https://thucphamlytuong.vn/mon/nam-kim-cham-xao-bo-toi/", title: "Nấm kim châm xào bơ tỏi –", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-nam-kim-cham-xao-toi-va-xao-muop-thom-ngon-hap-dan-08733", title: "2 cách làm nấm kim châm xào tỏi và xào mướp thơm ngon hấp dẫn", accessed_on: 2026-10-17}
+notes: "Món có bơ (sữa): hợp chế độ chay có sữa, cần kiểm dị ứng sữa."

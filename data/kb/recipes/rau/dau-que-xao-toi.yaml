@@ -1,0 +1,21 @@
+slug: dau-que-xao-toi
+name_vi: "Đậu que xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, gion, bua_thuong, com_hop, nau_nhanh]
+ingredients:
+  - {name: "đậu que", grams: 400, role: main}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Tước xơ hai đầu đậu que, cắt khúc hoặc thái vát, rửa sạch.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Chần đậu trong nước sôi có muối khoảng 2 phút, vớt ra để ráo.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Phi thơm tỏi băm, cho đậu vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Đảo đều khi đậu chín và thấm thì tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-dau-que-dau-co-ve-xao-toi-don-gian-bat-com-08115", title: "Cách làm đậu que (đậu cô ve) xào tỏi đơn giản, bắt cơm", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/tong-hop-15-cach-xao-dau-que-dau-co-ve-ngon-mieng-de-lam-cho-10364", title: "Tổng hợp 15 cách xào đậu que (đậu cô ve) ngon miệng dễ làm cho bữa cơm", accessed_on: 2026-10-17}
+  - {url: "https://luatminhkhue.vn/cach-xao-dau-que-dau-co-ve-ngon-mieng-de-lam-cho-bua-com.aspx", title: "1. Đậu que xào tỏi", accessed_on: 2026-10-17}

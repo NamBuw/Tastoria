@@ -1,0 +1,27 @@
+slug: canh-xuong-ham-cu-cai
+name_vi: "Canh xương hầm củ cải"
+slot: canh
+servings: 4
+method: ham
+tags: [thanh, nhieu_nuoc, troi_lanh, cuoi_tuan]
+ingredients:
+  - {name: "xương ống lợn", grams: 800, role: main}
+  - {name: "củ cải trắng", grams: 500, role: main}
+  - {name: "cà rốt", grams: 200, role: main, note: "2 củ (1 củ ≈ 100 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa xương ống lợn, chặt miếng; chần qua nước sôi rồi rửa lại cho sạch.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 2, text_vi: "Cho xương vào nồi với nước lạnh và hành tím đập dập, đun sôi rồi hạ lửa, hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 3, text_vi: "Ninh nhỏ lửa cho xương ra ngọt.", kind: passive, minutes: 60, uses_burner: true}
+  - {step_no: 4, text_vi: "Gọt củ cải và cà rốt, cắt khúc hoặc cắt miếng vừa; thái hành lá.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 5, text_vi: "Cho rau củ vào nồi, nêm muối và nước mắm.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 6, text_vi: "Nấu tiếp đến khi rau củ chín mềm.", kind: passive, minutes: 20, uses_burner: true}
+  - {step_no: 7, text_vi: "Nêm lại, rắc hành lá, rau thơm và tiêu rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-cu-cai-trang-dam-da-ngot-nuoc-cho-ban-them-13808", title: "5 cách nấu canh củ cải trắng đậm đà ngọt nước cho bạn thêm gợi ý nấu ngon", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/tong-hop-13-cach-nau-canh-xuong-heo-ngot-nuoc-thom-ngon-cho-11120", title: "Tổng hợp 13 cách nấu canh xương heo ngọt nước thơm ngon cho bữa cơm", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

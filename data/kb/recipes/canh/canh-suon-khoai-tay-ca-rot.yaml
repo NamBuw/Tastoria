@@ -1,0 +1,29 @@
+slug: canh-suon-khoai-tay-ca-rot
+name_vi: "Canh sườn hầm khoai tây cà rốt"
+slot: canh
+servings: 4
+method: ham
+tags: [thanh, mem, nhieu_nuoc, troi_lanh, cuoi_tuan]
+ingredients:
+  - {name: "sườn non", grams: 500, role: main}
+  - {name: "khoai tây", grams: 400, role: main, note: "2 củ (1 củ ≈ 200 g)"}
+  - {name: "cà rốt", grams: 200, role: main, note: "2 củ (1 củ ≈ 100 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "rau mùi", grams: 5, role: seasoning, optional: true}
+steps:
+  - {step_no: 1, text_vi: "Rửa sườn non, chặt miếng; chần qua nước sôi rồi rửa lại cho sạch.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 2, text_vi: "Cho xương vào nồi với nước lạnh và hành tím đập dập, đun sôi rồi hạ lửa, hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 3, text_vi: "Ninh nhỏ lửa cho xương ra ngọt.", kind: passive, minutes: 30, uses_burner: true}
+  - {step_no: 4, text_vi: "Gọt khoai tây và cà rốt, cắt khúc vừa; thái hành lá.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 5, text_vi: "Cho rau củ vào nồi, nêm muối và nước mắm.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 6, text_vi: "Nấu tiếp đến khi rau củ chín mềm.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 7, text_vi: "Nêm lại, rắc hành lá, rau thơm và tiêu rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-suon-non-ham-rau-cu-thom-ngon-dinh-duong-cho-10477", title: "Cách nấu canh sườn non hầm rau củ thơm ngon, dinh dưỡng cho gia đình", accessed_on: 2026-10-17}
+  - {url: "https://baovanhoa.vn/am-thuc/huong-dan-cach-nau-canh-suon-rau-cu-46900.html", title: "Hướng dẫn cách nấu canh sườn rau củ", accessed_on: 2026-10-17}
+  - {url: "https://cooking.edu.vn/canh-suon-rau-cu", title: "Canh Sườn Rau Củ: Công Thức Chuẩn Thanh Ngọt, Dinh Dưỡng Cho Bữa Cơm Gia Đình", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

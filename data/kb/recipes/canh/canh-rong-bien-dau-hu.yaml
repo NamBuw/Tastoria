@@ -1,0 +1,25 @@
+slug: canh-rong-bien-dau-hu
+name_vi: "Canh rong biển đậu hũ"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, mem, nhieu_nuoc, bua_thuong]
+ingredients:
+  - {name: "rong biển khô", grams: 20, role: main, note: "gần 1 gói (1 gói ≈ 25 g)"}
+  - {name: "đậu phụ", grams: 300, role: main, note: "2 miếng (1 miếng ≈ 150 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "nước tương", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "dầu vừng", grams: 4.7, role: seasoning, optional: true, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm rong biển với nước cho nở rồi rửa sạch, cắt khúc; cắt đậu phụ miếng vuông; thái hành lá.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 2, text_vi: "Chờ rong biển nở.", kind: passive, minutes: 10, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi chút dầu vừng (nếu dùng), xào nhanh rong biển rồi đổ nước vào đun sôi.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho đậu phụ, nêm nước tương và muối.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 5, text_vi: "Nấu thêm cho đậu nóng đều.", kind: passive, minutes: 4, uses_burner: true}
+  - {step_no: 6, text_vi: "Rắc hành lá rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-canh-dau-phu-rong-bien-thanh-mat-cang-an-cang-00350", title: "2 cách nấu canh rong biển đậu hũ non bùi ngọt thơm béo cực hấp dẫn", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/canh-rong-bien-dau-phu-177437", title: "Tổng hợp các cách nấu canh rong biển đậu phụ ngon “xoắn lưỡi” có thể bạn chưa biết", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-rong-bien-thit-bam-dau-hu-ngon-khong-tanh-tai-09753", title: "Cách nấu canh rong biển thịt băm đậu hũ ngon không tanh tại nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

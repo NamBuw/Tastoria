@@ -1,0 +1,27 @@
+slug: canh-cua-rau-day-mong-toi
+name_vi: "Canh cua rau đay mồng tơi"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, nhieu_nuoc, troi_nong, cuoi_tuan]
+ingredients:
+  - {name: "cua đồng", grams: 500, role: main}
+  - {name: "rau đay", grams: 200, role: main}
+  - {name: "mồng tơi", grams: 200, role: main}
+  - {name: "mướp", grams: 300, role: main, note: "1 quả (1 quả ≈ 300 g)"}
+  - {name: "mắm tôm", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g); nêm hoặc chấm"}
+  - {name: "muối", grams: 6, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "hành tím", grams: 10, role: seasoning, optional: true, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 5, role: seasoning, optional: true, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 5 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa cua thật sạch, bỏ yếm và mai, khều gạch để riêng; giã hoặc xay nhỏ thân cua.", kind: active, minutes: 15, uses_burner: false}
+  - {step_no: 2, text_vi: "Hòa cua với nước và chút muối, lọc lấy nước, bỏ bã.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Nhặt và thái nhỏ rau đay, mồng tơi; gọt mướp, cắt miếng.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 4, text_vi: "Đun nồi nước cua lửa vừa, khuấy nhẹ đến khi gạch cua nổi thành mảng thì thôi khuấy.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho rau đay, mồng tơi và mướp vào, nêm muối (và chút nước mắm).", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 6, text_vi: "Nấu đến khi rau chín, tắt bếp.", kind: passive, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-mon-canh-thanh-mat-giai-nhiet-ngay-he-00993", title: "3 món canh thanh mát giải nhiệt ngày hè cho bà nội trợ bận rộn", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-nau-canh-cua-rau-day-va-canh-cua-hoa-thien-ly-thom-00679", title: "2 cách nấu canh cua rau đay và canh cua hoa thiên lý thơm ngon hấp dẫn", accessed_on: 2026-10-17}
+  - {url: "https://thuonghieucongluan.com.vn/3-mon-canh-mat-bo-cho-ngay-he-a52971.html", title: "Canh cua rau đay, rau mồng tơi, rau muống", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu. Không đậy vung và không khuấy mạnh sau khi gạch nổi để riêu không vỡ. Mắm tôm thường để chấm kèm."

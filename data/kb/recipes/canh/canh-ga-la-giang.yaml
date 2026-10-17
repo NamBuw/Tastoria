@@ -1,0 +1,28 @@
+slug: canh-ga-la-giang
+name_vi: "Canh gà lá giang"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [chua, thom_sa_gung, nhieu_nuoc, cuoi_tuan]
+ingredients:
+  - {name: "thịt gà", grams: 600, role: main, note: "chặt miếng, cả xương"}
+  - {name: "lá giang", grams: 100, role: main, note: "1 bó (≈ 100 g)"}
+  - {name: "sả", grams: 50, role: seasoning, note: "2 cây (1 cây ≈ 25 g)"}
+  - {name: "ớt", grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: "nước mắm", grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "hành tím", grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: "tỏi", grams: 6, role: seasoning, note: "2 tép (1 tép ≈ 3 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa gà với muối, chặt miếng; ướp với hành tỏi băm và chút nước mắm.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Đập dập sả, cắt khúc; tuốt lá giang, rửa sạch và vò nhẹ.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi hành tỏi và sả, xào săn gà, đổ nước vào đun sôi, hớt bọt.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 4, text_vi: "Nấu nhỏ lửa đến khi gà mềm.", kind: passive, minutes: 25, uses_burner: true}
+  - {step_no: 5, text_vi: "Nêm nước mắm, đường; thả lá giang và ớt, sôi lại thì tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-ga-la-giang-ngon-nhat-vi-chua-diu-thit-ga-00187", title: "Cách nấu canh gà lá giang ngon nhất, vị chua dịu, thịt gà dai thơm đậm đà", accessed_on: 2026-10-17}
+  - {url: "https://dienmaycholon.com/mon-ngon/cach-nau-ga-la-giang", title: "Cách nấu gà lá giang (Điện máy Chợ Lớn)", accessed_on: 2026-10-17}
+  - {url: "https://hoanghamobile.com/tin-tuc/cach-nau-ga-la-giang/", title: "Cách nấu gà lá giang (Hoàng Hà Mobile)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

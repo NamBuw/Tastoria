@@ -1,0 +1,22 @@
+slug: dau-bap-luoc
+name_vi: "Đậu bắp luộc"
+slot: rau
+servings: 4
+method: luoc
+tags: [thanh, mem, troi_nong, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "đậu bắp", grams: 400, role: main}
+  - {name: "muối", grams: 6, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 6 g); cho vào nước luộc"}
+  - {name: "nước tương", grams: 30, role: seasoning, optional: true, note: "2 muỗng canh (1 muỗng canh ≈ 15 g); pha nước chấm"}
+  - {name: "tỏi", grams: 6, role: seasoning, optional: true, note: "2 tép (1 tép ≈ 3 g)"}
+  - {name: "ớt", grams: 5, role: seasoning, optional: true, note: "1 quả (1 quả ≈ 5 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa đậu bắp, xát nhẹ với muối cho sạch lông, cắt bỏ phần cuống cứng.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun sôi nồi nước với muối.", kind: passive, minutes: 5, uses_burner: true}
+  - {step_no: 3, text_vi: "Luộc đậu bắp lửa lớn khoảng 3–4 phút đến khi xanh và chín tới, vớt ra ngâm nước lạnh.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Pha nước tương với tỏi ớt băm để chấm.", kind: active, minutes: 2, uses_burner: false}
+sources:
+  - {url: "https://cookbeo.com/recipes/dau-bap-luoc", title: "Cách Luộc Đậu Bắp Không Bị Nhớt, Xanh Mướt", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-luoc-dau-bap-175699", title: "Gợi ý cách luộc đậu bắp xanh mướt, không nhớt, giữ nguyên độ ngọt siêu đơn giản tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://cooponline.vn/cong-thuc-nau-an/dau-bap-luoc-mon-luoc-thanh-mat-gion-ngot-va-de-tieu/", title: "Đậu bắp luộc - món luộc thanh mát, giòn ngọt và dễ tiêu", accessed_on: 2026-10-17}
+notes: "Nước luộc, nước pha không ghi thành nguyên liệu."

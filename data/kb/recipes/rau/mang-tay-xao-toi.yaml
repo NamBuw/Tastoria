@@ -1,0 +1,22 @@
+slug: mang-tay-xao-toi
+name_vi: "Măng tây xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, gion, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "măng tây", grams: 300, role: main, note: "khoảng 1,2 bó (1 bó ≈ 250 g)"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Bẻ bỏ phần gốc già của măng tây, cắt khúc vát, rửa sạch.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Chần nhanh rau trong nước sôi có chút muối, vớt ra nước lạnh rồi để ráo.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Đập dập và băm tỏi.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi thơm một nửa tỏi với dầu, cho rau vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho nốt tỏi còn lại, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/huong-dan-thuc-hien-mon-mang-tay-xao-toi-cuc-don-gian-01430", title: "Cách làm măng tây xào tỏi thơm ngon cực đơn giản", accessed_on: 2026-10-17}
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/huong-dan-cach-lam-mang-tay-xao-toi-ngon-dung-lam-moi-nhau-thi-het-say-1377992", title: "Hướng dẫn cách làm măng tây xào tỏi ngon, dùng làm mồi nhậu thì hết sẩy", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/cach-xao-mang-tay/", title: "7 cách xào măng tây khiến món đơn giản cũng trở nên đặc biệt", accessed_on: 2026-10-17}

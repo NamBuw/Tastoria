@@ -1,0 +1,26 @@
+slug: canh-bi-dao-tom
+name_vi: "Canh bí đao nấu tôm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, nhieu_nuoc, troi_nong, bua_thuong]
+ingredients:
+  - {name: "bí đao", grams: 600, role: main, note: "còn khoảng 500 g sau khi gọt vỏ"}
+  - {name: "tôm", grams: 200, role: main}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt vỏ bí đao, bỏ ruột, cắt miếng; thái hành lá.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Bóc vỏ, rút chỉ tôm, băm hoặc giã dập; ướp với hành tím băm, tiêu và một ít nước mắm.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi hành, xào tôm đến khi đỏ và thơm, đổ nước vào đun sôi.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho rau củ vào, nêm nước mắm.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 5, text_vi: "Nấu lửa vừa đến khi rau củ chín mềm.", kind: passive, minutes: 7, uses_burner: true}
+  - {step_no: 6, text_vi: "Nêm lại, cho hành lá hoặc rau thơm rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-bi-dao-nau-tom-tuoi-ngon-ngot-thanh-mat-don-11608", title: "2 Cách nấu canh bí đao nấu tôm ngon ngọt thanh mát đơn giản tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://www.cooky.vn/cong-thuc/canh-bi-dao-nau-tom-thit-1540", title: "Cách làm Canh Bí Đao Nấu Tôm Thịt cực dễ cho chị em nội trợ", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-nau-canh-bi-dao-nau-tom-va-nau-moc-thanh-mat-cho-bua-10369", title: "2 cách nấu canh bí đao nấu tôm và nấu mọc thanh mát cho bữa cơm gia đình", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

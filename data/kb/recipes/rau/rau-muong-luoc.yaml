@@ -1,0 +1,24 @@
+slug: rau-muong-luoc
+name_vi: "Rau muống luộc"
+slot: rau
+servings: 4
+method: luoc
+tags: [thanh, troi_nong, bua_thuong]
+ingredients:
+  - {name: "rau muống", grams: 500, role: main, note: "1 bó lớn khoảng 500 g"}
+  - {name: "muối", grams: 6, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 6 g); cho vào nước luộc"}
+  - {name: "nước mắm", grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g); pha nước chấm"}
+  - {name: "chanh", grams: 25, role: seasoning, note: "1/2 quả (1 quả ≈ 50 g); vắt vào nước luộc và nước chấm"}
+  - {name: "tỏi", grams: 9, role: seasoning, optional: true, note: "3 tép (1 tép ≈ 3 g); cho vào nước chấm"}
+  - {name: "ớt", grams: 5, role: seasoning, optional: true, note: "1 quả (1 quả ≈ 5 g)"}
+  - {name: "đường", grams: 4, role: seasoning, optional: true, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt rau muống, bỏ lá úa và gốc già, rửa sạch.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun sôi một nồi nước lớn với muối.", kind: passive, minutes: 6, uses_burner: true}
+  - {step_no: 3, text_vi: "Cho rau vào luộc ở lửa lớn, mở vung, đến khi cọng vừa chín thì vớt ra.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Pha nước chấm từ nước mắm, chanh, đường, tỏi ớt băm; vắt chút chanh vào nước luộc để làm canh.", kind: active, minutes: 3, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-luoc-rau-muong-xanh-muot-gion-ngon-khong-bi-tham-den-cuc-10244", title: "Cách luộc rau muống xanh mướt giòn ngon không bị thâm đen cực dễ tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/nuoc-luoc-rau-muong-mau-xanh-sam-168918", title: "Có nên ăn nước luộc rau muống màu xanh sẫm? Mẹo luộc rau muống xanh giòn, hấp dẫn", accessed_on: 2026-10-17}
+  - {url: "https://ngoisao.vn/theo-dong-su-kien/lam-sao/meo-luoc-rau-muong-mua-he-dung-tha-ngay-rau-vao-noi-bo-them-mot-thu-vao-truoc-rau-muong-se-xanh-muot-gion-san-sat-d485276.html", title: "Mẹo luộc rau muống mùa hè: Đừng thả ngay rau vào nồi, bỏ thêm một thứ vào trước, rau muống sẽ xanh mướt, giòn 'sần sật'", accessed_on: 2026-10-17}
+notes: "Nước luộc, nước pha không ghi thành nguyên liệu. Nước luộc rau giữ lại uống như canh (miền Bắc thường dầm sấu hoặc chanh)."

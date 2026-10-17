@@ -1,0 +1,21 @@
+slug: muop-xao-gia
+name_vi: "Mướp xào giá"
+slot: rau
+servings: 4
+method: xao
+tags: [thanh, mem, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "mướp", grams: 600, role: main, note: "2 quả (1 quả ≈ 300 g)"}
+  - {name: "giá đỗ", grams: 200, role: main}
+  - {name: "tỏi", grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, optional: true, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt vỏ mướp, cắt khúc rồi bổ miếng; nhặt rễ giá, rửa sạch; hành cắt khúc.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi thơm tỏi, cho mướp vào xào lửa vừa đến khi mướp hơi mềm, nêm muối.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Cho giá và hành lá vào đảo nhanh khoảng 1 phút rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-muop-xao-gia-do-thom-ngon-don-gian-cho-bua-com-07113", title: "Cách làm mướp xào giá đỗ giòn ngon đơn giản đổi vị cho bữa cơm", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/tong-hop-12-cach-lam-muop-xao-thanh-ngot-thom-ngon-don-gian-11620", title: "Tổng hợp 12 cách làm mướp xào thanh ngọt thơm ngon đơn giản (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-muop-xao-gia-thit-bo-gion-ngon-hap-dan-cho-bua-com-10435", title: "Cách làm mướp xào giá thịt bò giòn ngon hấp dẫn cho bữa cơm (Điện Máy XANH)", accessed_on: 2026-10-17}

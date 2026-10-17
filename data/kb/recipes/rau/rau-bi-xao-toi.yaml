@@ -1,0 +1,21 @@
+slug: rau-bi-xao-toi
+name_vi: "Rau bí xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, gion, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "rau bí", grams: 500, role: main, note: "khoảng 1,25 bó (1 bó ≈ 400 g)"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Tước vỏ xơ ở cọng và lá rau bí, bẻ khúc, rửa sạch.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 2, text_vi: "Đập dập và băm tỏi.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm một nửa tỏi với dầu, cho rau vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho nốt tỏi còn lại, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/doi-song-cooking-xao-rau-bi-voi-toi-4589418.html", title: "Bí quyết xào rau bí với tỏi xanh giòn", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-rau-bi-xao-toi-va-rau-bi-xao-tom-thom-ngon-hap-dan-04223", title: "3 cách làm rau bí xào tỏi và rau bí xào tôm thơm ngon hấp dẫn", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-lam-rau-bi-xao-toi-173135", title: "Cách làm rau bí xào tỏi giòn ngon, giữ nguyên chất dinh dưỡng cho cả gia đình", accessed_on: 2026-10-17}

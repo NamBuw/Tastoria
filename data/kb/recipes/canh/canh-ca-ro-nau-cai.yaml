@@ -1,0 +1,27 @@
+slug: canh-ca-ro-nau-cai
+name_vi: "Canh cá rô đồng nấu rau cải"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thom_sa_gung, nhieu_nuoc, troi_lanh, cuoi_tuan]
+ingredients:
+  - {name: "cá rô đồng", grams: 500, role: main, note: "5 con (1 con ≈ 100 g)"}
+  - {name: "cải bẹ xanh", grams: 400, role: main}
+  - {name: "gừng", grams: 20, role: seasoning, note: "1 nhánh nhỏ"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Đánh vảy, làm sạch cá rô, xát muối khử nhớt rồi rửa lại.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 2, text_vi: "Luộc cá với nước, gừng và chút muối đến khi chín; vớt cá ra, giữ nước luộc.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 3, text_vi: "Chờ cá chín.", kind: passive, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Gỡ thịt cá; giã xương đầu với chút nước luộc, lọc lấy nước cho vào nồi.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 5, text_vi: "Phi hành tím, xào thịt cá với chút nước mắm cho thơm; cắt cải thành khúc.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 6, text_vi: "Đun sôi nồi nước cá, cho cải vào, nêm nước mắm.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 7, text_vi: "Cho thịt cá vào, sôi lại thì tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/canh-cai-nau-ca-ro-dong-4798634.html", title: "Cách làm canh cải nấu cá rô đồng", accessed_on: 2026-10-17}
+  - {url: "https://tuoitre.vn/me-ly-ro-dong-nau-rau-cai-be-20210808090530415.htm", title: "Mê ly rô đồng nấu rau cải bẹ", accessed_on: 2026-10-17}
+  - {url: "https://dienmaycholon.com/kinh-nghiem-mua-sam/cach-nau-canh-ca-ro-rau-cai", title: "Cách nấu canh cá rô rau cải (Điện máy Chợ Lớn)", accessed_on: 2026-10-17}
+notes: "Dùng nước luộc cá làm nước canh."

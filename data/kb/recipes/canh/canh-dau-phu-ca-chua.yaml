@@ -1,0 +1,25 @@
+slug: canh-dau-phu-ca-chua
+name_vi: "Canh đậu phụ cà chua"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [chua_ngot, mem, nhieu_nuoc, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "đậu phụ", grams: 300, role: main, note: "2 miếng (1 miếng ≈ 150 g)"}
+  - {name: "cà chua", grams: 360, role: main, note: "3 quả (1 quả ≈ 120 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "hạt nêm chay", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt đậu phụ miếng vuông nhỏ; bổ múi cà chua; thái hành lá.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi chút dầu, xào cà chua đến khi mềm nhừ.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Đun sôi nước, cho rau củ vào, nêm muối và hạt nêm chay.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Nấu lửa vừa đến khi rau củ chín.", kind: passive, minutes: 4, uses_burner: true}
+  - {step_no: 5, text_vi: "Nêm lại, rắc hành lá hoặc rau thơm rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://yummyday.vn/canh-dau-phu-ca-chua-197", title: "Cách làm món canh đậu phụ cà chua cực kỳ ngon - YummyDay", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-ca-chua-trung-dau-hu-ngon-chua-beo-hap-dan-ngay-11702", title: "Cách nấu canh cà chua trứng đậu hũ ngon, chua béo hấp dẫn ngay tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://abcfood.vn/3-cach-bien-tau-canh-dau-phu-ca-chua-doc-dao-sieu-don-gian.html", title: "3+ cách “biến tấu” canh đậu phụ cà chua độc đáo, siêu đơn giản", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

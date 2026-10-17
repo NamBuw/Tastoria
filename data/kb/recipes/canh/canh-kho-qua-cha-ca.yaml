@@ -1,0 +1,26 @@
+slug: canh-kho-qua-cha-ca
+name_vi: "Canh khổ qua chả cá thác lác"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [dang, thanh, nhieu_nuoc, troi_nong, bua_thuong]
+ingredients:
+  - {name: "mướp đắng", grams: 500, role: main, note: "2 quả (1 quả ≈ 250 g)"}
+  - {name: "chả cá thác lác", grams: 300, role: main}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 1.2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "hành tím", grams: 10, role: seasoning, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: "rau mùi", grams: 5, role: seasoning, optional: true}
+steps:
+  - {step_no: 1, text_vi: "Bổ dọc mướp đắng, bỏ ruột, thái lát hoặc cắt khúc; thái hành lá.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Trộn chả cá với hành lá băm, tiêu và chút nước mắm.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Đun sôi nước, vo chả cá thành viên hoặc dùng thìa nặn thả vào nồi.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho mướp đắng vào, nêm nước mắm.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 5, text_vi: "Nấu đến khi mướp đắng chín mềm và chả nổi.", kind: passive, minutes: 10, uses_burner: true}
+  - {step_no: 6, text_vi: "Rắc hành lá, rau mùi và tiêu rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-kho-qua-ca-thac-lac-ngon-ngot-don-gian-tai-nha-06615", title: "Cách nấu canh khổ qua cá thác lác thanh mát, đổi vị cho gia đình", accessed_on: 2026-10-17}
+  - {url: "https://dienmaycholon.com/kinh-nghiem-mua-sam/cach-nau-canh-kho-qua-ca-thac-lac", title: "Cách nấu canh khổ qua cá thác lác (Điện máy Chợ Lớn)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cha-ca-nau-canh-gi-ngon-tong-hop-11-cach-nau-canh-cha-ca-ngon-13749", title: "Chả cá nấu canh gì ngon? Tổng hợp 11 cách nấu canh chả cá ngon", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu. Nguồn dùng 150–300 g chả cá; nhồi chả vào khúc khổ qua là cách làm khác cũng phổ biến."

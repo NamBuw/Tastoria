@@ -1,0 +1,27 @@
+slug: canh-suon-nau-sau
+name_vi: "Canh sườn nấu sấu"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [chua, nhieu_nuoc, troi_nong, cuoi_tuan]
+ingredients:
+  - {name: "sườn non", grams: 500, role: main}
+  - {name: "sấu", grams: 120, role: main, note: "8 quả (1 quả ≈ 15 g)"}
+  - {name: "cà chua", grams: 240, role: main, note: "2 quả (1 quả ≈ 120 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "thì là", grams: 10, role: seasoning, optional: true}
+steps:
+  - {step_no: 1, text_vi: "Chặt sườn, chần qua nước sôi rồi rửa lại; sấu gọt vỏ, khía cạnh.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 2, text_vi: "Phi hành tím, xào săn sườn với chút nước mắm, đổ nước và sấu vào đun sôi, hớt bọt.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 3, text_vi: "Ninh nhỏ lửa đến khi sườn mềm, sấu chín thì dầm sấu cho ra chua.", kind: passive, minutes: 35, uses_burner: true}
+  - {step_no: 4, text_vi: "Xào cà chua bổ múi cho mềm rồi cho vào nồi, nêm muối, nước mắm.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 5, text_vi: "Sôi lại thì rắc hành lá và thì là, tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-suon-nau-sau-dam-da-giai-nhiet-ngay-nang-he-08165", title: "Cách nấu canh sườn nấu sấu đậm đà, giải nhiệt ngày nắng hè", accessed_on: 2026-10-17}
+  - {url: "https://mytour.vn/vi/blog/bai-viet/chia-se-bi-quyet-lam-canh-suon-nau-sau-chua-chua-doc-dao.html", title: "Chia sẻ bí quyết làm canh sườn nấu sấu chua chua độc đáo (Mytour)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-nau-canh-sau-thit-bam-va-suon-thanh-mat-thom-ngon-don-05479", title: "2 cách nấu canh sấu thịt băm và sườn thanh mát thơm ngon (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

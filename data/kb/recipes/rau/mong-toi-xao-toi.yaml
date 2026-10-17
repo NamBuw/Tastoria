@@ -1,0 +1,21 @@
+slug: mong-toi-xao-toi
+name_vi: "Mồng tơi xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, mem, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "mồng tơi", grams: 500, role: main, note: "khoảng 1,25 bó (1 bó ≈ 400 g)"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt mồng tơi lấy ngọn và lá non, rửa sạch, để ráo.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Đập dập và băm tỏi.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm một nửa tỏi với dầu, cho rau vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho nốt tỏi còn lại, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/doi-song-cooking-mong-toi-xao-toi-4495929.html", title: "Cách làm mồng tơi xào tỏi đơn giản, ngon như nhà hàng", accessed_on: 2026-10-17}
+  - {url: "https://voh.com.vn/suc-khoe/mong-toi-xao-toi-348823.html", title: "Lợi ích sức khỏe khi ăn mồng tơi xào tỏi", accessed_on: 2026-10-17}
+  - {url: "https://www.cooky.vn/photo/detail/436056", title: "Rau mồng tơi xào tỏi", accessed_on: 2026-10-17}

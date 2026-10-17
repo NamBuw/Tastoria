@@ -1,0 +1,25 @@
+slug: dua-gia
+name_vi: "Dưa giá"
+slot: rau
+servings: 4
+method: muoi_chua
+tags: [chua, gion, bua_thuong, com_hop]
+ingredients:
+  - {name: "giá đỗ", grams: 500, role: main}
+  - {name: "hẹ", grams: 100, role: main, note: "1 bó (≈ 100 g)"}
+  - {name: "cà rốt", grams: 100, role: main, note: "1 củ (1 củ ≈ 100 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 36, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: "giấm", grams: 75, role: seasoning, note: "khoảng 5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "ớt", grams: 10, role: seasoning, optional: true, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: "hành tím", grams: 30, role: seasoning, optional: true, note: "3 củ (1 củ ≈ 10 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt rễ giá, rửa và để thật ráo; hẹ cắt khúc; cà rốt bào sợi; hành tím thái lát.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Pha nước ngâm từ nước ấm, muối, đường và giấm, khuấy tan.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Cho giá, hẹ, cà rốt và hành vào hũ, đổ nước ngâm ngập, dằn nhẹ.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 4, text_vi: "Đậy kín để ở nhiệt độ phòng đến khi dưa ngả vàng và chua nhẹ.", kind: passive, minutes: 360, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-ngam-dua-gia-dung-chuan-cho-bua-com-ngay-tet-00841", title: "2 Cách làm (muối) dưa giá hẹ thơm ngon, bắt vị cho bữa cơm thêm tròn vị", accessed_on: 2026-10-17}
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/cach-lam-dua-gia-chua-ngot-gion-ngon-chong-ngan-ngay-tet-1231933", title: "Cách làm dưa giá chua ngọt, giòn ngon chống ngán ngày Tết", accessed_on: 2026-10-17}
+  - {url: "https://www.cooky.vn/blog/cach-lam-dua-gia-ngon-gion-giu-duoc-lau-va-giup-chong-ngan-trong-nhung-ngay-tet-4416", title: "Cách Làm Dưa Giá Giòn, Giữ Được Lâu Cho Ngày Tết", accessed_on: 2026-10-17}
+notes: "Ủ khoảng 6 giờ (bước chờ, không chiếm người nấu); sau đó cất ngăn mát và ăn trong vài ngày."

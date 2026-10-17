@@ -1,0 +1,29 @@
+slug: canh-moc
+name_vi: "Canh mọc"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, mem, nhieu_nuoc, cuoi_tuan]
+ingredients:
+  - {name: "thịt băm", grams: 300, role: main, note: "nhiều nhà dùng giò sống; ở đây là thịt lợn xay"}
+  - {name: "nấm hương khô", grams: 15, role: main}
+  - {name: "mộc nhĩ", grams: 10, role: main, note: "khô"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 1.2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "xương ống lợn", grams: 500, role: side, optional: true, note: "ninh làm nước dùng"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm nấm hương và mộc nhĩ cho nở.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 2, text_vi: "Chờ nấm nở.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Thái nhỏ mộc nhĩ và một nửa nấm hương; trộn với thịt băm, hành tím băm, tiêu, nước mắm và quết cho dẻo.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 4, text_vi: "Đun sôi nước (hoặc nước ninh xương), cho phần nấm hương còn lại vào.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 5, text_vi: "Vo nhân thành viên nhỏ, thả từng viên vào nồi nước sôi, hớt bọt.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 6, text_vi: "Nấu đến khi viên mọc nổi lên và chín.", kind: passive, minutes: 5, uses_burner: true}
+  - {step_no: 7, text_vi: "Nêm nước mắm, rắc hành lá và tiêu rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-moc-nam-kim-cham-thom-ngon-don-gian-tai-nha-23829", title: "Cách nấu canh mọc nấm kim châm thơm ngon, đơn giản tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-moc-nam-huong-ngot-thanh-chuan-vi-cho-mam-co-23415", title: "Cách nấu canh mọc nấm hương ngọt thanh chuẩn vị cho mâm cỗ (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-moc-thap-cam-thom-ngon-don-gian-cho-bua-com-gia-07227", title: "Cách nấu canh mọc thập cẩm thơm ngon đơn giản cho bữa cơm gia đình (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu. Nếu ninh xương làm nước dùng thì cộng thêm khoảng 60 phút ninh."

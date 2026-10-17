@@ -1,0 +1,34 @@
+slug: canh-chua-chay
+name_vi: "Canh chua chay"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [chua_ngot, nhieu_nuoc, troi_nong, bua_thuong]
+ingredients:
+  - {name: "đậu phụ", grams: 300, role: main, note: "2 miếng (1 miếng ≈ 150 g)"}
+  - {name: "cà chua", grams: 240, role: main, note: "2 quả (1 quả ≈ 120 g)"}
+  - {name: "dứa", grams: 200, role: main, note: "khoảng 1/4 quả"}
+  - {name: "đậu bắp", grams: 100, role: main}
+  - {name: "giá đỗ", grams: 100, role: main}
+  - {name: "me chua", grams: 40, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 20 g); dầm lấy nước"}
+  - {name: "ngò gai", grams: 10, role: seasoning}
+  - {name: "nước tương", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 18, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "dầu ăn", grams: 42, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 14 g); rán đậu"}
+  - {name: "hạt nêm chay", grams: 4, role: seasoning, optional: true, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dọc mùng", grams: 100, role: side, optional: true}
+  - {name: "rau ngổ", grams: 10, role: seasoning, optional: true}
+  - {name: "ớt", grams: 5, role: seasoning, optional: true, note: "1 quả (1 quả ≈ 5 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt đậu phụ miếng vừa; dầm me lấy nước; thái dứa, cà chua, đậu bắp, dọc mùng; nhặt giá và rau thơm.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Rán vàng đậu phụ, vớt ra.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 3, text_vi: "Xào cà chua và dứa, đổ nước và nước me vào đun sôi.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho đậu bắp, dọc mùng và đậu rán; nêm nước tương, đường, muối, hạt nêm chay.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 5, text_vi: "Nấu đến khi đậu bắp chín.", kind: passive, minutes: 3, uses_burner: true}
+  - {step_no: 6, text_vi: "Cho giá, tắt bếp, rắc ngò gai, rau ngổ và ớt.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-chua-chay-nam-thanh-dam-bat-vi-cho-bua-com-chay-12274", title: "Cách nấu canh chua chay nấm thanh đạm, bắt vị cho bữa cơm chay", accessed_on: 2026-10-17}
+  - {url: "https://vietnamnet.vn/cach-nau-canh-chua-chay-nam-thanh-dam-cho-bua-an-hang-ngay-2124985.html", title: "Cách nấu canh chua chay nấm thanh đạm cho bữa ăn hằng ngày (vietnamnet)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-chua-dau-chay-don-gian-cho-bua-com-chay-03763", title: "Cách nấu canh chua đậu chay đơn giản cho bữa cơm chay", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

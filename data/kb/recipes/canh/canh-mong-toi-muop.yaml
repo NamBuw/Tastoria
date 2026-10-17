@@ -1,0 +1,21 @@
+slug: canh-mong-toi-muop
+name_vi: "Canh mồng tơi nấu mướp"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, mem, nhieu_nuoc, troi_nong, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "mồng tơi", grams: 300, role: main}
+  - {name: "mướp", grams: 300, role: main, note: "1 quả (1 quả ≈ 300 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "hạt nêm chay", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "hành lá", grams: 15, role: seasoning, optional: true, note: "1 cây (1 cây ≈ 15 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt mồng tơi; gọt mướp, cắt miếng.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun sôi nước.", kind: passive, minutes: 5, uses_burner: true}
+  - {step_no: 3, text_vi: "Cho rau vào, nêm muối và hạt nêm chay, sôi lại thì tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/tong-hop-7-cach-nau-canh-muop-ngon-ngot-thanh-nhiet-cho-gia-12191", title: "Tổng hợp 7 cách nấu canh mướp ngon ngọt thanh nhiệt cho gia đình", accessed_on: 2026-10-17}
+  - {url: "https://mytour.vn/vi/blog/bai-viet/8-cach-nau-canh-muop-thom-ngon-thanh-mat-de-che-bien.html", title: "8 cách nấu canh mướp thơm ngon, thanh mát, dễ chế biến", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-mong-toi-nau-tom-kho-thom-ngon-thanh-dam-cho-12447", title: "Cách nấu canh mồng tơi nấu tôm khô thơm ngon, thanh đạm cho bữa cơm trưa", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

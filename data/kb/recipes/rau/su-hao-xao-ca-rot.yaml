@@ -1,0 +1,24 @@
+slug: su-hao-xao-ca-rot
+name_vi: "Su hào xào cà rốt"
+slot: rau
+servings: 4
+method: xao
+tags: [thanh, gion, bua_thuong, com_hop, nau_nhanh]
+ingredients:
+  - {name: "su hào", grams: 450, role: main, note: "1,5 củ (1 củ ≈ 300 g)"}
+  - {name: "cà rốt", grams: 100, role: main, note: "1 củ (1 củ ≈ 100 g)"}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, optional: true, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 28, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, optional: true, note: "2 cây (1 cây ≈ 15 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt su hào và cà rốt, thái sợi hoặc thái lát mỏng.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi thơm tỏi và hành tím, cho cà rốt vào xào trước khoảng 1 phút.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 3, text_vi: "Cho su hào vào, thêm chút nước, xào lửa lớn đến khi chín tới còn giòn, nêm muối và đường.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Rắc hành lá, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://cookbeo.com/recipes/su-hao-xao-ca-rot", title: "Cách Làm Món Su Hào Xào Cà Rốt", accessed_on: 2026-10-17}
+  - {url: "https://cooponline.vn/tin-tuc/cong-thuc-nau-an/ca-rot-xao-su-hao/", title: "Cà rốt xào su hào", accessed_on: 2026-10-17}
+  - {url: "https://kingfoodmart.com/bai-viet/cong-thuc-nau-an/su-hao-xao-ca-rot", title: "Su hào xào cà rốt - Chuỗi siêu thị thực phẩm tươi ngon, chất lượng Kingfoodmart", accessed_on: 2026-10-17}

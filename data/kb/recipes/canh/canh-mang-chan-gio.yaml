@@ -1,0 +1,31 @@
+slug: canh-mang-chan-gio
+name_vi: "Canh măng nấu chân giò"
+slot: canh
+servings: 4
+method: ham
+tags: [dam_da, beo, nhieu_nuoc, troi_lanh, cuoi_tuan]
+ingredients:
+  - {name: "măng khô", grams: 150, role: main}
+  - {name: "chân giò", grams: 800, role: main}
+  - {name: "hành lá", grams: 45, role: seasoning, note: "3 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "hành tím", grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: "muối", grams: 6, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "rau mùi", grams: 10, role: seasoning, optional: true}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa măng khô, ngâm nước vo gạo cho mềm (nên ngâm từ hôm trước).", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm măng.", kind: passive, minutes: 480, uses_burner: false}
+  - {step_no: 3, text_vi: "Luộc măng, thay nước vài lần cho hết mùi, xé nhỏ và cắt khúc.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Luộc măng.", kind: passive, minutes: 30, uses_burner: true}
+  - {step_no: 5, text_vi: "Cạo rửa chân giò, chặt miếng, chần qua nước sôi rồi rửa lại.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 6, text_vi: "Phi hành tím, xào măng với chút nước mắm cho thấm.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 7, text_vi: "Cho chân giò và măng vào nồi nước, đun sôi, hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 8, text_vi: "Hầm nhỏ lửa đến khi chân giò mềm.", kind: passive, minutes: 60, uses_burner: true}
+  - {step_no: 9, text_vi: "Nêm muối, nước mắm; rắc hành lá, rau mùi và tiêu rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-chan-gio-ham-mang-tuoi-thom-ngon-dinh-duong-cho-ca-09309", title: "2 Cách nấu chân giò hầm măng tươi thơm ngon dinh dưỡng cho cả nhà", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cac-cach-nau-gio-heo-ham-mang-ngon-van-nguoi-me-163568", title: "Các cách nấu giò heo hầm măng ngon vạn người mê", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-chan-gio-ham-mang-kho-chan-gio-ham-mang-kho-09312", title: "Cách nấu chân giò hầm măng khô", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu. Bước ngâm măng khô (khoảng 8 giờ) làm từ trước, không chiếm người nấu."

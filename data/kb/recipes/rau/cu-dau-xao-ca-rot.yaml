@@ -1,0 +1,22 @@
+slug: cu-dau-xao-ca-rot
+name_vi: "Củ đậu xào cà rốt"
+slot: rau
+servings: 4
+method: xao
+tags: [thanh, gion, bua_thuong, com_hop, nau_nhanh]
+ingredients:
+  - {name: "củ đậu", grams: 400, role: main, note: "1 củ (1 củ ≈ 400 g)"}
+  - {name: "cà rốt", grams: 100, role: main, note: "1 củ (1 củ ≈ 100 g)"}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "hành lá", grams: 15, role: seasoning, optional: true, note: "1 cây (1 cây ≈ 15 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt vỏ củ đậu và cà rốt, thái sợi.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi tỏi, xào cà rốt trước khoảng 1 phút.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 3, text_vi: "Cho củ đậu vào xào lửa lớn đến khi chín tới còn giòn, nêm muối và đường.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Rắc hành lá, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-cu-san-cu-dau-xao-chay-don-gian-de-lam-cho-bua-an-08634", title: "Cách làm củ sắn (củ đậu) xào chay đơn giản, dể làm cho bữa ăn đạm bạc", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/cu-san-xao-thit/", title: "Củ sắn xào thịt - Món Ngon Mỗi Ngày", accessed_on: 2026-10-17}

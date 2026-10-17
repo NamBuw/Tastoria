@@ -1,0 +1,24 @@
+slug: bau-xao-trung
+name_vi: "Bầu xào trứng"
+slot: rau
+servings: 4
+method: xao
+tags: [thanh, mem, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "bầu", grams: 600, role: main, note: "1 quả nhỏ"}
+  - {name: "trứng gà", grams: 100, role: main, note: "2 quả (1 quả ≈ 50 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "tỏi", grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: "hành tím", grams: 10, role: seasoning, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: "tiêu", grams: 0.8, role: seasoning, note: "1/3 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt vỏ bầu, cắt khúc rồi thái sợi hoặc thái miếng; đánh tan trứng với một ít nước mắm và tiêu.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi hành tím và tỏi, xào bầu lửa lớn, thêm vài thìa nước.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Đậy vung cho bầu chín mềm.", kind: passive, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Nêm nước mắm, đổ trứng vào, để trứng đông rồi đảo đều; rắc hành lá và tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/doi-song-cooking-bau-xao-trung-4490502.html", title: "Cách nấu bầu xào trứng - món đơn giản mà đưa cơm ngày hè", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-bau-xao-trung-va-xao-tom-don-gian-ngon-mieng-02202", title: "Cách làm bầu xào trứng béo thơm đơn giản ngon miệng cho gia đình", accessed_on: 2026-10-17}
+  - {url: "https://cookbeo.com/recipes/bau-xao-trung", title: "Cách Làm Bầu Xào Trứng Gà Đơn Giản Trong 15 Phút", accessed_on: 2026-10-17}

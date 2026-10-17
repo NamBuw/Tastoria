@@ -1,0 +1,26 @@
+slug: canh-bi-xanh-nau-ngao
+name_vi: "Canh bí xanh nấu ngao"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, thom_sa_gung, nhieu_nuoc, troi_nong, bua_thuong]
+ingredients:
+  - {name: "bí đao", grams: 500, role: main, note: "còn khoảng 400 g sau khi gọt"}
+  - {name: "nghêu", grams: 800, role: main, note: "cả vỏ"}
+  - {name: "gừng", grams: 10, role: seasoning, note: "vài lát"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "hành tím", grams: 10, role: seasoning, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm ngao với nước muối có lát ớt cho nhả cát, rửa lại.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm ngao nhả cát.", kind: passive, minutes: 30, uses_burner: false}
+  - {step_no: 3, text_vi: "Luộc ngao với gừng đến khi há miệng, tách thịt, lọc lấy nước luộc.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 4, text_vi: "Gọt vỏ bí, bỏ ruột, cắt miếng; thái hành lá.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 5, text_vi: "Phi hành tím, cho bí vào đảo, đổ nước luộc ngao vào, nêm nước mắm.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 6, text_vi: "Nấu đến khi bí chín trong.", kind: passive, minutes: 7, uses_burner: true}
+  - {step_no: 7, text_vi: "Cho thịt ngao, sôi lại thì tắt bếp, rắc hành lá.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-ngao-ngheu-nau-bau-bat-com-ngon-mieng-07442", title: "Cách nấu canh ngao (nghêu) nấu bầu bắt cơm ngon miệng (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/mon-canh-thanh-mat-cho-ngay-dau-nam-2425273.html", title: "Món canh thanh mát cho ngày đầu năm (VnExpress)", accessed_on: 2026-10-17}
+notes: "Dùng nước luộc ngao làm nước canh. Chưa tìm được trang công thức đúng tên món; nguồn ghi dưới đây là các món gần (canh ngao nấu bầu, canh bí xanh nấu tôm); định lượng là của nhóm dựa trên các món đó."

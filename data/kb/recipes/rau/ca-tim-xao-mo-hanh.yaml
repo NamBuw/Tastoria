@@ -1,0 +1,26 @@
+slug: ca-tim-xao-mo-hanh
+name_vi: "Cà tím xào mỡ hành"
+slot: rau
+servings: 4
+method: xao
+tags: [dam_da, thom_toi, mem, bua_thuong]
+ingredients:
+  - {name: "cà tím", grams: 400, role: main, note: "2 quả (1 quả ≈ 200 g)"}
+  - {name: "hành lá", grams: 75, role: main, note: "5 cây (1 cây ≈ 15 g)"}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 42, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "ớt", grams: 5, role: seasoning, optional: true, note: "1 quả (1 quả ≈ 5 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g); ngâm cà"}
+steps:
+  - {step_no: 1, text_vi: "Cắt cà tím thành khúc rồi bổ dọc, ngâm nước muối loãng cho bớt thâm và bớt nhựa.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm cà trong nước muối.", kind: passive, minutes: 10, uses_burner: false}
+  - {step_no: 3, text_vi: "Thái nhỏ hành lá, băm tỏi; vớt cà ra để ráo.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi thơm tỏi, xào cà tím đến khi mềm, nêm nước mắm và đường.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho hành lá và dầu nóng vào trộn đều tạo mỡ hành, thêm ớt rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-ca-tim-chien-mo-hanh-thom-ngon-beo-bui-cuc-bat-vi-15907", title: "Cách làm cà tím chiên mỡ hành thơm ngon, béo bùi cực bắt vị", accessed_on: 2026-10-17}
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/chi-15-phut-co-ngay-dia-ca-tim-xao-thit-bam-thom-ngon-bo-duong-hao-com-1258085", title: "Chỉ 15 phút có ngay đĩa cà tím xào thịt băm thơm ngon (Bách hoá XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-ca-tim-xao-toi-ot-thom-ngon-cuc-dua-com-don-gian-tai-13961", title: "Cách làm cà tím xào tỏi ớt thơm ngon, đưa cơm, đơn giản tại nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Dùng dầu ăn thay mỡ lợn để làm mỡ hành."

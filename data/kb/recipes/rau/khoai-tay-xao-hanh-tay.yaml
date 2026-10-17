@@ -1,0 +1,23 @@
+slug: khoai-tay-xao-hanh-tay
+name_vi: "Khoai tây xào hành tây"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, mem, bua_thuong, com_hop]
+ingredients:
+  - {name: "khoai tây", grams: 500, role: main}
+  - {name: "hành tây", grams: 110, role: main, note: "1 củ (1 củ ≈ 110 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "tiêu", grams: 1.2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "dầu ăn", grams: 28, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "tỏi", grams: 6, role: seasoning, note: "2 tép (1 tép ≈ 3 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, optional: true, note: "2 cây (1 cây ≈ 15 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt khoai tây, thái sợi hoặc thái lát mỏng, ngâm nước cho bớt tinh bột rồi để ráo.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Bóc hành tây, thái múi cau; băm tỏi.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi tỏi, xào khoai tây lửa vừa đến khi gần chín.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho hành tây vào xào thêm, nêm muối và tiêu, rắc hành lá rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://chayngonhungphat.com/khoai-tay-xao-hanh-tay-thom-ngon-hap-dan", title: "Khoai tây xào hành tây thơm ngon, hấp dẫn", accessed_on: 2026-10-17}
+  - {url: "https://toyenxin.com/blog-1/xao-khoai-tay-voi-hanh-vi-cb.html", title: "Xào Khoai Tây Với Hành: Hướng Dẫn Chi Tiết Cho Bữa Ăn Thêm Ngon", accessed_on: 2026-10-17}
+  - {url: "https://kingfoodmart.com/bai-viet/cong-thuc-nau-an/khoai-tay-xao-ca-chua-hanh-tay", title: "Khoai tây xào cà chua hành tây - Chuỗi siêu thị thực phẩm tươi ngon, chất lượng Kingfoodmart", accessed_on: 2026-10-17}

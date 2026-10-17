@@ -1,0 +1,27 @@
+slug: canh-du-du-suon
+name_vi: "Canh đu đủ nấu sườn"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, mem, nhieu_nuoc, bua_thuong]
+ingredients:
+  - {name: "sườn non", grams: 400, role: main}
+  - {name: "đu đủ xanh", grams: 500, role: main, note: "khoảng 2/3 quả"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa sườn non, chặt miếng; chần qua nước sôi rồi rửa lại cho sạch.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 2, text_vi: "Cho xương vào nồi với nước lạnh và hành tím đập dập, đun sôi rồi hạ lửa, hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 3, text_vi: "Ninh nhỏ lửa cho xương ra ngọt.", kind: passive, minutes: 25, uses_burner: true}
+  - {step_no: 4, text_vi: "Gọt vỏ đu đủ, bỏ hạt, cắt miếng vừa, ngâm nước muối cho bớt nhựa; thái hành lá.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 5, text_vi: "Cho rau củ vào nồi, nêm muối và nước mắm.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 6, text_vi: "Nấu tiếp đến khi rau củ chín mềm.", kind: passive, minutes: 12, uses_burner: true}
+  - {step_no: 7, text_vi: "Nêm lại, rắc hành lá, rau thơm và tiêu rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-nau-suon-heo-va-suon-bo-ham-du-du-ngon-ngot-hap-dan-09402", title: "2 cách nấu sườn heo và sườn bò hầm đu đủ ngon ngọt hấp dẫn đơn giản tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/tong-hop-13-cach-nau-canh-du-du-mem-ngon-thom-bui-hap-dan-de-11980", title: "Tổng hợp 13 cách nấu canh đu đủ mềm ngon thơm bùi hấp dẫn", accessed_on: 2026-10-17}
+  - {url: "https://dienmaycholon.com/mon-ngon/cach-nau-suon-bo-ham", title: "Cách nấu sườn bò hầm (Điện máy Chợ Lớn)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

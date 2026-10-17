@@ -1,0 +1,25 @@
+slug: canh-cai-xanh-thit-bam
+name_vi: "Canh cải xanh thịt băm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, thom_sa_gung, nhieu_nuoc, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "cải bẹ xanh", grams: 400, role: main, note: "khoảng 1 bó nhỏ"}
+  - {name: "thịt băm", grams: 150, role: main}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+  - {name: "gừng", grams: 10, role: seasoning, note: "1 lát dày, thái sợi"}
+  - {name: "hạt nêm", grams: 2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt gốc, rửa sạch cải, cắt khúc; thái sợi gừng.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp thịt băm với hành tím băm, tiêu và một ít nước mắm.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm hành, cho thịt vào xào tơi rồi đổ nước, đun sôi và hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Thả rau vào, nêm phần nước mắm còn lại; nấu đến khi rau vừa chín rồi tắt bếp.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/canh-cai-xanh-nau-thit-bam-2949202.html", title: "Canh cải xanh nấu thịt bằm - Báo VnExpress Đời sống", accessed_on: 2026-10-17}
+  - {url: "https://www.cooky.vn/cong-thuc/canh-cai-thit-bam-1863", title: "Cách Làm Canh Cải Thịt Bằm Thơm Ngon Nóng Hổi", accessed_on: 2026-10-17}
+  - {url: "https://dienmaycholon.com/mon-ngon/cach-nau-canh-rau-cai", title: "Cách nấu canh rau cải (Điện máy Chợ Lớn)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

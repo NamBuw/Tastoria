@@ -1,0 +1,25 @@
+slug: canh-mong-toi-tom-bap
+name_vi: "Canh mồng tơi tôm bắp"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, nhieu_nuoc, troi_nong, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "mồng tơi", grams: 300, role: main}
+  - {name: "tôm", grams: 200, role: main}
+  - {name: "ngô ngọt", grams: 300, role: main, note: "1 bắp (≈ 300 g, cả lõi); tách lấy khoảng 150 g hạt"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "hạt nêm", grams: 4, role: seasoning, optional: true, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt mồng tơi; bóc vỏ, rút chỉ và băm tôm; tách hạt ngô.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi hành, xào tôm thơm, đổ nước và ngô vào đun sôi.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Nấu cho ngô chín.", kind: passive, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Thả mồng tơi, nêm nước mắm và hạt nêm, sôi lại thì tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://monngonmoingay.com/canh-mong-toi-tom-bap/", title: "Canh Mồng Tơi Tôm Bắp - Món Ngon Mỗi Ngày", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/canh-mong-toi-bap-nu/", title: "Canh mồng tơi bắp nụ - Món Ngon Mỗi Ngày", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-mong-toi-nau-tom-tuoi-thanh-mat-sieu-don-gian-09728", title: "Cách nấu canh mồng tơi nấu tôm tươi thanh mát, siêu đơn giản chỉ với 3 bước", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

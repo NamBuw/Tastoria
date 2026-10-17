@@ -1,0 +1,24 @@
+slug: canh-nam-dau-hu
+name_vi: "Canh nấm đậu hũ"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, nhieu_nuoc, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "nấm rơm", grams: 200, role: main}
+  - {name: "đậu phụ", grams: 300, role: main, note: "2 miếng (1 miếng ≈ 150 g)"}
+  - {name: "cải ngọt", grams: 200, role: main}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "hạt nêm chay", grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+steps:
+  - {step_no: 1, text_vi: "Gọt chân nấm, ngâm nước muối, rửa sạch, bổ đôi; cắt đậu phụ miếng; cải ngọt cắt khúc.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun sôi nước, cho rau củ vào, nêm muối và hạt nêm chay.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Nấu lửa vừa đến khi rau củ chín.", kind: passive, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Nêm lại, rắc hành lá hoặc rau thơm rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-nam-dau-hu-non-voi-he-va-thit-bam-thanh-dam-cho-10086", title: "Cách nấu canh nấm đậu hũ non với hẹ và thịt băm thanh đạm cho cả nhà", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-he-voi-dau-hu-va-nam-thanh-dam-cuc-don-gian-09490", title: "Cách nấu canh hẹ với đậu hũ và nấm thanh đạm cực đơn giản (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-bong-he-dau-hu-nam-chay-thanh-mat-giai-nhiet-11062", title: "Cách nấu canh bông hẹ đậu hũ nấm chay thanh mát (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

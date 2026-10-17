@@ -1,0 +1,20 @@
+slug: bong-cai-xanh-xao-toi
+name_vi: "Bông cải xanh xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, gion, bua_thuong, com_hop, nau_nhanh]
+ingredients:
+  - {name: "súp lơ xanh", grams: 500, role: main, note: "khoảng 1,5 cây (1 cây ≈ 350 g)"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt súp lơ thành bông nhỏ, ngâm nước muối loãng vài phút rồi rửa sạch.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Chần súp lơ trong nước sôi khoảng 1–2 phút, vớt ra nước lạnh, để ráo.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Phi thơm tỏi băm, cho súp lơ vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Đảo đến khi bông súp lơ thấm gia vị thì tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/bi-quyet-lam-sup-lo-xao-toi-xanh-gion-thom-lung-cho-bua-com-23557", title: "Bí quyết làm súp lơ xào tỏi xanh giòn, thơm lừng cho bữa cơm đơn giản", accessed_on: 2026-10-17}
+  - {url: "https://mytour.vn/vi/blog/bai-viet/bi-quyet-lam-sup-lo-baby-xao-toi-thom-ngon-gion-rum.html", title: "Bí quyết làm súp lơ baby xào tỏi thơm ngon giòn rụm (Mytour)", accessed_on: 2026-10-17}

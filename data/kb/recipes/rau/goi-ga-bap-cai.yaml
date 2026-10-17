@@ -1,0 +1,33 @@
+slug: goi-ga-bap-cai
+name_vi: "Gỏi gà bắp cải"
+slot: rau
+servings: 4
+method: tron
+tags: [chua_ngot, gion, cuoi_tuan, troi_nong]
+ingredients:
+  - {name: "bắp cải", grams: 500, role: main, note: "khoảng nửa bắp"}
+  - {name: "thịt gà", grams: 700, role: main, note: "khoảng nửa con gà nhỏ, cả xương"}
+  - {name: "hành tây", grams: 110, role: main, note: "1 củ (1 củ ≈ 110 g)"}
+  - {name: "cà rốt", grams: 100, role: side, note: "1 củ (1 củ ≈ 100 g)"}
+  - {name: "rau răm", grams: 20, role: seasoning}
+  - {name: "nước mắm", grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "chanh", grams: 50, role: seasoning, note: "1 quả (1 quả ≈ 50 g)"}
+  - {name: "đường", grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: "tiêu", grams: 1.2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "tỏi", grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: "ớt", grams: 5, role: seasoning, note: "1 quả (1 quả ≈ 5 g)"}
+  - {name: "hành tím", grams: 30, role: seasoning, optional: true, note: "3 củ (1 củ ≈ 10 g); phi giòn"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, optional: true, note: "1 muỗng canh (1 muỗng canh ≈ 14 g); phi hành"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g); luộc gà"}
+steps:
+  - {step_no: 1, text_vi: "Rửa gà, xát muối; cho vào nồi nước lạnh và bắc lên bếp.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 2, text_vi: "Luộc gà lửa vừa đến khi chín, tắt bếp ngâm thêm vài phút.", kind: passive, minutes: 25, uses_burner: true}
+  - {step_no: 3, text_vi: "Trong lúc chờ, thái sợi bắp cải, cà rốt; thái mỏng hành tây, ngâm nước đá; nhặt rau răm.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 4, text_vi: "Pha nước trộn từ nước mắm, đường, nước cốt chanh, tỏi ớt băm; phi hành tím nếu dùng.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 5, text_vi: "Xé gà thành sợi, trộn với tiêu và chút nước trộn.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 6, text_vi: "Trộn rau với gà và nước trộn, thêm rau răm, rắc hành phi khi dọn.", kind: active, minutes: 4, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-goi-ga-bap-cai-gion-ngon-don-gian-02493", title: "Cách làm gỏi gà bắp cải giòn ngon, siêu hấp dẫn ngay tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://www.huongnghiepaau.com/goi-ga-bap-cai", title: "Cách Làm Gỏi Gà Bắp Cải Giòn Ngon Ngất Ngây", accessed_on: 2026-10-17}
+  - {url: "https://www.bluestone.com.vn/blogs/vao-bep/goi-ga-bap-cai", title: "Làm gỏi gà bắp cải thơm ngon phù hợp mọi độ tuổi", accessed_on: 2026-10-17}
+notes: "Nước luộc, nước pha không ghi thành nguyên liệu. Nguồn dùng khoảng 1 kg gà cho 4–6 người; bản này lấy khoảng 700 g gà nguyên xương cho 4 người."

@@ -1,0 +1,23 @@
+slug: rau-muong-xao-toi
+name_vi: "Rau muống xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, gion, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "rau muống", grams: 500, role: main, note: "1 bó lớn khoảng 500 g; nhặt bỏ gốc già còn khoảng 350 g"}
+  - {name: "tỏi", grams: 18, role: seasoning, note: "6 tép (1 tép ≈ 3 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt rau muống lấy phần ngọn và cọng non, bẻ khúc, rửa sạch và để ráo.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Chần rau trong nồi nước sôi có chút muối khoảng 30 giây rồi vớt ra nước lạnh, để ráo.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Đập dập và băm tỏi.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi thơm một nửa tỏi, cho rau vào xào lửa lớn, nêm nước mắm và đường, đảo nhanh.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho phần tỏi còn lại, đảo vài lượt rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-rau-muong-xao-toi-ngon-thom-nuc-mui-dan-da-kho-cuong-09390", title: "Cách làm rau muống xào tỏi ngon thơm nức mũi dân dã khó cưỡng", accessed_on: 2026-10-17}
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/bi-quyet-cho-dia-rau-muong-xao-toi-xanh-gion-nhu-o-tiem-1073877", title: "2 cách làm rau muống xào tỏi xanh mướt, giòn ngon", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-nuoc-sot-sieu-de-de-lam-rau-muong-xao-toi-02845", title: "Cách làm nước sốt siêu dễ để làm rau muống xào tỏi (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Chần trước giúp rau xanh và không ra nhiều nước; có thể bỏ bước chần."

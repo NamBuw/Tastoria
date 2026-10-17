@@ -1,0 +1,30 @@
+slug: canh-ngao-nau-chua
+name_vi: "Canh ngao nấu chua"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [chua, nhieu_nuoc, troi_nong, bua_thuong]
+ingredients:
+  - {name: "nghêu", grams: 1000, role: main, note: "cả vỏ"}
+  - {name: "cà chua", grams: 240, role: main, note: "2 quả (1 quả ≈ 120 g)"}
+  - {name: "dứa", grams: 150, role: main}
+  - {name: "thì là", grams: 15, role: seasoning}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "me chua", grams: 30, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 20 g); dầm lấy nước"}
+  - {name: "gừng", grams: 10, role: seasoning, note: "vài lát"}
+  - {name: "hành tím", grams: 10, role: seasoning, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm ngao với nước muối có vài lát ớt cho nhả cát, rửa lại.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm ngao nhả cát.", kind: passive, minutes: 30, uses_burner: false}
+  - {step_no: 3, text_vi: "Cho ngao vào nồi nước với gừng, đun đến khi ngao há miệng, vớt ra tách thịt; lọc nước luộc.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 4, text_vi: "Thái cà chua, dứa; nhặt thì là, hành lá; dầm me lấy nước.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 5, text_vi: "Phi hành tím, xào cà chua và dứa, đổ nước luộc ngao vào, nêm nước me và nước mắm.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 6, text_vi: "Đun sôi lại để dứa chín.", kind: passive, minutes: 3, uses_burner: true}
+  - {step_no: 7, text_vi: "Cho thịt ngao, sôi lại thì tắt bếp, rắc thì là và hành lá.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-lam-mon-canh-ngao-ngheu-nau-chua-ngon-mieng-dua-com-1495", title: "Cách nấu canh chua ngao thanh đạm cho những ngày oi bức", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/canh-ngao-chua-162871", title: "3 công thức canh ngao chua thanh mát, ăn với cơm hay bún đều “ngon hết sảy”", accessed_on: 2026-10-17}
+  - {url: "https://luatminhkhue.vn/cach-nau-canh-chua-ngao-thanh-dam-cho-nhung-ngay-troi-oi-buc.aspx", title: "Cách nấu canh chua ngao thanh đạm cho những ngày trời oi bức (Luật Minh Khuê)", accessed_on: 2026-10-17}
+notes: "Dùng nước luộc ngao làm nước canh."

@@ -1,0 +1,26 @@
+slug: canh-cai-thao-thit-vien
+name_vi: "Canh cải thảo thịt viên"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, mem, nhieu_nuoc, bua_thuong]
+ingredients:
+  - {name: "cải thảo", grams: 500, role: main, note: "khoảng nửa cây"}
+  - {name: "thịt băm", grams: 250, role: main}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 1.2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "cà rốt", grams: 50, role: side, optional: true, note: "1/2 củ (1 củ ≈ 100 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa cải thảo, cắt khúc; thái hành lá; (cà rốt thái lát).", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Trộn thịt băm với hành tím băm, tiêu, nước mắm, quết dẻo rồi vo viên nhỏ.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 3, text_vi: "Đun sôi nước, thả thịt viên vào, hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Nấu đến khi viên nổi lên và chín.", kind: passive, minutes: 5, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho cải thảo (và cà rốt), nêm nước mắm.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 6, text_vi: "Nấu đến khi cải mềm.", kind: passive, minutes: 3, uses_burner: true}
+  - {step_no: 7, text_vi: "Rắc hành lá và tiêu rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://baohatinh.vn/2-mon-thom-ngon-de-lam-tu-rau-cai-thao-ca-nha-an-ai-cung-thich-post219245.html", title: "2 món thơm ngon dễ làm từ rau cải thảo, cả nhà ăn ai cũng thích", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-nau-canh-thit-bam-vien-rau-ru-va-canh-cai-thao-day-du-02292", title: "2 cách nấu canh thịt băm viên rau củ và canh cải thảo đầy đủ dinh dưỡng", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

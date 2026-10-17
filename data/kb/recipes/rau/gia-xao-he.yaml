@@ -1,0 +1,19 @@
+slug: gia-xao-he
+name_vi: "Giá xào hẹ"
+slot: rau
+servings: 4
+method: xao
+tags: [thanh, gion, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "giá đỗ", grams: 400, role: main}
+  - {name: "hẹ", grams: 100, role: main, note: "1 bó (≈ 100 g)"}
+  - {name: "tỏi", grams: 6, role: seasoning, optional: true, note: "2 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt bỏ vỏ đậu và rễ giá, rửa và để thật ráo; hẹ cắt khúc 3–4 cm.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi thơm tỏi, cho giá vào xào lửa thật lớn khoảng 1 phút, nêm muối.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 3, text_vi: "Cho hẹ vào đảo thêm khoảng 30 giây rồi tắt bếp ngay để giá không ra nước.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/gia-xao-he-bi-quyet-xao-khong-ra-nuoc-giu-tron-do-gion-ngot-24334", title: "Giá xào hẹ: Bí quyết xào không bị ra nước, giữ trọn độ giòn ngọt", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/gia-xao-gi-ngon-tong-hop-15-cach-lam-mon-gia-xao-don-gian-10834", title: "Giá xào gì ngon? Tổng hợp 15 cách làm món giá xào đơn giản (Điện Máy XANH)", accessed_on: 2026-10-17}

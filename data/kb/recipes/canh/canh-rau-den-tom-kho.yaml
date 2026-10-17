@@ -1,0 +1,23 @@
+slug: canh-rau-den-tom-kho
+name_vi: "Canh rau dền tôm khô"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, nhieu_nuoc, troi_nong, bua_thuong]
+ingredients:
+  - {name: "rau dền", grams: 400, role: main, note: "1 bó (≈ 400 g)"}
+  - {name: "tôm khô", grams: 30, role: main}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, optional: true, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa tôm khô, ngâm nước ấm cho mềm.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm tôm khô.", kind: passive, minutes: 10, uses_burner: false}
+  - {step_no: 3, text_vi: "Nhặt rau dền lấy lá và ngọn non, rửa sạch.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi hành, xào tôm khô thơm, đổ nước (gồm nước ngâm tôm) vào đun sôi.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 5, text_vi: "Thả rau dền, nêm nước mắm, sôi lại khoảng 2 phút thì tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-rau-den-tom-kho-ngot-thanh-don-gian-cho-mam-com-10702", title: "2 Cách nấu canh rau dền nấu tôm khô ngon ngọt, thanh mát cơ thể", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/mam-com-dan-da-ngay-he-bac-bo-4921993.html", title: "Mâm cơm dân dã ngày hè Bắc Bộ", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

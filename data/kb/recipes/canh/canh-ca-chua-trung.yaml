@@ -1,0 +1,23 @@
+slug: canh-ca-chua-trung
+name_vi: "Canh cà chua trứng"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [chua_ngot, nhieu_nuoc, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "cà chua", grams: 360, role: main, note: "3 quả (1 quả ≈ 120 g)"}
+  - {name: "trứng gà", grams: 150, role: main, note: "3 quả (1 quả ≈ 50 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "hành tím", grams: 10, role: seasoning, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+steps:
+  - {step_no: 1, text_vi: "Bổ múi cau cà chua; đánh tan trứng; thái hành lá, băm hành tím.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi hành tím, xào cà chua đến khi mềm, đổ nước vào đun sôi.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 3, text_vi: "Nêm nước mắm và đường, rót trứng thành dòng nhỏ vừa rót vừa khuấy nhẹ, cho hành lá rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-ca-chua-trung-ngon-dung-dieu-khong-bi-tanh-don-10696", title: "2 cách nấu canh cà chua trứng, canh mây không bị tanh đơn giản tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-nau-canh-ca-chua-trung-dam-da-don-gian-de-lam-thom-05752", title: "2 cách nấu canh cà chua trứng thịt bằm và đậu phụ đơn giản dễ làm", accessed_on: 2026-10-17}
+  - {url: "https://nhathuoclongchau.com.vn/bai-viet/bi-quyet-nau-canh-ca-chua-trung-don-gian-va-bo-duong-67646.html", title: "Bí quyết nấu canh cà chua trứng đơn giản và bổ dưỡng (Nhà thuốc Long Châu)", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

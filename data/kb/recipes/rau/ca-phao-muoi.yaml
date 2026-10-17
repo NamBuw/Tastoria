@@ -1,0 +1,24 @@
+slug: ca-phao-muoi
+name_vi: "Cà pháo muối"
+slot: rau
+servings: 4
+method: muoi_chua
+tags: [chua, cay, gion, bua_thuong, com_hop]
+ingredients:
+  - {name: "cà pháo", grams: 1000, role: main}
+  - {name: "muối", grams: 72, role: seasoning, note: "4 muỗng canh (1 muỗng canh ≈ 18 g); 2 muỗng ngâm cà, 2 muỗng pha nước muối"}
+  - {name: "tỏi", grams: 40, role: seasoning, note: "1 củ (1 củ ≈ 40 g)"}
+  - {name: "ớt", grams: 20, role: seasoning, note: "4 quả (1 quả ≈ 5 g)"}
+  - {name: "gừng", grams: 30, role: seasoning, note: "1 nhánh (≈ 30 g)"}
+  - {name: "đường", grams: 12, role: seasoning, optional: true, note: "1 muỗng canh (1 muỗng canh ≈ 12 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt cuống cà, rửa sạch, ngâm vào nước muối loãng cho bớt nhựa.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm cà trong nước muối, rồi vớt ra để thật ráo.", kind: passive, minutes: 240, uses_burner: false}
+  - {step_no: 3, text_vi: "Đun sôi nước với muối (và đường), để nguội.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Xếp cà vào hũ sạch cùng tỏi, gừng, ớt thái lát, đổ nước muối ngập và dằn vỉ cho cà chìm.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 5, text_vi: "Đậy kín, để nơi thoáng mát đến khi cà chuyển vàng và có vị chua nhẹ.", kind: passive, minutes: 4320, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-muoi-ca-phao-ngon-gion-dung-dieu-cho-ngay-tet-540", title: "Cách muối cà pháo trắng giòn, không bị nổi váng, không bị thâm, để được lâu", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/cach-muoi-ca-phao-nen-kieu-bac-4877317.html", title: "Cách muối cà pháo nén kiểu Bắc", accessed_on: 2026-10-17}
+  - {url: "https://nhathuoclongchau.com.vn/bai-viet/loi-ich-va-tac-hai-khi-an-ca-phao-muoi-cach-lam-ca-phao-gion-ngon-an-toan-tai-nha.html", title: "Lợi ích và tác hại khi ăn cà pháo muối; cách làm cà pháo giòn ngon an toàn tại nhà (Nhà thuốc Long Châu)", accessed_on: 2026-10-17}
+notes: "Thời gian muối khoảng 3 ngày (4.320 phút) là bước chờ, không chiếm người nấu; bảo quản ngăn mát sau khi đạt độ chua."

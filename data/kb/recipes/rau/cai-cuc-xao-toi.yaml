@@ -1,0 +1,20 @@
+slug: cai-cuc-xao-toi
+name_vi: "Cải cúc xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, mem, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "cải cúc", grams: 400, role: main, note: "khoảng 1,3 bó (1 bó ≈ 300 g)"}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt cải cúc, bỏ gốc già, cắt khúc, rửa sạch và để ráo.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Đập dập và băm tỏi.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm một nửa tỏi với dầu, cho rau vào xào lửa lớn, nêm muối và đường.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho nốt tỏi còn lại, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-rau-cai-cuc-tan-o-xao-toi-va-xao-ca-chua-thom-ngon-09581", title: "2 cách làm rau cải cúc (tần ô) xào tỏi và xào cà chua thơm ngon", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/rau-cai-cuc-xao-toi-170663", title: "Hướng dẫn chi tiết cách làm món rau cải cúc xào tỏi thơm ngon, giòn ngọt, đơn giản mà hấp dẫn", accessed_on: 2026-10-17}

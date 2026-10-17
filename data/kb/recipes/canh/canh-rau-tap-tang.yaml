@@ -1,0 +1,27 @@
+slug: canh-rau-tap-tang
+name_vi: "Canh rau tập tàng"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, nhieu_nuoc, troi_nong, bua_thuong]
+ingredients:
+  - {name: "rau dền", grams: 100, role: main}
+  - {name: "mồng tơi", grams: 100, role: main}
+  - {name: "rau ngót", grams: 100, role: main}
+  - {name: "rau đay", grams: 100, role: main}
+  - {name: "tôm khô", grams: 30, role: main}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "rau sam", grams: 50, role: side, optional: true}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa tôm khô, ngâm nước ấm cho mềm.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 2, text_vi: "Ngâm tôm khô.", kind: passive, minutes: 10, uses_burner: false}
+  - {step_no: 3, text_vi: "Nhặt các loại rau, rửa sạch, thái nhỏ.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi hành, xào tôm khô, đổ nước vào đun sôi.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho rau vào, nêm nước mắm, khuấy đều; sôi lại khoảng 3 phút thì tắt bếp.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/rau-tap-tang-la-rau-gi-tong-hop-2-cach-nau-canh-rau-tap-tang-22071", title: "Rau tập tàng là rau gì? Tổng hợp 2 cách nấu canh rau tập tàng ngon", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/canh-cua-dong-168320", title: "3 cách nấu canh cua đồng thơm ngon, bổ dưỡng, thanh mát giúp bữa cơm gia đình thêm tròn vị", accessed_on: 2026-10-17}
+  - {url: "https://mytour.vn/vi/blog/bai-viet/cach-nau-canh-cua-dong-voi-rau-tap-tang-thom-ngon-dam-da-vi-que-huong.html", title: "Cách nấu canh cua đồng với rau tập tàng thơm ngon đậm đà vị quê hương", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu. Nguồn tham khảo nấu với cua đồng; bản này nấu với tôm khô theo danh sách món."

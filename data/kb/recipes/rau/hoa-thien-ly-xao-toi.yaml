@@ -1,0 +1,20 @@
+slug: hoa-thien-ly-xao-toi
+name_vi: "Hoa thiên lý xào tỏi"
+slot: rau
+servings: 4
+method: xao
+tags: [thom_toi, mem, troi_nong, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "hoa thiên lý", grams: 300, role: main}
+  - {name: "tỏi", grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, optional: true, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Nhặt bỏ cuống già và hoa héo, rửa nhẹ hoa thiên lý, để ráo.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi thơm tỏi băm, cho hoa vào xào nhanh lửa lớn, nêm muối và đường.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 3, text_vi: "Đảo vài lượt đến khi hoa vừa chín rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/hoa-thien-ly-xao-toi-170563", title: "Bật mí cách làm hoa thiên lý xào tỏi thơm ngon, giòn ngọt hấp dẫn, đơn giản tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://cookbeo.com/recipes/cach-lam-hoa-thien-ly-xao-toi", title: "Cách Làm Món Hoa Thiên Lý Xào Tỏi Thơm Nức Mũi", accessed_on: 2026-10-17}
+  - {url: "https://cookez.net/recipe/hoa-thien-ly-xao-toi_RTkg45QH", title: "Cookez - Hoa thiên lý xào tỏi", accessed_on: 2026-10-17}

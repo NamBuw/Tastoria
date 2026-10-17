@@ -1,0 +1,22 @@
+slug: bap-cai-xao-ca-chua
+name_vi: "Bắp cải xào cà chua"
+slot: rau
+servings: 4
+method: xao
+tags: [chua_ngot, mem, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "bắp cải", grams: 500, role: main, note: "khoảng nửa bắp nhỏ"}
+  - {name: "cà chua", grams: 240, role: main, note: "2 quả (1 quả ≈ 120 g)"}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "hành tím", grams: 10, role: seasoning, optional: true, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "đường", grams: 2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Tách lá bắp cải, rửa sạch, thái miếng vừa ăn; cà chua bổ múi cau; hành lá cắt khúc.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi thơm hành tím với dầu, cho cà chua vào xào đến khi mềm ra nước.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 3, text_vi: "Cho bắp cải vào đảo lửa lớn, nêm muối và đường, xào đến khi bắp cải vừa chín tới.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho hành lá, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-mon-bap-cai-xao-ca-chua-va-bap-cai-xao-trung-thom-02891", title: "2 Cách làm bắp cải xào cà chua và bắp cải xào trứng thơm ngon thanh vị", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/tong-hop-11-cach-lam-bap-cai-xao-thanh-dam-thom-ngon-hap-dan-11588", title: "Tổng hợp 11 cách làm bắp cải xào thanh đạm thơm ngon hấp dẫn (Điện Máy XANH)", accessed_on: 2026-10-17}

@@ -1,0 +1,31 @@
+slug: canh-chua-tom
+name_vi: "Canh chua tôm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [chua_ngot, nhieu_nuoc, troi_nong, bua_thuong]
+ingredients:
+  - {name: "tôm", grams: 300, role: main}
+  - {name: "cà chua", grams: 240, role: main, note: "2 quả (1 quả ≈ 120 g)"}
+  - {name: "dứa", grams: 200, role: main, note: "khoảng 1/4 quả"}
+  - {name: "đậu bắp", grams: 100, role: main}
+  - {name: "me chua", grams: 30, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 20 g); ≈ 30 g, dầm lấy nước"}
+  - {name: "ngò gai", grams: 10, role: seasoning}
+  - {name: "nước mắm", grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 18, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: "giá đỗ", grams: 80, role: side, optional: true}
+  - {name: "dọc mùng", grams: 100, role: side, optional: true}
+  - {name: "rau ngổ", grams: 10, role: seasoning, optional: true}
+  - {name: "tỏi", grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: "dầu ăn", grams: 14, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 14 g)"}
+steps:
+  - {step_no: 1, text_vi: "Bóc vỏ, rút chỉ tôm, ướp với chút nước mắm; dầm me lấy nước; thái dứa, cà chua, đậu bắp và rau thơm.", kind: active, minutes: 15, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi tỏi, xào cà chua và dứa, đổ nước và nước me vào đun sôi.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 3, text_vi: "Thả tôm và đậu bắp (cùng dọc mùng), nêm nước mắm và đường.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Nấu đến khi tôm chín.", kind: passive, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho giá, tắt bếp, rắc ngò gai và rau ngổ.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-nau-canh-chua-tom-thanh-mat-don-gian-de-lam-01532", title: "2 cách nấu canh chua tôm thanh mát đơn giản dễ làm tại nhà", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/canh-chua-tom-nam-bo-4604069.html", title: "Cách làm canh chua tôm Nam Bộ thanh mát ngày nóng", accessed_on: 2026-10-17}
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/tiet-lo-cach-nau-canh-chua-tom-phong-cach-nam-bo-ngon-tuyet-1173143", title: "2 cách làm canh chua tôm phong cách Nam Bộ ngon tuyệt đỉnh", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

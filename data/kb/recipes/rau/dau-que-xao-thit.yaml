@@ -1,0 +1,24 @@
+slug: dau-que-xao-thit
+name_vi: "Đậu que xào thịt"
+slot: rau
+servings: 4
+method: xao
+tags: [dam_da, thom_toi, bua_thuong, com_hop]
+ingredients:
+  - {name: "đậu que", grams: 400, role: main}
+  - {name: "thịt nạc vai", grams: 200, role: main}
+  - {name: "tỏi", grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: "nước mắm", grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "đường", grams: 2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: "tiêu", grams: 0.8, role: seasoning, note: "1/3 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g); ≈ 1/3 muỗng cà phê"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "cà rốt", grams: 50, role: side, optional: true, note: "1/2 củ (1 củ ≈ 100 g)"}
+steps:
+  - {step_no: 1, text_vi: "Tước xơ đậu que, thái vát; thịt thái mỏng, ướp với một nửa nước mắm, tiêu và chút tỏi băm.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Để thịt ngấm gia vị.", kind: passive, minutes: 10, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi tỏi, cho thịt vào xào săn rồi trút ra bát.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho đậu que vào xào với chút nước đến khi gần chín, nêm phần nước mắm còn lại và đường.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 5, text_vi: "Trút thịt vào đảo chung đến khi thấm đều thì tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-xao-dau-que-dau-co-ve-thom-ngon-hap-dan-voi-thit-bo-va-03873", title: "2 Cách làm thịt bò xào đậu que (đậu cove) giòn ngon, đơn giản cực dễ làm", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/doi-song-cooking-dau-xao-thit-bo-4883405.html", title: "Cách làm món đậu cô ve xào thịt bò - Báo VnExpress Cooking", accessed_on: 2026-10-17}

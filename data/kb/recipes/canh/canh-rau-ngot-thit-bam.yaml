@@ -1,0 +1,23 @@
+slug: canh-rau-ngot-thit-bam
+name_vi: "Canh rau ngót thịt băm"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [thanh, nhieu_nuoc, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: "rau ngót", grams: 300, role: main, note: "1 bó (≈ 300 g); còn khoảng 200 g lá"}
+  - {name: "thịt băm", grams: 150, role: main}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+  - {name: "dầu ăn", grams: 4.7, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4.7 g)"}
+steps:
+  - {step_no: 1, text_vi: "Tuốt lá rau ngót, rửa sạch, vò nhẹ cho dập.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp thịt băm với hành tím băm, tiêu và một ít nước mắm.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm hành, cho thịt vào xào tơi rồi đổ nước, đun sôi và hớt bọt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Thả rau vào, nêm phần nước mắm còn lại; nấu đến khi rau vừa chín rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-rau-ngot-thit-bam-thanh-mat-don-gian-cho-bua-10653", title: "Cách nấu canh rau ngót thịt băm thanh mát đơn giản cho bữa cơm gia đình", accessed_on: 2026-10-17}
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/giai-nhiet-nang-he-voi-canh-rau-ngot-thit-bam-1162382", title: "Giải nhiệt nắng hè với canh rau ngót thịt băm - Bách hóa XANH", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/doi-song-cooking-hai-kieu-nau-canh-rau-ngot-4473606.html", title: "Hai kiểu nấu canh rau ngót nhanh mà ngon cho bữa cơm gia đình", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."

@@ -1,0 +1,28 @@
+slug: canh-ca-thi-la
+name_vi: "Canh cá thì là"
+slot: canh
+servings: 4
+method: nau_canh
+tags: [chua, nhieu_nuoc, bua_thuong]
+ingredients:
+  - {name: "cá lóc", grams: 500, role: main, note: "khúc giữa"}
+  - {name: "cà chua", grams: 240, role: main, note: "2 quả (1 quả ≈ 120 g)"}
+  - {name: "thì là", grams: 30, role: seasoning}
+  - {name: "hành lá", grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: "gừng", grams: 15, role: seasoning, note: "vài lát"}
+  - {name: "nước mắm", grams: 22.5, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: "hành tím", grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: "dầu ăn", grams: 21, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 14 g)"}
+  - {name: "muối", grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: "tiêu", grams: 0.6, role: seasoning, note: "1/4 muỗng cà phê (1 muỗng cà phê ≈ 2.3 g)"}
+steps:
+  - {step_no: 1, text_vi: "Làm sạch cá, xát muối và gừng khử tanh, cắt khúc; ướp với chút nước mắm, tiêu.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Thái cà chua, nhặt thì là và hành lá cắt khúc.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Rán sơ cá cho săn mặt, gắp ra.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi hành tím, xào cà chua mềm, đổ nước vào đun sôi rồi thả cá.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 5, text_vi: "Nấu nhỏ lửa đến khi cá chín.", kind: passive, minutes: 8, uses_burner: true}
+  - {step_no: 6, text_vi: "Nêm nước mắm, thả thì là và hành lá rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-canh-ca-khoai-thi-la-ngon-mat-hap-dan-chuan-vi-me-15893", title: "Cách nấu canh cá khoai thì là ngon mát, hấp dẫn chuẩn vị mẹ làm", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/canh-ca-nau-qua-doc-kieu-bac-4658530.html", title: "Cách làm canh cá nấu quả dọc kiểu Bắc", accessed_on: 2026-10-17}
+notes: "Nước nấu canh (khoảng 1–1,5 lít cho 4 người) không ghi thành nguyên liệu."
