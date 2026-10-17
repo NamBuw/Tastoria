@@ -1,0 +1,486 @@
+# Tastoria — mô hình phân tích thiết kế: nguồn sự thật duy nhất cho SRS, UML, ERD, API, kiểm thử.
+# Mọi tài liệu và sơ đồ phải dùng đúng mã (A.., PK.., UC.., M.., bảng, endpoint) trong file này.
+# Thiết kế: docs/superpowers/specs/2026-10-17-tastoria-thiet-ke-v2.md (BR-*, NFR-* định nghĩa ở §4 và §11).
+version: 1
+updated: "2026-10-17"
+
+actors:
+  - {id: A01, name: "Khách", kind: human, desc: "Người chưa đăng nhập: xem landing, đăng ký, đăng nhập, đặt lại mật khẩu"}
+  - {id: A02, name: "Người dùng", kind: human, generalizes: A01, desc: "Người nấu có tài khoản; chủ hồ sơ, kho, mâm"}
+  - {id: A03, name: "Người tham gia khảo sát", kind: human, desc: "Chấm điểm món qua link khảo sát, ẩn danh, không cần tài khoản"}
+  - {id: A04, name: "Quản trị viên", kind: human, desc: "Xử lý yêu cầu dữ liệu thủ công, xem nhật ký kiểm toán, quản lý tài khoản nhân sự"}
+  - {id: A05, name: "Người biên soạn công thức", kind: human, desc: "Soạn và nhập kho món, nguyên liệu, cặp thay thế (CLI)"}
+  - {id: A06, name: "Người vận hành mô hình", kind: human, desc: "Xuất dữ liệu huấn luyện, đăng ký, kiểm định, triển khai, quay lui mô hình; quản lý đợt khảo sát"}
+  - {id: A07, name: "Người gán nhãn", kind: human, desc: "Gán khung/nhãn độ tươi cho ảnh trong công cụ gán nhãn"}
+  - {id: A08, name: "Bộ lập lịch", kind: time, desc: "Kích hoạt tác vụ định kỳ (cron)"}
+  - {id: A09, name: "Dịch vụ email", kind: external_system, desc: "Gửi thư đặt lại mật khẩu (SMTP; môi trường dev dùng Mailpit)"}
+  - {id: A10, name: "Công cụ gán nhãn", kind: external_system, desc: "Label Studio tự host; nhận ảnh góp, trả nhãn"}
+
+packages:
+  - {id: PK1, name: "Tài khoản & bảo mật"}
+  - {id: PK2, name: "Quyền riêng tư"}
+  - {id: PK3, name: "Hồ sơ & mục tiêu"}
+  - {id: PK4, name: "Kho & quét"}
+  - {id: PK5, name: "Mâm cơm"}
+  - {id: PK6, name: "Nấu & nhật ký"}
+  - {id: PK7, name: "Khảo sát gu"}
+  - {id: PK8, name: "Quản trị nội dung & dữ liệu"}
+  - {id: PK9, name: "Vận hành mô hình"}
+  - {id: PK10, name: "Tác vụ định kỳ"}
+
+# priority: MoSCoW (M/S/C). rels: include/extend theo UML.
+use_cases:
+  - {id: UC01, pkg: PK1, name: "Đăng ký tài khoản", primary: A01, secondary: [], priority: M}
+  - {id: UC02, pkg: PK1, name: "Đăng nhập", primary: A01, secondary: [], priority: M, note: "gồm làm mới phiên và khoá tạm khi sai 5 lần (NFR-SEC-02)"}
+  - {id: UC03, pkg: PK1, name: "Đăng xuất (một hoặc mọi thiết bị)", primary: A02, secondary: [], priority: M}
+  - {id: UC04, pkg: PK1, name: "Đặt lại mật khẩu", primary: A01, secondary: [A09], priority: S}
+  - {id: UC05, pkg: PK2, name: "Quản lý đồng ý theo mục đích", primary: A02, secondary: [], priority: M, rules: [BR-CONSENT-01, BR-CONSENT-02, BR-CONSENT-03, BR-CONSENT-04]}
+  - {id: UC06, pkg: PK2, name: "Tải về dữ liệu cá nhân", primary: A02, secondary: [], priority: M, rules: [BR-DSR-01]}
+  - {id: UC07, pkg: PK2, name: "Xoá tài khoản và toàn bộ dữ liệu", primary: A02, secondary: [], priority: M, rules: [BR-DSR-01, BR-RETAIN-01]}
+  - {id: UC08, pkg: PK2, name: "Yêu cầu sửa, hạn chế hoặc phản đối xử lý", primary: A02, secondary: [A04], priority: C, rules: [BR-DSR-01]}
+  - {id: UC09, pkg: PK3, name: "Thiết lập hồ sơ 60 giây", primary: A02, secondary: [], priority: M, rels: [{include: UC05}], rules: [BR-NUT-01, BR-NUT-02, BR-NUT-03, BR-CONSENT-02]}
+  - {id: UC10, pkg: PK3, name: "Cập nhật hồ sơ, dị ứng, chế độ ăn, cài đặt bếp", primary: A02, secondary: [], priority: M, rules: [BR-ALG-02, BR-DIET-01]}
+  - {id: UC11, pkg: PK3, name: "Đặt mục tiêu năng lượng (gợi ý / tự nhập / chuyên gia)", primary: A02, secondary: [], priority: M, rules: [BR-NUT-01, BR-NUT-02, BR-NUT-03, BR-NUT-04]}
+  - {id: UC12, pkg: PK4, name: "Quét nguyên liệu (toàn tủ hoặc đồ vừa mua)", primary: A02, secondary: [], priority: M, rels: [{include: UC13}], rules: [BR-SCAN-01, BR-PANTRY-03, BR-FRESH-02]}
+  - {id: UC13, pkg: PK4, name: "Xác nhận và sửa kết quả quét", primary: A02, secondary: [], priority: M, rules: [BR-SCAN-02, BR-PANTRY-01, BR-QTY-02, BR-FRESH-04]}
+  - {id: UC14, pkg: PK4, name: "Quản lý kho (sửa lượng, ngày mua, bỏ đồ, xác nhận đồ cần kiểm tra)", primary: A02, secondary: [], priority: M, rules: [BR-PANTRY-01, BR-FRESH-01, BR-FRESH-03, BR-FRESH-04, BR-FRESH-05]}
+  - {id: UC15, pkg: PK5, name: "Nhận mâm cơm hôm nay", primary: A02, secondary: [], priority: M, rules: [BR-TRAY-01, BR-TRAY-02, BR-TRAY-03, BR-TRAY-04, BR-TRAY-05, BR-TRAY-06, BR-TRAY-07, BR-TRAY-08, BR-ALG-01, BR-DIET-01, BR-NUT-04, BR-NUT-06, BR-CONSENT-03]}
+  - {id: UC16, pkg: PK5, name: "Đổi một món", primary: A02, secondary: [], priority: M, rels: [{extend: UC15}], rules: [BR-SWAP-01, BR-ALG-01]}
+  - {id: UC17, pkg: PK5, name: "Xem và chọn thay thế nguyên liệu thiếu (Thiếu gì?)", primary: A02, secondary: [], priority: M, rels: [{extend: UC15}], rules: [BR-ALG-01, BR-DIET-01]}
+  - {id: UC18, pkg: PK5, name: "Quản lý danh sách đi chợ", primary: A02, secondary: [], priority: S, rels: [{extend: UC17}, {extend: UC15, condition: "không có mâm khả thi (BR-TRAY-06)"}]}
+  - {id: UC19, pkg: PK6, name: "Nấu cả mâm", primary: A02, secondary: [], priority: M, rules: [BR-COOK-01, BR-TRAY-05]}
+  - {id: UC20, pkg: PK6, name: "Hoàn tất bữa nấu (nấu xong một chạm)", primary: A02, secondary: [], priority: M, rules: [BR-COOK-02, BR-PANTRY-02, BR-CONSENT-03]}
+  - {id: UC21, pkg: PK6, name: "Hoàn tác trừ kho", primary: A02, secondary: [], priority: S, rels: [{extend: UC20}], rules: [BR-PANTRY-02]}
+  - {id: UC22, pkg: PK6, name: "Xem nhật ký tuần", primary: A02, secondary: [], priority: S, rules: [BR-NUT-06]}
+  - {id: UC23, pkg: PK7, name: "Tham gia khảo sát gu món ăn", primary: A03, secondary: [], priority: M, rules: [BR-CONSENT-01]}
+  - {id: UC24, pkg: PK7, name: "Quản lý đợt khảo sát (tạo phiếu, xuất kết quả)", primary: A06, secondary: [], priority: S}
+  - {id: UC25, pkg: PK8, name: "Nhập và kiểm tra kho công thức, nguyên liệu", primary: A05, secondary: [], priority: M, rules: [BR-NUT-05, BR-ALG-01]}
+  - {id: UC26, pkg: PK8, name: "Quản lý cặp thay thế nguyên liệu", primary: A05, secondary: [], priority: S}
+  - {id: UC27, pkg: PK8, name: "Xử lý yêu cầu dữ liệu và xem nhật ký kiểm toán", primary: A04, secondary: [], priority: S, rules: [BR-DSR-01]}
+  - {id: UC28, pkg: PK9, name: "Xuất dữ liệu huấn luyện đã bí danh hoá", primary: A06, secondary: [], priority: S, rules: [BR-CONSENT-03]}
+  - {id: UC29, pkg: PK9, name: "Đăng ký và kiểm định phiên bản mô hình", primary: A06, secondary: [], priority: M}
+  - {id: UC30, pkg: PK9, name: "Triển khai và quay lui phiên bản mô hình", primary: A06, secondary: [], priority: M}
+  - {id: UC31, pkg: PK9, name: "Gán nhãn ảnh góp", primary: A07, secondary: [A10], priority: C}
+  - {id: UC32, pkg: PK10, name: "Xoá ảnh quét quá hạn", primary: A08, secondary: [], priority: M, rules: [BR-RETAIN-01]}
+  - {id: UC33, pkg: PK10, name: "Sao lưu cơ sở dữ liệu", primary: A08, secondary: [], priority: M, rules: [BR-RETAIN-01]}
+  - {id: UC34, pkg: PK10, name: "Dọn job quét kẹt, token và khoá lũy đẳng hết hạn", primary: A08, secondary: [], priority: M}
+
+# Module của modular monolith. deps = các module được phép gọi (qua service.py). Không vòng.
+modules:
+  - {id: M01, name: core, desc: "DB session, Unit of Work, lỗi RFC 9457, Idempotency-Key, cấu hình, lưu tệp, bảo mật dùng chung", deps: []}
+  - {id: M02, name: identity, desc: "Tài khoản, mật khẩu, JWT, refresh token, đặt lại mật khẩu, khoá đăng nhập", deps: [core]}
+  - {id: M03, name: privacy, desc: "Mục đích đồng ý, phiên bản điều khoản, nhật ký đồng ý, yêu cầu chủ thể dữ liệu, nhật ký kiểm toán", deps: [core, identity]}
+  - {id: M04, name: catalog, desc: "Thành phần thực phẩm, nguyên liệu, món, bước, dinh dưỡng món, lớp thị giác, dữ liệu tham chiếu", deps: [core]}
+  - {id: M05, name: profile, desc: "Hồ sơ (cột sức khỏe mã hoá), dị ứng, chế độ ăn, món hay ăn, cài đặt; công thức BMR/TEE/E_mâm; get_meal_constraints()", deps: [core, identity, privacy, catalog]}
+  - {id: M06, name: pantry, desc: "Lô, giao dịch kho, quy đổi lượng, độ gấp u (tính lúc đọc)", deps: [core, catalog]}
+  - {id: M07, name: mlops, desc: "Phiên bản mô hình, bản đồ lớp, con trỏ triển khai, nạp mô hình", deps: [core, catalog]}
+  - {id: M08, name: scan, desc: "Nhận ảnh, job suy luận (worker), chip, xác nhận vào kho", deps: [core, catalog, pantry, mlops, privacy]}
+  - {id: M09, name: events, desc: "Ghi tương tác có cổng đồng ý, chống trùng theo event_id", deps: [core, privacy]}
+  - {id: M10, name: substitute, desc: "Cặp thay thế, embedding nguyên liệu, gợi ý thay thế có lọc cứng, danh sách đi chợ", deps: [core, catalog, profile, pantry, mlops]}
+  - {id: M11, name: meal, desc: "Lọc cứng, xếp hạng gu, ghép mâm, đổi món, nhận thay thế, dòng lý do", deps: [core, catalog, profile, pantry, substitute, events, mlops, privacy]}
+  - {id: M12, name: cooking, desc: "Lịch nấu CP-SAT, phiên nấu, nấu xong (UoW), hoàn tác", deps: [core, catalog, meal, pantry, events]}
+  - {id: M13, name: journal, desc: "Nhật ký tuần (view chỉ đọc)", deps: [core, cooking, meal, pantry, profile]}
+  - {id: M14, name: survey, desc: "Phiếu khảo sát khối không đầy đủ, người tham gia ẩn danh, điểm, món hay ăn", deps: [core, catalog, privacy]}
+  - {id: M15, name: admin, desc: "Endpoint/CLI nhân sự: yêu cầu dữ liệu, kiểm toán, nhập kho món, mô hình, khảo sát", deps: [core, identity, privacy, catalog, mlops, survey, substitute]}
+  - {id: M16, name: jobs, desc: "Tác vụ định kỳ: xoá ảnh, sao lưu, sweeper, dọn hết hạn", deps: [core, scan, identity, privacy]}
+
+# Kiểu: uuid, text, citext, int, smallint, bigint, numeric, real, bool, date, timestamptz, bytea, jsonb, vector(n), enum(...)
+# Ký hiệu: PK, FK->bảng(cột), UQ, NN (not null), CK(...) check, D=default. Bảng không có user_id thì truy chủ sở hữu qua FK.
+tables:
+  # ---------- core
+  - name: idempotency_keys
+    module: core
+    columns: ["user_id uuid NN FK->users(id) ON DELETE CASCADE", "key text NN", "request_sha256 bytea NN", "status_code smallint NN", "response_body jsonb NN", "created_at timestamptz NN D now()"]
+    pk: [user_id, key]
+    notes: "jsonb chỉ lưu phản hồi để trả lại nguyên văn, không truy vấn; xoá sau 48 giờ (UC34)"
+  # ---------- identity
+  - name: users
+    module: identity
+    columns: ["id uuid PK", "email citext NN UQ", "password_hash text NN", "role enum(user,admin,curator,ml_operator) NN D user", "status enum(active,deletion_requested) NN D active", "token_version int NN D 0", "failed_logins smallint NN D 0", "locked_until timestamptz NULL", "created_at timestamptz NN", "updated_at timestamptz NN"]
+    pk: [id]
+  - name: refresh_tokens
+    module: identity
+    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "family_id uuid NN", "token_sha256 bytea NN UQ", "issued_at timestamptz NN", "expires_at timestamptz NN", "revoked_at timestamptz NULL", "replaced_by_id uuid NULL FK->refresh_tokens(id)", "user_agent text NULL"]
+    pk: [id]
+  - name: password_resets
+    module: identity
+    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "token_sha256 bytea NN UQ", "created_at timestamptz NN", "expires_at timestamptz NN", "used_at timestamptz NULL"]
+    pk: [id]
+  # ---------- privacy
+  - name: consent_purposes
+    module: privacy
+    columns: ["code text PK (health_profile|personalization|photo_contribution|survey)", "name_vi text NN", "description_vi text NN", "data_category text NN", "is_sensitive bool NN", "is_required bool NN D false"]
+    pk: [code]
+  - name: policy_versions
+    module: privacy
+    columns: ["id uuid PK", "purpose_code text NN FK->consent_purposes(code)", "version text NN", "text_sha256 bytea NN", "effective_from timestamptz NN"]
+    pk: [id]
+    unique: [[purpose_code, version]]
+  - name: consent_events
+    module: privacy
+    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "policy_version_id uuid NN FK->policy_versions(id)", "action enum(grant,withdraw) NN", "channel enum(onboarding,settings) NN", "app_version text NULL", "created_at timestamptz NN"]
+    pk: [id]
+    notes: "chỉ ghi thêm; trạng thái hiện tại = sự kiện mới nhất mỗi mục đích (view v_current_consents)"
+  - name: dsr_requests
+    module: privacy
+    columns: ["id uuid PK", "user_id uuid NULL FK->users(id) ON DELETE SET NULL", "subject_ref bytea NN (HMAC-SHA256 của user_id, giữ bằng chứng sau khi xoá)", "type enum(access,export,correct,delete,withdraw,restrict,object) NN", "status enum(received,in_progress,completed,rejected) NN", "received_at timestamptz NN", "acknowledged_at timestamptz NULL", "completed_at timestamptz NULL", "result_key text NULL", "note text NULL"]
+    pk: [id]
+  - name: audit_log
+    module: privacy
+    columns: ["id bigint PK identity", "actor_user_id uuid NULL FK->users(id) ON DELETE SET NULL", "actor_role text NN", "action text NN", "entity text NN", "entity_id text NULL", "purpose text NULL", "request_id text NULL", "created_at timestamptz NN"]
+    pk: [id]
+    notes: "chỉ ghi thêm; ghi mỗi lần giải mã cột sức khoẻ và mỗi thao tác nhân sự"
+  # ---------- catalog
+  - name: food_groups
+    module: catalog
+    columns: ["code text PK", "name_vi text NN"]
+    pk: [code]
+  - name: nutrient_sources
+    module: catalog
+    columns: ["id smallint PK", "code text NN UQ (fct2007|usda_sr_legacy|usda_foundation)", "name text NN", "version text NN", "license text NN", "url text NN"]
+    pk: [id]
+  - name: food_items
+    module: catalog
+    columns: ["source_id smallint NN FK->nutrient_sources(id)", "source_code text NN", "name text NN", "name_en text NULL", "refuse_pct numeric NULL CK(0..100)"]
+    pk: [source_id, source_code]
+  - name: nutrients
+    module: catalog
+    columns: ["code text PK (energy_kcal|protein_g|lipid_g|glucid_g|fiber_g|sugar_g|sodium_mg)", "name_vi text NN", "unit text NN"]
+    pk: [code]
+  - name: food_nutrients
+    module: catalog
+    columns: ["source_id smallint NN", "source_code text NN", "nutrient_code text NN FK->nutrients(code)", "per_100g numeric NN"]
+    pk: [source_id, source_code, nutrient_code]
+    fks: ["(source_id, source_code) -> food_items(source_id, source_code)"]
+  - name: allergen_groups
+    module: catalog
+    columns: ["code text PK", "name_vi text NN", "name_en text NN", "basis enum(codex_2024,tastoria_extra) NN"]
+    pk: [code]
+  - name: diets
+    module: catalog
+    columns: ["code text PK", "name_vi text NN"]
+    pk: [code]
+  - name: diet_exclusions
+    module: catalog
+    columns: ["diet_code text NN FK->diets(code)", "food_group_code text NN FK->food_groups(code)"]
+    pk: [diet_code, food_group_code]
+  - name: ingredients
+    module: catalog
+    columns: ["id uuid PK", "name_vi text NN UQ", "food_group_code text NN FK->food_groups(code)", "comp_source_id smallint NULL", "comp_source_code text NULL", "is_staple bool NN D false", "countable bool NN D false", "shelf_life_days numeric NULL", "shelf_life_basis text NULL (FoodKeeper id hoặc hiệu chỉnh của nhóm)", "is_active bool NN D true", "created_at timestamptz NN", "updated_at timestamptz NN"]
+    pk: [id]
+    fks: ["(comp_source_id, comp_source_code) -> food_items(source_id, source_code)"]
+    notes: "EP lấy qua FK tới food_items.refuse_pct, không chép vào đây (tránh phụ thuộc bắc cầu)"
+  - name: ingredient_synonyms
+    module: catalog
+    columns: ["ingredient_id uuid NN FK->ingredients(id)", "synonym text NN", "lang enum(vi,en) NN", "source text NULL"]
+    pk: [ingredient_id, synonym, lang]
+  - name: ingredient_allergens
+    module: catalog
+    columns: ["ingredient_id uuid NN FK->ingredients(id)", "allergen_code text NN FK->allergen_groups(code)"]
+    pk: [ingredient_id, allergen_code]
+  - name: ingredient_units
+    module: catalog
+    columns: ["ingredient_id uuid NN FK->ingredients(id)", "unit_code text NN (qua|bo|cu|nhanh|mieng|goi|hop)", "grams_per_unit numeric NN CK(>0)", "source text NN"]
+    pk: [ingredient_id, unit_code]
+  - name: qty_levels
+    module: catalog
+    columns: ["food_group_code text NN FK->food_groups(code)", "level enum(it,vua,nhieu) NN", "g_min numeric NN", "g_max numeric NN", "CK(g_min <= g_max)"]
+    pk: [food_group_code, level]
+  - name: cooking_methods
+    module: catalog
+    columns: ["code text PK", "name_vi text NN"]
+    pk: [code]
+  - name: tags
+    module: catalog
+    columns: ["code text PK", "kind enum(flavor,texture,occasion) NN", "name_vi text NN"]
+    pk: [code]
+  - name: recipes
+    module: catalog
+    columns: ["id uuid PK", "name_vi text NN UQ", "slot enum(man,rau,canh) NN", "servings smallint NN CK(>0)", "method_code text NN FK->cooking_methods(code)", "status enum(draft,published,retired) NN D draft", "notes text NULL", "created_at timestamptz NN", "updated_at timestamptz NN"]
+    pk: [id]
+    unique: [[id, slot]]
+    notes: "món đã published là bất biến (BR-CATALOG-01): sửa = tạo bản mới, retire bản cũ; tổng thời gian và nguyên liệu chính là giá trị dẫn xuất, không lưu"
+  - name: recipe_ingredients
+    module: catalog
+    columns: ["recipe_id uuid NN FK->recipes(id)", "ingredient_id uuid NN FK->ingredients(id)", "grams numeric NN CK(>0) (khối lượng lúc mua cho `servings` khẩu phần)", "role enum(main,side,seasoning) NN", "is_optional bool NN D false"]
+    pk: [recipe_id, ingredient_id]
+  - name: recipe_steps
+    module: catalog
+    columns: ["recipe_id uuid NN FK->recipes(id)", "step_no smallint NN", "text_vi text NN", "kind enum(active,passive) NN", "minutes smallint NN CK(>0)", "uses_burner bool NN D false"]
+    pk: [recipe_id, step_no]
+  - name: recipe_tags
+    module: catalog
+    columns: ["recipe_id uuid NN FK->recipes(id)", "tag_code text NN FK->tags(code)"]
+    pk: [recipe_id, tag_code]
+  - name: recipe_sources
+    module: catalog
+    columns: ["recipe_id uuid NN FK->recipes(id)", "url text NN", "title text NN", "accessed_on date NN"]
+    pk: [recipe_id, url]
+  - name: recipe_nutrition
+    module: catalog
+    columns: ["recipe_id uuid NN FK->recipes(id)", "nutrient_code text NN FK->nutrients(code)", "per_serving numeric NN", "computed_at timestamptz NN", "data_version text NN"]
+    pk: [recipe_id, nutrient_code]
+    notes: "PHI CHUẨN HOÁ CÓ KIỂM SOÁT: giá trị dẫn xuất từ recipe_ingredients × food_nutrients × EP; tính lại bằng job khi kho món hoặc bảng thành phần đổi; data_version ghi phiên bản dữ liệu nguồn"
+  - name: vision_classes
+    module: catalog
+    columns: ["id smallint PK", "code text NN UQ", "name_vi text NN", "name_en text NN", "countable bool NN", "instance_def enum(item,group_of,package) NN", "has_freshness_model bool NN D false"]
+    pk: [id]
+  - name: vision_class_ingredients
+    module: catalog
+    columns: ["vision_class_id smallint NN FK->vision_classes(id)", "ingredient_id uuid NN FK->ingredients(id)", "is_default bool NN D false"]
+    pk: [vision_class_id, ingredient_id]
+  # ---------- profile
+  - name: profiles
+    module: profile
+    columns: ["user_id uuid PK FK->users(id) ON DELETE CASCADE", "sex_enc bytea NULL", "birth_year_enc bytea NULL", "height_cm_enc bytea NULL", "weight_kg_enc bytea NULL", "enc_key_id text NULL", "activity_level enum(light,moderate,heavy) NULL", "goal enum(maintain,lose,expert) NULL", "kcal_target int NULL CK(800..5000)", "kcal_source enum(suggested,user,expert) NULL", "diet_code text NULL FK->diets(code)", "updated_at timestamptz NN"]
+    pk: [user_id]
+    notes: "users 1 — 0..1 profiles; cột *_enc mã hoá AES-GCM tầng ứng dụng, chỉ module profile giải mã (ghi audit_log)"
+  - name: user_allergens
+    module: profile
+    columns: ["user_id uuid NN FK->users(id) ON DELETE CASCADE", "allergen_code text NN FK->allergen_groups(code)"]
+    pk: [user_id, allergen_code]
+  - name: user_favorite_recipes
+    module: profile
+    columns: ["user_id uuid NN FK->users(id) ON DELETE CASCADE", "recipe_id uuid NN FK->recipes(id)", "created_at timestamptz NN"]
+    pk: [user_id, recipe_id]
+    notes: "tối đa 5 món (kiểm ở service)"
+  - name: user_settings
+    module: profile
+    columns: ["user_id uuid PK FK->users(id) ON DELETE CASCADE", "burners smallint NN D 2 CK(1..4)", "default_persons smallint NN D 2 CK(1..6)", "timezone text NN D 'Asia/Ho_Chi_Minh'", "updated_at timestamptz NN"]
+    pk: [user_id]
+  # ---------- pantry
+  - name: pantry_lots
+    module: pantry
+    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "ingredient_id uuid NN FK->ingredients(id)", "initial_g_min numeric NN CK(>=0)", "initial_g_max numeric NN", "acquired_at timestamptz NN", "acquired_basis enum(purchase_date_entered,first_seen) NN", "status enum(in_stock,used_up,discarded,not_seen) NN D in_stock", "p_tuoi real NULL", "p_dung_som real NULL", "p_dung_ngay real NULL", "p_kiem_tra real NULL", "freshness_observed_at timestamptz NULL", "freshness_model_version_id uuid NULL FK->model_versions(id)", "user_checked_at timestamptz NULL (người dùng xác nhận đồ 'kiểm tra' vẫn dùng được)", "source_scan_item_id uuid NULL FK->scan_items(id) ON DELETE SET NULL", "created_at timestamptz NN", "updated_at timestamptz NN", "CK(initial_g_min <= initial_g_max)"]
+    pk: [id]
+    notes: "lượng hiện tại = initial + Σ giao dịch (view v_pantry_lot_balance); u tính lúc đọc (BR-FRESH-05); p_* là quan sát mới nhất của chính lô"
+  - name: pantry_transactions
+    module: pantry
+    columns: ["id bigint PK identity", "lot_id uuid NN FK->pantry_lots(id) ON DELETE CASCADE", "delta_g_min numeric NN", "delta_g_max numeric NN", "reason enum(scan_add,cook_deduct,manual_edit,discard,undo) NN", "ref_type enum(scan,cook_session,user) NULL", "ref_id uuid NULL", "reverses_id bigint NULL FK->pantry_transactions(id)", "urgency_at_event real NULL", "created_at timestamptz NN"]
+    pk: [id]
+    notes: "chỉ ghi thêm; hoàn tác = ghi giao dịch đảo trỏ reverses_id"
+  # ---------- mlops
+  - name: model_versions
+    module: mlops
+    columns: ["id uuid PK", "name enum(detector,freshness,ranker,substitution) NN", "version text NN", "artifact_key text NN", "sha256 bytea NN", "preprocess_version text NULL", "metrics jsonb NN", "gate_report_key text NULL", "mlflow_run_id text NULL", "status enum(candidate,validated,rejected,retired) NN D candidate", "created_at timestamptz NN"]
+    pk: [id]
+    unique: [[name, version]]
+    notes: "metrics là báo cáo không truy vấn (jsonb hợp lý); bản đang chạy xác định DUY NHẤT qua model_deployments"
+  - name: model_version_classes
+    module: mlops
+    columns: ["model_version_id uuid NN FK->model_versions(id)", "class_index smallint NN", "vision_class_id smallint NN FK->vision_classes(id)"]
+    pk: [model_version_id, class_index]
+  - name: model_deployments
+    module: mlops
+    columns: ["name enum(detector,freshness,ranker,substitution) PK", "active_version_id uuid NN FK->model_versions(id)", "previous_version_id uuid NULL FK->model_versions(id)", "switched_at timestamptz NN", "switched_by uuid NULL FK->users(id) ON DELETE SET NULL"]
+    pk: [name]
+  # ---------- scan
+  - name: scans
+    module: scan
+    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "mode enum(fridge,haul) NN", "status enum(queued,processing,done,failed,expired,confirmed,discarded) NN", "error_code text NULL", "attempts smallint NN D 0", "detector_version_id uuid NULL FK->model_versions(id)", "classifier_version_id uuid NULL FK->model_versions(id)", "preprocess_version text NULL", "enqueued_at timestamptz NULL", "started_at timestamptz NULL", "finished_at timestamptz NULL", "confirmed_at timestamptz NULL", "created_at timestamptz NN"]
+    pk: [id]
+  - name: scan_images
+    module: scan
+    columns: ["id uuid PK", "scan_id uuid NN FK->scans(id) ON DELETE CASCADE", "ordinal smallint NN CK(1..2)", "shelf_group smallint NN D 1 (cùng số = cùng ngăn → lấy max; khác số → cộng)", "storage_key text NN UQ", "width int NN", "height int NN", "contributed bool NN D false", "purged_at timestamptz NULL"]
+    pk: [id]
+    unique: [[scan_id, ordinal]]
+  - name: scan_items
+    module: scan
+    columns: ["id uuid PK", "scan_id uuid NN FK->scans(id) ON DELETE CASCADE", "ingredient_id uuid NN FK->ingredients(id)", "origin enum(model,user_added) NN", "model_count smallint NULL", "final_count smallint NULL", "qty_level enum(it,vua,nhieu) NULL", "user_action enum(kept,relabeled,deleted,edited) NN D kept", "original_ingredient_id uuid NULL FK->ingredients(id)", "user_freshness enum(tuoi,dung_som,dung_ngay,kiem_tra) NULL", "created_at timestamptz NN", "updated_at timestamptz NN"]
+    pk: [id]
+    notes: "chip; ghi vào kho chỉ khi xác nhận (BR-SCAN-02)"
+  - name: detections
+    module: scan
+    columns: ["id bigint PK identity", "scan_image_id uuid NN FK->scan_images(id) ON DELETE CASCADE", "scan_item_id uuid NULL FK->scan_items(id) ON DELETE SET NULL", "vision_class_id smallint NN FK->vision_classes(id)", "x1 real NN", "y1 real NN", "x2 real NN", "y2 real NN", "confidence real NN", "p_tuoi real NULL", "p_dung_som real NULL", "p_dung_ngay real NULL", "p_kiem_tra real NULL", "CK(0<=x1<x2<=1 AND 0<=y1<y2<=1)"]
+    pk: [id]
+  # ---------- substitute
+  - name: substitution_pairs
+    module: substitute
+    columns: ["id uuid PK", "ingredient_id uuid NN FK->ingredients(id)", "substitute_id uuid NN FK->ingredients(id)", "context_slot enum(man,rau,canh) NULL", "context_method_code text NULL FK->cooking_methods(code)", "ratio numeric NN D 1", "score real NN", "source text NN", "curated bool NN", "CK(ingredient_id <> substitute_id)"]
+    pk: [id]
+    unique: [[ingredient_id, substitute_id, context_slot, context_method_code]]
+  - name: ingredient_embeddings
+    module: substitute
+    columns: ["ingredient_id uuid NN FK->ingredients(id)", "model_version_id uuid NN FK->model_versions(id)", "vector vector(100) NN"]
+    pk: [ingredient_id, model_version_id]
+  - name: shopping_items
+    module: substitute
+    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "ingredient_id uuid NN FK->ingredients(id)", "qty_g numeric NULL", "note text NULL", "status enum(open,bought,dropped) NN D open", "source_meal_plan_item_id uuid NULL FK->meal_plan_items(id) ON DELETE SET NULL", "created_at timestamptz NN", "updated_at timestamptz NN"]
+    pk: [id]
+  # ---------- meal
+  - name: meal_plans
+    module: meal
+    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "meal enum(lunch,dinner) NN", "persons smallint NN CK(1..6)", "max_minutes smallint NN CK(10..180)", "status enum(proposed,accepted,cooked,abandoned,expired) NN D proposed", "e_target_kcal numeric NULL (ảnh chụp lúc tạo)", "kcal_low numeric NULL", "kcal_high numeric NULL", "rice_bowls_per_person numeric NULL", "reason_vi text NN", "ranker_version_id uuid NULL FK->model_versions(id)", "params_version text NN", "created_at timestamptz NN", "updated_at timestamptz NN"]
+    pk: [id]
+    unique: [[id, user_id]]
+    notes: "e_target_kcal, kcal_low/high là ảnh chụp lịch sử, không phải dẫn xuất lặp"
+  - name: meal_plan_coeater_allergens
+    module: meal
+    columns: ["meal_plan_id uuid NN FK->meal_plans(id) ON DELETE CASCADE", "allergen_code text NN FK->allergen_groups(code)"]
+    pk: [meal_plan_id, allergen_code]
+  - name: meal_plan_pins
+    module: meal
+    columns: ["meal_plan_id uuid NN FK->meal_plans(id) ON DELETE CASCADE", "lot_id uuid NN FK->pantry_lots(id) ON DELETE CASCADE"]
+    pk: [meal_plan_id, lot_id]
+  - name: meal_plan_items
+    module: meal
+    columns: ["id uuid PK", "meal_plan_id uuid NN FK->meal_plans(id) ON DELETE CASCADE", "slot enum(man,rau,canh) NN", "recipe_id uuid NN", "status enum(active,swapped_out) NN D active", "replaced_item_id uuid NULL FK->meal_plan_items(id)", "swap_reason enum(khong_hop_gu,moi_an,thieu_thoi_gian,khac) NULL", "rank_score real NN", "servings_scale numeric NN", "kcal_per_person numeric NULL (ảnh chụp)", "created_at timestamptz NN"]
+    pk: [id]
+    fks: ["(recipe_id, slot) -> recipes(id, slot)"]
+    unique_partial: ["UNIQUE(meal_plan_id, slot) WHERE status = 'active'"]
+  - name: meal_plan_item_substitutions
+    module: meal
+    columns: ["item_id uuid NN FK->meal_plan_items(id) ON DELETE CASCADE", "original_ingredient_id uuid NN FK->ingredients(id)", "substitute_ingredient_id uuid NN FK->ingredients(id)", "grams numeric NN", "origin enum(lookup,embedding,user) NN", "created_at timestamptz NN"]
+    pk: [item_id, original_ingredient_id]
+  # ---------- cooking
+  - name: cook_sessions
+    module: cooking
+    columns: ["id uuid PK", "meal_plan_id uuid NN FK->meal_plans(id) ON DELETE CASCADE", "status enum(in_progress,completed,reverted,abandoned) NN D in_progress", "serve_at timestamptz NN", "burners smallint NN (ảnh chụp)", "started_at timestamptz NN", "completed_at timestamptz NULL", "reverted_at timestamptz NULL", "created_at timestamptz NN"]
+    pk: [id]
+    notes: "meal_plans 1 — 0..* cook_sessions; không lưu user_id (truy qua meal_plans để giữ 3NF)"
+  - name: cook_schedule_entries
+    module: cooking
+    columns: ["cook_session_id uuid NN FK->cook_sessions(id) ON DELETE CASCADE", "recipe_id uuid NN", "step_no smallint NN", "start_offset_s int NN", "end_offset_s int NN", "CK(start_offset_s < end_offset_s)"]
+    pk: [cook_session_id, recipe_id, step_no]
+    fks: ["(recipe_id, step_no) -> recipe_steps(recipe_id, step_no)"]
+  # ---------- events
+  - name: interactions
+    module: events
+    columns: ["id uuid PK (event_id do client sinh → chống trùng)", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "recipe_id uuid NN FK->recipes(id)", "meal_plan_id uuid NULL", "meal_plan_item_id uuid NULL FK->meal_plan_items(id) ON DELETE SET NULL", "type enum(served,viewed,swapped,cooked,liked,disliked,undone) NN", "position smallint NULL", "swap_reason enum(khong_hop_gu,moi_an,thieu_thoi_gian,khac) NULL", "ranker_version_id uuid NULL FK->model_versions(id)", "propensity real NULL", "occurred_at timestamptz NN", "received_at timestamptz NN"]
+    pk: [id]
+    fks: ["(meal_plan_id, user_id) -> meal_plans(id, user_id) ON DELETE CASCADE"]
+    notes: "FK ghép bảo đảm user_id khớp chủ mâm (không có phụ thuộc bắc cầu tự do); chỉ ghi khi có đồng ý personalization (BR-CONSENT-03)"
+  # ---------- survey
+  - name: survey_forms
+    module: survey
+    columns: ["id uuid PK", "version text NN UQ", "n_anchor smallint NN", "n_random smallint NN", "is_open bool NN D false", "created_at timestamptz NN"]
+    pk: [id]
+  - name: survey_form_anchors
+    module: survey
+    columns: ["form_id uuid NN FK->survey_forms(id)", "recipe_id uuid NN FK->recipes(id)"]
+    pk: [form_id, recipe_id]
+  - name: survey_respondents
+    module: survey
+    columns: ["id uuid PK", "form_id uuid NN FK->survey_forms(id)", "policy_version_id uuid NN FK->policy_versions(id)", "consented_at timestamptz NN", "completed_at timestamptz NULL", "channel enum(link,qr) NN"]
+    pk: [id]
+  - name: survey_assignments
+    module: survey
+    columns: ["respondent_id uuid NN FK->survey_respondents(id) ON DELETE CASCADE", "recipe_id uuid NN FK->recipes(id)", "display_order smallint NN", "is_anchor bool NN"]
+    pk: [respondent_id, recipe_id]
+  - name: survey_ratings
+    module: survey
+    columns: ["respondent_id uuid NN", "recipe_id uuid NN", "rating smallint NULL CK(1..5)", "never_eaten bool NN D false", "answered_at timestamptz NN", "CK((rating IS NULL) = never_eaten)"]
+    pk: [respondent_id, recipe_id]
+    fks: ["(respondent_id, recipe_id) -> survey_assignments(respondent_id, recipe_id) ON DELETE CASCADE"]
+  - name: survey_favorites
+    module: survey
+    columns: ["respondent_id uuid NN FK->survey_respondents(id) ON DELETE CASCADE", "recipe_id uuid NN FK->recipes(id)"]
+    pk: [respondent_id, recipe_id]
+
+views:
+  - {name: v_current_consents, module: privacy, desc: "đồng ý hiện hành theo (user, mục đích) = consent_event mới nhất"}
+  - {name: v_pantry_lot_balance, module: pantry, desc: "lượng hiện tại [g_min, g_max] = initial + Σ delta, chặn dưới 0"}
+  - {name: v_journal_days, module: journal, desc: "theo ngày địa phương: số mâm đã nấu, kcal/người, mục tiêu ảnh chụp, số lô gấp được dùng kịp"}
+
+# Endpoint: method, path (tiền tố /api/v1 trừ healthz), module, use cases, idempotent, auth (public|user|staff:<role>)
+endpoints:
+  - [POST, "/auth/register", identity, [UC01], false, public]
+  - [POST, "/auth/login", identity, [UC02], false, public]
+  - [POST, "/auth/refresh", identity, [UC02], false, public]
+  - [POST, "/auth/logout", identity, [UC03], true, user]
+  - [POST, "/auth/logout-all", identity, [UC03], true, user]
+  - [POST, "/auth/password-reset/request", identity, [UC04], true, public]
+  - [POST, "/auth/password-reset/confirm", identity, [UC04], false, public]
+  - [GET, "/policies/{purpose}/current", privacy, [UC05, UC09, UC23], true, public]
+  - [GET, "/me/consents", privacy, [UC05], true, user]
+  - [POST, "/me/consents", privacy, [UC05, UC09], true, user]
+  - [POST, "/me/consents/{purpose}/withdraw", privacy, [UC05], true, user]
+  - [POST, "/me/data-requests", privacy, [UC06, UC07, UC08], true, user]
+  - [GET, "/me/data-requests/{id}", privacy, [UC06, UC07, UC08], true, user]
+  - [GET, "/me/data-requests/{id}/download", privacy, [UC06], true, user]
+  - [GET, "/me/profile", profile, [UC10], true, user]
+  - [PUT, "/me/profile", profile, [UC09, UC10], true, user]
+  - [POST, "/me/energy-suggestion", profile, [UC09, UC11], true, user]
+  - [PUT, "/me/energy-target", profile, [UC09, UC11], true, user]
+  - [PUT, "/me/allergens", profile, [UC09, UC10], true, user]
+  - [PUT, "/me/diet", profile, [UC09, UC10], true, user]
+  - [PUT, "/me/favorites", profile, [UC09, UC10], true, user]
+  - [GET, "/me/settings", profile, [UC10], true, user]
+  - [PUT, "/me/settings", profile, [UC10], true, user]
+  - [GET, "/reference", catalog, [UC09, UC10, UC15], true, public]
+  - [GET, "/recipes", catalog, [UC09, UC15], true, user]
+  - [GET, "/recipes/{id}", catalog, [UC15, UC19], true, user]
+  - [GET, "/ingredients", catalog, [UC13, UC14, UC18], true, user]
+  - [GET, "/catalog/snapshot", catalog, [UC19], true, user]
+  - [GET, "/pantry/lots", pantry, [UC14, UC15], true, user]
+  - [POST, "/pantry/lots", pantry, [UC14], false, user]
+  - [PATCH, "/pantry/lots/{id}", pantry, [UC14], true, user]
+  - [POST, "/pantry/lots/{id}/discard", pantry, [UC14], true, user]
+  - [POST, "/scans", scan, [UC12], "Idempotency-Key", user]
+  - [GET, "/scans/{id}", scan, [UC12, UC13], true, user]
+  - [GET, "/scans/{id}/images/{ordinal}", scan, [UC13], true, user]
+  - [POST, "/scans/{id}/items", scan, [UC13], false, user]
+  - [PATCH, "/scans/{id}/items/{itemId}", scan, [UC13], true, user]
+  - [DELETE, "/scans/{id}/items/{itemId}", scan, [UC13], true, user]
+  - [POST, "/scans/{id}/confirm", scan, [UC13], true, user]
+  - [POST, "/scans/{id}/discard", scan, [UC13], true, user]
+  - [POST, "/meal-plans", meal, [UC15], "Idempotency-Key", user]
+  - [GET, "/meal-plans", meal, [UC22], true, user]
+  - [GET, "/meal-plans/latest", meal, [UC15], true, user]
+  - [GET, "/meal-plans/{id}", meal, [UC15], true, user]
+  - [POST, "/meal-plans/{id}/accept", meal, [UC15], true, user]
+  - [POST, "/meal-plans/{id}/items/{itemId}/swap", meal, [UC16], "Idempotency-Key", user]
+  - [GET, "/meal-plans/{id}/items/{itemId}/substitutes", meal, [UC17], true, user]
+  - [POST, "/meal-plans/{id}/items/{itemId}/substitutions", meal, [UC17], true, user]
+  - [GET, "/shopping-items", substitute, [UC18], true, user]
+  - [POST, "/shopping-items", substitute, [UC17, UC18], false, user]
+  - [PATCH, "/shopping-items/{id}", substitute, [UC18], true, user]
+  - [POST, "/cook-sessions", cooking, [UC19], "Idempotency-Key", user]
+  - [GET, "/cook-sessions/{id}", cooking, [UC19], true, user]
+  - [POST, "/cook-sessions/{id}/complete", cooking, [UC20], "Idempotency-Key", user]
+  - [POST, "/cook-sessions/{id}/undo", cooking, [UC21], true, user]
+  - [POST, "/cook-sessions/{id}/abandon", cooking, [UC19], true, user]
+  - [GET, "/journal", journal, [UC22], true, user]
+  - [POST, "/events", events, [UC15, UC16, UC19, UC20], "event_id", user]
+  - [POST, "/survey/respondents", survey, [UC23], false, public]
+  - [GET, "/survey/respondents/{id}", survey, [UC23], true, "public+respondent_token"]
+  - [PUT, "/survey/respondents/{id}/ratings/{recipeId}", survey, [UC23], true, "public+respondent_token"]
+  - [PUT, "/survey/respondents/{id}/favorites", survey, [UC23], true, "public+respondent_token"]
+  - [POST, "/survey/respondents/{id}/complete", survey, [UC23], true, "public+respondent_token"]
+  - [GET, "/admin/data-requests", admin, [UC27], true, "staff:admin"]
+  - [POST, "/admin/data-requests/{id}/resolve", admin, [UC08, UC27], true, "staff:admin"]
+  - [GET, "/admin/audit-log", admin, [UC27], true, "staff:admin"]
+  - [GET, "/admin/models", admin, [UC29, UC30], true, "staff:ml_operator"]
+  - [GET, "/admin/surveys", admin, [UC24], true, "staff:ml_operator"]
+  - [GET, "/healthz", core, [], true, public]
+  - [GET, "/readyz", core, [], true, public]
+
+# Lệnh CLI (ranh giới cho actor nhân sự; chạy trong container api)
+cli:
+  - {cmd: "tastoria catalog import <bundle_dir>", module: admin, use_cases: [UC25], desc: "kiểm tra + nhập YAML/CSV món, nguyên liệu; tính lại recipe_nutrition"}
+  - {cmd: "tastoria catalog substitutes import <file>", module: admin, use_cases: [UC26]}
+  - {cmd: "tastoria survey create-form --anchors N --random M", module: admin, use_cases: [UC24]}
+  - {cmd: "tastoria survey export <form_version>", module: admin, use_cases: [UC24]}
+  - {cmd: "tastoria mlops export-training-data --since <date>", module: admin, use_cases: [UC28]}
+  - {cmd: "tastoria mlops register <name> <artifact> --metrics <json>", module: admin, use_cases: [UC29]}
+  - {cmd: "tastoria mlops gate <name> <version>", module: admin, use_cases: [UC29]}
+  - {cmd: "tastoria mlops deploy <name> <version>", module: admin, use_cases: [UC30]}
+  - {cmd: "tastoria mlops rollback <name>", module: admin, use_cases: [UC30]}
+  - {cmd: "tastoria labeling push|pull", module: admin, use_cases: [UC31]}
+  - {cmd: "python -m tastoria.jobs.purge_images", module: jobs, use_cases: [UC32]}
+  - {cmd: "python -m tastoria.jobs.backup", module: jobs, use_cases: [UC33]}
+  - {cmd: "python -m tastoria.jobs.sweep", module: jobs, use_cases: [UC34]}
+
+# Máy trạng thái cần vẽ (sơ đồ state machine UML)
+state_machines:
+  - {entity: scans, states: [queued, processing, done, failed, expired, confirmed, discarded]}
+  - {entity: meal_plans, states: [proposed, accepted, cooked, abandoned, expired]}
+  - {entity: cook_sessions, states: [in_progress, completed, reverted, abandoned]}
+  - {entity: "consent (theo mục đích)", states: [none, granted, withdrawn, superseded]}
+  - {entity: pantry_lots, states: [in_stock, not_seen, used_up, discarded]}
+  - {entity: "users (tài khoản)", states: [active, locked, deletion_requested, deleted]}
+  - {entity: model_versions, states: [candidate, validated, rejected, active, retired]}
+  - {entity: dsr_requests, states: [received, in_progress, completed, rejected]}
+
+business_rules: [BR-TRAY-01, BR-TRAY-02, BR-TRAY-03, BR-TRAY-04, BR-TRAY-05, BR-TRAY-06, BR-TRAY-07, BR-TRAY-08, BR-SWAP-01, BR-ALG-01, BR-ALG-02, BR-DIET-01, BR-QTY-01, BR-QTY-02, BR-PANTRY-01, BR-PANTRY-02, BR-PANTRY-03, BR-SCAN-01, BR-SCAN-02, BR-FRESH-01, BR-FRESH-02, BR-FRESH-03, BR-FRESH-04, BR-FRESH-05, BR-NUT-01, BR-NUT-02, BR-NUT-03, BR-NUT-04, BR-NUT-05, BR-NUT-06, BR-CONSENT-01, BR-CONSENT-02, BR-CONSENT-03, BR-CONSENT-04, BR-DSR-01, BR-RETAIN-01, BR-COOK-01, BR-COOK-02, BR-CATALOG-01]
+nfrs: [NFR-PERF-01, NFR-PERF-02, NFR-PERF-03, NFR-REL-01, NFR-SEC-01, NFR-SEC-02, NFR-PRIV-01, NFR-A11Y-01, NFR-USE-01, NFR-MAINT-01]
