@@ -63,7 +63,10 @@ def test_three_dish_tray_from_the_pantry(kb_client: TestClient, kb_db, h: dict) 
     assert sorted(i["slot"] for i in p["items"]) == ["canh", "man", "rau"]
     assert all(i["kcal_per_person"] and i["servings_scale"] > 0 and 0 <= i["rank_score"] <= 1 for i in p["items"])
     assert p["e_target_kcal"] is None and p["rice_bowls_per_person"] is None  # no health consent (BR-CONSENT-02)
-    assert p["kcal_low"] is None and p["kcal_high"] is None  # BR-NUT-06 not calibrated yet
+    h_ = float(q(kb_db, "SELECT current_setting('tastoria.kcal_half_width', true)").scalar() or "nan")
+    dishes = sum(i["kcal_per_person"] for i in p["items"])
+    assert p["kcal_low"] == pytest.approx(dishes * (1 - h_), abs=0.2)  # FR-15-22, h from validation (BR-NUT-06)
+    assert p["kcal_high"] == pytest.approx(dishes * (1 + h_), abs=0.2)
     assert p["reason_vi"] and p["params_version"] and p["ranker_version_id"] is None
     assert _pooled_ok(kb_db, p)
     assert q(kb_db, "SELECT count(*) FROM interactions").scalar() == 0  # no personalization consent

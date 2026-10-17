@@ -44,7 +44,7 @@ def test_week_has_seven_days_and_the_cooked_tray(kb_client: TestClient, kb_db) -
     r = kb_client.get(f"{API}/journal", params={"week": _week_of(local)}, headers=h)
     assert r.status_code == 200, r.text
     wk = r.json()
-    assert wk["timezone"] == tz and wk["kcal_range_status"] == "calibrating"  # BR-NUT-06
+    assert wk["timezone"] == tz and wk["kcal_range_status"] == "calibrated"  # h from validation/nin_dishes.yaml
     assert len(wk["days"]) == 7 and date.fromisoformat(wk["days"][0]["date"]).isoweekday() == 1  # FR-22-01
     day = next(d for d in wk["days"] if d["date"] == local.isoformat())
     dishes = sum(i["kcal_per_person"] for i in done["plan"]["items"])

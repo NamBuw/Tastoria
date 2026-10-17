@@ -97,6 +97,7 @@ class ImportReport:
     nutrition_recomputed: int = 0
     data_version: str = ""
     rice_bowl_kcal: float = 0.0
+    kcal_half_width: float | None = None
     nutrition_engine: str = ""
     warnings: list[str] = field(default_factory=list)
 
@@ -118,6 +119,7 @@ class ImportReport:
             "nutrition_engine": self.nutrition_engine,
             "data_version": self.data_version,
             "rice_bowl_kcal": self.rice_bowl_kcal,
+            "kcal_half_width": self.kcal_half_width,
             "warnings": self.warnings,
         }
 
@@ -548,21 +550,41 @@ def _nutrition(
     session.flush()
 
 
-def _set_rice_bowl(session: Session, kcal: float, report: ImportReport) -> None:
-    """E_bát for v_journal_days (app_param('rice_bowl_kcal'), BR-TRAY-03); new sessions see it."""
+MIN_CALIBRATION_DISHES = 30  # BR-NUT-06
+
+
+def _set_db_param(session: Session, key: str, value: float | None, report: ImportReport) -> None:
+    """Database-level parameter tastoria.<key> (app_param() in views; catalog.service.db_param() reads it fresh).
+    None resets it. Needs the database owner; otherwise a warning (the API then falls back to "not calibrated")."""
+    assert key.isidentifier()
+    action = f"SET tastoria.{key} = %L" if value is not None else f"RESET tastoria.{key}"
+    arg = f", '{float(value)}'" if value is not None else ""
     try:
         with session.begin_nested():
             session.execute(
-                text("SELECT set_config('tastoria.rice_bowl_kcal', :v, false)"), {"v": str(kcal)}
-            )  # this session
-            session.execute(
-                text(
-                    "DO $$ BEGIN EXECUTE format('ALTER DATABASE %I SET tastoria.rice_bowl_kcal = %L', "
-                    f"current_database(), '{float(kcal)}'); END $$"
-                )
+                text(f"DO $$ BEGIN EXECUTE format('ALTER DATABASE %I {action}', current_database(){arg}); END $$")
             )
-    except Exception as exc:  # noqa: BLE001 — not owner of the database: report, the meal module reads the table
-        report.warnings.append(f"ALTER DATABASE SET tastoria.rice_bowl_kcal failed: {exc.__class__.__name__}")
+    except Exception as exc:  # noqa: BLE001
+        report.warnings.append(f"ALTER DATABASE {action.split(' ')[0]} tastoria.{key} failed: {exc.__class__.__name__}")
+
+
+def _calibration(b: Bundle, nut: NutritionResult, report: ImportReport) -> float | None:
+    """Half width h of the calorie range (BR-NUT-06): p80 of |relative error| against Viện Dinh dưỡng, used only
+    when ≥ 30 dishes were compared with the same nutrition rules and data that computed recipe_nutrition."""
+    c = b.calorie_check
+    if not c:
+        return None
+    n, h, version = c.get("n"), c.get("p80_abs_rel_error"), c.get("data_version")
+    if not isinstance(n, int) or n < MIN_CALIBRATION_DISHES or not isinstance(h, int | float):
+        report.warnings.append(f"validation/nin_dishes.yaml: {n} dishes, BR-NUT-06 needs ≥ {MIN_CALIBRATION_DISHES}")
+        return None
+    if version != nut.data_version:
+        report.warnings.append(
+            f"validation/nin_dishes.yaml was computed with {version}, recipe_nutrition with {nut.data_version}: "
+            "calorie range left uncalibrated"
+        )
+        return None
+    return float(h)
 
 
 def apply(session: Session, b: Bundle, nut: NutritionResult, now: datetime) -> ImportReport:
@@ -579,5 +601,7 @@ def apply(session: Session, b: Bundle, nut: NutritionResult, now: datetime) -> I
     ing_ids = _ingredients(session, b, comp_ids, now, report)
     recipe_ids = _recipes(session, b, ing_ids, now, report)
     _nutrition(session, recipe_ids, nut, now, report)
-    _set_rice_bowl(session, nut.rice_bowl_kcal, report)
+    _set_db_param(session, "rice_bowl_kcal", nut.rice_bowl_kcal, report)
+    report.kcal_half_width = _calibration(b, nut, report)
+    _set_db_param(session, "kcal_half_width", report.kcal_half_width, report)
     return report

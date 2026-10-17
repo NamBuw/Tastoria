@@ -70,7 +70,6 @@ STRUCTURE_2 = (("man", "rau"), ("man", "canh"))
 MEAL_END = {"lunch": time(15, 0), "dinner": None}  # FR-15-39: 15:00 / 24:00 local time of the creation day
 STIR_FRY = catalog.STIR_FRY_METHOD
 VERIFY_MAX = 30  # trays whose exact schedule is tried before giving up on time
-KCAL_HALF_WIDTH: float | None = None  # BR-NUT-06: not calibrated yet → kcal_low/high NULL ("đang hiệu chỉnh")
 
 
 @dataclass(frozen=True)
@@ -538,7 +537,7 @@ def create_plan(session: Session, deps: MealDeps, user: AuthUser, body: MealPlan
     )
     session.add(plan)
     session.flush()
-    _set_kcal_range(plan, best)
+    _set_kcal_range(session, plan, _dishes_kcal(best))
     session.add_all(
         MealPlanCoeaterAllergen(meal_plan_id=plan.id, allergen_code=c) for c in sorted(set(body.coeater_allergen_codes))
     )
@@ -581,13 +580,24 @@ def create_plan(session: Session, deps: MealDeps, user: AuthUser, body: MealPlan
     return Created(plan=plan_out(session, plan))
 
 
-def _set_kcal_range(plan: MealPlan, tray: cmp.Tray | None, e_pp: float | None = None) -> None:
-    e = e_pp if e_pp is not None else (tray.e_pp if tray else None)
-    if KCAL_HALF_WIDTH is None or e is None:
+def _set_kcal_range(session: Session, plan: MealPlan, dishes_kcal: float | None) -> None:
+    """FR-15-22: [E(m)·(1 − h), E(m)·(1 + h)] with E(m) = Σ kcal_per_person of the active dishes and h the calibrated
+    half width (BR-NUT-06); NULL while h is not calibrated ("đang hiệu chỉnh")."""
+    h = catalog.kcal_half_width(session)
+    if h is None or dishes_kcal is None:
         plan.kcal_low = plan.kcal_high = None
     else:
-        plan.kcal_low = Decimal(str(round(e * (1 - KCAL_HALF_WIDTH), 1)))
-        plan.kcal_high = Decimal(str(round(e * (1 + KCAL_HALF_WIDTH), 1)))
+        plan.kcal_low = Decimal(str(round(dishes_kcal * (1 - h), 1)))
+        plan.kcal_high = Decimal(str(round(dishes_kcal * (1 + h), 1)))
+
+
+def kcal_half_width(session: Session) -> float | None:
+    return catalog.kcal_half_width(session)
+
+
+def _dishes_kcal(tray: cmp.Tray) -> float | None:
+    k = [d.kcal_pp for d in tray.dishes]
+    return sum(x for x in k if x is not None) if any(x is not None for x in k) else None
 
 
 # ---------------------------------------------------------------- UC15: read, accept
@@ -778,7 +788,7 @@ def swap_item(
     session.add(new)
     session.flush()
     plan.rice_bowls_per_person = Decimal(str(best.bowls)) if best.bowls is not None else None
-    _set_kcal_range(plan, best)
+    _set_kcal_range(session, plan, _dishes_kcal(best))
     plan.reason_vi = _reason(session, ctx, best, second, two_dish=len(active) == 2 and plan.persons >= 2)
     plan.updated_at = now
     position = [i.id for i in active].index(item.id)
@@ -993,12 +1003,10 @@ def _refresh_energy(session: Session, plan: MealPlan) -> None:
     active = [i for i in _items(session, [plan.id])[plan.id] if i.status == "active"]
     dish = sum(float(i.kcal_per_person or 0) for i in active)
     rice = catalog.rice_bowl_kcal(session)
-    e_pp = dish
     if plan.e_target_kcal is not None and rice:
         bowls = min(3.0, max(0.5, cmp.round_half((float(plan.e_target_kcal) - dish) / rice)))
         plan.rice_bowls_per_person = Decimal(str(bowls))
-        e_pp = dish + bowls * rice
-    _set_kcal_range(plan, None, e_pp)
+    _set_kcal_range(session, plan, dish)
     plan.updated_at = utcnow()
 
 

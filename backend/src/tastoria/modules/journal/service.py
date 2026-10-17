@@ -70,5 +70,5 @@ def get_week(session: Session, user_id: uuid.UUID, week: str | None) -> JournalW
                 urgent_lots_used=int(r.urgent_lots_used),
             )
         )
-    status = "calibrated" if meal.KCAL_HALF_WIDTH is not None else "calibrating"  # BR-NUT-06
+    status = "calibrated" if meal.kcal_half_width(session) is not None else "calibrating"  # BR-NUT-06
     return JournalWeek(week=week, timezone=tz, days=days, kcal_range_status=status)

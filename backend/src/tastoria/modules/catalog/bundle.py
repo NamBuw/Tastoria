@@ -274,6 +274,7 @@ class Bundle:
     comp: dict[tuple[str, str], CompRow] = field(default_factory=dict)  # (fct2007|usda, code) -> row
     publishable: dict[str, bool] = field(default_factory=dict)  # slug -> FR-25-08
     vegetarian: dict[str, bool] = field(default_factory=dict)  # slug -> dish_list.yaml `vegetarian` (post-check)
+    calorie_check: dict[str, Any] | None = None  # summary of validation/nin_dishes.yaml (BR-NUT-06), if present
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     file_sha: dict[str, str] = field(default_factory=dict)
@@ -587,6 +588,16 @@ def load_bundle(root: Path, processed: Path | None = None) -> Bundle:
         for dish in dl.data.get("dishes") or []:
             if isinstance(dish, dict) and isinstance(dish.get("slug"), str):
                 b.vegetarian[dish["slug"]] = bool(dish.get("vegetarian"))
+
+    nin = root / "validation" / "nin_dishes.yaml"
+    if nin.exists():  # BR-NUT-06 calibration by the ML team: only its summary is used
+        try:
+            summary = (yaml.safe_load(nin.read_text(encoding="utf-8")) or {}).get("summary")
+        except yaml.YAMLError as exc:
+            summary = None
+            b.warnings.append(f"validation/nin_dishes.yaml:1: yaml_error: {exc}")
+        if isinstance(summary, dict):
+            b.calorie_check = summary
 
     # make-ahead (passive step > threshold)
     threshold = ma_file.passive_threshold_minutes if ma_file else 120

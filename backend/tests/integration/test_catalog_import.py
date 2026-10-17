@@ -112,6 +112,25 @@ def test_rice_bowl_energy_is_set_for_the_journal_view(kb_database_url: str) -> N
     assert v is not None and 150 < float(v) < 200  # 150 g cooked rice ≈ 50 g gạo tẻ máy × 346 kcal/100 g
 
 
+def test_calorie_range_is_calibrated_from_the_validation_file(kb_database_url: str) -> None:
+    summary = yaml.safe_load((KB_DIR / "validation/nin_dishes.yaml").read_text(encoding="utf-8"))["summary"]
+    assert summary["n"] >= 30
+    stored = _one(kb_database_url, "SELECT current_setting('tastoria.kcal_half_width', true)")
+    assert float(stored) == pytest.approx(summary["p80_abs_rel_error"])  # BR-NUT-06
+
+
+def test_too_few_validated_dishes_leave_the_range_uncalibrated(fresh_database, bundle_copy: Path) -> None:
+    url = fresh_database()
+    path = bundle_copy / "validation/nin_dishes.yaml"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    doc["summary"]["n"] = 12
+    path.write_text(yaml.safe_dump(doc, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    res = _run(url, bundle_copy)
+    assert res.ok and res.report["kcal_half_width"] is None
+    assert any("needs ≥ 30" in w for w in res.report["warnings"])
+    assert _one(url, "SELECT current_setting('tastoria.kcal_half_width', true)") in (None, "")
+
+
 def test_reimport_of_the_same_bundle_changes_nothing(kb_database_url: str) -> None:
     before = _rows(kb_database_url, "SELECT recipe_id, nutrient_code, computed_at FROM recipe_nutrition ORDER BY 1, 2")
     res = _run(kb_database_url)

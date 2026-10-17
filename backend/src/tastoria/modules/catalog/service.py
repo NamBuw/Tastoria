@@ -297,6 +297,28 @@ def rice_bowl_kcal(session: Session) -> float | None:
     return round(float(v) * nut.RICE_BOWL_G / nut.RICE_YIELD / 100, 1) if v is not None else None
 
 
+_DB_PARAM = text(
+    "SELECT split_part(c, '=', 2) FROM pg_db_role_setting s CROSS JOIN LATERAL unnest(s.setconfig) c "
+    "WHERE s.setdatabase = (SELECT oid FROM pg_database WHERE datname = current_database()) AND s.setrole = 0 "
+    "AND split_part(c, '=', 1) = :k"
+)
+
+
+def db_param(session: Session, key: str) -> float | None:
+    """A database-level parameter tastoria.<key> as stored now (pg_db_role_setting), not the value the pooled
+    connection saw when it opened — so a catalog import takes effect without restarting the API."""
+    v = session.scalar(_DB_PARAM, {"k": f"tastoria.{key}"})
+    try:
+        return float(v) if v not in (None, "") else None
+    except ValueError:
+        return None
+
+
+def kcal_half_width(session: Session) -> float | None:
+    """BR-NUT-06 half width h of the calorie range; None = still calibrating (no range shown)."""
+    return db_param(session, "kcal_half_width")
+
+
 # ---------------------------------------------------------------- API: reference (public, ETag)
 
 

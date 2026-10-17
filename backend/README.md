@@ -171,8 +171,9 @@ Catalog import (UC25, `modules/catalog/{bundle,importer,nutrition}.py`, CLI in `
   0.2 kcal, the rest differ by the ML overrides. Run the import where `tastoria-ml` is installed to store the
   reference numbers.
 - E_bát (150 g cooked rice, BR-TRAY-03) = FCT 1004 energy × 150 / 2.98 / 100 (cooked yield 2.98, Bognár 2002): 173.2
-  kcal. The import also sets the database GUC `tastoria.rice_bowl_kcal` for `v_journal_days`; meal and journal read
-  E_bát from the table, because a GUC set by `ALTER DATABASE` reaches only connections opened afterwards.
+  kcal. The import also sets the database parameter `tastoria.rice_bowl_kcal` for `v_journal_days`; meal and journal
+  compute E_bát from the table, because a parameter set by `ALTER DATABASE` reaches a session only when it connects.
+  Both parameters need the database owner; without it the import reports a warning.
 - After writing, the import re-checks the hard filter against raw SQL for every published recipe × allergen group /
   diet and the `vegetarian` flags of `dish_list.yaml`; any violation rolls everything back. Every run, failed or not,
   writes one `audit_log` row (`catalog.import`, actor_role `curator`, outcome in `purpose`; the CLI has no logged-in
@@ -204,8 +205,13 @@ Pantry (UC14):
 
 Meal (UC15–UC17):
 - Objective weights are provisional (`tray-p0-provisional`: α = 1, β = 1, γ = 0.5, K = 20); spec §6.2 fixes them
-  later by the pre-registered scenario rule. `kcal_low` / `kcal_high` stay NULL ("đang hiệu chỉnh") until the
-  BR-NUT-06 half width is measured (`meal.service.KCAL_HALF_WIDTH`).
+  later by the pre-registered scenario rule.
+- Calorie range (BR-NUT-06, FR-15-22): `kcal_low/high` = Σ dish kcal per person × (1 ∓ h). h is the
+  `p80_abs_rel_error` of `data/kb/validation/nin_dishes.yaml` (the ML team's comparison with Viện Dinh dưỡng; today
+  45 dishes, h = 0.2135). The import stores it as the database parameter `tastoria.kcal_half_width` only when ≥ 30
+  dishes were compared with the same nutrition `data_version` that computed `recipe_nutrition`; otherwise it resets
+  it and the API shows "đang hiệu chỉnh" (NULL range, journal `calibrating`). Database parameters are read from
+  `pg_db_role_setting` on each request, so an import takes effect without restarting the API.
 - Ranker: `meal/ranker.py` `Ranker` protocol; the served `BaselineRanker` = shrunk popularity of consenting users'
   interactions + content-based cosine to the 5 favourites (+ the user's own signal with consent). No ranker model is
   deployed (mlops has no code yet), so `ranker_version_id` is NULL and propensity is 1.
@@ -238,7 +244,7 @@ Cooking (UC19–UC21):
   `occurred_at` of the interactions.
 
 Journal (UC22): kcal per person = Σ dish snapshots + Σ rice bowls × E_bát; days without a cooked tray have
-`kcal_per_person = null`.
+`kcal_per_person = null`; `kcal_range_status` follows the calibration above.
 
 Privacy: pantry, meal, cooking, events and substitute export their tables in data-subject exports; withdrawing
 `personalization` deletes the user's interactions (BR-CONSENT-04).
@@ -262,8 +268,7 @@ Privacy: pantry, meal, cooking, events and substitute export their tables in dat
 - `tastoria catalog substitutes import` (UC26) and a curated `data/kb/substitutions.yaml`; then UC17 has candidates.
 - mlops module (model_versions / model_deployments mapping) to serve a trained ranker through the `Ranker` protocol
   and to record `ranker_version_id`; scan module (UC12/UC13) writing lots and freshness probabilities.
-- Calibrate: objective weights (§6.2 rule), kcal half width (BR-NUT-06, ≥ 30 dishes vs Viện Dinh dưỡng), qty_levels,
-  made-ahead yields, shelf lives of the made-ahead products.
+- Calibrate: objective weights (§6.2 rule), qty_levels, made-ahead yields, shelf lives of the made-ahead products.
 - Refresh the derived documents for migration 0003 (`docs/sad/05-tu-dien-du-lieu.md`, `db/schema_vp.sql`, ERD).
 - A role for the CLI actor in `audit_log` (UC25 open question 1); `Idempotency-Key` on `POST /pantry/lots` (UC14 open
   question 2).
