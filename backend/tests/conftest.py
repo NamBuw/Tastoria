@@ -163,3 +163,41 @@ def db(engine: Engine, clean_db: None) -> Iterator[object]:
 
 def q(conn, sql: str, **params: object):
     return conn.execute(text(sql), params)
+
+
+@pytest.fixture(scope="session")
+def catalog_ref(engine: Engine) -> dict[str, list[str]]:
+    """Allergen groups and diets from data/kb/ref (the curated reference data of the catalog slice)."""
+    import yaml
+
+    ref = REPO_ROOT / "data/kb/ref"
+    groups = yaml.safe_load((ref / "allergen_groups.yaml").read_text(encoding="utf-8"))["allergen_groups"]
+    diets = yaml.safe_load((ref / "diets.yaml").read_text(encoding="utf-8"))["diets"]
+    with engine.begin() as conn:
+        for g in groups:
+            conn.execute(
+                text(
+                    "INSERT INTO allergen_groups (code, name_vi, name_en, basis) "
+                    "VALUES (:code, :name_vi, :name_en, :basis) ON CONFLICT (code) DO NOTHING"
+                ),
+                g,
+            )
+        for d in diets:
+            conn.execute(
+                text("INSERT INTO diets (code, name_vi) VALUES (:code, :name_vi) ON CONFLICT (code) DO NOTHING"), d
+            )
+    return {"allergens": [g["code"] for g in groups], "diets": [d["code"] for d in diets]}
+
+
+def insert_recipe(conn, name: str, *, status: str = "published", slot: str = "man") -> str:
+    """A minimal recipe row (the catalog import slice will provide real ones)."""
+    conn.execute(text("INSERT INTO cooking_methods (code, name_vi) VALUES ('xao', 'Xào') ON CONFLICT DO NOTHING"))
+    return str(
+        conn.execute(
+            text(
+                "INSERT INTO recipes (name_vi, slot, servings, method_code, status) "
+                "VALUES (:n, :slot, 2, 'xao', :st) RETURNING id"
+            ),
+            {"n": name, "slot": slot, "st": status},
+        ).scalar_one()
+    )

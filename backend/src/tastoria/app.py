@@ -18,8 +18,17 @@ from tastoria.core.middleware import RequestContextMiddleware
 from tastoria.modules.identity.mailer import make_mailer
 from tastoria.modules.identity.router import router as identity_router
 from tastoria.modules.identity.throttle import MemoryLoginThrottle, ValkeyLoginThrottle
+from tastoria.modules.privacy.router import router as privacy_router
+from tastoria.modules.privacy.service import PrivacyDeps
 
 API_PREFIX = "/api/v1"
+
+
+def build_subject_handlers(settings: Settings) -> list:
+    """Per-module exporters/erasers for data-subject requests (privacy calls them; ADR 0001 inversion)."""
+    from tastoria.modules.identity.dsr import IdentitySubjectData
+
+    return [IdentitySubjectData()]
 
 
 def create_app(settings: Settings | None = None, *, configure_logs: bool = True) -> FastAPI:
@@ -60,9 +69,11 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
             max_failures=settings.login_max_failures, lock_s=settings.login_lock_s
         )
     app.state.mailer = make_mailer(settings)
+    app.state.privacy = PrivacyDeps(settings, app.state.sessionmaker, handlers=build_subject_handlers(settings))
 
     install_error_handlers(app)
     app.add_middleware(RequestContextMiddleware, min_app_version=settings.min_app_version)
     app.include_router(health_router)
     app.include_router(identity_router, prefix=API_PREFIX)
+    app.include_router(privacy_router, prefix=API_PREFIX)
     return app
