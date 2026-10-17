@@ -1,7 +1,6 @@
 """RFC 9457 problem details with the stable `code` catalogue of docs/api/openapi-v1.yaml (schema ProblemCode).
 
-`ProblemCode` mirrors the OpenAPI enum exactly (tests/unit/test_problem_codes.py compares them), plus one
-backend-only code, `internal_error`, for unexpected 500s: the contract has no code for that case yet.
+`ProblemCode` mirrors the OpenAPI enum exactly, in the same order (tests/unit/test_problem_codes.py compares them).
 """
 
 from __future__ import annotations
@@ -102,11 +101,11 @@ class ProblemCode(StrEnum):
     invalid_rating = "invalid_rating"
     invalid_favorites = "invalid_favorites"
     survey_form_misconfigured = "survey_form_misconfigured"
-    # backend-only (not yet in openapi ProblemCode): unexpected server error
     internal_error = "internal_error"
 
 
-BACKEND_ONLY_CODES = {ProblemCode.internal_error}
+# Codes the backend may send that the contract does not list (none since slice 2 added internal_error).
+BACKEND_ONLY_CODES: frozenset[ProblemCode] = frozenset()
 
 # Short Vietnamese titles; constant per code (clients branch on `code`, never on `title`).
 TITLES: dict[ProblemCode, str] = {

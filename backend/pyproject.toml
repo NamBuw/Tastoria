@@ -17,6 +17,7 @@ dependencies = [
     "pyjwt==2.15.1",
     "cryptography==50.0.2",
     "valkey==6.1.1",
+    "ortools==9.15.6755",
 ]
 
 [project.scripts]
@@ -32,6 +33,8 @@ dev = [
     "httpx==0.28.1",
     "import-linter==2.15",
     "pyyaml==6.0.3",
+    "hypothesis==6.168.5",
+    "openapi-spec-validator==0.9.0",
 ]
 
 [tool.pytest.ini_options]

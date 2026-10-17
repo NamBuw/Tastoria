@@ -475,7 +475,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConsentState'
+                $ref: '#/components/schemas/ConsentWithdrawResult'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -803,7 +803,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EnergyTarget'
+                $ref: '#/components/schemas/EnergyTargetResult'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -3562,6 +3562,7 @@ components:
         | invalid_rating | 422 | Điểm ngoài 1–5 hoặc có điểm đồng thời `never_eaten = true` | FR-23-08 |
         | invalid_favorites | 422 | Quá 5 món, món trùng hoặc món không `published` | FR-23-11 |
         | survey_form_misconfigured | 503 | Kho món `published` ít hơn số món ngẫu nhiên của phiếu | UC23 |
+        | internal_error | 500 | Lỗi không lường trước ở server; giao dịch đã rollback; xem `request_id` | NFR-REL-01 |
       enum:
       - validation_error
       - not_found
@@ -3640,6 +3641,7 @@ components:
       - invalid_rating
       - invalid_favorites
       - survey_form_misconfigured
+      - internal_error
       x-catalog:
       - code: validation_error
         status: 400, 422
@@ -3952,6 +3954,10 @@ components:
         status: '503'
         when: Kho món `published` ít hơn số món ngẫu nhiên của phiếu
         source: UC23
+      - code: internal_error
+        status: '500'
+        when: Lỗi không lường trước ở server; giao dịch đã rollback; xem `request_id`
+        source: NFR-REL-01
     FieldError:
       type: object
       properties:
@@ -4299,6 +4305,18 @@ components:
       - version
       - current_policy_version_id
       - decided_at
+    ConsentWithdrawResult:
+      allOf:
+      - $ref: '#/components/schemas/ConsentState'
+      - type: object
+        properties:
+          data_request_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: dsr_requests loại withdraw xoá dữ liệu của mục đích (BR-CONSENT-04); null khi mục đích chưa có dữ liệu
+              cần xoá
     ConsentList:
       type: object
       properties:
@@ -4379,6 +4397,12 @@ components:
           - 'null'
           maxLength: 2000
           description: Bắt buộc với correct/restrict/object (mô tả nội dung yêu cầu)
+        password:
+          type:
+          - string
+          - 'null'
+          maxLength: 256
+          description: Mật khẩu hiện tại, bắt buộc với type = delete (UC07 bước 3); sai → 403 reauth_failed
       required:
       - type
       additionalProperties: false
@@ -4512,6 +4536,15 @@ components:
           - string
           - 'null'
           format: date-time
+        target_stale:
+          type: boolean
+          description: FR-10-04. Với kcal_source = suggested, true khi công thức hiện tại cho kết quả khác mục tiêu đã
+            lưu (mục tiêu không bao giờ bị đổi ngầm)
+        suggested_kcal:
+          type:
+          - integer
+          - 'null'
+          description: FR-10-04. Kết quả công thức hiện tại khi kcal_source = suggested; null khi không tính được
       required:
       - sex
       - birth_year
@@ -4633,6 +4666,26 @@ components:
         e_dinner_kcal:
           type: number
           description: E × 0,30 (BR-NUT-04)
+        goal:
+          type: string
+          enum:
+          - maintain
+          - lose
+          description: Mục tiêu dùng để tính (FR-11-07)
+        age_years:
+          type: integer
+          description: Tuổi tính theo năm hiện tại ở múi giờ server (BR-NUT-01)
+        equation:
+          type: string
+          description: Phương trình BMR đã dùng, dạng chữ để hiện trên app (FR-11-16)
+        source:
+          type: string
+          description: Trích dẫn nguồn công thức (FR-11-16)
+        bmr_mifflin_kcal:
+          type:
+          - number
+          - 'null'
+          description: BMR theo Mifflin–St Jeor để so sánh khi formula = mifflin_st_jeor (BR-NUT-01)
       required:
       - formula
       - bmr_kcal
@@ -4673,6 +4726,45 @@ components:
       - kcal_target
       - kcal_source
       additionalProperties: false
+    EnergyTargetResult:
+      type: object
+      description: Mục tiêu đã lưu kèm E_mâm từng bữa (BR-NUT-04)
+      properties:
+        kcal_target:
+          type: integer
+          minimum: 800
+          maximum: 5000
+        kcal_source:
+          type: string
+          enum:
+          - suggested
+          - user
+          - expert
+        goal:
+          type:
+          - string
+          - 'null'
+          enum:
+          - maintain
+          - lose
+          - expert
+          - null
+        below_floor:
+          type: boolean
+          description: true khi mục tiêu tự nhập dưới sàn và người dùng đã xác nhận (FR-11-12)
+        e_lunch_kcal:
+          type: integer
+          description: E × 0,35 (BR-NUT-04)
+        e_dinner_kcal:
+          type: integer
+          description: E × 0,30 (BR-NUT-04)
+      required:
+      - kcal_target
+      - kcal_source
+      - goal
+      - below_floor
+      - e_lunch_kcal
+      - e_dinner_kcal
     AllergenSet:
       type: object
       properties:
