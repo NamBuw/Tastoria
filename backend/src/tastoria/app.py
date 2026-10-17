@@ -8,6 +8,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from sqlalchemy import text
 
+import tastoria.models_registry  # noqa: F401  (every table in the metadata before the first flush)
 from tastoria.core.config import Settings, get_settings
 from tastoria.core.db import make_engine, make_sessionmaker
 from tastoria.core.errors import install_error_handlers
@@ -22,6 +23,8 @@ from tastoria.modules.identity.mailer import make_mailer
 from tastoria.modules.identity.router import router as identity_router
 from tastoria.modules.identity.service import BearerAuthenticator
 from tastoria.modules.identity.throttle import MemoryLoginThrottle, ValkeyLoginThrottle
+from tastoria.modules.pantry.router import router as pantry_router
+from tastoria.modules.pantry.service import PantrySubjectData
 from tastoria.modules.privacy.router import router as privacy_router
 from tastoria.modules.privacy.service import PrivacyDeps, SubjectDataHandler, list_purposes
 from tastoria.modules.profile.router import router as profile_router
@@ -32,7 +35,7 @@ API_PREFIX = "/api/v1"
 
 def build_subject_handlers(profile: ProfileDeps) -> list[SubjectDataHandler]:
     """Per-module exporters/erasers for data-subject requests (privacy calls them; ADR 0001 inversion)."""
-    return [IdentitySubjectData(), ProfileSubjectData(profile)]
+    return [IdentitySubjectData(), ProfileSubjectData(profile), PantrySubjectData()]
 
 
 def create_app(settings: Settings | None = None, *, configure_logs: bool = True) -> FastAPI:
@@ -88,4 +91,5 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
     app.include_router(privacy_router, prefix=API_PREFIX)
     app.include_router(profile_router, prefix=API_PREFIX)
     app.include_router(catalog_router, prefix=API_PREFIX)
+    app.include_router(pantry_router, prefix=API_PREFIX)
     return app

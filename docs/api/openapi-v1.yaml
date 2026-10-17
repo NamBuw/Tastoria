@@ -1286,7 +1286,9 @@ paths:
       tags:
       - pantry
       summary: Thêm lô bằng tay
-      description: 'Tạo pantry_lots mới và giao dịch reason = manual_edit. Không lũy đẳng: mỗi lần gọi là một lô mới (BR-PANTRY-01).'
+      description: 'Tạo pantry_lots mới; lượng nằm ở initial_g_min/initial_g_max (không ghi giao dịch, v_pantry_lot_balance
+        = initial + Σ delta). Không lũy đẳng: mỗi lần gọi là một lô mới (BR-PANTRY-01). Số đếm dùng được với mọi nguyên liệu
+        có dòng ingredient_units (ví dụ 2 bó rau muống); mức ít/vừa/nhiều chỉ cho đồ không đếm được.'
       x-use-cases:
       - UC14
       x-module: M06
@@ -5339,9 +5341,12 @@ components:
           - 'null'
           format: date-time
         urgency:
-          type: number
+          type:
+          - number
+          - 'null'
           minimum: 0
-          description: u tính lúc đọc, không lưu (BR-FRESH-01..05)
+          description: u tính lúc đọc, không lưu (BR-FRESH-01..05); null khi nguyên liệu không có thời hạn ngăn mát và lô
+            không có xác suất độ tươi (FR-14-05)
         freshness_label:
           type: string
           enum:
@@ -5349,7 +5354,9 @@ components:
           - dung_som
           - dung_ngay
           - kiem_tra
-          description: Nhãn suy từ u (BR-FRESH-04); app luôn hiện chữ kèm chấm màu
+          - chua_ro
+          description: Nhãn suy từ u (BR-FRESH-04); chua_ro = "Chưa rõ hạn" (FR-14-05, vẫn khả dụng, không được thưởng);
+            app luôn hiện chữ kèm chấm màu
         available:
           type: boolean
           description: false khi nhãn kiem_tra chưa được người dùng xác nhận — không tính vào lượng khả dụng
@@ -5452,7 +5459,9 @@ components:
           type: string
           enum:
           - in_stock
-          description: Chỉ dùng để trả lô not_seen về in_stock (BR-PANTRY-03)
+          - used_up
+          description: 'FR-14-13: not_seen → in_stock (BR-PANTRY-03), not_seen | in_stock → used_up (kèm giao dịch manual_edit
+            đưa lượng về 0); chuyển khác → 409 invalid_lot_transition'
         user_checked:
           type: boolean
           const: true

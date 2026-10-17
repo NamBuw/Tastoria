@@ -25,6 +25,10 @@ def test_orm_models_match_database(engine: Engine) -> None:
     def include_object(obj, name, type_, reflected, compare_to):  # noqa: ANN001
         if type_ == "table":
             return name in mapped
+        if type_ == "foreign_key_constraint":
+            # an FK to a table no module maps yet (model_versions, scan_items) is checked once that table is mapped
+            referred = getattr(obj, "referred_table", None)
+            return referred is None or referred.name in mapped
         table = getattr(obj, "table", None)
         return table is None or table.name in mapped
 
