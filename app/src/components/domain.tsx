@@ -70,10 +70,10 @@ export function Tray({
   const { c } = useTheme();
   const order = { man: 0, rau: 1, canh: 2 } as const;
   const sorted = [...items].sort((a, b) => order[a.slot] - order[b.slot]);
-  const angles = sorted.length === 3 ? [-90, 150, 30] : sorted.length === 2 ? [-90, 90] : [-90];
-  const dishD = S * (compact ? 0.34 : 0.38);
-  const bowlD = S * 0.28;
-  const r = S * 0.29;
+  const angles = sorted.length === 3 ? [-90, 150, 30] : sorted.length === 2 ? [180, 0] : [-90];
+  const dishD = S * 0.33;
+  const bowlD = S * 0.24;
+  const r = S * 0.3;
   return (
     <View
       style={{ width: S, height: S, alignSelf: 'center' }}
@@ -218,7 +218,7 @@ export function KcalBar({
       </View>
       <T v="small" tone="muted">
         {target
-          ? `Vạch đen: mục tiêu bữa ${Math.round(target)} kcal · ${status}`
+          ? `Vạch dọc: mục tiêu bữa ${Math.round(target)} kcal · ${status}`
           : 'Chưa có mục tiêu năng lượng. Đặt trong Cài đặt › Hồ sơ.'}
       </T>
     </View>

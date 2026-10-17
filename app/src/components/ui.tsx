@@ -48,18 +48,21 @@ export function Screen({
   scroll = true,
   footer,
   testID,
+  scrollKey,
 }: {
   children: ReactNode;
   scroll?: boolean;
   footer?: ReactNode;
   testID?: string;
+  /** Changing it remounts the scroll view, i.e. scrolls back to the top. */
+  scrollKey?: string;
 }) {
   const { c } = useTheme();
   const inner = <View style={styles.inner}>{children}</View>;
   return (
     <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: c.bg }} testID={testID}>
       {scroll ? (
-        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        <ScrollView key={scrollKey} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           {inner}
         </ScrollView>
       ) : (

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { api, call, type Schemas } from '@/api/client';
+import { goTab } from '@/lib/nav';
 import { codeText, errorText } from '@/api/errors';
 import { FRESH_LABEL, FreshBadge, type Freshness } from '@/components/domain';
 import { IngredientSearch, LEVEL_LABEL } from '@/components/pantryForms';
@@ -50,7 +51,7 @@ export default function ConfirmScan() {
   });
   const discard = useMutation({
     mutationFn: () => call(api.POST('/scans/{id}/discard', { params: { path: { id } } })),
-    onSuccess: () => router.replace('/'),
+    onSuccess: () => goTab('/'),
   });
 
   if (scan.isLoading) return <Screen><Loading label="Đang tải kết quả quét…" /></Screen>;
@@ -72,7 +73,7 @@ export default function ConfirmScan() {
           <T>{s.error_code ? codeText(s.error_code) : 'Ảnh chưa xử lý được.'}</T>
         </Notice>
         <Button label="Quét lại" onPress={() => router.replace({ pathname: '/quet', params: { mode: s.mode } })} />
-        <Button label="Nhập tay trong Kho" kind="secondary" onPress={() => router.replace('/kho')} />
+        <Button label="Nhập tay trong Kho" kind="secondary" onPress={() => goTab('/kho')} />
       </Screen>
     );
   }
@@ -88,8 +89,8 @@ export default function ConfirmScan() {
             </T>
           ) : null}
         </Notice>
-        <Button label="Ra mâm cơm" onPress={() => router.replace('/mam')} />
-        <Button label="Xem kho" kind="secondary" onPress={() => router.replace('/kho')} />
+        <Button label="Ra mâm cơm" onPress={() => goTab('/mam')} />
+        <Button label="Xem kho" kind="secondary" onPress={() => goTab('/kho')} />
       </Screen>
     );
   }

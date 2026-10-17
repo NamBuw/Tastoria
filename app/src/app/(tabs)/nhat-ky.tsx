@@ -4,6 +4,7 @@ import { View } from 'react-native';
 
 import { api, call } from '@/api/client';
 import { errorText } from '@/api/errors';
+import { useSession } from '@/auth/session';
 import { Button, Card, ErrorBox, Loading, Notice, Row, Screen, T } from '@/components/ui';
 import { qk } from '@/lib/queries';
 import { radius, space, useTheme } from '@/theme';
@@ -23,9 +24,10 @@ const WD = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 /** Nhật ký tuần (UC22): trays cooked, kcal per person vs target, urgent lots used. */
 export default function Journal() {
   const { c } = useTheme();
+  const { status } = useSession();
   const [offset, setOffset] = useState(0);
   const week = isoWeek(new Date(Date.now() + offset * 7 * 86400000));
-  const q = useQuery({ queryKey: qk.journal(week), queryFn: () => call(api.GET('/journal', { params: { query: { week } } })) });
+  const q = useQuery({ queryKey: qk.journal(week), queryFn: () => call(api.GET('/journal', { params: { query: { week } } })), enabled: status === 'signedIn' });
   const days = q.data?.days ?? [];
   const max = Math.max(1, ...days.map((d) => Math.max(d.kcal_per_person ?? 0, d.e_target_kcal ?? 0)));
   const trays = days.reduce((s, d) => s + d.cooked_trays, 0);
@@ -103,7 +105,7 @@ export default function Journal() {
               })}
             </View>
             <T v="small" tone="muted">
-              Vạch đen là mục tiêu của ngày (nếu đã đặt). Ngày chưa nấu mâm nào không tính calo.
+              Vạch dọc là mục tiêu năng lượng máy chủ ghi cho ngày đó (nếu đã đặt). Ngày chưa nấu mâm nào không tính calo.
             </T>
           </Card>
         </>

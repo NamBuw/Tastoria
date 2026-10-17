@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { api, call, isCode, type Schemas } from '@/api/client';
+import { goTab } from '@/lib/nav';
 import { errorText } from '@/api/errors';
 import { Icon } from '@/components/domain';
 import { Button, Checkbox, ErrorBox, Notice, Radio, Row, Screen, T } from '@/components/ui';
@@ -90,7 +91,7 @@ export default function Scan() {
           <T v="title">Quét ảnh chưa mở</T>
           <T>Máy chủ này chưa chạy phần nhận diện ảnh. Bạn vẫn thêm được đồ vào kho bằng tay; mâm cơm ghép từ kho như bình thường.</T>
         </Notice>
-        <Button label="Thêm đồ bằng tay trong Kho" onPress={() => router.replace('/kho')} />
+        <Button label="Thêm đồ bằng tay trong Kho" onPress={() => goTab('/kho')} />
         <Button label="Quay lại" kind="ghost" onPress={() => router.back()} />
       </Screen>
     );

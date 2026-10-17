@@ -4,6 +4,7 @@ import { View } from 'react-native';
 
 import { api, call, type Schemas } from '@/api/client';
 import { errorText } from '@/api/errors';
+import { useSession } from '@/auth/session';
 import { IngredientSearch } from '@/components/pantryForms';
 import { Button, Card, Checkbox, Empty, ErrorBox, Field, Loading, Row, Screen, Section, Sheet, T } from '@/components/ui';
 import { qk } from '@/lib/queries';
@@ -14,8 +15,10 @@ const MERGE = { headers: { 'Content-Type': 'application/merge-patch+json' } };
 /** Danh sách đi chợ (UC18). */
 export default function Shopping() {
   const qc = useQueryClient();
+  const { status } = useSession();
   const list = useQuery({
     queryKey: qk.shopping,
+    enabled: status === 'signedIn',
     queryFn: () => call(api.GET('/shopping-items', { params: { query: { status: ['open', 'bought'], limit: 100 } } })),
   });
   const [adding, setAdding] = useState(false);

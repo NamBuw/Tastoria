@@ -30,7 +30,7 @@ export default function TrayScreen() {
   const plan = latest.data;
 
   return (
-    <Screen testID="screen-tray">
+    <Screen testID="screen-tray" scrollKey={plan && !composing ? plan.id : `new-${meal}`}>
       <Row>
         <Radio label="Bữa trưa" selected={meal === 'lunch'} onPress={() => setMeal('lunch')} />
         <Radio label="Bữa tối" selected={meal === 'dinner'} onPress={() => setMeal('dinner')} />

@@ -198,7 +198,7 @@ export function EnergyTargetPanel({
             <T v="small" tone="muted">
               Đây là ước tính, không thay lời khuyên của bác sĩ. Cách tính: {sugg.data.equation ?? 'FAO/WHO/UNU 1985'}; hệ số vận động{' '}
               {String(sugg.data.pal).replace('.', ',')}
-              {sugg.data.floor_applied ? '; đã nâng lên mức sàn tối thiểu' : ''}.{sugg.data.source ? ` Nguồn: ${sugg.data.source}.` : ''}
+              {sugg.data.floor_applied ? '; đã nâng lên mức sàn tối thiểu' : ''}.{sugg.data.source ? ` Nguồn: ${sugg.data.source.replace(/\.+$/, '')}.` : ''}
             </T>
           </Card>
         ) : null
@@ -312,7 +312,18 @@ export function FavoritesPicker({ selected, onChange }: { selected: string[]; on
   const [q, setQ] = useState('');
   const recipes = useQuery({
     queryKey: ['recipes', q],
-    queryFn: () => call(api.GET('/recipes', { params: { query: { q: q || undefined, limit: 100 } } })),
+    queryFn: async () => {
+      // all published recipes (≈170): follow next_cursor
+      const items: Schemas['RecipeSummary'][] = [];
+      let cursor: string | undefined;
+      for (let i = 0; i < 10; i++) {
+        const page = await call(api.GET('/recipes', { params: { query: { q: q || undefined, limit: 100, cursor } } }));
+        items.push(...page.items);
+        if (!page.next_cursor) break;
+        cursor = page.next_cursor;
+      }
+      return { items };
+    },
   });
   const items = recipes.data?.items ?? [];
   const bySlot = (['man', 'rau', 'canh'] as const).map((s) => ({ slot: s, list: items.filter((r) => r.slot === s) }));
