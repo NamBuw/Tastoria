@@ -1,4 +1,4 @@
 # uv virtual workspace root: it holds no package of its own, only the member list.
 # Run everything from here with `uv run --package tastoria-ml ...`.
 [tool.uv.workspace]
-members = ["ml"]
+members = ["ml", "backend"]

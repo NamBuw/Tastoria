@@ -1,0 +1,45 @@
+[project]
+name = "tastoria-backend"
+version = "0.1.0"
+description = "Tastoria backend: modular monolith FastAPI (identity, privacy, profile, ...)"
+requires-python = ">=3.12,<3.13"
+# Exact pins: the API runs on a lab server; upgrades are deliberate commits, not side effects of `uv lock`.
+dependencies = [
+    "fastapi==0.142.4",
+    "uvicorn==0.54.0",
+    "sqlalchemy==2.0.54",
+    "alembic==1.20.0",
+    "psycopg[binary]==3.3.6",
+    "pydantic==2.13.5",
+    "pydantic-settings==2.15.0",
+    "email-validator==2.3.0",
+    "pwdlib[argon2]==0.3.1",
+    "pyjwt==2.15.1",
+    "cryptography==50.0.2",
+    "valkey==6.1.1",
+]
+
+[project.scripts]
+tastoria = "tastoria.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.28,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "httpx==0.28.1",
+    "import-linter==2.15",
+    "pyyaml==6.0.3",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib -p no:cacheprovider"
+markers = [
+    "integration: needs Docker (PostgreSQL pgvector:pg18 + Valkey containers on random 127.0.0.1 ports)",
+]
+
+[tool.uv.build-backend]
+module-name = "tastoria"
