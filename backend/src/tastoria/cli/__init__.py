@@ -6,6 +6,9 @@ tastoria jobs process-dsr          finish open export / delete / withdraw reques
 tastoria jobs sweep                same as `python -m tastoria.jobs.sweep`
 tastoria catalog import BUNDLE_DIR [--processed DIR]
                                    validate data/kb and upsert the catalog (UC25); JSON report, exit 1 on errors
+tastoria catalog substitutes import FILE
+                                   validate data/kb/substitution_pairs.yaml against the imported catalog and make the
+                                   curated rows of substitution_pairs equal to it; JSON report, exit 1 on errors
 """
 
 from __future__ import annotations
@@ -80,6 +83,26 @@ def _catalog(args: argparse.Namespace) -> int:
     return 0 if res.ok else 1
 
 
+def _substitutes(args: argparse.Namespace) -> int:
+    from pathlib import Path
+
+    from tastoria.core.db import make_engine, make_sessionmaker
+    from tastoria.modules.admin.service import import_substitutes
+
+    engine = make_engine(get_settings().database_url, pool_size=1)
+    try:
+        res = import_substitutes(make_sessionmaker(engine), Path(args.file))
+    finally:
+        engine.dispose()
+    out = {"ok": res.ok, **res.report}
+    if res.errors:
+        out["errors"] = res.errors
+        for e in res.errors:
+            print(e, file=sys.stderr)
+    print(json.dumps(out, ensure_ascii=False, indent=2))
+    return 0 if res.ok else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     configure_logging(get_settings().log_level)
     p = argparse.ArgumentParser(prog="tastoria")
@@ -99,6 +122,11 @@ def main(argv: list[str] | None = None) -> int:
         "--processed", default=None, help="processed composition tables (default: BUNDLE_DIR/../processed)"
     )
     imp.set_defaults(func=_catalog)
+    subs = cat_sub.add_parser("substitutes", help="curated substitution table (design v2 §6.3)")
+    subs_sub = subs.add_subparsers(dest="substitutes_cmd", required=True)
+    simp = subs_sub.add_parser("import", help="validate and import data/kb/substitution_pairs.yaml")
+    simp.add_argument("file")
+    simp.set_defaults(func=_substitutes)
     args = p.parse_args(argv)
     return int(args.func(args))
 

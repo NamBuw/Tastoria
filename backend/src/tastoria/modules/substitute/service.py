@@ -21,7 +21,7 @@ from decimal import Decimal
 from typing import Any
 
 from fastapi import Request
-from sqlalchemy import select, tuple_
+from sqlalchemy import delete, select, tuple_
 from sqlalchemy.orm import Session
 
 from tastoria.core import pagination
@@ -32,6 +32,7 @@ from tastoria.modules.catalog import service as catalog
 from tastoria.modules.substitute.models import ShoppingItem, SubstitutionPair
 from tastoria.modules.substitute.schemas import (
     Candidate,
+    CuratedPair,
     ShoppingItemCreate,
     ShoppingItemOut,
     ShoppingItemPage,
@@ -114,6 +115,55 @@ def pair_ratio(session: Session, original_id: uuid.UUID, substitute_id: uuid.UUI
         if rank is not None and (best is None or rank < best[0]):
             best = (rank, float(p.ratio))
     return best[1] if best else 1.0
+
+
+# ---------------------------------------------------------------- curated table import (UC26 data, via admin)
+
+
+def sync_curated_pairs(session: Session, pairs: list[CuratedPair]) -> dict[str, int]:
+    """Make the curated rows of `substitution_pairs` equal to `pairs` (idempotent): insert new keys, update changed
+    ratio/score/source, delete curated rows whose key is gone. Rows proposed by a model (curated = false) are kept,
+    unless the file now holds the same key — then the curated row replaces them."""
+    existing = {
+        (p.ingredient_id, p.substitute_id, p.context_slot, p.context_method_code): p
+        for p in session.scalars(select(SubstitutionPair).with_for_update())
+    }
+    counts = {"inserted": 0, "updated": 0, "unchanged": 0, "removed": 0}
+    wanted = set()
+    for c in pairs:
+        wanted.add(c.key)
+        row = existing.get(c.key)
+        if row is None:
+            session.add(
+                SubstitutionPair(
+                    id=uuid.uuid4(),
+                    ingredient_id=c.ingredient_id,
+                    substitute_id=c.substitute_id,
+                    context_slot=c.context_slot,
+                    context_method_code=c.context_method_code,
+                    ratio=c.ratio,
+                    score=c.score,
+                    source=c.source,
+                    curated=True,
+                )
+            )
+            counts["inserted"] += 1
+        elif (
+            Decimal(row.ratio) != c.ratio
+            or abs(float(row.score) - c.score) > 1e-6  # real (float4) column
+            or row.source != c.source
+            or not row.curated
+        ):
+            row.ratio, row.score, row.source, row.curated = c.ratio, c.score, c.source, True
+            counts["updated"] += 1
+        else:
+            counts["unchanged"] += 1
+    gone = [r.id for k, r in existing.items() if r.curated and k not in wanted]
+    if gone:
+        session.execute(delete(SubstitutionPair).where(SubstitutionPair.id.in_(gone)))
+    counts["removed"] = len(gone)
+    session.flush()
+    return counts
 
 
 # ---------------------------------------------------------------- shopping items (UC18)

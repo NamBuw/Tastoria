@@ -1,0 +1,1598 @@
+# Bảng tra cặp thay thế nguyên liệu do nhóm soạn (catalog.substitution_pairs, curated = true; thiết kế v2 §6.3 (a)).
+# Nạp: uv run --package tastoria-backend tastoria catalog substitutes import data/kb/substitution_pairs.yaml
+# Kiểm: uv run --package tastoria-ml python -m tastoria_ml.kb.substitutes data/kb
+#
+# Trường:
+#   ingredient / substitute  tên chuẩn trong ingredients.yaml (name_vi). Một dòng là một chiều: nguyên liệu bị thiếu
+#                            -> đồ dùng thay. Hai chiều thì ghi hai dòng (điểm có thể khác nhau).
+#   context_slot             man | rau | canh | null (null = mọi slot).
+#   context_method           mã trong ref/cooking_methods.yaml | null (null = mọi cách nấu).
+#   ratio                    gam đồ thay / gam đồ gốc (khối lượng lúc mua, BR-QTY-01); 1 trừ đồ khô <-> tươi.
+#   score                    0–1, độ hợp của cặp trong ngữ cảnh đó: 0,85+ gần như không đổi món; 0,7–0,8 đổi vị/kết cấu
+#                            nhẹ; 0,5–0,65 món vẫn ăn được nhưng khác rõ; < 0,5 chỉ là phương án cuối.
+#   source                   URL đã đọc (kèm câu trích) hoặc 'kiến thức nấu ăn phổ biến: <lý do>'.
+#
+# Ràng buộc (validator tastoria_ml.kb.substitutes và lệnh import backend kiểm lại):
+#   - cùng food_group: bộ lọc cứng lúc chạy (FR-17-05) bỏ mọi cặp khác nhóm, nên cặp khác nhóm là dữ liệu chết
+#     (ví dụ hành lá rau_thom -> hành tây rau_cu_qua, me -> giấm gia_vi, cà chua -> me không ghi được);
+#   - không tự thay chính nó; duy nhất theo (ingredient, substitute, context_slot, context_method); ratio > 0.
+#   - đồ thay mang thêm nhóm dị ứng là được phép (lạc -> vừng): dị ứng lấy từ ingredients.yaml và bộ lọc
+#     BR-ALG-01/BR-DIET-01 lúc chạy loại cặp đó với người dùng/người ăn cùng có nhóm dị ứng ấy.
+version: 1
+pairs:
+  - ingredient: "thịt ba chỉ"
+    substitute: "thịt nạc vai"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.85
+    source: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-thit-kho-tieu-thom-ngon-dam-da-de-lam-cho-bua-com-10184 — món kho 'nên chọn phần thịt ba chỉ, thịt nạc vai hoặc thịt thăn'"
+    curated: true
+  - ingredient: "thịt nạc vai"
+    substitute: "thịt ba chỉ"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.85
+    source: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-thit-kho-tieu-thom-ngon-dam-da-de-lam-cho-bua-com-10184 — món kho 'nên chọn phần thịt ba chỉ, thịt nạc vai hoặc thịt thăn'"
+    curated: true
+  - ingredient: "thịt ba chỉ"
+    substitute: "thịt nạc vai"
+    context_slot: man
+    context_method: rim
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: rim mặn dùng nạc vai được, ít mỡ nên thịt khô hơn một chút"
+    curated: true
+  - ingredient: "thịt ba chỉ"
+    substitute: "thịt nạc vai"
+    context_slot: man
+    context_method: luoc
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: thịt luộc chấm mắm thường dùng ba chỉ hoặc nạc vai"
+    curated: true
+  - ingredient: "thịt ba chỉ"
+    substitute: "thịt nạc vai"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: rau xào thịt (măng, đậu) dùng ba chỉ hay nạc vai thái mỏng đều được"
+    curated: true
+  - ingredient: "thịt nạc vai"
+    substitute: "thịt ba chỉ"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: đậu que xào thịt dùng nạc vai hay ba chỉ thái mỏng đều được"
+    curated: true
+  - ingredient: "thịt nạc vai"
+    substitute: "thịt ba chỉ"
+    context_slot: man
+    context_method: nuong
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: thịt nướng sả, xá xíu làm bằng ba chỉ cũng phổ biến, béo hơn"
+    curated: true
+  - ingredient: "thịt ba chỉ"
+    substitute: "thịt nạc vai"
+    context_slot: man
+    context_method: om
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: món om có thịt ba chỉ (ốc chuối đậu, cá bung) thay nạc vai được, kém béo"
+    curated: true
+  - ingredient: "thịt ba chỉ"
+    substitute: "thịt nạc vai"
+    context_slot: rau
+    context_method: om
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: cà bung thịt ba chỉ thay nạc vai được, kém béo"
+    curated: true
+  - ingredient: "thịt ba chỉ"
+    substitute: "thịt nạc vai"
+    context_slot: rau
+    context_method: tron
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: gỏi ngó sen tôm thịt dùng thịt luộc thái mỏng, ba chỉ hay nạc vai đều được"
+    curated: true
+  - ingredient: "thịt băm"
+    substitute: "thịt nạc vai"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: thịt băm là nạc vai (nạc dăm) băm hoặc xay, mua miếng về băm tay"
+    curated: true
+  - ingredient: "thịt băm"
+    substitute: "thịt bò xay"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: canh rau nấu bò băm có ở bữa cơm nhà, vị ngọt nước khác thịt lợn"
+    curated: true
+  - ingredient: "thịt băm"
+    substitute: "thịt bò xay"
+    context_slot: man
+    context_method: chien
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: chả lá lốt, trứng đúc thịt làm bằng bò băm được, thịt khô hơn"
+    curated: true
+  - ingredient: "thịt băm"
+    substitute: "thịt bò xay"
+    context_slot: man
+    context_method: om
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: xíu mại, đậu nhồi thịt làm bằng bò băm được, nên trộn thêm mỡ"
+    curated: true
+  - ingredient: "thịt bò xay"
+    substitute: "thịt băm"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: bò băm và thịt lợn xay dùng thay nhau trong món viên, chả, canh"
+    curated: true
+  - ingredient: "thịt bò"
+    substitute: "bắp bò"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.9
+    source: "kiến thức nấu ăn phổ biến: bò kho thường dùng bắp bò, nạm; thịt bò thăn kho được nhưng dễ khô"
+    curated: true
+  - ingredient: "thịt bò"
+    substitute: "bắp bò"
+    context_slot: man
+    context_method: om
+    ratio: 1
+    score: 0.9
+    source: "kiến thức nấu ăn phổ biến: bò sốt vang hợp bắp bò hầm lâu"
+    curated: true
+  - ingredient: "bắp bò"
+    substitute: "thịt bò"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: thịt bò thăn thay bắp bò được, rút ngắn thời gian hầm để khỏi dai khô"
+    curated: true
+  - ingredient: "sườn non"
+    substitute: "chân giò"
+    context_slot: canh
+    context_method: ham
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh hầm củ (củ sen, khoai tây cà rốt) nấu với chân giò thay sườn"
+    curated: true
+  - ingredient: "sườn non"
+    substitute: "xương ống lợn"
+    context_slot: canh
+    context_method: null
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: canh rau củ nấu xương ống thay sườn: nước vẫn ngọt, ít thịt hơn"
+    curated: true
+  - ingredient: "xương ống lợn"
+    substitute: "sườn non"
+    context_slot: canh
+    context_method: null
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: nước dùng canh hầm từ sườn non thay xương ống: ngọt nước, có thêm thịt"
+    curated: true
+  - ingredient: "chân giò"
+    substitute: "sườn non"
+    context_slot: canh
+    context_method: ham
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh măng/hầm nấu sườn thay chân giò, bớt béo"
+    curated: true
+  - ingredient: "chân giò"
+    substitute: "thịt ba chỉ"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: giò heo kho đổi sang ba chỉ kho cùng cách nêm"
+    curated: true
+  - ingredient: "thịt gà"
+    substitute: "đùi gà"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.9
+    source: "kiến thức nấu ăn phổ biến: gà chặt miếng thay bằng đùi gà chặt, cùng cách nấu"
+    curated: true
+  - ingredient: "đùi gà"
+    substitute: "thịt gà"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: đùi gà thay bằng gà ta chặt miếng, thịt chắc hơn"
+    curated: true
+  - ingredient: "thịt gà"
+    substitute: "cánh gà"
+    context_slot: man
+    context_method: null
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: gà kho gừng, gà om, gà xào sả ớt làm bằng cánh gà được"
+    curated: true
+  - ingredient: "thịt gà"
+    substitute: "ức gà"
+    context_slot: man
+    context_method: xao
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: gà xào sả ớt dùng ức gà được, xào nhanh lửa lớn để không khô"
+    curated: true
+  - ingredient: "thịt gà"
+    substitute: "ức gà"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: canh gà nấu ức gà được nhưng nước kém ngọt"
+    curated: true
+  - ingredient: "ức gà"
+    substitute: "thịt gà"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: ức gà thay bằng gà chặt miếng hoặc đùi lọc"
+    curated: true
+  - ingredient: "ức gà"
+    substitute: "đùi gà"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: đùi gà lọc xương mềm hơn ức, thay nhau được"
+    curated: true
+  - ingredient: "đùi gà"
+    substitute: "cánh gà"
+    context_slot: man
+    context_method: nuong
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: cánh gà nướng mật ong phổ biến như đùi gà nướng"
+    curated: true
+  - ingredient: "cánh gà"
+    substitute: "đùi gà"
+    context_slot: man
+    context_method: chien
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: đùi gà chặt nhỏ chiên nước mắm thay cánh gà"
+    curated: true
+  - ingredient: "đùi gà"
+    substitute: "ức gà"
+    context_slot: man
+    context_method: nuong
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: ức gà nướng mật ong được nhưng dễ khô, ướp lâu hơn"
+    curated: true
+  - ingredient: "cá lóc"
+    substitute: "cá basa"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: cá kho tộ miền Nam phổ biến với cá lóc, cá basa (cá tra)"
+    curated: true
+  - ingredient: "cá lóc"
+    substitute: "cá trê"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: cá trê kho tộ là biến thể truyền thống của cá kho tộ"
+    curated: true
+  - ingredient: "cá lóc"
+    substitute: "cá basa"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: canh chua cá basa là món canh chua nhà rất phổ biến"
+    curated: true
+  - ingredient: "cá lóc"
+    substitute: "cá diêu hồng"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: canh chua và canh cá thì là nấu cá diêu hồng được"
+    curated: true
+  - ingredient: "cá lóc"
+    substitute: "cá chép"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh cá nấu thì là miền Bắc dùng cá quả, cá chép, cá rô"
+    curated: true
+  - ingredient: "cá lóc"
+    substitute: "cá rô phi"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: canh chua cá rô phi có ở bữa nhà, thịt kém chắc hơn cá lóc"
+    curated: true
+  - ingredient: "cá basa"
+    substitute: "cá lóc"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: cá lóc làm được các món chiên, kho, canh chua như cá basa"
+    curated: true
+  - ingredient: "cá basa"
+    substitute: "cá diêu hồng"
+    context_slot: man
+    context_method: chien
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: cá chiên sả nghệ làm với cá diêu hồng cắt khúc được"
+    curated: true
+  - ingredient: "cá diêu hồng"
+    substitute: "cá rô phi"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: cá diêu hồng là cá rô phi đỏ, thịt và cách nấu như nhau"
+    curated: true
+  - ingredient: "cá rô phi"
+    substitute: "cá diêu hồng"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: cá diêu hồng là cá rô phi đỏ, thịt và cách nấu như nhau"
+    curated: true
+  - ingredient: "cá diêu hồng"
+    substitute: "cá chép"
+    context_slot: man
+    context_method: hap
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: cá hấp xì dầu làm với cá chép được, nhiều xương dăm hơn"
+    curated: true
+  - ingredient: "cá chép"
+    substitute: "cá trắm"
+    context_slot: man
+    context_method: null
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: cá chép và cá trắm là cá nước ngọt thịt chắc, om dưa và kho riềng dùng thay nhau"
+    curated: true
+  - ingredient: "cá trắm"
+    substitute: "cá chép"
+    context_slot: man
+    context_method: null
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: cá trắm kho riềng làm với cá chép được"
+    curated: true
+  - ingredient: "cá trắm"
+    substitute: "cá trê"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: cá kho riềng làm với cá trê được, thịt béo mềm hơn"
+    curated: true
+  - ingredient: "cá ngừ"
+    substitute: "cá thu"
+    context_slot: man
+    context_method: null
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: cá ngừ và cá thu là cá biển thịt chắc, kho và sốt cà chua thay nhau"
+    curated: true
+  - ingredient: "cá thu"
+    substitute: "cá ngừ"
+    context_slot: man
+    context_method: null
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: cá thu sốt cà chua làm với cá ngừ được, thịt khô hơn"
+    curated: true
+  - ingredient: "cá thu"
+    substitute: "cá nục"
+    context_slot: man
+    context_method: null
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: cá nục sốt cà chua là món nhà phổ biến, rẻ hơn cá thu"
+    curated: true
+  - ingredient: "cá nục"
+    substitute: "cá thu"
+    context_slot: man
+    context_method: null
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: cá nục kho cà chua làm với cá thu cắt khúc được"
+    curated: true
+  - ingredient: "cá nục"
+    substitute: "cá ngừ"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: cá ngừ kho cà/kho thơm thay cá nục được"
+    curated: true
+  - ingredient: "cá ngừ"
+    substitute: "cá nục"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: cá nục kho thơm thay cá ngừ được"
+    curated: true
+  - ingredient: "cá bống"
+    substitute: "cá rô đồng"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: cá rô đồng kho tiêu là món kho cá nhỏ phổ biến như cá bống kho"
+    curated: true
+  - ingredient: "cá rô đồng"
+    substitute: "cá lóc"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: canh cá nấu cải dùng cá quả thay cá rô, ít xương hơn"
+    curated: true
+  - ingredient: "cá trê"
+    substitute: "cá lóc"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: cá kho tộ dùng cá lóc hoặc cá trê"
+    curated: true
+  - ingredient: "tôm"
+    substitute: "tép"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: canh bầu, bí, mướp nấu tép đồng phổ biến như nấu tôm"
+    curated: true
+  - ingredient: "tôm"
+    substitute: "tép"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: su su/đậu Hà Lan xào tép thay tôm được"
+    curated: true
+  - ingredient: "tép"
+    substitute: "tôm"
+    context_slot: man
+    context_method: rang
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: tép rang khế làm với tôm nhỏ bóc vỏ được"
+    curated: true
+  - ingredient: "tôm"
+    substitute: "tôm khô"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 0.2
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh rau nấu tôm khô (nõn) phổ biến; tôm khô ngâm nở, cần khoảng 1/5 khối lượng tôm tươi"
+    curated: true
+  - ingredient: "tôm"
+    substitute: "tôm khô"
+    context_slot: rau
+    context_method: xao
+    ratio: 0.2
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: bí, su su xào tôm khô thay tôm tươi; khoảng 1/5 khối lượng"
+    curated: true
+  - ingredient: "tôm khô"
+    substitute: "tôm"
+    context_slot: null
+    context_method: null
+    ratio: 4
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: tôm tươi thay tôm khô, cần khoảng 4–5 lần khối lượng để đủ vị ngọt"
+    curated: true
+  - ingredient: "tôm khô"
+    substitute: "tép"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 4
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh rau dền/tập tàng nấu tép tươi thay tôm khô"
+    curated: true
+  - ingredient: "tôm"
+    substitute: "mực"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: su su xào mực, đậu xào mực là món nhà quen thuộc"
+    curated: true
+  - ingredient: "mực"
+    substitute: "tôm"
+    context_slot: man
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: tôm xào hành cần tây làm cùng cách như mực xào"
+    curated: true
+  - ingredient: "nghêu"
+    substitute: "hến"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: canh chua nấu hến và canh nghêu (ngao) cùng cách nấu"
+    curated: true
+  - ingredient: "hến"
+    substitute: "nghêu"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: canh hến nấu chua làm với ngao được"
+    curated: true
+  - ingredient: "nghêu"
+    substitute: "sò"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: canh chua nấu sò/hàu thay ngao được"
+    curated: true
+  - ingredient: "nghêu"
+    substitute: "sò"
+    context_slot: man
+    context_method: hap
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: sò hấp sả và nghêu hấp sả cùng cách làm"
+    curated: true
+  - ingredient: "sò"
+    substitute: "nghêu"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: nghêu thay sò trong món hấp, canh chua"
+    curated: true
+  - ingredient: "ghẹ"
+    substitute: "cua biển"
+    context_slot: man
+    context_method: hap
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: cua biển hấp gừng sả cùng cách như ghẹ hấp"
+    curated: true
+  - ingredient: "cua biển"
+    substitute: "ghẹ"
+    context_slot: man
+    context_method: hap
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: ghẹ hấp thay cua biển hấp"
+    curated: true
+  - ingredient: "trứng gà"
+    substitute: "trứng vịt"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: trứng vịt thay trứng gà trong chiên, luộc, đúc thịt; vị đậm, tanh hơn chút"
+    curated: true
+  - ingredient: "trứng vịt"
+    substitute: "trứng gà"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: thịt kho trứng và các món trứng làm với trứng gà được"
+    curated: true
+  - ingredient: "trứng vịt"
+    substitute: "trứng cút"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: thịt kho trứng cút phổ biến như thịt kho trứng vịt"
+    curated: true
+  - ingredient: "trứng gà"
+    substitute: "trứng cút"
+    context_slot: man
+    context_method: luoc
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: trứng cút luộc thay trứng gà luộc, theo khối lượng"
+    curated: true
+  - ingredient: "trứng gà"
+    substitute: "trứng cút"
+    context_slot: man
+    context_method: om
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: trứng sốt cà chua làm với trứng cút luộc bóc vỏ"
+    curated: true
+  - ingredient: "đậu phụ"
+    substitute: "đậu phụ non"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: canh đậu nấu với đậu hũ non mềm mịn hơn"
+    curated: true
+  - ingredient: "đậu phụ non"
+    substitute: "đậu phụ"
+    context_slot: man
+    context_method: om
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: đậu sốt nấm/cà chua làm với đậu phụ thường, chắc hơn"
+    curated: true
+  - ingredient: "đậu phụ"
+    substitute: "đậu phụ non"
+    context_slot: man
+    context_method: om
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: đậu sốt cà chua làm với đậu non được nhưng dễ nát, không rán trước"
+    curated: true
+  - ingredient: "đậu phụ"
+    substitute: "mì căn"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: món kho chay dùng mì căn hoặc đậu hũ làm phần đạm"
+    curated: true
+  - ingredient: "mì căn"
+    substitute: "đậu phụ"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: kho sả chay làm với đậu hũ chiên thay mì căn"
+    curated: true
+  - ingredient: "cải ngọt"
+    substitute: "cải thìa"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: cải ngọt và cải chíp (cải thìa) cùng họ cải, xào tỏi như nhau"
+    curated: true
+  - ingredient: "cải thìa"
+    substitute: "cải ngọt"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: cải chíp xào thay bằng cải ngọt, cùng thời gian xào"
+    curated: true
+  - ingredient: "cải ngọt"
+    substitute: "cải làn"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: cải làn xào thay cải ngọt, cuống cứng hơn cần xào lâu hơn"
+    curated: true
+  - ingredient: "cải làn"
+    substitute: "cải ngọt"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: cải ngọt xào thịt bò thay cải làn xào bò là món nhà phổ biến"
+    curated: true
+  - ingredient: "cải làn"
+    substitute: "cải thìa"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: cải chíp xào thịt bò/xào dầu hào thay cải làn"
+    curated: true
+  - ingredient: "cải ngọt"
+    substitute: "cải bẹ xanh"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: canh nấu cải bẹ xanh thay cải ngọt, vị hơi đắng cay"
+    curated: true
+  - ingredient: "cải bẹ xanh"
+    substitute: "cải ngọt"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: canh cải thịt băm nấu bằng cải ngọt được, vị ngọt dịu hơn"
+    curated: true
+  - ingredient: "cải ngọt"
+    substitute: "cải thìa"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: canh nấm đậu hũ nấu cải chíp thay cải ngọt"
+    curated: true
+  - ingredient: "cải bẹ xanh"
+    substitute: "cải thìa"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh cải nấu cải chíp thay cải bẹ xanh"
+    curated: true
+  - ingredient: "cải thảo"
+    substitute: "bắp cải"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh thịt viên nấu bắp cải thay cải thảo"
+    curated: true
+  - ingredient: "bắp cải"
+    substitute: "cải thảo"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: canh cải thảo thay canh bắp cải cuộn/rau củ, mềm nhanh hơn"
+    curated: true
+  - ingredient: "cải thảo"
+    substitute: "bắp cải"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: bắp cải xào tỏi cùng cách như cải thảo xào"
+    curated: true
+  - ingredient: "bắp cải"
+    substitute: "cải thảo"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: cải thảo xào thay bắp cải, chín nhanh hơn"
+    curated: true
+  - ingredient: "bắp cải"
+    substitute: "cải thảo"
+    context_slot: rau
+    context_method: tron
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: gỏi gà dùng cải thảo thái sợi thay bắp cải"
+    curated: true
+  - ingredient: "cải bó xôi"
+    substitute: "rau dền"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: rau dền xào tỏi cùng cách như cải bó xôi xào"
+    curated: true
+  - ingredient: "rau dền"
+    substitute: "cải bó xôi"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: cải bó xôi xào tỏi thay rau dền"
+    curated: true
+  - ingredient: "cải xoong"
+    substitute: "cải ngọt"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: canh cải ngọt thịt băm thay canh cải xoong"
+    curated: true
+  - ingredient: "cải xoong"
+    substitute: "cải bẹ xanh"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: canh cải xanh thịt băm thay canh cải xoong"
+    curated: true
+  - ingredient: "rau ngót"
+    substitute: "mồng tơi"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "https://fptshop.com.vn/tin-tuc/dien-may/canh-cua-nau-rau-gi-ngon-189643 — 'canh cua có thể nấu cùng rau đay, mồng tơi, rau ngót, bầu hay mướp'"
+    curated: true
+  - ingredient: "rau ngót"
+    substitute: "rau dền"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh rau dền nấu thịt băm/tôm cùng cách như canh rau ngót"
+    curated: true
+  - ingredient: "rau ngót"
+    substitute: "rau đay"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.6
+    source: "https://fptshop.com.vn/tin-tuc/dien-may/canh-cua-nau-rau-gi-ngon-189643 — 'canh cua có thể nấu cùng rau đay, mồng tơi, rau ngót, bầu hay mướp'"
+    curated: true
+  - ingredient: "mồng tơi"
+    substitute: "rau đay"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.75
+    source: "https://fptshop.com.vn/tin-tuc/dien-may/canh-cua-nau-rau-gi-ngon-189643 — 'canh cua có thể nấu cùng rau đay, mồng tơi, rau ngót, bầu hay mướp'"
+    curated: true
+  - ingredient: "mồng tơi"
+    substitute: "rau ngót"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "https://fptshop.com.vn/tin-tuc/dien-may/canh-cua-nau-rau-gi-ngon-189643 — 'canh cua có thể nấu cùng rau đay, mồng tơi, rau ngót, bầu hay mướp'"
+    curated: true
+  - ingredient: "mồng tơi"
+    substitute: "rau dền"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh rau dền nấu tôm thay canh mồng tơi nấu tôm"
+    curated: true
+  - ingredient: "rau đay"
+    substitute: "mồng tơi"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.8
+    source: "https://fptshop.com.vn/tin-tuc/dien-may/canh-cua-nau-rau-gi-ngon-189643 — 'canh cua có thể nấu cùng rau đay, mồng tơi, rau ngót, bầu hay mướp'"
+    curated: true
+  - ingredient: "rau đay"
+    substitute: "rau ngót"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.65
+    source: "https://fptshop.com.vn/tin-tuc/dien-may/canh-cua-nau-rau-gi-ngon-189643 — 'canh cua có thể nấu cùng rau đay, mồng tơi, rau ngót, bầu hay mướp'"
+    curated: true
+  - ingredient: "rau dền"
+    substitute: "mồng tơi"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh mồng tơi nấu tôm khô thay canh rau dền"
+    curated: true
+  - ingredient: "rau dền"
+    substitute: "rau ngót"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh rau ngót nấu tôm khô thay canh rau dền"
+    curated: true
+  - ingredient: "mồng tơi"
+    substitute: "rau dền"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: rau dền xào tỏi cùng cách như mồng tơi xào"
+    curated: true
+  - ingredient: "rau muống"
+    substitute: "rau lang"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: rau lang xào tỏi là món rau nhà phổ biến như rau muống xào"
+    curated: true
+  - ingredient: "rau lang"
+    substitute: "rau muống"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: rau muống xào tỏi thay rau lang"
+    curated: true
+  - ingredient: "rau muống"
+    substitute: "rau lang"
+    context_slot: rau
+    context_method: luoc
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: rau lang luộc chấm mắm thay rau muống luộc"
+    curated: true
+  - ingredient: "rau muống"
+    substitute: "rau bí"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: rau bí xào tỏi thay rau muống, cần tước xơ"
+    curated: true
+  - ingredient: "rau bí"
+    substitute: "ngọn su su"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: ngọn su su và ngọn bí xào tỏi là hai món rau ngọn thay nhau"
+    curated: true
+  - ingredient: "ngọn su su"
+    substitute: "rau bí"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: rau bí xào tỏi thay ngọn su su"
+    curated: true
+  - ingredient: "hoa thiên lý"
+    substitute: "bông bí"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: bông bí và hoa thiên lý xào tỏi là hai món hoa xào thay nhau"
+    curated: true
+  - ingredient: "bông bí"
+    substitute: "hoa thiên lý"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: hoa thiên lý xào tỏi thay bông bí xào"
+    curated: true
+  - ingredient: "cần tây"
+    substitute: "rau cần"
+    context_slot: man
+    context_method: xao
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: mực xào cần ta là món quen thuộc như mực xào cần tây"
+    curated: true
+  - ingredient: "rau cần"
+    substitute: "cần tây"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: cần tây xào tỏi thay rau cần, sợi to hơn cần thái khúc"
+    curated: true
+  - ingredient: "cải bó xôi"
+    substitute: "cải ngọt"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: cải ngọt xào tỏi thay cải bó xôi"
+    curated: true
+  - ingredient: "bầu"
+    substitute: "bí đao"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: canh bầu và canh bí xanh nấu tôm là hai món canh thanh mát thay nhau"
+    curated: true
+  - ingredient: "bí đao"
+    substitute: "bầu"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: canh bầu nấu tôm/ngao thay canh bí xanh"
+    curated: true
+  - ingredient: "bầu"
+    substitute: "mướp"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.75
+    source: "https://fptshop.com.vn/tin-tuc/dien-may/canh-cua-nau-rau-gi-ngon-189643 — 'canh cua có thể nấu cùng rau đay, mồng tơi, rau ngót, bầu hay mướp'"
+    curated: true
+  - ingredient: "mướp"
+    substitute: "bầu"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.75
+    source: "https://fptshop.com.vn/tin-tuc/dien-may/canh-cua-nau-rau-gi-ngon-189643 — 'canh cua có thể nấu cùng rau đay, mồng tơi, rau ngót, bầu hay mướp'"
+    curated: true
+  - ingredient: "su su"
+    substitute: "bí đao"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh bí xanh nấu tôm thay canh su su nấu tôm"
+    curated: true
+  - ingredient: "bí đao"
+    substitute: "su su"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh su su nấu tôm thay canh bí xanh"
+    curated: true
+  - ingredient: "bầu"
+    substitute: "bí ngòi"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: bí ngòi xào trứng/tỏi thay bầu xào"
+    curated: true
+  - ingredient: "bí ngòi"
+    substitute: "bầu"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: bầu xào tỏi thay bí ngòi xào"
+    curated: true
+  - ingredient: "bí ngòi"
+    substitute: "su su"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: su su xào tỏi thay bí ngòi xào"
+    curated: true
+  - ingredient: "su su"
+    substitute: "bí ngòi"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: bí ngòi xào tỏi thay su su xào"
+    curated: true
+  - ingredient: "bí ngòi"
+    substitute: "mướp"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: mướp xào tỏi thay bí ngòi xào, mềm hơn"
+    curated: true
+  - ingredient: "su hào"
+    substitute: "củ đậu"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: củ đậu xào cà rốt thay su hào xào cà rốt, giòn ngọt tương tự"
+    curated: true
+  - ingredient: "củ đậu"
+    substitute: "su hào"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: su hào xào cà rốt thay củ đậu xào"
+    curated: true
+  - ingredient: "su hào"
+    substitute: "củ cải trắng"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: canh củ cải nấu xương thay canh su hào"
+    curated: true
+  - ingredient: "củ cải trắng"
+    substitute: "su hào"
+    context_slot: canh
+    context_method: null
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh xương su hào thay canh xương củ cải"
+    curated: true
+  - ingredient: "đu đủ xanh"
+    substitute: "su hào"
+    context_slot: rau
+    context_method: tron
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: nộm su hào thay nộm đu đủ, cùng nước trộn chua ngọt"
+    curated: true
+  - ingredient: "su hào"
+    substitute: "đu đủ xanh"
+    context_slot: rau
+    context_method: tron
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: nộm đu đủ thay nộm su hào"
+    curated: true
+  - ingredient: "đu đủ xanh"
+    substitute: "su su"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: canh sườn nấu su su thay đu đủ xanh"
+    curated: true
+  - ingredient: "súp lơ xanh"
+    substitute: "súp lơ trắng"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: súp lơ trắng và xanh nấu cùng cách, súp lơ trắng mềm hơn"
+    curated: true
+  - ingredient: "súp lơ trắng"
+    substitute: "súp lơ xanh"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: súp lơ xanh thay súp lơ trắng"
+    curated: true
+  - ingredient: "đậu que"
+    substitute: "đậu đũa"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: đậu đũa xào tỏi/xào thịt thay đậu cô ve"
+    curated: true
+  - ingredient: "đậu đũa"
+    substitute: "đậu que"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: đậu cô ve xào tỏi thay đậu đũa"
+    curated: true
+  - ingredient: "đậu que"
+    substitute: "đậu Hà Lan"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: đậu Hà Lan xào thay đậu que xào"
+    curated: true
+  - ingredient: "đậu Hà Lan"
+    substitute: "đậu que"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: đậu que thái khúc xào tôm thay đậu Hà Lan"
+    curated: true
+  - ingredient: "ớt chuông"
+    substitute: "hành tây"
+    context_slot: man
+    context_method: xao
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: bò lúc lắc thiếu ớt chuông thì tăng hành tây"
+    curated: true
+  - ingredient: "măng khô"
+    substitute: "măng tươi"
+    context_slot: man
+    context_method: kho
+    ratio: 4
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: thịt kho măng tươi thay măng khô; măng khô ngâm nở khoảng 4–5 lần"
+    curated: true
+  - ingredient: "măng khô"
+    substitute: "măng tươi"
+    context_slot: canh
+    context_method: ham
+    ratio: 4
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: canh chân giò nấu măng tươi thay măng khô"
+    curated: true
+  - ingredient: "khoai sọ"
+    substitute: "khoai môn"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: khoai môn và khoai sọ cùng họ ráy, nấu canh, om thay nhau"
+    curated: true
+  - ingredient: "khoai môn"
+    substitute: "khoai sọ"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.85
+    source: "kiến thức nấu ăn phổ biến: khoai sọ thay khoai môn trong canh, om, chả giò"
+    curated: true
+  - ingredient: "khoai mỡ"
+    substitute: "khoai môn"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh khoai môn nấu tôm thay canh khoai mỡ"
+    curated: true
+  - ingredient: "khoai môn"
+    substitute: "khoai mỡ"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: canh khoai mỡ nấu tôm thay khoai môn"
+    curated: true
+  - ingredient: "nấm rơm"
+    substitute: "nấm sò"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: nấm bào ngư xào tỏi thay nấm rơm xào"
+    curated: true
+  - ingredient: "nấm sò"
+    substitute: "nấm rơm"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: nấm rơm thay nấm bào ngư trong xào, canh, kho"
+    curated: true
+  - ingredient: "nấm rơm"
+    substitute: "nấm sò"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: canh nấm bào ngư thay canh nấm rơm"
+    curated: true
+  - ingredient: "nấm rơm"
+    substitute: "nấm sò"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: nấm bào ngư kho tiêu/kho đậu thay nấm rơm"
+    curated: true
+  - ingredient: "nấm rơm"
+    substitute: "nấm hương tươi"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: canh nấm đông cô tươi thay nấm rơm, thơm hơn"
+    curated: true
+  - ingredient: "nấm hương tươi"
+    substitute: "nấm hương khô"
+    context_slot: null
+    context_method: null
+    ratio: 0.2
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: nấm đông cô khô ngâm nở thay tươi; khoảng 1/5 khối lượng"
+    curated: true
+  - ingredient: "nấm hương khô"
+    substitute: "nấm hương tươi"
+    context_slot: null
+    context_method: null
+    ratio: 5
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: nấm đông cô tươi thay khô; khoảng 5 lần khối lượng, mùi nhẹ hơn"
+    curated: true
+  - ingredient: "nấm hương tươi"
+    substitute: "nấm đùi gà"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: cải xào nấm đùi gà thay nấm hương tươi"
+    curated: true
+  - ingredient: "nấm hương tươi"
+    substitute: "nấm sò"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: nấm bào ngư thay nấm đông cô tươi trong canh, sốt, hấp"
+    curated: true
+  - ingredient: "nấm hương tươi"
+    substitute: "nấm mỡ"
+    context_slot: man
+    context_method: om
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: đậu sốt nấm làm với nấm mỡ được"
+    curated: true
+  - ingredient: "nấm kim châm"
+    substitute: "nấm rơm"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: canh nấm rơm thịt băm thay canh nấm kim châm"
+    curated: true
+  - ingredient: "nấm kim châm"
+    substitute: "nấm đùi gà"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: nấm đùi gà xào bơ tỏi thay nấm kim châm xào"
+    curated: true
+  - ingredient: "nấm đùi gà"
+    substitute: "nấm sò"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: nấm kho tiêu làm với nấm bào ngư được"
+    curated: true
+  - ingredient: "nấm đùi gà"
+    substitute: "nấm hương tươi"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: nấm kho tiêu làm với nấm đông cô tươi được"
+    curated: true
+  - ingredient: "nấm mỡ"
+    substitute: "nấm rơm"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: nấm rơm thay nấm mỡ trong xào, sốt"
+    curated: true
+  - ingredient: "mộc nhĩ"
+    substitute: "nấm hương khô"
+    context_slot: man
+    context_method: null
+    ratio: 1
+    score: 0.55
+    source: "kiến thức nấu ăn phổ biến: nhân nem, chả, xíu mại dùng nấm hương khô băm thay mộc nhĩ; mất độ giòn"
+    curated: true
+  - ingredient: "hành lá"
+    substitute: "hẹ"
+    context_slot: man
+    context_method: chien
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: trứng chiên hẹ phổ biến như trứng chiên hành"
+    curated: true
+  - ingredient: "hành lá"
+    substitute: "tỏi tây"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: tỏi tây (boa rô) thái nhỏ thay hành lá rắc/phi, thơm nồng hơn"
+    curated: true
+  - ingredient: "hành lá"
+    substitute: "hẹ"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: rắc hẹ thay hành lá trong canh"
+    curated: true
+  - ingredient: "hẹ"
+    substitute: "hành lá"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: canh đậu hũ nấu hành lá thay hẹ, mất mùi hẹ"
+    curated: true
+  - ingredient: "hẹ"
+    substitute: "hành lá"
+    context_slot: rau
+    context_method: xao
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: giá xào hành lá thay giá xào hẹ"
+    curated: true
+  - ingredient: "tỏi tây"
+    substitute: "hành lá"
+    context_slot: man
+    context_method: kho
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: nấm kho tiêu rắc hành lá thay tỏi tây"
+    curated: true
+  - ingredient: "ngò gai"
+    substitute: "rau mùi"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: canh chua rắc ngò rí thay ngò gai"
+    curated: true
+  - ingredient: "rau mùi"
+    substitute: "hành lá"
+    context_slot: canh
+    context_method: null
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: canh hầm rắc hành lá khi thiếu rau mùi"
+    curated: true
+  - ingredient: "húng lủi"
+    substitute: "rau răm"
+    context_slot: rau
+    context_method: tron
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: nộm/gỏi dùng rau răm thay rau thơm (húng lủi)"
+    curated: true
+  - ingredient: "rau răm"
+    substitute: "húng lủi"
+    context_slot: rau
+    context_method: tron
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: gỏi gà, gỏi ngó sen dùng húng lủi thay rau răm"
+    curated: true
+  - ingredient: "me chua"
+    substitute: "sấu"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.8
+    source: "https://fptshop.com.vn/tin-tuc/dien-may/canh-chua-ca-chot-177260 — 'Nếu không có me chua, có thể dùng sấu, quả dọc hoặc giấm để tạo vị chua.'"
+    curated: true
+  - ingredient: "me chua"
+    substitute: "khế"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 2
+    score: 0.75
+    source: "https://www.dienmayxanh.com/vao-bep/2-cach-nau-canh-chua-tom-thanh-mat-don-gian-de-lam-01532 — canh chua tôm bản dùng khế 'có vị chua của khế thay vì me hoặc trái sấu'"
+    curated: true
+  - ingredient: "me chua"
+    substitute: "chanh"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 0.6
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: canh chua vắt nước cốt chanh cuối lúc tắt bếp thay nước me, kém thơm"
+    curated: true
+  - ingredient: "sấu"
+    substitute: "me chua"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1
+    score: 0.75
+    source: "kiến thức nấu ăn phổ biến: canh sườn nấu me thay canh sấu, vẫn là canh chua miền Bắc"
+    curated: true
+  - ingredient: "sấu"
+    substitute: "khế"
+    context_slot: canh
+    context_method: nau_canh
+    ratio: 1.5
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: canh sườn nấu khế chua thay sấu"
+    curated: true
+  - ingredient: "khế"
+    substitute: "me chua"
+    context_slot: null
+    context_method: null
+    ratio: 0.5
+    score: 0.65
+    source: "kiến thức nấu ăn phổ biến: me tạo vị chua thay khế trong canh, rang; cần ít hơn"
+    curated: true
+  - ingredient: "bột chiên giòn"
+    substitute: "bột mì"
+    context_slot: man
+    context_method: chien
+    ratio: 1
+    score: 0.7
+    source: "kiến thức nấu ăn phổ biến: lăn bột mì thay bột chiên giòn khi chiên, kém giòn"
+    curated: true
+  - ingredient: "mật ong"
+    substitute: "đường thốt nốt"
+    context_slot: man
+    context_method: nuong
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: ướp nướng với đường thốt nốt thay mật ong, vẫn lên màu cánh gián"
+    curated: true
+  - ingredient: "hoa hồi"
+    substitute: "ngũ vị hương"
+    context_slot: man
+    context_method: null
+    ratio: 0.5
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: ngũ vị hương có hồi, quế; dùng thay hoa hồi trong kho/sốt vang"
+    curated: true
+  - ingredient: "quế"
+    substitute: "ngũ vị hương"
+    context_slot: man
+    context_method: null
+    ratio: 0.5
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: ngũ vị hương có quế; thay quế thanh trong bò kho, sốt vang"
+    curated: true
+  - ingredient: "ớt bột"
+    substitute: "sa tế"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: sa tế thay ớt bột tạo cay, màu đỏ và thơm dầu"
+    curated: true
+  - ingredient: "hạt nêm chay"
+    substitute: "nước tương"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.4
+    source: "kiến thức nấu ăn phổ biến: món chay thiếu hạt nêm nấm thì nêm nước tương (thêm dị ứng đậu nành, gluten)"
+    curated: true
+  - ingredient: "mắm tôm"
+    substitute: "mắm ruốc"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: mắm ruốc là mắm tôm miền Trung, dùng thay nhau trong bung, om, canh cua"
+    curated: true
+  - ingredient: "mắm ruốc"
+    substitute: "mắm tôm"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: mắm tôm thay mắm ruốc"
+    curated: true
+  - ingredient: "mắm tép"
+    substitute: "mắm ruốc"
+    context_slot: man
+    context_method: rim
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: chưng mắm ruốc với thịt thay mắm tép"
+    curated: true
+  - ingredient: "lạc"
+    substitute: "vừng"
+    context_slot: rau
+    context_method: tron
+    ratio: 1
+    score: 0.6
+    source: "kiến thức nấu ăn phổ biến: nộm rắc vừng rang thay lạc rang (thêm dị ứng vừng)"
+    curated: true
+  - ingredient: "lạc"
+    substitute: "hạt điều"
+    context_slot: rau
+    context_method: tron
+    ratio: 1
+    score: 0.55
+    source: "kiến thức nấu ăn phổ biến: nộm rắc hạt điều rang thay lạc (thêm dị ứng hạt cây)"
+    curated: true
+  - ingredient: "dầu lạc"
+    substitute: "dầu ăn"
+    context_slot: null
+    context_method: null
+    ratio: 1
+    score: 0.8
+    source: "kiến thức nấu ăn phổ biến: dầu ăn thường thay dầu phộng"
+    curated: true

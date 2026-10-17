@@ -1,0 +1,100 @@
+# Truy vấn đánh giá gợi ý thay thế nguyên liệu (thiết kế v2 §6.3, Hit@1/3, MRR, độ phủ). KHÔNG có đáp án:
+# đáp án do hai người gán độc lập theo substitution_eval/README.md, ghi ở tệp riêng.
+#   slug     món trong data/kb/recipes/<slot>/<slug>.yaml
+#   missing  nguyên liệu của món đó bị thiếu (tên chuẩn, không phải gia vị luôn có)
+#   split    dev (~30%, chỉnh tham số) | test (~70%, chỉ chạy một lần khi công bố)
+# Sinh bằng cách lấy mẫu phân tầng theo slot (seed 20261017), mỗi nguyên liệu thiếu tối đa 3 lần; không lọc theo
+# việc bảng tra có cặp hay không, để đo được cả độ phủ.
+version: 1
+seed: 20261017
+queries:
+  - {id: q001, slug: bo-cuon-nam-kim-cham, missing: "thịt bò", split: test}
+  - {id: q002, slug: bo-kho, missing: "thịt bò", split: dev}
+  - {id: q003, slug: bo-luc-lac, missing: "ớt chuông", split: test}
+  - {id: q004, slug: bo-sot-vang, missing: "hoa hồi", split: test}
+  - {id: q005, slug: ca-chep-om-dua, missing: "dưa cải chua", split: test}
+  - {id: q006, slug: ca-chep-om-dua, missing: "thì là", split: test}
+  - {id: q007, slug: ca-com-rim, missing: "cá cơm", split: dev}
+  - {id: q008, slug: ca-dieu-hong-hap-xi-dau, missing: "hành lá", split: test}
+  - {id: q009, slug: ca-ngu-kho-thom, missing: "dứa", split: test}
+  - {id: q010, slug: ca-nuc-kho-ca-chua, missing: "cá nục", split: dev}
+  - {id: q011, slug: cha-gio-chay, missing: "bánh đa nem", split: test}
+  - {id: q012, slug: cha-la-lot, missing: "thịt băm", split: dev}
+  - {id: q013, slug: dau-hu-kho-nam, missing: "hạt nêm chay", split: test}
+  - {id: q014, slug: dau-hu-kho-nam, missing: "đậu phụ", split: test}
+  - {id: q015, slug: dau-phu-nhoi-thit-sot-ca-chua, missing: "hành lá", split: test}
+  - {id: q016, slug: dau-phu-nhoi-thit-sot-ca-chua, missing: "thịt băm", split: dev}
+  - {id: q017, slug: ga-nuong-mat-ong, missing: "mật ong", split: test}
+  - {id: q018, slug: ga-xao-sa-ot, missing: "thịt gà", split: test}
+  - {id: q019, slug: mam-tep-chung-thit, missing: "thịt ba chỉ", split: dev}
+  - {id: q020, slug: muc-xao-hanh-can, missing: "cần tây", split: dev}
+  - {id: q021, slug: nem-ran, missing: "mộc nhĩ", split: dev}
+  - {id: q022, slug: oc-nau-chuoi-dau, missing: "lá lốt", split: test}
+  - {id: q023, slug: oc-nau-chuoi-dau, missing: "thịt ba chỉ", split: test}
+  - {id: q024, slug: oc-nau-chuoi-dau, missing: "tía tô", split: test}
+  - {id: q025, slug: oc-nau-chuoi-dau, missing: "ốc", split: test}
+  - {id: q026, slug: suon-xao-chua-ngot, missing: "sườn non", split: test}
+  - {id: q027, slug: thit-kho-tau, missing: "trứng vịt", split: test}
+  - {id: q028, slug: thit-kho-tieu, missing: "thịt ba chỉ", split: test}
+  - {id: q029, slug: tom-rang-me, missing: "tôm", split: test}
+  - {id: q030, slug: trung-cuon-rau-cu, missing: "cà rốt", split: dev}
+  - {id: q031, slug: trung-duc-thit, missing: "trứng gà", split: test}
+  - {id: q032, slug: trung-sot-ca-chua, missing: "trứng gà", split: test}
+  - {id: q033, slug: vit-om-sau, missing: "hành lá", split: dev}
+  - {id: q034, slug: vit-om-sau, missing: "rau mùi", split: test}
+  - {id: q035, slug: bap-cai-luoc, missing: "bắp cải", split: test}
+  - {id: q036, slug: bap-cai-xao-ca-chua, missing: "bắp cải", split: test}
+  - {id: q037, slug: bau-xao-trung, missing: "bầu", split: test}
+  - {id: q038, slug: bau-xao-trung, missing: "trứng gà", split: dev}
+  - {id: q039, slug: bi-dao-xao-tom-kho, missing: "tôm khô", split: test}
+  - {id: q040, slug: bo-xao-sup-lo, missing: "súp lơ trắng", split: dev}
+  - {id: q041, slug: bo-xao-sup-lo, missing: "thịt bò", split: test}
+  - {id: q042, slug: bong-bi-xao-toi, missing: "bông bí", split: test}
+  - {id: q043, slug: ca-bung, missing: "mắm tôm", split: test}
+  - {id: q044, slug: ca-bung, missing: "tía tô", split: test}
+  - {id: q045, slug: cai-thia-xao-nam-huong, missing: "cải thìa", split: dev}
+  - {id: q046, slug: cu-dau-xao-ca-rot, missing: "cà rốt", split: test}
+  - {id: q047, slug: cu-dau-xao-ca-rot, missing: "củ đậu", split: test}
+  - {id: q048, slug: dua-cai-muoi, missing: "cải bẹ xanh", split: test}
+  - {id: q049, slug: nom-du-du, missing: "cà rốt", split: dev}
+  - {id: q050, slug: nom-du-du, missing: "đu đủ xanh", split: test}
+  - {id: q051, slug: nom-hoa-chuoi, missing: "lạc", split: test}
+  - {id: q052, slug: rau-can-xao-toi, missing: "rau cần", split: test}
+  - {id: q053, slug: rau-cu-luoc-thap-cam, missing: "su su", split: dev}
+  - {id: q054, slug: rau-cu-xao-thap-cam, missing: "ngô bao tử", split: test}
+  - {id: q055, slug: rau-cu-xao-thap-cam, missing: "nấm rơm", split: test}
+  - {id: q056, slug: rau-cu-xao-thap-cam, missing: "súp lơ xanh", split: dev}
+  - {id: q057, slug: rau-cu-xao-thap-cam, missing: "đậu Hà Lan", split: test}
+  - {id: q058, slug: rau-muong-luoc, missing: "rau muống", split: dev}
+  - {id: q059, slug: xa-lach-tron-dau-giam, missing: "cà chua", split: test}
+  - {id: q060, slug: xa-lach-tron-dau-giam, missing: "xà lách", split: dev}
+  - {id: q061, slug: canh-bi-dao-nam, missing: "hạt nêm chay", split: test}
+  - {id: q062, slug: canh-bi-do-dau-phong, missing: "hạt nêm chay", split: dev}
+  - {id: q063, slug: canh-ca-ro-nau-cai, missing: "cải bẹ xanh", split: test}
+  - {id: q064, slug: canh-chua-ca-loc, missing: "dứa", split: dev}
+  - {id: q065, slug: canh-chua-chay, missing: "đậu bắp", split: test}
+  - {id: q066, slug: canh-chua-tom, missing: "cà chua", split: test}
+  - {id: q067, slug: canh-chua-tom, missing: "tôm", split: test}
+  - {id: q068, slug: canh-cua-rau-day-mong-toi, missing: "cua đồng", split: test}
+  - {id: q069, slug: canh-cua-rau-day-mong-toi, missing: "mắm tôm", split: dev}
+  - {id: q070, slug: canh-dau-phu-ca-chua, missing: "đậu phụ", split: test}
+  - {id: q071, slug: canh-du-du-suon, missing: "sườn non", split: test}
+  - {id: q072, slug: canh-ga-la-giang, missing: "lá giang", split: test}
+  - {id: q073, slug: canh-ga-nau-nam, missing: "thịt gà", split: dev}
+  - {id: q074, slug: canh-hen, missing: "cà chua", split: test}
+  - {id: q075, slug: canh-khoai-mo-tom, missing: "ngò gai", split: test}
+  - {id: q076, slug: canh-mong-toi-muop, missing: "mồng tơi", split: test}
+  - {id: q077, slug: canh-mong-toi-tom-bap, missing: "ngô ngọt", split: test}
+  - {id: q078, slug: canh-nam-dau-hu, missing: "cải ngọt", split: test}
+  - {id: q079, slug: canh-nam-dau-hu, missing: "đậu phụ", split: test}
+  - {id: q080, slug: canh-ngao-nau-chua, missing: "dứa", split: dev}
+  - {id: q081, slug: canh-rau-den-tom-kho, missing: "tôm khô", split: dev}
+  - {id: q082, slug: canh-rau-ngot-nam, missing: "nấm rơm", split: dev}
+  - {id: q083, slug: canh-rau-ngot-thit-bam, missing: "thịt băm", split: test}
+  - {id: q084, slug: canh-rau-tap-tang, missing: "mồng tơi", split: test}
+  - {id: q085, slug: canh-rau-tap-tang, missing: "rau đay", split: test}
+  - {id: q086, slug: canh-rau-tap-tang, missing: "tôm khô", split: test}
+  - {id: q087, slug: canh-su-su-tom, missing: "su su", split: dev}
+  - {id: q088, slug: canh-su-su-tom, missing: "tôm", split: test}
+  - {id: q089, slug: canh-xuong-ham-cu-cai, missing: "củ cải trắng", split: dev}
+  - {id: q090, slug: canh-xuong-ham-cu-cai, missing: "xương ống lợn", split: test}

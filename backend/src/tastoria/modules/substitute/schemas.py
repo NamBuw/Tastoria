@@ -5,6 +5,7 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import Decimal
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -46,6 +47,23 @@ class ShoppingItemPatch(_Req):
     qty_g: float | None = Field(default=None, gt=0, le=100_000)
     note: str | None = Field(default=None, max_length=500)
     status: ShopStatus | None = None
+
+
+@dataclass(frozen=True)
+class CuratedPair:
+    """One row of the curated lookup table, names already resolved (admin: `tastoria catalog substitutes import`)."""
+
+    ingredient_id: uuid.UUID
+    substitute_id: uuid.UUID
+    context_slot: str | None
+    context_method_code: str | None
+    ratio: Decimal
+    score: float
+    source: str
+
+    @property
+    def key(self) -> tuple[uuid.UUID, uuid.UUID, str | None, str | None]:
+        return (self.ingredient_id, self.substitute_id, self.context_slot, self.context_method_code)
 
 
 @dataclass(frozen=True)

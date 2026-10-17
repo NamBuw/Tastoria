@@ -110,6 +110,10 @@ def diet_exists(session: Session, code: str) -> bool:
     return session.get(Diet, code) is not None
 
 
+def cooking_method_codes(session: Session) -> frozenset[str]:
+    return frozenset(session.scalars(select(CookingMethod.code)).all())
+
+
 def not_published_recipe_ids(session: Session, recipe_ids: Iterable[uuid.UUID]) -> list[uuid.UUID]:
     """Ids that do not exist or are not `published` (draft, retired)."""
     wanted = list(dict.fromkeys(recipe_ids))

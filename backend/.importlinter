@@ -388,6 +388,17 @@ forbidden_modules =
     tastoria.migrations
 allow_indirect_imports = True
 
+[importlinter:contract:M15-admin-private]
+name = M15 admin: internals are private (all but service, schemas)
+type = protected
+protected_modules =
+    tastoria.modules.admin.substitutes
+allowed_importers =
+    tastoria.modules.admin
+    tastoria.app
+    tastoria.cli
+    tastoria.models_registry
+
 [importlinter:contract:M16-jobs-deps]
 name = M16 jobs may import only core, identity, privacy, scan (model.yaml)
 type = forbidden
