@@ -33,7 +33,7 @@ from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from tastoria.core.clock import utcnow
-from tastoria.core.errors import ApiError, ProblemCode
+from tastoria.core.errors import PROBLEM_MEDIA_TYPE, ApiError, ProblemCode
 from tastoria.core.models import IdempotencyKey
 
 KEY_PATTERN = re.compile(r"^[A-Za-z0-9_-]{16,64}$")
@@ -88,7 +88,12 @@ def begin(session: Session, user_id: uuid.UUID, idem: IdempotencyRequest) -> JSO
         return None
     if bytes(row.request_sha256) != idem.request_sha256:
         raise ApiError(422, ProblemCode.idempotency_key_reused)
-    return JSONResponse(row.response_body, status_code=row.status_code, headers={"Idempotent-Replayed": "true"})
+    return JSONResponse(
+        row.response_body,
+        status_code=row.status_code,
+        headers={"Idempotent-Replayed": "true"},
+        media_type=PROBLEM_MEDIA_TYPE if row.status_code >= 400 else None,  # a stored 422 (SD03) stays a problem
+    )
 
 
 def finish(
@@ -111,7 +116,8 @@ def finish(
         )
     )
     session.flush()
-    return JSONResponse(body, status_code=status_code, headers=headers)
+    media = PROBLEM_MEDIA_TYPE if status_code >= 400 else None
+    return JSONResponse(body, status_code=status_code, headers=headers, media_type=media)
 
 
 def purge_expired(session: Session) -> int:

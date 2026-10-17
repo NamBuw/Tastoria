@@ -180,16 +180,15 @@ class ApiError(Exception):
         self.commit = commit
 
 
-def problem_response(
+def problem_body(
     status: int,
     code: ProblemCode,
     *,
     detail: str | None = None,
     instance: str | None = None,
-    headers: dict[str, str] | None = None,
     extra: dict[str, Any] | None = None,
     errors: list[dict[str, str]] | None = None,
-) -> JSONResponse:
+) -> dict[str, Any]:
     body: dict[str, Any] = {
         "type": PROBLEM_BASE + code.value,
         "title": TITLES.get(code, code.value),
@@ -207,6 +206,20 @@ def problem_response(
         body["errors"] = errors
     if extra:
         body.update(extra)
+    return body
+
+
+def problem_response(
+    status: int,
+    code: ProblemCode,
+    *,
+    detail: str | None = None,
+    instance: str | None = None,
+    headers: dict[str, str] | None = None,
+    extra: dict[str, Any] | None = None,
+    errors: list[dict[str, str]] | None = None,
+) -> JSONResponse:
+    body = problem_body(status, code, detail=detail, instance=instance, extra=extra, errors=errors)
     return JSONResponse(body, status_code=status, headers=headers, media_type=PROBLEM_MEDIA_TYPE)
 
 

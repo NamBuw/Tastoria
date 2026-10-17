@@ -18,24 +18,41 @@ from tastoria.core.logging import configure_logging
 from tastoria.core.middleware import RequestContextMiddleware
 from tastoria.modules.catalog.router import router as catalog_router
 from tastoria.modules.catalog.service import CatalogDeps
+from tastoria.modules.cooking.router import router as cooking_router
+from tastoria.modules.cooking.service import CookingSubjectData, has_live_cook_session
+from tastoria.modules.events.router import router as events_router
+from tastoria.modules.events.service import EventsSubjectData
 from tastoria.modules.identity.dsr import IdentitySubjectData
 from tastoria.modules.identity.mailer import make_mailer
 from tastoria.modules.identity.router import router as identity_router
 from tastoria.modules.identity.service import BearerAuthenticator
 from tastoria.modules.identity.throttle import MemoryLoginThrottle, ValkeyLoginThrottle
+from tastoria.modules.journal.router import router as journal_router
+from tastoria.modules.meal.router import router as meal_router
+from tastoria.modules.meal.service import MealDeps, MealSubjectData, item_owned
 from tastoria.modules.pantry.router import router as pantry_router
 from tastoria.modules.pantry.service import PantrySubjectData
 from tastoria.modules.privacy.router import router as privacy_router
 from tastoria.modules.privacy.service import PrivacyDeps, SubjectDataHandler, list_purposes
 from tastoria.modules.profile.router import router as profile_router
 from tastoria.modules.profile.service import ProfileDeps, ProfileSubjectData, make_cipher
+from tastoria.modules.substitute.router import router as shopping_router
+from tastoria.modules.substitute.service import SubstituteDeps, SubstituteSubjectData
 
 API_PREFIX = "/api/v1"
 
 
 def build_subject_handlers(profile: ProfileDeps) -> list[SubjectDataHandler]:
     """Per-module exporters/erasers for data-subject requests (privacy calls them; ADR 0001 inversion)."""
-    return [IdentitySubjectData(), ProfileSubjectData(profile), PantrySubjectData()]
+    return [
+        IdentitySubjectData(),
+        ProfileSubjectData(profile),
+        PantrySubjectData(),
+        MealSubjectData(),
+        CookingSubjectData(),
+        EventsSubjectData(),
+        SubstituteSubjectData(),
+    ]
 
 
 def create_app(settings: Settings | None = None, *, configure_logs: bool = True) -> FastAPI:
@@ -83,6 +100,9 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
     )
 
     app.state.catalog = CatalogDeps(consent_purposes=list_purposes)
+    # Dependency inversions (ADR 0001): meal may not import cooking, substitute may not import meal.
+    app.state.meal = MealDeps(has_live_cook_session=has_live_cook_session)
+    app.state.substitute = SubstituteDeps(item_owned=item_owned)
 
     install_error_handlers(app)
     app.add_middleware(RequestContextMiddleware, min_app_version=settings.min_app_version)
@@ -92,4 +112,9 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
     app.include_router(profile_router, prefix=API_PREFIX)
     app.include_router(catalog_router, prefix=API_PREFIX)
     app.include_router(pantry_router, prefix=API_PREFIX)
+    app.include_router(meal_router, prefix=API_PREFIX)
+    app.include_router(shopping_router, prefix=API_PREFIX)
+    app.include_router(cooking_router, prefix=API_PREFIX)
+    app.include_router(journal_router, prefix=API_PREFIX)
+    app.include_router(events_router, prefix=API_PREFIX)
     return app

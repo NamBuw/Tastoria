@@ -123,6 +123,7 @@ class LotView:
 class Need:
     ingredient_id: uuid.UUID
     grams: float
+    report_short: bool = True  # False for staples and optional lines: deducted when there are lots, never "missing"
 
 
 @dataclass(frozen=True)

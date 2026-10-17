@@ -383,9 +383,12 @@ def deduct(
     so a pin really gets used (BR-TRAY-08). Check-level lots are skipped (BR-FRESH-04); a shortage is reported, not an
     error (FR-20-10). One cook_deduct row per touched lot with the urgency at that moment (FR-20-09)."""
     wanted: dict[uuid.UUID, float] = defaultdict(float)
+    reported: set[uuid.UUID] = set()
     for n in needs:
         if n.grams > 0:
             wanted[n.ingredient_id] += n.grams
+            if n.report_short:
+                reported.add(n.ingredient_id)
     if not wanted:
         return [], []
     rows = list(
@@ -423,12 +426,12 @@ def deduct(
                     ref_id=cook_session_id,
                     urgency=x.f.urgency,
                 )
-                deductions.append(Deduction(tx.id, x.row.id, iid, dmin, dmax, x.f.urgency))
+                deductions.append(Deduction(tx.id, x.row.id, iid, dmin, dmax, tx.urgency_at_event))
                 if new_hi <= 0:
                     x.row.status = "used_up"
                 x.row.updated_at = utcnow()
         avail = sum(x.g_min for x in cands)
-        if need > avail + 1e-9:
+        if iid in reported and need > avail + 1e-9:  # staples / optional lines without lots are not "missing" (8b, 8c)
             shortfalls.append(Shortfall(iid, round(need, 1), round(avail, 1), round(need - avail, 1)))
     session.flush()
     return deductions, shortfalls

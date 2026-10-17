@@ -428,6 +428,12 @@ def update_settings(session: Session, user: AuthUser, body: UserSettingsIn) -> U
 # ---------------------------------------------------------------- for other modules
 
 
+def get_settings_tz(session: Session, user_id: uuid.UUID) -> str:
+    """The user's IANA time zone (user_settings.timezone, default Asia/Ho_Chi_Minh) for local days."""
+    s = session.get(UserSettings, user_id)
+    return s.timezone if s else DEFAULT_SETTINGS["timezone"]
+
+
 def get_meal_constraints(session: Session, user_id: uuid.UUID) -> MealConstraints:
     """Read fresh on every call (FR-10-08). No decryption: E comes from the stored target, not from metrics."""
     p = session.get(Profile, user_id)

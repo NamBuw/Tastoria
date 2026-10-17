@@ -2117,6 +2117,14 @@ paths:
       parameters:
       - $ref: '#/components/parameters/Id'
       - $ref: '#/components/parameters/ItemId'
+      - name: ingredient_id
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+        description: Hỏi thay thế cho đúng nguyên liệu này của món, kể cả gia vị hay đồ đủ trong kho (FR-17-02); không thuộc
+          món → 422 validation_error
       - $ref: '#/components/parameters/AppVersion'
       responses:
         '200':
@@ -2238,8 +2246,9 @@ paths:
       tags:
       - substitute
       summary: Thêm đồ cần mua
-      description: Từ 'Thiếu gì?' (UC17), từ danh sách đồ thiếu khi không có mâm khả thi (BR-TRAY-06) hoặc nhập tay. Không
-        lũy đẳng.
+      description: Từ 'Thiếu gì?' (UC17), từ danh sách đồ thiếu khi không có mâm khả thi (BR-TRAY-06) hoặc nhập tay. Đã
+        có dòng open cùng nguyên liệu và cùng source_meal_plan_item_id (kể cả cùng null) thì cập nhật qty_g, note của
+        dòng đó và trả 200 (FR-18-05); source_meal_plan_item_id không thuộc người gọi → 404 (FR-18-06).
       x-use-cases:
       - UC17
       - UC18
@@ -2256,6 +2265,12 @@ paths:
             schema:
               $ref: '#/components/schemas/ShoppingItemCreate'
       responses:
+        '200':
+          description: Đã có dòng open cùng nguyên liệu và cùng món nguồn — đã cập nhật dòng đó (FR-18-05)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShoppingItem'
         '201':
           description: Đã thêm
           content:
@@ -2367,8 +2382,9 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         '409':
-          description: 'Mâm chưa accepted, không nấu được, đã có phiên đang nấu, hoặc yêu cầu cùng khoá đang chạy — code:
-            `meal_plan_not_accepted`, `meal_plan_not_cookable`, `cook_session_in_progress`, `idempotency_in_progress`'
+          description: 'Mâm chưa accepted, không nấu được, đã có phiên đang nấu, lịch dài hơn max_minutes mà chưa có confirm_over_time
+            (conflict_state + over_time_minutes, makespan_s, solver_status), hoặc yêu cầu cùng khoá đang chạy — code:
+            `meal_plan_not_accepted`, `meal_plan_not_cookable`, `cook_session_in_progress`, `conflict_state`, `idempotency_in_progress`'
           content:
             application/problem+json:
               schema:
@@ -6196,6 +6212,13 @@ components:
           - embedding
         in_pantry:
           type: boolean
+        available_g_min:
+          type: number
+          minimum: 0
+          description: Lượng khả dụng của đồ thay (lô kiểm tra chưa xác nhận không tính, FR-17-08/09)
+        available_g_max:
+          type: number
+          minimum: 0
       required:
       - substitute_ingredient_id
       - name_vi
@@ -6365,7 +6388,13 @@ components:
         serve_at:
           type: string
           format: date-time
-          description: Giờ dọn mâm; lịch CP-SAT xếp để mọi món xong trong 5 phút trước giờ này (BR-COOK-01)
+          description: Giờ dọn mâm; lịch CP-SAT xếp để mọi món xong trong 5 phút trước giờ này (BR-COOK-01). Sớm hơn
+            lúc tạo + makespan thì server dời tới mốc sớm nhất có thể (UC19 1a; serve_at trong phản hồi là giờ đã dời)
+        confirm_over_time:
+          type: boolean
+          default: false
+          description: 'FR-19-10: lịch dài hơn max_minutes của mâm thì phải gửi true mới tạo phiên; thiếu → 409 conflict_state
+            kèm over_time_minutes, makespan_s'
       required:
       - meal_plan_id
       - serve_at
@@ -6532,6 +6561,27 @@ components:
         interactions_recorded:
           type: boolean
           description: false khi chưa đồng ý personalization (BR-CONSENT-03)
+        shortfalls:
+          type: array
+          description: 'FR-20-10: nguyên liệu (không phải gia vị luôn có, không tuỳ chọn) cần nhiều hơn kho khả dụng; các lô
+            đã trừ về 0. Rỗng khi gửi lại sau lần hoàn tất đầu.'
+          items:
+            type: object
+            properties:
+              ingredient_id:
+                type: string
+                format: uuid
+              need_g:
+                type: number
+              available_g_min:
+                type: number
+              short_g:
+                type: number
+            required:
+            - ingredient_id
+            - need_g
+            - available_g_min
+            - short_g
       required:
       - cook_session
       - deductions
