@@ -1,0 +1,27 @@
+# Mức lượng ít / vừa / nhiều quy ra gam (bảng catalog.qty_levels), theo BR-QTY-02.
+# Dùng khi người dùng không cân mà chỉ chọn mức cho một lô (đồ không đếm được).
+# Gam = khối lượng lúc mua (BR-QTY-01). Khoảng [g_min, g_max] đi thẳng vào lô kho.
+# CẢNH BÁO: đây là ƯỚC LƯỢNG CỦA NHÓM, chưa đo. Hiệu chỉnh bằng cách cân các lô thật của nhóm
+# (ghi lại lượng người dùng chọn và cân thật) trước khi dùng trong thí nghiệm ghép mâm.
+# Một nguyên liệu có thể ghi đè mức của nhóm bằng qty_override trong ingredients.yaml.
+version: 1
+status: team_estimate_uncalibrated
+qty_levels:
+  ngu_coc:        {it: [100, 300], vua: [300, 700], nhieu: [700, 2000]}
+  cu_khoai:       {it: [150, 400], vua: [400, 1000], nhieu: [1000, 2500]}
+  dau_do:         {it: [100, 250], vua: [250, 500], nhieu: [500, 1000]}
+  hat:            {it: [30, 100], vua: [100, 250], nhieu: [250, 500]}
+  rau_la:         {it: [100, 250], vua: [250, 500], nhieu: [500, 1000]}
+  rau_cu_qua:     {it: [150, 400], vua: [400, 900], nhieu: [900, 2000]}
+  rau_thom:       {it: [10, 40], vua: [40, 100], nhieu: [100, 250]}
+  nam:            {it: [50, 150], vua: [150, 300], nhieu: [300, 600]}
+  trai_cay:       {it: [100, 300], vua: [300, 700], nhieu: [700, 1500]}
+  thit:           {it: [150, 300], vua: [300, 600], nhieu: [600, 1200]}
+  gia_cam:        {it: [200, 400], vua: [400, 900], nhieu: [900, 1800]}
+  ca:             {it: [200, 400], vua: [400, 800], nhieu: [800, 1500]}
+  hai_san:        {it: [100, 250], vua: [250, 500], nhieu: [500, 1000]}
+  trung:          {it: [100, 200], vua: [200, 400], nhieu: [400, 600]}
+  sua:            {it: [100, 300], vua: [300, 700], nhieu: [700, 1500]}
+  dau_mo:         {it: [50, 200], vua: [200, 500], nhieu: [500, 1000]}
+  gia_vi:         {it: [20, 100], vua: [100, 300], nhieu: [300, 800]}
+  gia_vi_dong_vat: {it: [20, 100], vua: [100, 300], nhieu: [300, 800]}

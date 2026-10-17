@@ -1,0 +1,19 @@
+# Cách nấu (bảng catalog.cooking_methods). Nhãn bám theo bộ lọc "Cách nấu" của monngonmoingay.com
+# (Kho, Xào, Canh/Súp, Chiên, Hấp, Om, Nướng, Gỏi, Hầm) và các mục món của dienmayxanh.com/vao-bep,
+# thêm luộc, rim, rang, trộn, muối chua theo cách gọi trong bếp nhà.
+# Dùng cho D(m) trong hàm mục tiêu ghép mâm (phạt trùng cách nấu) và lịch nấu (bước chiếm bếp).
+version: 1
+cooking_methods:
+  - {code: kho, name_vi: "Kho", uses_burner: true}
+  - {code: rim, name_vi: "Rim, ram", uses_burner: true}
+  - {code: om, name_vi: "Om, sốt", uses_burner: true}
+  - {code: ham, name_vi: "Hầm", uses_burner: true}
+  - {code: xao, name_vi: "Xào", uses_burner: true}
+  - {code: chien, name_vi: "Chiên, rán, áp chảo", uses_burner: true}
+  - {code: rang, name_vi: "Rang", uses_burner: true}
+  - {code: luoc, name_vi: "Luộc", uses_burner: true}
+  - {code: hap, name_vi: "Hấp, chưng", uses_burner: true}
+  - {code: nuong, name_vi: "Nướng (lò, chảo nướng, nồi chiên không dầu)", uses_burner: false}
+  - {code: nau_canh, name_vi: "Nấu canh", uses_burner: true}
+  - {code: tron, name_vi: "Trộn, gỏi, nộm", uses_burner: false}
+  - {code: muoi_chua, name_vi: "Muối chua", uses_burner: false}

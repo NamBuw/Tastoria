@@ -1,0 +1,29 @@
+# Thẻ món (bảng catalog.tags). kind: flavor | texture | occasion.
+# Dùng làm đặc trưng content-based và LambdaMART (thiết kế v2 §6.1). Không có thẻ mang tính khẳng định
+# sức khoẻ (kiểu "giảm cân"); calo đã có số riêng.
+version: 1
+tags:
+  # vị
+  - {code: dam_da, kind: flavor, name_vi: "Đậm đà, mặn ngọt"}
+  - {code: chua, kind: flavor, name_vi: "Chua"}
+  - {code: chua_ngot, kind: flavor, name_vi: "Chua ngọt"}
+  - {code: cay, kind: flavor, name_vi: "Cay"}
+  - {code: thanh, kind: flavor, name_vi: "Thanh, nhạt"}
+  - {code: beo, kind: flavor, name_vi: "Béo"}
+  - {code: thom_sa_gung, kind: flavor, name_vi: "Thơm sả, gừng, riềng"}
+  - {code: thom_toi, kind: flavor, name_vi: "Thơm tỏi, hành"}
+  - {code: dang, kind: flavor, name_vi: "Đắng nhẹ"}
+  - {code: mam_ruoc, kind: flavor, name_vi: "Mùi mắm (mắm tôm, mắm tép)"}
+  # kết cấu
+  - {code: gion, kind: texture, name_vi: "Giòn"}
+  - {code: mem, kind: texture, name_vi: "Mềm"}
+  - {code: kho_rao, kind: texture, name_vi: "Khô ráo, ít nước"}
+  - {code: sot_sanh, kind: texture, name_vi: "Có nước sốt sánh"}
+  - {code: nhieu_nuoc, kind: texture, name_vi: "Nhiều nước"}
+  # dịp
+  - {code: bua_thuong, kind: occasion, name_vi: "Bữa cơm thường ngày"}
+  - {code: nau_nhanh, kind: occasion, name_vi: "Nấu nhanh (≤ 20 phút)"}
+  - {code: troi_nong, kind: occasion, name_vi: "Hợp trời nóng"}
+  - {code: troi_lanh, kind: occasion, name_vi: "Hợp trời lạnh"}
+  - {code: cuoi_tuan, kind: occasion, name_vi: "Cầu kỳ hơn, hợp cuối tuần"}
+  - {code: com_hop, kind: occasion, name_vi: "Mang đi làm (cơm hộp) được"}

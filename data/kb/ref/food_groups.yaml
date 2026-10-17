@@ -1,0 +1,26 @@
+# Nhóm thực phẩm của Tastoria (bảng catalog.food_groups, docs/sad/model.yaml).
+# Dùng cho: mức ít/vừa/nhiều (qty_levels), loại trừ theo chế độ ăn (diet_exclusions),
+# lọc cứng "cùng nhóm" khi gợi ý thay thế (thiết kế v2 §6.3).
+# Nhóm do nhóm Tastoria tự đặt, tham khảo cách chia 14 nhóm của Bảng TPTP VN 2007 nhưng tách nhỏ
+# hơn ở rau và thủy sản cho việc thay thế, và tách gia vị nguồn động vật (nước mắm, mắm tôm...)
+# để chế độ ăn chay loại được chúng.
+version: 1
+food_groups:
+  - {code: ngu_coc, name_vi: "Ngũ cốc, tinh bột và sản phẩm", animal_origin: false, fct2007_groups: [1]}
+  - {code: cu_khoai, name_vi: "Khoai củ", animal_origin: false, fct2007_groups: [2]}
+  - {code: dau_do, name_vi: "Đậu đỗ và sản phẩm từ đậu (đậu phụ, chao, mì căn...)", animal_origin: false, fct2007_groups: [3]}
+  - {code: hat, name_vi: "Hạt có dầu (lạc, vừng, hạt điều)", animal_origin: false, fct2007_groups: [3]}
+  - {code: rau_la, name_vi: "Rau lá, ngọn, hoa và rong", animal_origin: false, fct2007_groups: [4]}
+  - {code: rau_cu_qua, name_vi: "Rau củ, quả dùng như rau", animal_origin: false, fct2007_groups: [4]}
+  - {code: rau_thom, name_vi: "Rau thơm và gia vị tươi (hành, tỏi, gừng, sả, ớt)", animal_origin: false, fct2007_groups: [4, 13]}
+  - {code: nam, name_vi: "Nấm và mộc nhĩ", animal_origin: false, fct2007_groups: [4]}
+  - {code: trai_cay, name_vi: "Quả chín, quả chua dùng nấu (dứa, me, sấu, khế, chanh, nước dừa)", animal_origin: false, fct2007_groups: [5, 4, 14]}
+  - {code: thit, name_vi: "Thịt gia súc, nội tạng, thịt chế biến, ếch", animal_origin: true, fct2007_groups: [7]}
+  - {code: gia_cam, name_vi: "Thịt gia cầm", animal_origin: true, fct2007_groups: [7]}
+  - {code: ca, name_vi: "Cá và sản phẩm từ cá", animal_origin: true, fct2007_groups: [8]}
+  - {code: hai_san, name_vi: "Tôm, cua, nhuyễn thể và thủy sản khác", animal_origin: true, fct2007_groups: [8]}
+  - {code: trung, name_vi: "Trứng", animal_origin: true, fct2007_groups: [9]}
+  - {code: sua, name_vi: "Sữa và sản phẩm từ sữa", animal_origin: true, fct2007_groups: [10]}
+  - {code: dau_mo, name_vi: "Dầu thực vật", animal_origin: false, fct2007_groups: [6]}
+  - {code: gia_vi, name_vi: "Gia vị khô, nước chấm và chất tạo ngọt nguồn thực vật hoặc khoáng", animal_origin: false, fct2007_groups: [12, 13, 14]}
+  - {code: gia_vi_dong_vat, name_vi: "Gia vị, nước chấm nguồn động vật (nước mắm, mắm tôm, mắm tép, dầu hào, hạt nêm thường)", animal_origin: true, fct2007_groups: [13]}

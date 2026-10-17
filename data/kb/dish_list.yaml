@@ -1,0 +1,245 @@
+# Danh sách món nhà Việt cho kho công thức Tastoria (bước 1: danh sách, chưa có định lượng và bước nấu).
+#
+# Mục đích: chốt 180 món phổ biến của bữa cơm nhà, chia 3 slot của mâm (BR-TRAY-01):
+#   man = món mặn (đạm), rau = món rau (xào, luộc, nộm, dưa), canh = món canh.
+# Món rau có thịt (đậu que xào thịt, bò xào súp lơ) xếp vào slot rau khi rau chiếm phần lớn khối lượng.
+#
+# Trường của mỗi món:
+#   slug, name_vi       định danh và tên (NFC, không trùng).
+#   slot                man | rau | canh.
+#   method              mã trong ref/cooking_methods.yaml.
+#   main                nguyên liệu chính (định nghĩa món; dùng cho D(m) trùng nguyên liệu chính và bảng lớp thị giác).
+#   seasonings          gia vị và rau thơm đặc trưng của món (không đủ hết gia vị nền). Ghi để BR-ALG/BR-DIET
+#                       kiểm được cả gia vị (ví dụ nước mắm làm món không còn chay).
+#   region              bac | trung | nam | chung (phổ biến cả nước).
+#   vegetarian          true khi mọi main + seasonings đều qua chế độ "chay" (ref/diets.yaml).
+#                       Validator kiểm cờ này khớp với nhóm thực phẩm của nguyên liệu.
+#   minutes             tổng thời gian nấu ƯỚC LƯỢNG (phút, gồm sơ chế, không gồm thời gian ướp qua đêm hay
+#                       chờ muối chua). Là ước lượng của nhóm để chọn món; số thật lấy từ recipe_steps khi soạn.
+#   seen_in             (nếu có) URL bài viết cùng tên món trên một trang tham khảo bên dưới. Khớp tự động tên món
+#                       (có đổi cách gọi vùng: lợn/heo, đậu phụ/đậu hũ...) với 360 tiêu đề ở trang 1–2 của các mục
+#                       trong references, lấy ngày 17/10/2026; chỉ đọc tiêu đề, không chép nội dung công thức.
+#                       Mẫu tiêu đề nhỏ nên món không có seen_in KHÔNG có nghĩa là không phổ biến; khi soạn công
+#                       thức, mỗi món cần ≥ 2 nguồn trong recipe_sources (thiết kế v2 §5).
+#
+# Căn cứ độ phổ biến (đọc tên món, không chép công thức):
+version: 1
+references:
+  - id: mnmn
+    title: "Món Ngon Mỗi Ngày (Ajinomoto Việt Nam) — tìm món theo cách nấu"
+    urls:
+      - https://monngonmoingay.com/tim-kiem-mon-ngon/?cach-nau=cac-mon-kho-ngon
+      - https://monngonmoingay.com/tim-kiem-mon-ngon/?cach-nau=cach-mon-canh-ngon
+      - https://monngonmoingay.com/tim-kiem-mon-ngon/?cach-nau=cac-mon-xao-ngon
+      - https://monngonmoingay.com/tim-kiem-mon-ngon/?cach-nau=cac-mon-chien-ngon
+      - https://monngonmoingay.com/tim-kiem-mon-ngon/?cach-nau=cac-mon-hap-ngon
+      - https://monngonmoingay.com/tim-kiem-mon-ngon/?cach-nau=cac-mon-om-ngon
+      - https://monngonmoingay.com/tim-kiem-mon-ngon/?loai-mon=cac-mon-chay-ngon
+    note: "Điều khoản: nội dung thuộc Ajinomoto VN, không sao chép. Chỉ dùng tên món làm bằng chứng phổ biến."
+  - id: dmx
+    title: "Điện Máy XANH — Vào bếp, các mục món"
+    urls:
+      - https://www.dienmayxanh.com/vao-bep/mon-canh
+      - https://www.dienmayxanh.com/vao-bep/mon-xao
+      - https://www.dienmayxanh.com/vao-bep/mon-kho
+      - https://www.dienmayxanh.com/vao-bep/mon-chien
+      - https://www.dienmayxanh.com/vao-bep/mon-chay
+  - id: nin
+    title: "Viện Dinh dưỡng — Tra cứu giá trị dinh dưỡng món ăn (1.250 món)"
+    urls:
+      - https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+    note: "Chỉ tra tay từng món (không tải hàng loạt). Ví dụ tên món đã thấy khi khảo sát: Canh cải xanh thịt nạc, Thịt bò kho, Rau muống xào, Canh trai nấu chua (docs/research/raw/02-*.md)."
+
+dishes:
+  # ===================== MÓN MẶN (man) =====================
+  # --- thịt lợn
+  - {slug: thit-kho-tau, name_vi: "Thịt kho tàu", slot: man, method: kho, main: [thịt ba chỉ, trứng vịt, nước dừa], seasonings: [nước mắm, đường, hành tím, tỏi], region: nam, vegetarian: false, minutes: 90}
+  - {slug: thit-kho-tieu, name_vi: "Thịt kho tiêu", slot: man, method: kho, main: [thịt ba chỉ], seasonings: [nước mắm, đường, tiêu, hành tím], region: chung, vegetarian: false, minutes: 45}
+  - {slug: thit-rang-chay-canh, name_vi: "Thịt rang cháy cạnh", slot: man, method: rang, main: [thịt ba chỉ], seasonings: [nước mắm, đường, hành tím, hành lá], region: bac, vegetarian: false, minutes: 25}
+  - {slug: suon-xao-chua-ngot, name_vi: "Sườn xào chua ngọt", slot: man, method: xao, main: [sườn non], seasonings: [giấm, đường, nước mắm, tương cà, tỏi], region: chung, vegetarian: false, minutes: 45, seen_in: [https://www.dienmayxanh.com/vao-bep/cach-lam-suon-xao-chua-ngot-bang-chanh-thom-mem-bat-vi-cho-23742]}
+  - {slug: suon-ram-man, name_vi: "Sườn ram mặn", slot: man, method: rim, main: [sườn non], seasonings: [nước mắm, đường, hành tím, tỏi], region: nam, vegetarian: false, minutes: 40}
+  - {slug: thit-luoc, name_vi: "Thịt luộc", slot: man, method: luoc, main: [thịt ba chỉ], seasonings: [muối, hành tím], region: chung, vegetarian: false, minutes: 30}
+  - {slug: cha-trung-hap, name_vi: "Chả trứng hấp", slot: man, method: hap, main: [thịt băm, trứng gà, mộc nhĩ, miến], seasonings: [nước mắm, hành lá, tiêu], region: nam, vegetarian: false, minutes: 35}
+  - {slug: thit-kho-dau-phu, name_vi: "Thịt kho đậu phụ", slot: man, method: kho, main: [thịt ba chỉ, đậu phụ], seasonings: [nước mắm, hành tím, hành lá], region: bac, vegetarian: false, minutes: 40}
+  - {slug: ba-chi-chien-nuoc-mam, name_vi: "Ba chỉ chiên nước mắm", slot: man, method: chien, main: [thịt ba chỉ], seasonings: [nước mắm, đường, tỏi, dầu ăn], region: nam, vegetarian: false, minutes: 25}
+  - {slug: thit-nuong-sa, name_vi: "Thịt nướng sả", slot: man, method: nuong, main: [thịt nạc vai], seasonings: [sả, nước mắm, đường, mật ong, tỏi], region: nam, vegetarian: false, minutes: 40}
+  - {slug: cha-la-lot, name_vi: "Chả lá lốt", slot: man, method: chien, main: [thịt băm, lá lốt], seasonings: [hành tím, nước mắm, tiêu, dầu ăn], region: bac, vegetarian: false, minutes: 40}
+  - {slug: nem-ran, name_vi: "Nem rán (chả giò)", slot: man, method: chien, main: [thịt băm, bánh đa nem, miến, mộc nhĩ, cà rốt, trứng gà], seasonings: [hành tím, nước mắm, tiêu, dầu ăn], region: bac, vegetarian: false, minutes: 60}
+  - {slug: dau-phu-nhoi-thit-sot-ca-chua, name_vi: "Đậu phụ nhồi thịt sốt cà chua", slot: man, method: om, main: [đậu phụ, thịt băm, cà chua], seasonings: [nước mắm, hành lá, hành tím], region: bac, vegetarian: false, minutes: 40}
+  - {slug: gio-heo-kho, name_vi: "Giò heo kho", slot: man, method: kho, main: [chân giò], seasonings: [nước mắm, đường, hành tím, tiêu], region: nam, vegetarian: false, minutes: 90, seen_in: [https://www.dienmayxanh.com/vao-bep/cach-lam-gio-heo-kho-nuoc-tuong-mem-ngon-dam-da-cuc-dua-com-23881]}
+  - {slug: xiu-mai-sot-ca-chua, name_vi: "Xíu mại sốt cà chua", slot: man, method: om, main: [thịt băm, cà chua, củ đậu], seasonings: [nước mắm, hành tím, bột năng, tiêu], region: nam, vegetarian: false, minutes: 50}
+  - {slug: thit-xa-xiu, name_vi: "Thịt xá xíu", slot: man, method: nuong, main: [thịt nạc vai], seasonings: [mật ong, nước tương, tỏi, ngũ vị hương, hạt điều màu], region: nam, vegetarian: false, minutes: 60, seen_in: [https://www.dienmayxanh.com/vao-bep/cach-lam-thit-xa-xiu-bang-goi-gia-vi-cholimex-mem-ngon-chuan-24373]}
+  - {slug: thit-kho-mang, name_vi: "Thịt kho măng", slot: man, method: kho, main: [thịt ba chỉ, măng khô], seasonings: [nước mắm, đường, hành tím], region: chung, vegetarian: false, minutes: 90}
+  - {slug: kho-quet, name_vi: "Kho quẹt", slot: man, method: kho, main: [thịt ba chỉ, tôm khô], seasonings: [nước mắm, đường, hành tím, tiêu, ớt], region: nam, vegetarian: false, minutes: 30, seen_in: [https://www.dienmayxanh.com/vao-bep/chia-se-cach-kho-quet-thit-ba-roi-man-ngot-dam-da-thom-nuc-ca-24194]}
+  - {slug: mam-tep-chung-thit, name_vi: "Mắm tép chưng thịt", slot: man, method: rim, main: [thịt ba chỉ, mắm tép], seasonings: [hành tím, sả, ớt, đường], region: bac, vegetarian: false, minutes: 30}
+  - {slug: gan-lon-xao-hanh, name_vi: "Gan lợn xào hành", slot: man, method: xao, main: [gan lợn, hành tây], seasonings: [tỏi, nước mắm, tiêu, hành lá], region: bac, vegetarian: false, minutes: 15}
+  - {slug: suon-kho-thom, name_vi: "Sườn kho thơm", slot: man, method: kho, main: [sườn non, dứa], seasonings: [nước mắm, đường, hành tím], region: nam, vegetarian: false, minutes: 45}
+  # --- thịt bò
+  - {slug: bo-xao-hanh-tay, name_vi: "Bò xào hành tây", slot: man, method: xao, main: [thịt bò, hành tây], seasonings: [tỏi, dầu hào, tiêu], region: chung, vegetarian: false, minutes: 15}
+  - {slug: bo-kho, name_vi: "Bò kho", slot: man, method: kho, main: [thịt bò, cà rốt], seasonings: [sả, hoa hồi, quế, hạt điều màu, nước mắm, hành tím], region: nam, vegetarian: false, minutes: 120, seen_in: [https://www.dienmayxanh.com/vao-bep/cach-nau-bo-kho-truyen-thong-bi-quyet-uop-gia-vi-tham-mem-24364]}
+  - {slug: bo-luc-lac, name_vi: "Bò lúc lắc", slot: man, method: xao, main: [thịt bò, ớt chuông, hành tây], seasonings: [tỏi, dầu hào, nước tương, tiêu, bơ], region: nam, vegetarian: false, minutes: 20}
+  - {slug: bo-nuong-la-lot, name_vi: "Bò nướng lá lốt", slot: man, method: nuong, main: [thịt bò, lá lốt], seasonings: [sả, hành tím, nước mắm, tiêu], region: nam, vegetarian: false, minutes: 45}
+  - {slug: bo-xao-sa-ot, name_vi: "Bò xào sả ớt", slot: man, method: xao, main: [thịt bò], seasonings: [sả, ớt, tỏi, nước mắm], region: chung, vegetarian: false, minutes: 15}
+  - {slug: bo-sot-vang, name_vi: "Bò sốt vang", slot: man, method: om, main: [thịt bò, cà rốt], seasonings: [rượu vang đỏ, hoa hồi, quế, tương cà, hành tím], region: bac, vegetarian: false, minutes: 90}
+  - {slug: bo-cuon-nam-kim-cham, name_vi: "Bò cuộn nấm kim châm", slot: man, method: chien, main: [thịt bò, nấm kim châm], seasonings: [dầu hào, tỏi, tiêu], region: chung, vegetarian: false, minutes: 25}
+  - {slug: bo-xao-ca-chua, name_vi: "Bò xào cà chua", slot: man, method: xao, main: [thịt bò, cà chua], seasonings: [tỏi, nước mắm, hành lá], region: bac, vegetarian: false, minutes: 15}
+  # --- gia cầm
+  - {slug: ga-kho-gung, name_vi: "Gà kho gừng", slot: man, method: kho, main: [thịt gà], seasonings: [gừng, nước mắm, đường, hành tím], region: chung, vegetarian: false, minutes: 40}
+  - {slug: ga-luoc, name_vi: "Gà luộc", slot: man, method: luoc, main: [thịt gà], seasonings: [lá chanh, gừng, muối, tiêu, chanh], region: bac, vegetarian: false, minutes: 50}
+  - {slug: canh-ga-chien-nuoc-mam, name_vi: "Cánh gà chiên nước mắm", slot: man, method: chien, main: [cánh gà], seasonings: [nước mắm, đường, tỏi, dầu ăn], region: nam, vegetarian: false, minutes: 30}
+  - {slug: ga-xao-sa-ot, name_vi: "Gà xào sả ớt", slot: man, method: xao, main: [thịt gà], seasonings: [sả, ớt, nước mắm, đường, nghệ], region: nam, vegetarian: false, minutes: 30}
+  - {slug: ga-om-nam, name_vi: "Gà om nấm", slot: man, method: om, main: [thịt gà, nấm hương khô], seasonings: [hành tím, nước mắm, dầu hào], region: bac, vegetarian: false, minutes: 40}
+  - {slug: ga-nuong-mat-ong, name_vi: "Gà nướng mật ong", slot: man, method: nuong, main: [đùi gà], seasonings: [mật ong, tỏi, nước tương, tiêu], region: chung, vegetarian: false, minutes: 50}
+  - {slug: vit-om-sau, name_vi: "Vịt om sấu", slot: man, method: om, main: [thịt vịt, sấu], seasonings: [hành tím, nước mắm, sả, rau mùi], region: bac, vegetarian: false, minutes: 60, seen_in: [https://www.dienmayxanh.com/vao-bep/cach-lam-vit-om-sau-khoai-so-chuan-vi-mien-bac-thom-ngon-kho-23990]}
+  - {slug: vit-luoc, name_vi: "Vịt luộc", slot: man, method: luoc, main: [thịt vịt], seasonings: [gừng, muối, hành tím], region: bac, vegetarian: false, minutes: 60}
+  # --- cá
+  - {slug: ca-kho-to, name_vi: "Cá kho tộ", slot: man, method: kho, main: [cá lóc], seasonings: [nước mắm, đường, hành tím, tiêu, ớt], region: nam, vegetarian: false, minutes: 45}
+  - {slug: ca-thu-sot-ca-chua, name_vi: "Cá thu sốt cà chua", slot: man, method: om, main: [cá thu, cà chua], seasonings: [hành tím, nước mắm, hành lá], region: chung, vegetarian: false, minutes: 30}
+  - {slug: ca-ro-phi-chien, name_vi: "Cá rô phi chiên giòn", slot: man, method: chien, main: [cá rô phi], seasonings: [muối, dầu ăn], region: chung, vegetarian: false, minutes: 25}
+  - {slug: ca-chep-om-dua, name_vi: "Cá chép om dưa", slot: man, method: om, main: [cá chép, dưa cải chua, cà chua], seasonings: [hành tím, thì là, nước mắm], region: bac, vegetarian: false, minutes: 45, seen_in: [https://www.dienmayxanh.com/vao-bep/cach-lam-ca-chep-om-dua-ha-noi-ngon-chuan-vi-dam-da-khong-23859]}
+  - {slug: ca-nuc-kho-ca-chua, name_vi: "Cá nục kho cà chua", slot: man, method: kho, main: [cá nục, cà chua], seasonings: [nước mắm, hành tím, ớt], region: trung, vegetarian: false, minutes: 40}
+  - {slug: ca-tram-kho-rieng, name_vi: "Cá trắm kho riềng", slot: man, method: kho, main: [cá trắm], seasonings: [riềng, nước mắm, đường, hành tím], region: bac, vegetarian: false, minutes: 60, seen_in: [https://monngonmoingay.com/ca-tram-kho-rieng/]}
+  - {slug: ca-dieu-hong-hap-xi-dau, name_vi: "Cá diêu hồng hấp xì dầu", slot: man, method: hap, main: [cá diêu hồng], seasonings: [nước tương, gừng, hành lá], region: chung, vegetarian: false, minutes: 30}
+  - {slug: ca-bong-kho-tieu, name_vi: "Cá bống kho tiêu", slot: man, method: kho, main: [cá bống], seasonings: [nước mắm, tiêu, hành tím, đường], region: trung, vegetarian: false, minutes: 40}
+  - {slug: ca-ngu-kho-thom, name_vi: "Cá ngừ kho thơm", slot: man, method: kho, main: [cá ngừ, dứa], seasonings: [nước mắm, hành tím, ớt], region: trung, vegetarian: false, minutes: 40}
+  - {slug: ca-basa-chien-sa, name_vi: "Cá basa chiên sả", slot: man, method: chien, main: [cá basa], seasonings: [sả, ớt, nước mắm, dầu ăn], region: nam, vegetarian: false, minutes: 25}
+  - {slug: ca-com-rim, name_vi: "Cá cơm rim mặn ngọt", slot: man, method: rim, main: [cá cơm], seasonings: [nước mắm, đường, tỏi, ớt], region: trung, vegetarian: false, minutes: 25}
+  # --- hải sản
+  - {slug: tom-rim-thit-ba-chi, name_vi: "Tôm rim thịt ba chỉ", slot: man, method: rim, main: [tôm, thịt ba chỉ], seasonings: [nước mắm, đường, hành tím], region: chung, vegetarian: false, minutes: 30, seen_in: [https://www.dienmayxanh.com/vao-bep/cach-lam-tom-rim-thit-ba-chi-man-ngot-chuan-vi-cuc-ky-hao-com-24002]}
+  - {slug: tom-hap-sa, name_vi: "Tôm hấp sả", slot: man, method: hap, main: [tôm], seasonings: [sả, muối, tiêu, chanh], region: nam, vegetarian: false, minutes: 15}
+  - {slug: tom-rang-me, name_vi: "Tôm rang me", slot: man, method: rang, main: [tôm, me chua], seasonings: [đường, nước mắm, tỏi], region: nam, vegetarian: false, minutes: 25}
+  - {slug: muc-xao-hanh-can, name_vi: "Mực xào hành cần", slot: man, method: xao, main: [mực, cần tây, hành tây], seasonings: [tỏi, nước mắm, tiêu], region: chung, vegetarian: false, minutes: 20}
+  - {slug: muc-hap-gung, name_vi: "Mực hấp gừng", slot: man, method: hap, main: [mực], seasonings: [gừng, hành lá, muối, tiêu], region: chung, vegetarian: false, minutes: 15}
+  - {slug: muc-nhoi-thit-sot-ca, name_vi: "Mực nhồi thịt sốt cà chua", slot: man, method: om, main: [mực, thịt băm, cà chua, mộc nhĩ], seasonings: [hành tím, nước mắm, tiêu], region: chung, vegetarian: false, minutes: 50}
+  - {slug: ngheu-hap-sa, name_vi: "Nghêu hấp sả", slot: man, method: hap, main: [nghêu], seasonings: [sả, ớt, lá chanh, muối], region: nam, vegetarian: false, minutes: 15}
+  - {slug: tep-rang-khe, name_vi: "Tép rang khế", slot: man, method: rang, main: [tép, khế], seasonings: [nước mắm, hành lá, tiêu], region: bac, vegetarian: false, minutes: 20}
+  - {slug: oc-nau-chuoi-dau, name_vi: "Ốc nấu chuối đậu", slot: man, method: om, main: [ốc, chuối xanh, đậu phụ, thịt ba chỉ], seasonings: [nghệ, mẻ, mắm tôm, tía tô, lá lốt], region: bac, vegetarian: false, minutes: 90}
+  - {slug: ghe-hap-gung, name_vi: "Ghẹ hấp gừng", slot: man, method: hap, main: [ghẹ], seasonings: [gừng, sả, muối, chanh], region: trung, vegetarian: false, minutes: 20}
+  - {slug: ech-xao-sa-ot, name_vi: "Ếch xào sả ớt", slot: man, method: xao, main: [ếch], seasonings: [sả, ớt, nghệ, nước mắm], region: bac, vegetarian: false, minutes: 25}
+  - {slug: luon-xao-sa-ot, name_vi: "Lươn xào sả ớt", slot: man, method: xao, main: [lươn], seasonings: [sả, ớt, nghệ, nước mắm, rau răm], region: bac, vegetarian: false, minutes: 30}
+  # --- trứng
+  - {slug: trung-chien-hanh, name_vi: "Trứng chiên hành lá", slot: man, method: chien, main: [trứng gà, hành lá], seasonings: [nước mắm, dầu ăn], region: chung, vegetarian: false, minutes: 10}
+  - {slug: trung-sot-ca-chua, name_vi: "Trứng sốt cà chua", slot: man, method: om, main: [trứng gà, cà chua], seasonings: [hành lá, nước mắm], region: chung, vegetarian: false, minutes: 15}
+  - {slug: trung-ga-luoc, name_vi: "Trứng gà luộc", slot: man, method: luoc, main: [trứng gà], seasonings: [muối], region: chung, vegetarian: false, minutes: 12}
+  - {slug: trung-cuon-rau-cu, name_vi: "Trứng cuộn rau củ", slot: man, method: chien, main: [trứng gà, cà rốt, hành lá], seasonings: [muối, dầu ăn], region: chung, vegetarian: false, minutes: 15}
+  - {slug: trung-op-la, name_vi: "Trứng ốp la", slot: man, method: chien, main: [trứng gà], seasonings: [dầu ăn, nước tương, tiêu], region: chung, vegetarian: false, minutes: 5}
+  - {slug: trung-duc-thit, name_vi: "Trứng đúc thịt", slot: man, method: chien, main: [trứng gà, thịt băm], seasonings: [hành lá, nước mắm, tiêu, dầu ăn], region: bac, vegetarian: false, minutes: 20}
+  # --- chay
+  - {slug: dau-phu-sot-ca-chua, name_vi: "Đậu phụ sốt cà chua", slot: man, method: om, main: [đậu phụ, cà chua], seasonings: [hành lá, muối, nước tương, dầu ăn], region: bac, vegetarian: true, minutes: 20}
+  - {slug: dau-hu-chien-sa, name_vi: "Đậu hũ chiên sả", slot: man, method: chien, main: [đậu phụ], seasonings: [sả, ớt, nước tương, dầu ăn], region: nam, vegetarian: true, minutes: 20}
+  - {slug: dau-phu-tam-hanh, name_vi: "Đậu phụ rán tẩm hành", slot: man, method: chien, main: [đậu phụ, hành lá], seasonings: [nước tương, muối, dầu ăn], region: bac, vegetarian: true, minutes: 15}
+  - {slug: dau-hu-kho-nam, name_vi: "Đậu hũ kho nấm", slot: man, method: kho, main: [đậu phụ, nấm rơm], seasonings: [nước tương, đường, tiêu, hạt nêm chay], region: nam, vegetarian: true, minutes: 30}
+  - {slug: nam-kho-tieu, name_vi: "Nấm kho tiêu", slot: man, method: kho, main: [nấm đùi gà], seasonings: [nước tương, đường, tiêu, hạt nêm chay], region: nam, vegetarian: true, minutes: 25}
+  - {slug: cha-gio-chay, name_vi: "Chả giò chay", slot: man, method: chien, main: [bánh đa nem, khoai môn, cà rốt, mộc nhĩ, miến, đậu phụ], seasonings: [muối, tiêu, hạt nêm chay, dầu ăn], region: nam, vegetarian: true, minutes: 50, seen_in: [https://www.dienmayxanh.com/vao-bep/cach-lam-cha-gio-chay-khoai-mon-dau-xanh-thanh-tinh-an-hoai-23679]}
+  - {slug: dau-phu-non-sot-nam, name_vi: "Đậu phụ non sốt nấm", slot: man, method: om, main: [đậu phụ non, nấm hương tươi], seasonings: [nước tương, bột năng, hành lá, dầu ăn], region: chung, vegetarian: true, minutes: 20}
+  - {slug: mi-can-kho-sa, name_vi: "Mì căn kho sả", slot: man, method: kho, main: [mì căn], seasonings: [sả, ớt, nước tương, đường], region: nam, vegetarian: true, minutes: 25}
+  - {slug: dau-hu-nhoi-nam-hap, name_vi: "Đậu hũ nhồi nấm hấp", slot: man, method: hap, main: [đậu phụ, nấm hương tươi, cà rốt], seasonings: [nước tương, tiêu, hạt nêm chay], region: chung, vegetarian: true, minutes: 30}
+
+  # ===================== MÓN RAU (rau) =====================
+  - {slug: rau-muong-xao-toi, name_vi: "Rau muống xào tỏi", slot: rau, method: xao, main: [rau muống], seasonings: [tỏi, nước mắm, dầu ăn], region: chung, vegetarian: false, minutes: 10}
+  - {slug: rau-muong-luoc, name_vi: "Rau muống luộc", slot: rau, method: luoc, main: [rau muống], seasonings: [muối, nước mắm, chanh], region: bac, vegetarian: false, minutes: 10}
+  - {slug: cai-ngot-xao-toi, name_vi: "Cải ngọt xào tỏi", slot: rau, method: xao, main: [cải ngọt], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 10}
+  - {slug: bap-cai-xao-ca-chua, name_vi: "Bắp cải xào cà chua", slot: rau, method: xao, main: [bắp cải, cà chua], seasonings: [hành lá, muối, dầu ăn], region: bac, vegetarian: true, minutes: 15}
+  - {slug: bap-cai-luoc, name_vi: "Bắp cải luộc", slot: rau, method: luoc, main: [bắp cải], seasonings: [muối], region: bac, vegetarian: true, minutes: 15}
+  - {slug: su-su-xao-toi, name_vi: "Su su xào tỏi", slot: rau, method: xao, main: [su su], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 15}
+  - {slug: rau-cu-luoc-thap-cam, name_vi: "Rau củ luộc thập cẩm", slot: rau, method: luoc, main: [su su, cà rốt, súp lơ xanh], seasonings: [muối], region: chung, vegetarian: true, minutes: 15, seen_in: [https://www.dienmayxanh.com/vao-bep/bi-quyet-lam-rau-cu-luoc-thap-cam-xanh-gion-trinh-bay-dep-mat-23906]}
+  - {slug: dau-que-xao-toi, name_vi: "Đậu que xào tỏi", slot: rau, method: xao, main: [đậu que], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 15}
+  - {slug: dau-que-xao-thit, name_vi: "Đậu que xào thịt", slot: rau, method: xao, main: [đậu que, thịt nạc vai], seasonings: [tỏi, nước mắm, dầu ăn], region: chung, vegetarian: false, minutes: 20}
+  - {slug: bong-cai-xanh-xao-toi, name_vi: "Bông cải xanh xào tỏi", slot: rau, method: xao, main: [súp lơ xanh], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 15}
+  - {slug: bo-xao-sup-lo, name_vi: "Bò xào súp lơ", slot: rau, method: xao, main: [súp lơ xanh, súp lơ trắng, thịt bò, cà rốt], seasonings: [tỏi, dầu hào, dầu ăn], region: chung, vegetarian: false, minutes: 20}
+  - {slug: gia-xao-he, name_vi: "Giá xào hẹ", slot: rau, method: xao, main: [giá đỗ, hẹ], seasonings: [muối, dầu ăn], region: chung, vegetarian: true, minutes: 10, seen_in: [https://www.dienmayxanh.com/vao-bep/gia-xao-he-bi-quyet-xao-khong-ra-nuoc-giu-tron-do-gion-ngot-24334]}
+  - {slug: muop-xao-gia, name_vi: "Mướp xào giá", slot: rau, method: xao, main: [mướp, giá đỗ], seasonings: [tỏi, muối, dầu ăn], region: bac, vegetarian: true, minutes: 15}
+  - {slug: bi-do-xao-toi, name_vi: "Bí đỏ xào tỏi", slot: rau, method: xao, main: [bí đỏ], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 15, seen_in: [https://www.dienmayxanh.com/vao-bep/cach-lam-bi-do-xao-toi-bui-beo-thom-ngon-cuc-don-gian-cho-bua-24295]}
+  - {slug: ngon-su-su-xao-toi, name_vi: "Ngọn su su xào tỏi", slot: rau, method: xao, main: [ngọn su su], seasonings: [tỏi, muối, dầu ăn], region: bac, vegetarian: true, minutes: 10}
+  - {slug: rau-lang-xao-toi, name_vi: "Rau lang xào tỏi", slot: rau, method: xao, main: [rau lang], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 10}
+  - {slug: ca-tim-xao-mo-hanh, name_vi: "Cà tím xào mỡ hành", slot: rau, method: xao, main: [cà tím, hành lá], seasonings: [tỏi, nước mắm, dầu ăn], region: nam, vegetarian: false, minutes: 20}
+  - {slug: ca-bung, name_vi: "Cà bung", slot: rau, method: om, main: [cà tím, đậu phụ, thịt ba chỉ], seasonings: [tía tô, mắm tôm, mẻ], region: bac, vegetarian: false, minutes: 45}
+  - {slug: ca-phao-muoi, name_vi: "Cà pháo muối", slot: rau, method: muoi_chua, main: [cà pháo], seasonings: [muối, tỏi, ớt, gừng], region: bac, vegetarian: true, minutes: 30}
+  - {slug: dua-cai-muoi, name_vi: "Dưa cải muối", slot: rau, method: muoi_chua, main: [cải bẹ xanh], seasonings: [muối, đường, hành tím], region: chung, vegetarian: true, minutes: 30}
+  - {slug: goi-ngo-sen-tom-thit, name_vi: "Gỏi ngó sen tôm thịt", slot: rau, method: tron, main: [ngó sen, tôm, thịt ba chỉ, cà rốt], seasonings: [nước mắm, đường, chanh, rau răm, lạc], region: nam, vegetarian: false, minutes: 40}
+  - {slug: nom-su-hao, name_vi: "Nộm su hào", slot: rau, method: tron, main: [su hào, cà rốt], seasonings: [nước mắm, đường, giấm, lạc, húng lủi], region: bac, vegetarian: false, minutes: 25}
+  - {slug: goi-ga-bap-cai, name_vi: "Gỏi gà bắp cải", slot: rau, method: tron, main: [bắp cải, thịt gà, hành tây], seasonings: [rau răm, nước mắm, chanh, đường, tiêu], region: nam, vegetarian: false, minutes: 40}
+  - {slug: dua-leo-tron-chua-ngot, name_vi: "Dưa chuột trộn chua ngọt", slot: rau, method: tron, main: [dưa chuột], seasonings: [giấm, đường, tỏi, ớt, muối], region: chung, vegetarian: true, minutes: 10}
+  - {slug: dau-bap-luoc, name_vi: "Đậu bắp luộc", slot: rau, method: luoc, main: [đậu bắp], seasonings: [muối], region: nam, vegetarian: true, minutes: 10}
+  - {slug: kho-qua-xao-trung, name_vi: "Khổ qua xào trứng", slot: rau, method: xao, main: [mướp đắng, trứng gà], seasonings: [nước mắm, hành lá, dầu ăn], region: nam, vegetarian: false, minutes: 15}
+  - {slug: cai-thia-xao-nam-huong, name_vi: "Cải thìa xào nấm hương", slot: rau, method: xao, main: [cải thìa, nấm hương tươi], seasonings: [tỏi, nước tương, dầu ăn], region: chung, vegetarian: true, minutes: 15}
+  - {slug: nam-rom-xao-toi, name_vi: "Nấm rơm xào tỏi", slot: rau, method: xao, main: [nấm rơm], seasonings: [tỏi, hành lá, muối, dầu ăn], region: nam, vegetarian: true, minutes: 15}
+  - {slug: nam-kim-cham-xao-bo-toi, name_vi: "Nấm kim châm xào bơ tỏi", slot: rau, method: xao, main: [nấm kim châm], seasonings: [bơ, tỏi, muối, hành lá], region: chung, vegetarian: true, minutes: 10}
+  - {slug: cai-lan-xao-thit-bo, name_vi: "Cải làn xào thịt bò", slot: rau, method: xao, main: [cải làn, thịt bò], seasonings: [tỏi, dầu hào, dầu ăn], region: chung, vegetarian: false, minutes: 15}
+  - {slug: rau-den-xao-toi, name_vi: "Rau dền xào tỏi", slot: rau, method: xao, main: [rau dền], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 10}
+  - {slug: mang-tuoi-xao-thit, name_vi: "Măng tươi xào thịt ba chỉ", slot: rau, method: xao, main: [măng tươi, thịt ba chỉ], seasonings: [tỏi, nước mắm, hành lá], region: bac, vegetarian: false, minutes: 40}
+  - {slug: su-hao-xao-ca-rot, name_vi: "Su hào xào cà rốt", slot: rau, method: xao, main: [su hào, cà rốt], seasonings: [tỏi, muối, dầu ăn], region: bac, vegetarian: true, minutes: 15}
+  - {slug: bau-xao-trung, name_vi: "Bầu xào trứng", slot: rau, method: xao, main: [bầu, trứng gà], seasonings: [hành lá, nước mắm, dầu ăn], region: nam, vegetarian: false, minutes: 15}
+  - {slug: bi-ngoi-xao-toi, name_vi: "Bí ngòi xào tỏi", slot: rau, method: xao, main: [bí ngòi], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 10}
+  - {slug: cai-bo-xoi-xao-toi, name_vi: "Cải bó xôi xào tỏi", slot: rau, method: xao, main: [cải bó xôi], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 10}
+  - {slug: rau-can-xao-toi, name_vi: "Rau cần xào tỏi", slot: rau, method: xao, main: [rau cần], seasonings: [tỏi, muối, dầu ăn], region: bac, vegetarian: true, minutes: 10}
+  - {slug: dau-ha-lan-xao-tom, name_vi: "Đậu Hà Lan xào tôm", slot: rau, method: xao, main: [đậu Hà Lan, tôm, cà rốt], seasonings: [tỏi, nước mắm, dầu ăn], region: chung, vegetarian: false, minutes: 20}
+  - {slug: hoa-thien-ly-xao-toi, name_vi: "Hoa thiên lý xào tỏi", slot: rau, method: xao, main: [hoa thiên lý], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 10}
+  - {slug: rau-bi-xao-toi, name_vi: "Rau bí xào tỏi", slot: rau, method: xao, main: [rau bí], seasonings: [tỏi, muối, dầu ăn], region: bac, vegetarian: true, minutes: 10}
+  - {slug: khoai-tay-xao-hanh-tay, name_vi: "Khoai tây xào hành tây", slot: rau, method: xao, main: [khoai tây, hành tây], seasonings: [muối, tiêu, dầu ăn], region: chung, vegetarian: true, minutes: 20}
+  - {slug: nom-hoa-chuoi, name_vi: "Nộm hoa chuối", slot: rau, method: tron, main: [hoa chuối, cà rốt], seasonings: [nước mắm, chanh, đường, lạc, húng lủi], region: bac, vegetarian: false, minutes: 30}
+  - {slug: bong-bi-xao-toi, name_vi: "Bông bí xào tỏi", slot: rau, method: xao, main: [bông bí], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 10}
+  - {slug: rau-cu-xao-thap-cam, name_vi: "Rau củ xào thập cẩm", slot: rau, method: xao, main: [súp lơ xanh, cà rốt, ngô bao tử, nấm rơm, đậu Hà Lan], seasonings: [tỏi, nước tương, dầu ăn], region: chung, vegetarian: true, minutes: 20}
+  - {slug: xa-lach-tron-dau-giam, name_vi: "Xà lách trộn dầu giấm", slot: rau, method: tron, main: [xà lách, cà chua, hành tây], seasonings: [giấm, đường, muối, dầu ăn], region: chung, vegetarian: true, minutes: 10}
+  - {slug: dua-gia, name_vi: "Dưa giá", slot: rau, method: muoi_chua, main: [giá đỗ, hẹ, cà rốt], seasonings: [muối, đường, giấm], region: nam, vegetarian: true, minutes: 20}
+  - {slug: dau-dua-xao-toi, name_vi: "Đậu đũa xào tỏi", slot: rau, method: xao, main: [đậu đũa], seasonings: [tỏi, muối, dầu ăn], region: nam, vegetarian: true, minutes: 15}
+  - {slug: mang-tay-xao-toi, name_vi: "Măng tây xào tỏi", slot: rau, method: xao, main: [măng tây], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 10}
+  - {slug: nom-du-du, name_vi: "Nộm đu đủ", slot: rau, method: tron, main: [đu đủ xanh, cà rốt], seasonings: [nước mắm, đường, chanh, lạc, húng lủi], region: chung, vegetarian: false, minutes: 25}
+  - {slug: cu-dau-xao-ca-rot, name_vi: "Củ đậu xào cà rốt", slot: rau, method: xao, main: [củ đậu, cà rốt], seasonings: [tỏi, muối, dầu ăn], region: bac, vegetarian: true, minutes: 15}
+  - {slug: bi-dao-xao-tom-kho, name_vi: "Bí đao xào tôm khô", slot: rau, method: xao, main: [bí đao, tôm khô], seasonings: [tỏi, nước mắm, dầu ăn], region: chung, vegetarian: false, minutes: 15}
+  - {slug: su-su-xao-tom, name_vi: "Su su xào tôm", slot: rau, method: xao, main: [su su, tôm], seasonings: [tỏi, nước mắm, dầu ăn], region: nam, vegetarian: false, minutes: 20}
+  - {slug: cai-thao-xao-toi, name_vi: "Cải thảo xào tỏi", slot: rau, method: xao, main: [cải thảo], seasonings: [tỏi, muối, dầu ăn], region: chung, vegetarian: true, minutes: 10}
+  - {slug: cai-cuc-xao-toi, name_vi: "Cải cúc xào tỏi", slot: rau, method: xao, main: [cải cúc], seasonings: [tỏi, muối, dầu ăn], region: bac, vegetarian: true, minutes: 10}
+  - {slug: mong-toi-xao-toi, name_vi: "Mồng tơi xào tỏi", slot: rau, method: xao, main: [mồng tơi], seasonings: [tỏi, muối, dầu ăn], region: nam, vegetarian: true, minutes: 10}
+
+  # ===================== MÓN CANH (canh) =====================
+  - {slug: canh-chua-ca-loc, name_vi: "Canh chua cá lóc", slot: canh, method: nau_canh, main: [cá lóc, cà chua, dứa, đậu bắp, giá đỗ, dọc mùng], seasonings: [me chua, ngò gai, rau ngổ, nước mắm, đường, tỏi], region: nam, vegetarian: false, minutes: 40}
+  - {slug: canh-chua-tom, name_vi: "Canh chua tôm", slot: canh, method: nau_canh, main: [tôm, cà chua, dứa, đậu bắp], seasonings: [me chua, ngò gai, nước mắm, đường], region: nam, vegetarian: false, minutes: 30}
+  - {slug: canh-cua-rau-day-mong-toi, name_vi: "Canh cua rau đay mồng tơi", slot: canh, method: nau_canh, main: [cua đồng, rau đay, mồng tơi, mướp], seasonings: [mắm tôm, muối], region: bac, vegetarian: false, minutes: 45}
+  - {slug: canh-mong-toi-tom-bap, name_vi: "Canh mồng tơi tôm bắp", slot: canh, method: nau_canh, main: [mồng tơi, tôm, ngô ngọt], seasonings: [hành tím, nước mắm], region: nam, vegetarian: false, minutes: 20, seen_in: [https://monngonmoingay.com/canh-mong-toi-tom-bap/]}
+  - {slug: canh-rau-ngot-thit-bam, name_vi: "Canh rau ngót thịt băm", slot: canh, method: nau_canh, main: [rau ngót, thịt băm], seasonings: [hành tím, nước mắm], region: chung, vegetarian: false, minutes: 15}
+  - {slug: canh-bi-do-thit-bam, name_vi: "Canh bí đỏ thịt băm", slot: canh, method: nau_canh, main: [bí đỏ, thịt băm], seasonings: [hành lá, nước mắm], region: chung, vegetarian: false, minutes: 25}
+  - {slug: canh-bi-dao-tom, name_vi: "Canh bí đao nấu tôm", slot: canh, method: nau_canh, main: [bí đao, tôm], seasonings: [hành lá, nước mắm], region: chung, vegetarian: false, minutes: 20}
+  - {slug: canh-cai-xanh-thit-bam, name_vi: "Canh cải xanh thịt băm", slot: canh, method: nau_canh, main: [cải bẹ xanh, thịt băm], seasonings: [gừng, nước mắm, hạt nêm], region: chung, vegetarian: false, minutes: 15}
+  - {slug: canh-muop-nau-tom, name_vi: "Canh mướp nấu tôm", slot: canh, method: nau_canh, main: [mướp, tôm], seasonings: [hành lá, nước mắm], region: chung, vegetarian: false, minutes: 15}
+  - {slug: canh-kho-qua-nhoi-thit, name_vi: "Canh khổ qua nhồi thịt", slot: canh, method: nau_canh, main: [mướp đắng, thịt băm, mộc nhĩ], seasonings: [hành lá, nước mắm, tiêu], region: nam, vegetarian: false, minutes: 45}
+  - {slug: canh-ca-chua-trung, name_vi: "Canh cà chua trứng", slot: canh, method: nau_canh, main: [cà chua, trứng gà], seasonings: [hành lá, nước mắm], region: chung, vegetarian: false, minutes: 10}
+  - {slug: canh-suon-khoai-tay-ca-rot, name_vi: "Canh sườn hầm khoai tây cà rốt", slot: canh, method: ham, main: [sườn non, khoai tây, cà rốt], seasonings: [hành tím, nước mắm, hành lá], region: chung, vegetarian: false, minutes: 60}
+  - {slug: canh-suon-nau-sau, name_vi: "Canh sườn nấu sấu", slot: canh, method: nau_canh, main: [sườn non, sấu, cà chua], seasonings: [hành lá, nước mắm], region: bac, vegetarian: false, minutes: 50}
+  - {slug: canh-cai-cuc-thit-bam, name_vi: "Canh cải cúc thịt băm", slot: canh, method: nau_canh, main: [cải cúc, thịt băm], seasonings: [gừng, nước mắm], region: bac, vegetarian: false, minutes: 15}
+  - {slug: canh-rau-den-tom-kho, name_vi: "Canh rau dền tôm khô", slot: canh, method: nau_canh, main: [rau dền, tôm khô], seasonings: [hành tím, nước mắm], region: chung, vegetarian: false, minutes: 15}
+  - {slug: canh-bau-nau-tom, name_vi: "Canh bầu nấu tôm", slot: canh, method: nau_canh, main: [bầu, tôm], seasonings: [hành lá, nước mắm], region: chung, vegetarian: false, minutes: 15}
+  - {slug: canh-dau-phu-ca-chua, name_vi: "Canh đậu phụ cà chua", slot: canh, method: nau_canh, main: [đậu phụ, cà chua], seasonings: [hành lá, muối, hạt nêm chay], region: bac, vegetarian: true, minutes: 15}
+  - {slug: canh-nam-dau-hu, name_vi: "Canh nấm đậu hũ", slot: canh, method: nau_canh, main: [nấm rơm, đậu phụ, cải ngọt], seasonings: [muối, hạt nêm chay, hành lá], region: chung, vegetarian: true, minutes: 20}
+  - {slug: canh-rong-bien-dau-hu, name_vi: "Canh rong biển đậu hũ", slot: canh, method: nau_canh, main: [rong biển khô, đậu phụ], seasonings: [muối, nước tương, hành lá], region: chung, vegetarian: true, minutes: 15}
+  - {slug: canh-bi-do-dau-phong, name_vi: "Canh bí đỏ đậu phộng", slot: canh, method: nau_canh, main: [bí đỏ, lạc], seasonings: [muối, hạt nêm chay, rau mùi], region: nam, vegetarian: true, minutes: 40}
+  - {slug: canh-rau-cu, name_vi: "Canh rau củ", slot: canh, method: nau_canh, main: [cà rốt, khoai tây, su su, bắp cải], seasonings: [muối, hạt nêm chay, hành lá], region: chung, vegetarian: true, minutes: 30}
+  - {slug: canh-khoai-mo-tom, name_vi: "Canh khoai mỡ nấu tôm", slot: canh, method: nau_canh, main: [khoai mỡ, tôm], seasonings: [rau ngổ, ngò gai, nước mắm], region: nam, vegetarian: false, minutes: 30}
+  - {slug: canh-khoai-so-suon, name_vi: "Canh khoai sọ nấu sườn", slot: canh, method: nau_canh, main: [khoai sọ, sườn non], seasonings: [hành lá, rau mùi, nước mắm], region: bac, vegetarian: false, minutes: 50}
+  - {slug: canh-hen, name_vi: "Canh hến nấu chua", slot: canh, method: nau_canh, main: [hến, cà chua], seasonings: [rau răm, thì là, hành tím, nước mắm], region: bac, vegetarian: false, minutes: 30}
+  - {slug: canh-ngao-nau-chua, name_vi: "Canh ngao nấu chua", slot: canh, method: nau_canh, main: [nghêu, cà chua, dứa], seasonings: [thì là, hành lá, nước mắm, me chua], region: bac, vegetarian: false, minutes: 25}
+  - {slug: canh-su-hao-ca-rot, name_vi: "Canh su hào cà rốt", slot: canh, method: nau_canh, main: [su hào, cà rốt], seasonings: [muối, hạt nêm chay, hành lá], region: bac, vegetarian: true, minutes: 25}
+  - {slug: canh-bap-cai-cuon-thit, name_vi: "Canh bắp cải cuộn thịt", slot: canh, method: nau_canh, main: [bắp cải, thịt băm, hành lá], seasonings: [nước mắm, tiêu, hành tím], region: chung, vegetarian: false, minutes: 40}
+  - {slug: canh-rau-ma-tom, name_vi: "Canh rau má nấu tôm", slot: canh, method: nau_canh, main: [rau má, tôm], seasonings: [hành tím, nước mắm], region: nam, vegetarian: false, minutes: 15}
+  - {slug: canh-moc, name_vi: "Canh mọc", slot: canh, method: nau_canh, main: [thịt băm, nấm hương khô, mộc nhĩ], seasonings: [hành lá, nước mắm, tiêu], region: bac, vegetarian: false, minutes: 35, seen_in: [https://www.dienmayxanh.com/vao-bep/cach-nau-canh-moc-nam-kim-cham-thom-ngon-don-gian-tai-nha-23829]}
+  - {slug: canh-ga-nau-nam, name_vi: "Canh gà nấu nấm", slot: canh, method: nau_canh, main: [thịt gà, nấm hương tươi], seasonings: [gừng, hành lá, nước mắm], region: chung, vegetarian: false, minutes: 45}
+  - {slug: canh-xuong-ham-cu-cai, name_vi: "Canh xương hầm củ cải", slot: canh, method: ham, main: [xương ống lợn, củ cải trắng, cà rốt], seasonings: [hành lá, muối, nước mắm], region: chung, vegetarian: false, minutes: 90}
+  - {slug: canh-ca-thi-la, name_vi: "Canh cá thì là", slot: canh, method: nau_canh, main: [cá lóc, cà chua], seasonings: [thì là, hành lá, gừng, nước mắm], region: bac, vegetarian: false, minutes: 30}
+  - {slug: canh-dau-hu-he, name_vi: "Canh đậu hũ hẹ thịt băm", slot: canh, method: nau_canh, main: [đậu phụ, hẹ, thịt băm], seasonings: [nước mắm, tiêu], region: nam, vegetarian: false, minutes: 15}
+  - {slug: canh-nam-kim-cham-thit-bam, name_vi: "Canh nấm kim châm thịt băm", slot: canh, method: nau_canh, main: [nấm kim châm, thịt băm], seasonings: [hành lá, nước mắm], region: chung, vegetarian: false, minutes: 15}
+  - {slug: canh-chua-chay, name_vi: "Canh chua chay", slot: canh, method: nau_canh, main: [đậu phụ, cà chua, dứa, đậu bắp, giá đỗ], seasonings: [me chua, ngò gai, nước tương, đường, muối], region: nam, vegetarian: true, minutes: 25}
+  - {slug: canh-cai-thao-thit-vien, name_vi: "Canh cải thảo thịt viên", slot: canh, method: nau_canh, main: [cải thảo, thịt băm], seasonings: [hành lá, nước mắm, tiêu], region: chung, vegetarian: false, minutes: 25}
+  - {slug: canh-du-du-suon, name_vi: "Canh đu đủ nấu sườn", slot: canh, method: nau_canh, main: [đu đủ xanh, sườn non], seasonings: [hành lá, nước mắm], region: nam, vegetarian: false, minutes: 50}
+  - {slug: canh-cu-sen-ham-suon, name_vi: "Canh củ sen hầm sườn", slot: canh, method: ham, main: [củ sen, sườn non, cà rốt], seasonings: [hành lá, muối, nước mắm], region: chung, vegetarian: false, minutes: 90}
+  - {slug: canh-mang-chan-gio, name_vi: "Canh măng nấu chân giò", slot: canh, method: ham, main: [măng khô, chân giò], seasonings: [hành lá, nước mắm, hành tím], region: bac, vegetarian: false, minutes: 120}
+  - {slug: canh-mong-toi-muop, name_vi: "Canh mồng tơi nấu mướp", slot: canh, method: nau_canh, main: [mồng tơi, mướp], seasonings: [muối, hạt nêm chay], region: chung, vegetarian: true, minutes: 15}
+  - {slug: canh-khoai-tay-thit-bam, name_vi: "Canh khoai tây thịt băm", slot: canh, method: nau_canh, main: [khoai tây, thịt băm, cà rốt], seasonings: [hành lá, nước mắm], region: chung, vegetarian: false, minutes: 25}
+  - {slug: canh-su-su-tom, name_vi: "Canh su su nấu tôm", slot: canh, method: nau_canh, main: [su su, tôm], seasonings: [hành lá, nước mắm], region: chung, vegetarian: false, minutes: 20}
+  - {slug: canh-ca-ro-nau-cai, name_vi: "Canh cá rô đồng nấu rau cải", slot: canh, method: nau_canh, main: [cá rô đồng, cải bẹ xanh], seasonings: [gừng, hành tím, nước mắm], region: bac, vegetarian: false, minutes: 40}
+  - {slug: canh-ga-la-giang, name_vi: "Canh gà lá giang", slot: canh, method: nau_canh, main: [thịt gà, lá giang], seasonings: [sả, ớt, nước mắm], region: nam, vegetarian: false, minutes: 45}
+  - {slug: canh-cai-xoong-thit-bam, name_vi: "Canh cải xoong thịt băm", slot: canh, method: nau_canh, main: [cải xoong, thịt băm], seasonings: [hành tím, nước mắm], region: chung, vegetarian: false, minutes: 15}
+  - {slug: canh-bi-dao-nam, name_vi: "Canh bí đao nấu nấm", slot: canh, method: nau_canh, main: [bí đao, nấm rơm], seasonings: [muối, hạt nêm chay, hành lá], region: chung, vegetarian: true, minutes: 20}
+  - {slug: canh-rau-tap-tang, name_vi: "Canh rau tập tàng", slot: canh, method: nau_canh, main: [rau dền, mồng tơi, rau ngót, rau đay, tôm khô], seasonings: [nước mắm, hành tím], region: bac, vegetarian: false, minutes: 25}
+  - {slug: canh-bi-xanh-nau-ngao, name_vi: "Canh bí xanh nấu ngao", slot: canh, method: nau_canh, main: [bí đao, nghêu], seasonings: [gừng, hành lá, nước mắm], region: bac, vegetarian: false, minutes: 25}
+  - {slug: canh-kho-qua-cha-ca, name_vi: "Canh khổ qua chả cá thác lác", slot: canh, method: nau_canh, main: [mướp đắng, chả cá thác lác], seasonings: [hành lá, nước mắm, tiêu], region: nam, vegetarian: false, minutes: 35}
+  - {slug: canh-rau-ngot-nam, name_vi: "Canh rau ngót nấu nấm", slot: canh, method: nau_canh, main: [rau ngót, nấm rơm], seasonings: [muối, hạt nêm chay], region: chung, vegetarian: true, minutes: 15}

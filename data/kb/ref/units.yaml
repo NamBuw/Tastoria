@@ -1,0 +1,15 @@
+# Đơn vị đếm (cột ingredient_units.unit_code). model.yaml hiện liệt kê qua|bo|cu|nhanh|mieng|goi|hop;
+# kho món cần thêm cay (cây sả, cây hành), tep (tép tỏi), con (con tôm, con cá, con mực).
+# Ba mã thêm cần được bổ sung vào model.yaml khi cập nhật ERD.
+version: 1
+units:
+  - {code: qua, name_vi: "quả, trái"}
+  - {code: bo, name_vi: "bó"}
+  - {code: cu, name_vi: "củ"}
+  - {code: nhanh, name_vi: "nhánh (gừng, riềng)"}
+  - {code: mieng, name_vi: "miếng"}
+  - {code: goi, name_vi: "gói"}
+  - {code: hop, name_vi: "hộp, vỉ, bìa (đậu phụ)"}
+  - {code: cay, name_vi: "cây (sả, hành lá, tỏi tây)"}
+  - {code: tep, name_vi: "tép (tỏi)"}
+  - {code: con, name_vi: "con (cá, tôm, mực, cua)"}

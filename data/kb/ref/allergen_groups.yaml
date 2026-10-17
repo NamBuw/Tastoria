@@ -1,0 +1,21 @@
+# Nhóm dị ứng (bảng catalog.allergen_groups). Căn cứ: thiết kế v2 BR-ALG-02.
+# codex_2024: danh sách thực phẩm và thành phần gây quá mẫn trong Codex CXS 1-1985
+#   (General Standard for the Labelling of Prepackaged Foods), bản sửa đổi 2024.
+# tastoria_extra: nhóm Tastoria giữ thêm. Đậu nành không còn trong danh sách bắt buộc của bản 2024
+#   (chuyển sang nhóm các nước tự quyết), Tastoria vẫn giữ vì đậu phụ, nước tương phổ biến trong bếp Việt.
+#   Nhuyễn thể (nghêu, hến, mực, ốc, dầu hào) là nhóm bổ sung của Tastoria.
+version: 1
+source:
+  citation: "Codex Alimentarius Commission. General Standard for the Labelling of Pre-packaged Foods (CXS 1-1985), sửa đổi 2024 (mục 4.2.1.4–4.2.1.5). Rome: FAO/WHO; 2024."
+  note: "Sửa phần ghi nhãn dị ứng tại CAC47 (thông qua 27/11/2024). Hạt cây bắt buộc gồm 6 loại: hạnh nhân, điều, phỉ, pecan, dẻ cười, óc chó (hạt dẻ không thuộc nhóm). Đối chiếu: docs/research/raw/05-soi-tai-lieu-v1-phat-hien-tho.md mục [64]."
+allergen_groups:
+  - {code: gluten, name_vi: "Ngũ cốc chứa gluten (lúa mì, lúa mạch, lúa mạch đen...)", name_en: "Cereals containing gluten", basis: codex_2024}
+  - {code: giap_xac, name_vi: "Động vật giáp xác (tôm, cua, ghẹ, tép)", name_en: "Crustacea", basis: codex_2024}
+  - {code: trung, name_vi: "Trứng", name_en: "Eggs", basis: codex_2024}
+  - {code: ca, name_vi: "Cá", name_en: "Fish", basis: codex_2024}
+  - {code: dau_phong, name_vi: "Đậu phộng (lạc)", name_en: "Peanuts", basis: codex_2024}
+  - {code: sua, name_vi: "Sữa", name_en: "Milk", basis: codex_2024}
+  - {code: vung, name_vi: "Vừng (mè)", name_en: "Sesame", basis: codex_2024}
+  - {code: hat_cay, name_vi: "Hạt cây (hạnh nhân, điều, phỉ, pecan, dẻ cười, óc chó)", name_en: "Tree nuts", basis: codex_2024}
+  - {code: dau_nanh, name_vi: "Đậu nành (đậu tương)", name_en: "Soybeans", basis: tastoria_extra}
+  - {code: nhuyen_the, name_vi: "Động vật thân mềm (nghêu, hến, sò, ốc, mực)", name_en: "Molluscs", basis: tastoria_extra}

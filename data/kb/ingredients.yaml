@@ -1,0 +1,5359 @@
+# Nguyên liệu của kho món Tastoria (bảng catalog.ingredients + ingredient_synonyms + ingredient_allergens
+# + ingredient_units, docs/sad/model.yaml). Tên tiếng Việt NFC, không trùng.
+#
+# Trường:
+#   food_group       mã trong ref/food_groups.yaml.
+#   comp_source      nguồn thành phần dinh dưỡng:
+#                      source: fct2007 (mã trong data/processed/fct2007/foods.csv) — ưu tiên;
+#                              usda (fdc_id trong data/processed/usda/foods.csv) — khi FCT không có mục hợp lý;
+#                              null — kèm reason (không có mục phù hợp trong cả hai bảng).
+#                    match: exact (cùng thực phẩm) | close (cùng loại, khác giống/cách gọi/phần) |
+#                           proxy (thực phẩm khác dùng tạm, cần thay khi có nguồn tốt hơn).
+#                    source_name chép tên trong bảng nguồn để người đọc soát nhanh (validator kiểm khớp).
+#   is_staple        chỉ true cho gia vị luôn có trong bếp (BR-TRAY-04 miễn kiểm kho; BR-ALG-01 KHÔNG miễn
+#                    kiểm dị ứng).
+#   countable/units  đơn vị đếm (ref/units.yaml) và số gam mỗi đơn vị, gam = khối lượng lúc mua (BR-QTY-01).
+#                    source: "usda_sr:<fdc_id> '<portion>'" khi lấy từ bảng khẩu phần USDA SR Legacy
+#                    (food_portion.csv, thường là phần ăn được), "uoc_luong_nhom" là ước lượng của nhóm,
+#                    chưa cân, cần cân lại khi soạn công thức.
+#   allergens        mã trong ref/allergen_groups.yaml. allergen_note ghi phần phụ thuộc nhãn hãng.
+#   synonyms         vi: cách gọi khác theo vùng; en: tên tiếng Anh kiểu danh sách nguyên liệu Food.com, để ánh xạ
+#                    sang từ vựng Word2Vec (thiết kế v2 §6.3).
+#   shelf_life       L trong BR-FRESH-01 (ngày, ngăn mát):
+#                      basis foodkeeper: lấy fridge_max_days (cận trên) của mục FoodKeeper ghi trong foodkeeper_id
+#                        (data/processed/foodkeeper/products.csv); validator kiểm days nằm trong [min, max];
+#                      basis estimate: ước lượng của nhóm, có lý do, cần hiệu chỉnh bằng dữ liệu lô;
+#                      basis not_tracked: đồ khô, gia vị, đồ để ngoài; days = null, không tính độ gấp.
+version: 1
+ingredients:
+- name_vi: gạo tẻ
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '1004'
+    source_name: Gạo tẻ máy
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - gạo
+    en:
+    - rice
+    - white rice
+    - long grain rice
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp; không tính độ gấp.
+- name_vi: gạo nếp
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '1002'
+    source_name: Gạo nếp máy (Loại thường)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - glutinous rice
+    - sticky rice
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: bún
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '1020'
+    source_name: Bún
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - bún tươi
+    en:
+    - rice vermicelli
+    - rice noodles
+  shelf_life:
+    days: 2
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Bún tươi mua ở chợ, ước lượng 1–2 ngày ngăn mát.
+- name_vi: bánh phở
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '1013'
+    source_name: Bánh phở
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - phở tươi
+    en:
+    - rice noodles
+    - flat rice noodles
+  shelf_life:
+    days: 2
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Bánh phở tươi, ước lượng 1–2 ngày ngăn mát.
+- name_vi: mì sợi
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '1022'
+    source_name: Mỳ sợi
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - gluten
+  allergen_note: Mì trứng có thêm trứng; kiểm nhãn.
+  synonyms:
+    vi:
+    - mì trứng
+    en:
+    - wheat noodles
+    - egg noodles
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Mì khô để tủ bếp.
+- name_vi: miến
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '2015'
+    source_name: Miến dong
+    match: exact
+    note: Miến dong (bột dong riềng). Miến đậu xanh dùng USDA 174258 nếu cần tách.
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: goi
+    grams_per_unit: 100
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - miến dong
+    en:
+    - glass noodles
+    - cellophane noodles
+    - bean thread noodles
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: bánh đa nem
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '1010'
+    source_name: Bánh đa nem
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: goi
+    grams_per_unit: 200
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - bánh tráng
+    - bánh tráng cuốn
+    en:
+    - rice paper
+    - spring roll wrapper
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: bột mì
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '1018'
+    source_name: Bột mì
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - gluten
+  synonyms:
+    vi: []
+    en:
+    - wheat flour
+    - all-purpose flour
+    - flour
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: bột năng
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '2020'
+    source_name: Bột sắn
+    match: close
+    note: Bột năng là tinh bột sắn; FCT 2020 'Bột sắn' (cassava flour) là gần nhất.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - bột sắn
+    en:
+    - tapioca starch
+    - tapioca flour
+    - cornstarch
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: bột chiên giòn
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '1018'
+    source_name: Bột mì
+    match: proxy
+    note: Hỗn hợp chủ yếu bột mì, bột gạo; dùng bột mì làm xấp xỉ.
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - gluten
+  synonyms:
+    vi: []
+    en:
+    - tempura flour
+    - batter mix
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: bánh mì
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '1012'
+    source_name: Bánh mỳ
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 80
+    source: uoc_luong_nhom
+  allergens:
+  - gluten
+  synonyms:
+    vi:
+    - ổ bánh mì
+    en:
+    - baguette
+    - bread
+    - french bread
+  shelf_life:
+    days: 2
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Bánh mì để ngoài, ước lượng 1–2 ngày.
+- name_vi: ngô ngọt
+  food_group: ngu_coc
+  comp_source:
+    source: fct2007
+    code: '1007'
+    source_name: Ngô bắp tươi
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 300
+    source: usda_sr:169998 '1 ear, large' = 143 g hạt; FCT 1007 thải bỏ 45% → bắp nguyên vỏ ≈ 260–300 g, nhóm làm tròn 300
+  allergens: []
+  synonyms:
+    vi:
+    - bắp
+    - bắp ngọt
+    - ngô bắp
+    en:
+    - sweet corn
+    - corn
+    - corn on the cob
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 282
+    foodkeeper_name: Corn on the cob
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: ngô bao tử
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4058'
+    source_name: Ngô bao tử
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - bắp non
+    en:
+    - baby corn
+  shelf_life:
+    days: 5
+    basis: estimate
+    note: 'Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng theo đậu non tươi (FoodKeeper 273: 3–5 ngày).'
+- name_vi: khoai tây
+  food_group: cu_khoai
+  comp_source:
+    source: fct2007
+    code: '2014'
+    source_name: Khoai tây
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: cu
+    grams_per_unit: 200
+    source: usda_sr:170026 '1 potato medium' = 213 g, nhóm làm tròn 200
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - potato
+    - potatoes
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 297
+    foodkeeper_name: Potatoes
+    note: Ngăn mát 7–14 ngày; lấy cận trên.
+- name_vi: khoai môn
+  food_group: cu_khoai
+  comp_source:
+    source: fct2007
+    code: '2010'
+    source_name: Khoai môn
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: cu
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - taro
+  shelf_life:
+    days: 7
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Để nơi thoáng; ước lượng 7 ngày (FoodKeeper 305 'Taro' ngăn mát 2–3 ngày sau khi cắt).
+- name_vi: khoai sọ
+  food_group: cu_khoai
+  comp_source:
+    source: fct2007
+    code: '2013'
+    source_name: Khoai sọ
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: cu
+    grams_per_unit: 60
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - eddoe
+    - taro
+    - small taro
+  shelf_life:
+    days: 7
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng 7 ngày, để nơi thoáng.
+- name_vi: khoai mỡ
+  food_group: cu_khoai
+  comp_source:
+    source: fct2007
+    code: '2002'
+    source_name: Củ cái
+    match: exact
+    note: FCT 2002 'Củ cái' (Yam winged, Dioscorea alata) là khoai mỡ.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - củ cái
+    - khoai tím
+    en:
+    - purple yam
+    - ube
+    - winged yam
+  shelf_life:
+    days: 14
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Củ nguyên để nơi thoáng; ước lượng 14 ngày.
+- name_vi: khoai lang
+  food_group: cu_khoai
+  comp_source:
+    source: fct2007
+    code: '2008'
+    source_name: Khoai lang
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: cu
+    grams_per_unit: 250
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - sweet potato
+  shelf_life:
+    days: 14
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Để nơi thoáng; ước lượng 14 ngày.
+- name_vi: củ sen
+  food_group: cu_khoai
+  comp_source:
+    source: fct2007
+    code: '4059'
+    source_name: Ngó sen
+    match: close
+    note: FCT 4059 'Ngó sen' (lotus stem underground) là thân rễ; USDA 169250 'Lotus root, raw' tương đương.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - lotus root
+  shelf_life:
+    days: 7
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng 7 ngày ngăn mát, bọc kín.
+- name_vi: đậu phụ
+  food_group: dau_do
+  comp_source:
+    source: fct2007
+    code: '3025'
+    source_name: Đậu phụ
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: mieng
+    grams_per_unit: 150
+    source: uoc_luong_nhom
+  allergens:
+  - dau_nanh
+  synonyms:
+    vi:
+    - đậu hũ
+    - tàu hũ
+    en:
+    - tofu
+    - firm tofu
+    - bean curd
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 168
+    foodkeeper_name: Tofu
+    note: Ngăn mát 7–7 ngày; lấy cận trên.
+- name_vi: đậu phụ non
+  food_group: dau_do
+  comp_source:
+    source: usda
+    code: '172449'
+    source_name: Tofu, soft, prepared with calcium sulfate and magnesium chloride (nigari)
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: hop
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens:
+  - dau_nanh
+  synonyms:
+    vi:
+    - đậu hũ non
+    - tàu hũ non
+    en:
+    - soft tofu
+    - silken tofu
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 168
+    foodkeeper_name: Tofu
+    note: Ngăn mát 7–7 ngày; lấy cận trên.
+- name_vi: tàu hũ ky
+  food_group: dau_do
+  comp_source:
+    source: fct2007
+    code: '3026'
+    source_name: Đậu phụ chúc
+    match: close
+    note: FCT 3026 'Đậu phụ chúc' là váng đậu.
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - dau_nanh
+  synonyms:
+    vi:
+    - váng đậu
+    - phù trúc
+    en:
+    - tofu skin
+    - yuba
+    - bean curd sheet
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: chao
+  food_group: dau_do
+  comp_source:
+    source: usda
+    code: '174280'
+    source_name: Tofu, salted and fermented (fuyu)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - dau_nanh
+  synonyms:
+    vi:
+    - đậu phụ nhự
+    en:
+    - fermented tofu
+    - fermented bean curd
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Lọ đã lên men, để tủ bếp hoặc ngăn mát; không tính độ gấp.
+- name_vi: mì căn
+  food_group: dau_do
+  comp_source:
+    source: usda
+    code: '168147'
+    source_name: Vital wheat gluten
+    match: proxy
+    note: Mì căn làm từ gluten lúa mì; USDA 'Vital wheat gluten' là bột khô, cần quy đổi độ ẩm khi tính dinh dưỡng.
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - gluten
+  synonyms:
+    vi:
+    - mì căng
+    en:
+    - seitan
+    - wheat gluten
+  shelf_life:
+    days: 5
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Mì căn tươi mua ở chợ chay, ước lượng 3–5 ngày ngăn mát.
+- name_vi: đậu xanh
+  food_group: dau_do
+  comp_source:
+    source: fct2007
+    code: '3010'
+    source_name: Đậu xanh (đậu tắt)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - đỗ xanh
+    en:
+    - mung beans
+    - mung bean
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: đậu đen
+  food_group: dau_do
+  comp_source:
+    source: fct2007
+    code: '3004'
+    source_name: Đậu đen (hạt)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - đỗ đen
+    en:
+    - black beans
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: đậu nành
+  food_group: dau_do
+  comp_source:
+    source: fct2007
+    code: '3007'
+    source_name: Đậu tương (đậu nành)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - dau_nanh
+  synonyms:
+    vi:
+    - đậu tương
+    en:
+    - soybeans
+    - soy beans
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: sữa đậu nành
+  food_group: dau_do
+  comp_source:
+    source: fct2007
+    code: '3032'
+    source_name: Sữa đậu nành (100g đậu/lít)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - dau_nanh
+  synonyms:
+    vi: []
+    en:
+    - soy milk
+  shelf_life:
+    days: 3
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Sữa đậu nành tự nấu hoặc mua ở chợ, ước lượng 2–3 ngày ngăn mát.
+- name_vi: lạc
+  food_group: hat
+  comp_source:
+    source: fct2007
+    code: '3017'
+    source_name: Lạc hạt
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - dau_phong
+  synonyms:
+    vi:
+    - đậu phộng
+    en:
+    - peanuts
+    - peanut
+  shelf_life:
+    days: 360
+    basis: foodkeeper
+    foodkeeper_id: 442
+    foodkeeper_name: Peanuts — no shell
+    note: Ngăn mát 360–360 ngày; lấy cận trên.
+- name_vi: vừng
+  food_group: hat
+  comp_source:
+    source: fct2007
+    code: '3020'
+    source_name: Vừng (đen, trắng)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - vung
+  synonyms:
+    vi:
+    - mè
+    en:
+    - sesame seeds
+    - sesame
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: hạt điều
+  food_group: hat
+  comp_source:
+    source: fct2007
+    code: '3015'
+    source_name: Hạt điều
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - hat_cay
+  synonyms:
+    vi: []
+    en:
+    - cashews
+    - cashew nuts
+  shelf_life:
+    days: 180
+    basis: foodkeeper
+    foodkeeper_id: 439
+    foodkeeper_name: Cashews — no shell
+    note: Ngăn mát 180–180 ngày; lấy cận trên.
+- name_vi: hạt sen
+  food_group: hat
+  comp_source:
+    source: fct2007
+    code: '4040'
+    source_name: Hạt sen tươi
+    match: close
+    note: Hạt sen không có dầu nhiều; xếp nhóm hạt để thay thế.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - hạt sen tươi
+    en:
+    - lotus seeds
+  shelf_life:
+    days: 4
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Hạt sen tươi, ước lượng 3–4 ngày ngăn mát.
+- name_vi: rau muống
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4083'
+    source_name: Rau muống
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 400
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - rau muống ta
+    - rau muống nước
+    en:
+    - water spinach
+    - morning glory
+    - swamp cabbage
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: cải ngọt
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4015'
+    source_name: Cải thìa (cải trắng)
+    match: proxy
+    note: FCT không có cải ngọt; dùng 4015 'Cải thìa' cùng loài Brassica rapa.
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 400
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - choy sum
+    - chinese flowering cabbage
+    - bok choy
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: cải thìa
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4015'
+    source_name: Cải thìa (cải trắng)
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - cải chíp
+    - cải trắng
+    en:
+    - bok choy
+    - pak choi
+    - baby bok choy
+  shelf_life:
+    days: 3
+    basis: foodkeeper
+    foodkeeper_id: 275
+    foodkeeper_name: Bok choy
+    note: Ngăn mát 2–3 ngày; lấy cận trên.
+- name_vi: cải bẹ xanh
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4016'
+    source_name: Cải xanh
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 500
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - cải xanh
+    - cải đắng
+    - cải canh
+    en:
+    - mustard greens
+    - chinese mustard greens
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: cải làn
+  food_group: rau_la
+  comp_source:
+    source: usda
+    code: '169404'
+    source_name: Broccoli, chinese, raw
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - chinese broccoli
+    - gai lan
+    - kai lan
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 276
+    foodkeeper_name: Broccoli and broccoli raab (rapini)
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: cải thảo
+  food_group: rau_la
+  comp_source:
+    source: usda
+    code: '169979'
+    source_name: Cabbage, chinese (pe-tsai), raw
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: cay
+    grams_per_unit: 1000
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - cải bao
+    en:
+    - napa cabbage
+    - chinese cabbage
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 278
+    foodkeeper_name: Cabbage
+    note: Ngăn mát 7–14 ngày; lấy cận trên.
+- name_vi: bắp cải
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4010'
+    source_name: Cải bắp
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 900
+    source: usda_sr:169975 '1 head, medium' = 908 g
+  allergens: []
+  synonyms:
+    vi:
+    - cải bắp
+    en:
+    - cabbage
+    - green cabbage
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 278
+    foodkeeper_name: Cabbage
+    note: Ngăn mát 7–14 ngày; lấy cận trên.
+- name_vi: cải cúc
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4013'
+    source_name: Cải cúc
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - tần ô
+    en:
+    - chrysanthemum greens
+    - crown daisy
+    - shungiku
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: cải xoong
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4014'
+    source_name: Cải soong
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - cải soong
+    en:
+    - watercress
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: cải bó xôi
+  food_group: rau_la
+  comp_source:
+    source: usda
+    code: '168462'
+    source_name: Spinach, raw
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - rau chân vịt
+    - rau bina
+    en:
+    - spinach
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 291
+    foodkeeper_name: Lettuce — leaf, spinach
+    note: Ngăn mát 3–7 ngày; lấy cận trên.
+- name_vi: xà lách
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4090'
+    source_name: Rau sà lách
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: cay
+    grams_per_unit: 150
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - rau diếp
+    - xà lách ta
+    en:
+    - lettuce
+    - butter lettuce
+    - salad greens
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 291
+    foodkeeper_name: Lettuce — leaf, spinach
+    note: Ngăn mát 3–7 ngày; lấy cận trên.
+- name_vi: rau ngót
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4086'
+    source_name: Rau ngót
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - katuk
+    - sweet leaf
+    - star gooseberry leaves
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: mồng tơi
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4080'
+    source_name: Rau mồng tơi
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 400
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - rau mồng tơi
+    - mùng tơi
+    en:
+    - malabar spinach
+    - ceylon spinach
+    - vine spinach
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: rau dền
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4072'
+    source_name: Rau giền cơm
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 400
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - rau giền
+    - dền cơm
+    - dền đỏ
+    en:
+    - amaranth greens
+    - chinese spinach
+    - amaranth
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: rau đay
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4070'
+    source_name: Rau đay
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - jute leaves
+    - jute mallow
+    - molokhia
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: rau má
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4079'
+    source_name: Rau má, má mơ
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 200
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - pennywort
+    - centella
+    - gotu kola
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: rau lang
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4076'
+    source_name: Rau khoai lang
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 400
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - ngọn khoai lang
+    - đọt lang
+    en:
+    - sweet potato leaves
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: rau bí
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4066'
+    source_name: Rau bí
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 400
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - ngọn bí
+    en:
+    - pumpkin leaves
+    - pumpkin shoots
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: ngọn su su
+  food_group: rau_la
+  comp_source:
+    source: null
+    reason: FCT và USDA không có ngọn su su (chỉ có quả 4098); chưa có nguồn thành phần.
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 400
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - rau su su
+    - đọt su su
+    en:
+    - chayote shoots
+    - chayote leaves
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: rau cần
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4017'
+    source_name: Cần ta
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - cần ta
+    - cần nước
+    en:
+    - water dropwort
+    - water celery
+    - chinese celery
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 281
+    foodkeeper_name: Celery
+    note: Ngăn mát 7–14 ngày; lấy cận trên.
+- name_vi: cần tây
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4018'
+    source_name: Cần tây
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - celery
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 281
+    foodkeeper_name: Celery
+    note: Ngăn mát 7–14 ngày; lấy cận trên.
+- name_vi: hoa thiên lý
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4044'
+    source_name: Hoa lý
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - thiên lý
+    - hoa lý
+    en:
+    - tonkin jasmine
+    - pergularia flowers
+  shelf_life:
+    days: 3
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Hoa tươi dễ héo; ước lượng 2–3 ngày.
+- name_vi: bông bí
+  food_group: rau_la
+  comp_source:
+    source: usda
+    code: '169270'
+    source_name: Pumpkin flowers, raw
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 200
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - hoa bí
+    en:
+    - pumpkin flowers
+    - squash blossoms
+  shelf_life:
+    days: 2
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Hoa tươi dễ héo; ước lượng 1–2 ngày.
+- name_vi: hoa chuối
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4043'
+    source_name: Hoa chuối
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 400
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - bắp chuối
+    en:
+    - banana blossom
+    - banana flower
+  shelf_life:
+    days: 4
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng 3–4 ngày ngăn mát.
+- name_vi: giá đỗ
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4036'
+    source_name: Giá đậu xanh
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - giá
+    - giá đậu xanh
+    en:
+    - bean sprouts
+    - mung bean sprouts
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 549
+    foodkeeper_name: Bean sprouts
+    note: Ngăn mát 5–10 ngày; lấy cận trên.
+- name_vi: rong biển khô
+  food_group: rau_la
+  comp_source:
+    source: null
+    reason: FCT chỉ có rau câu (4067, Gracilaria), USDA chỉ có rong tươi (wakame, kelp); chưa có rong lá khô dùng nấu canh.
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: goi
+    grams_per_unit: 25
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - rong biển
+    en:
+    - dried seaweed
+    - wakame
+    - dried kelp
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: lá giang
+  food_group: rau_la
+  comp_source:
+    source: null
+    reason: FCT và USDA không có lá giang (Aganonerion polymorphum).
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 100
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - aganonerion leaves
+    - sour leaves
+  shelf_life:
+    days: 4
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Lá tươi, ước lượng như rau thơm 3–4 ngày.
+- name_vi: dọc mùng
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4026'
+    source_name: Dọc mùng
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - bạc hà (nam)
+    en:
+    - taro stem
+    - elephant ear stem
+  shelf_life:
+    days: 4
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng 3–4 ngày ngăn mát.
+- name_vi: ngó sen
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4059'
+    source_name: Ngó sen
+    match: close
+    note: Cùng mã FCT với củ sen (4059, lotus stem underground).
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - ngó sen ngâm
+    en:
+    - lotus stem
+    - lotus shoots
+  shelf_life:
+    days: 3
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Ngó sen tươi ước lượng 2–3 ngày; ngó sen ngâm giấm lâu hơn.
+- name_vi: măng tươi
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4053'
+    source_name: Măng tre
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - măng tre
+    - măng luộc
+    en:
+    - bamboo shoots
+    - fresh bamboo shoots
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 272
+    foodkeeper_name: Bamboo shoots
+    note: Ngăn mát 14–14 ngày; lấy cận trên.
+- name_vi: măng khô
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4051'
+    source_name: Măng khô
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - măng lưỡi lợn
+    en:
+    - dried bamboo shoots
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: măng tây
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4052'
+    source_name: Măng tây
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 250
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - asparagus
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 271
+    foodkeeper_name: Asparagus
+    note: Ngăn mát 3–4 ngày; lấy cận trên.
+- name_vi: rau sam
+  food_group: rau_la
+  comp_source:
+    source: fct2007
+    code: '4091'
+    source_name: Rau sam
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - purslane
+  shelf_life:
+    days: 4
+    basis: foodkeeper
+    foodkeeper_id: 287
+    foodkeeper_name: Greens
+    note: Ngăn mát 1–4 ngày; lấy cận trên.
+- name_vi: cà chua
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4005'
+    source_name: Cà chua
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 120
+    source: usda_sr:170457 '1 medium whole' = 123 g
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - tomato
+    - tomatoes
+  shelf_life:
+    days: 5
+    basis: estimate
+    note: 'Ước lượng của nhóm, cần hiệu chỉnh. Cà chua chín, ngăn mát; FoodKeeper chỉ có cà chua bi (600: 5 ngày), dùng cùng giá trị.'
+- name_vi: cà rốt
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4007'
+    source_name: Cà rốt (củ đỏ, vàng)
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: cu
+    grams_per_unit: 100
+    source: usda_sr:170393 '1 large' = 72 g; củ cà rốt ở chợ Việt thường lớn hơn, nhóm ước lượng 100 g
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - carrot
+    - carrots
+  shelf_life:
+    days: 21
+    basis: foodkeeper
+    foodkeeper_id: 279
+    foodkeeper_name: Carrots, parsnips
+    note: Ngăn mát 14–21 ngày; lấy cận trên.
+- name_vi: su su
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4098'
+    source_name: Su su, quả
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 250
+    source: usda_sr:170402 '1 chayote (5-3/4")' = 203 g, nhóm làm tròn 250 vì tính cả vỏ
+  allergens: []
+  synonyms:
+    vi:
+    - su le
+    en:
+    - chayote
+    - chayote squash
+  shelf_life:
+    days: 10
+    basis: estimate
+    note: 'Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng theo bí mùa hè/bí ngòi (FoodKeeper 547: 7 ngày) cộng vỏ dày; 7–10 ngày.'
+- name_vi: su hào
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4096'
+    source_name: Su hào
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: cu
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - kohlrabi
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 494
+    foodkeeper_name: Kohlrabi
+    note: Ngăn mát 7–7 ngày; lấy cận trên.
+- name_vi: súp lơ xanh
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4100'
+    source_name: Súp lơ xanh
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: cay
+    grams_per_unit: 350
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - bông cải xanh
+    en:
+    - broccoli
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 276
+    foodkeeper_name: Broccoli and broccoli raab (rapini)
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: súp lơ trắng
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4099'
+    source_name: Súp lơ trắng
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: cay
+    grams_per_unit: 500
+    source: usda_sr:169986 '1 head medium' = 588 g, nhóm làm tròn 500
+  allergens: []
+  synonyms:
+    vi:
+    - bông cải trắng
+    en:
+    - cauliflower
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 280
+    foodkeeper_name: Cauliflower
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: đậu que
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4029'
+    source_name: Đậu cô ve
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - đỗ cô ve
+    - đậu cô ve
+    en:
+    - green beans
+    - string beans
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 273
+    foodkeeper_name: Beans and peas — green, fava, lima, soybean, wax, snow, sugar snap
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: đậu đũa
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4030'
+    source_name: Đậu đũa
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - đỗ đũa
+    en:
+    - yardlong beans
+    - long beans
+    - chinese long beans
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 273
+    foodkeeper_name: Beans and peas — green, fava, lima, soybean, wax, snow, sugar snap
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: đậu Hà Lan
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4031'
+    source_name: Đậu Hà Lan
+    match: close
+    note: Ở Việt Nam 'đậu Hà Lan' thường là quả non ăn cả vỏ (USDA 170010 'Peas, edible-podded'); FCT 4031 là đậu Hà Lan tươi.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - đậu hòa lan
+    - đỗ Hà Lan
+    en:
+    - snow peas
+    - sugar snap peas
+    - green peas
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 273
+    foodkeeper_name: Beans and peas — green, fava, lima, soybean, wax, snow, sugar snap
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: đậu bắp
+  food_group: rau_cu_qua
+  comp_source:
+    source: usda
+    code: '169260'
+    source_name: Okra, raw
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - okra
+  shelf_life:
+    days: 3
+    basis: foodkeeper
+    foodkeeper_id: 293
+    foodkeeper_name: Okra
+    note: Ngăn mát 2–3 ngày; lấy cận trên.
+- name_vi: mướp
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4054'
+    source_name: Mướp
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 300
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - mướp hương
+    - mướp ta
+    en:
+    - luffa
+    - sponge gourd
+    - loofah
+  shelf_life:
+    days: 5
+    basis: estimate
+    note: 'Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng theo bí mùa hè (FoodKeeper 302: 4–5 ngày).'
+- name_vi: mướp đắng
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4055'
+    source_name: Mướp đắng
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 250
+    source: usda_sr:168393 '1 balsam-pear' = 124 g; quả ở chợ Việt dài hơn, nhóm ước lượng 250 g
+  allergens: []
+  synonyms:
+    vi:
+    - khổ qua
+    en:
+    - bitter melon
+    - bitter gourd
+  shelf_life:
+    days: 5
+    basis: estimate
+    note: 'Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng theo bí mùa hè (FoodKeeper 302: 4–5 ngày).'
+- name_vi: bí đỏ
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4003'
+    source_name: Bí ngô
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - bí ngô
+    en:
+    - pumpkin
+    - kabocha squash
+  shelf_life:
+    days: 14
+    basis: estimate
+    note: 'Ước lượng của nhóm, cần hiệu chỉnh. Bí đã cắt bọc kín ngăn mát; quả nguyên lâu hơn nhiều (FoodKeeper 298 ''Pumpkins'': 90–150 ngày).'
+- name_vi: bí đao
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4002'
+    source_name: Bí đao (bí xanh)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - bí xanh
+    en:
+    - winter melon
+    - wax gourd
+    - ash gourd
+  shelf_life:
+    days: 14
+    basis: estimate
+    note: 'Ước lượng của nhóm, cần hiệu chỉnh. Quả nguyên để nơi thoáng; ước lượng 14 ngày (bí mùa đông FoodKeeper 303: 30–90 ngày khi chưa cắt).'
+- name_vi: bầu
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4001'
+    source_name: Bầu
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 700
+    source: usda_sr:169232 '1 gourd' = 771 g, nhóm làm tròn 700
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - bottle gourd
+    - calabash
+    - opo squash
+  shelf_life:
+    days: 7
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng 5–7 ngày ngăn mát.
+- name_vi: bí ngòi
+  food_group: rau_cu_qua
+  comp_source:
+    source: usda
+    code: '169291'
+    source_name: Squash, summer, zucchini, includes skin, raw
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 200
+    source: usda_sr:169291 '1 medium' = 196 g
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - zucchini
+    - courgette
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 547
+    foodkeeper_name: Zucchini — fresh, whole
+    note: Ngăn mát 7–7 ngày; lấy cận trên.
+- name_vi: cà tím
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4009'
+    source_name: Cà tím
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 200
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - eggplant
+    - aubergine
+    - chinese eggplant
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 284
+    foodkeeper_name: Eggplant
+    note: Ngăn mát 4–7 ngày; lấy cận trên.
+- name_vi: cà pháo
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4006'
+    source_name: Cà pháo
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - thai eggplant
+    - pea eggplant
+    - white eggplant
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 284
+    foodkeeper_name: Eggplant
+    note: Ngăn mát 4–7 ngày; lấy cận trên.
+- name_vi: dưa chuột
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4027'
+    source_name: Dưa chuột
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 150
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - dưa leo
+    en:
+    - cucumber
+    - cucumbers
+  shelf_life:
+    days: 6
+    basis: foodkeeper
+    foodkeeper_id: 283
+    foodkeeper_name: Cucumbers
+    note: Ngăn mát 4–6 ngày; lấy cận trên.
+- name_vi: củ đậu
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4023'
+    source_name: Củ đậu
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: cu
+    grams_per_unit: 400
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - củ sắn (nam)
+    en:
+    - jicama
+    - yam bean
+  shelf_life:
+    days: 21
+    basis: foodkeeper
+    foodkeeper_id: 492
+    foodkeeper_name: Jicama — fresh
+    note: Ngăn mát 14–21 ngày; lấy cận trên.
+- name_vi: củ cải trắng
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4021'
+    source_name: Củ cải trắng
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: cu
+    grams_per_unit: 400
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - daikon
+    - white radish
+    - chinese radish
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 299
+    foodkeeper_name: Radishes
+    note: Ngăn mát 10–14 ngày; lấy cận trên.
+- name_vi: đu đủ xanh
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4033'
+    source_name: Đu đủ xanh
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 800
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - green papaya
+    - unripe papaya
+  shelf_life:
+    days: 7
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Quả xanh để ngăn mát, ước lượng 5–7 ngày.
+- name_vi: hành tây
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4039'
+    source_name: Hành tây
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: cu
+    grams_per_unit: 110
+    source: usda_sr:170000 '1 medium' = 110 g
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - onion
+    - onions
+    - yellow onion
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để nơi khô thoáng ngoài tủ lạnh; FoodKeeper 294 ghi ngăn mát 60 ngày, không tính độ gấp.
+- name_vi: ớt chuông
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4061'
+    source_name: Ớt đỏ to
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 150
+    source: usda_sr:170108 '1 large' = 164 g, nhóm làm tròn 150
+  allergens: []
+  synonyms:
+    vi:
+    - ớt Đà Lạt
+    - ớt ngọt
+    en:
+    - bell pepper
+    - red bell pepper
+    - capsicum
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 296
+    foodkeeper_name: Peppers
+    note: Ngăn mát 4–14 ngày; lấy cận trên.
+- name_vi: chuối xanh
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4019'
+    source_name: Chuối xanh
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 100
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - green banana
+    - unripe banana
+  shelf_life:
+    days: 4
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng 3–4 ngày để ngoài.
+- name_vi: dưa cải chua
+  food_group: rau_cu_qua
+  comp_source:
+    source: fct2007
+    code: '4112'
+    source_name: Dưa cải bẹ
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - dưa cải
+    - dưa chua
+    en:
+    - pickled mustard greens
+    - sour mustard greens
+  shelf_life:
+    days: 7
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Dưa đã chua, ngăn mát; ước lượng 5–7 ngày trước khi quá chua.
+- name_vi: nấm rơm
+  food_group: nam
+  comp_source:
+    source: fct2007
+    code: '4125'
+    source_name: Nấm rơm
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - straw mushrooms
+  shelf_life:
+    days: 2
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Nấm rơm nhanh nở và nhũn; ước lượng 1–2 ngày (FoodKeeper 292 'Mushrooms' 3–7 ngày là nấm mỡ).
+- name_vi: nấm hương tươi
+  food_group: nam
+  comp_source:
+    source: fct2007
+    code: '4123'
+    source_name: Nấm hương tươi
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - nấm đông cô tươi
+    en:
+    - shiitake mushrooms
+    - fresh shiitake
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 292
+    foodkeeper_name: Mushrooms
+    note: Ngăn mát 3–7 ngày; lấy cận trên.
+- name_vi: nấm hương khô
+  food_group: nam
+  comp_source:
+    source: fct2007
+    code: '4122'
+    source_name: Nấm hương khô
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - nấm đông cô
+    en:
+    - dried shiitake mushrooms
+    - dried mushrooms
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: nấm kim châm
+  food_group: nam
+  comp_source:
+    source: usda
+    code: '169382'
+    source_name: Mushrooms, enoki, raw
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: goi
+    grams_per_unit: 150
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - enoki mushrooms
+    - enoki
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 292
+    foodkeeper_name: Mushrooms
+    note: Ngăn mát 3–7 ngày; lấy cận trên.
+- name_vi: nấm đùi gà
+  food_group: nam
+  comp_source:
+    source: usda
+    code: '2003599'
+    source_name: Mushroom, king oyster
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: goi
+    grams_per_unit: 200
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - king oyster mushrooms
+    - king trumpet mushrooms
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 292
+    foodkeeper_name: Mushrooms
+    note: Ngăn mát 3–7 ngày; lấy cận trên.
+- name_vi: nấm sò
+  food_group: nam
+  comp_source:
+    source: usda
+    code: '168580'
+    source_name: Mushrooms, oyster, raw
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - nấm bào ngư
+    en:
+    - oyster mushrooms
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 292
+    foodkeeper_name: Mushrooms
+    note: Ngăn mát 3–7 ngày; lấy cận trên.
+- name_vi: nấm mỡ
+  food_group: nam
+  comp_source:
+    source: fct2007
+    code: '4124'
+    source_name: Nấm mỡ (Nấm tây)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - button mushrooms
+    - white mushrooms
+    - champignon
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 292
+    foodkeeper_name: Mushrooms
+    note: Ngăn mát 3–7 ngày; lấy cận trên.
+- name_vi: mộc nhĩ
+  food_group: nam
+  comp_source:
+    source: fct2007
+    code: '4121'
+    source_name: Mộc nhĩ
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - nấm mèo
+    en:
+    - wood ear mushrooms
+    - black fungus
+    - dried black fungus
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: hành lá
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4038'
+    source_name: Hành lá (hành hoa)
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: cay
+    grams_per_unit: 15
+    source: usda_sr:170005 '1 medium' = 15 g
+  - unit_code: bo
+    grams_per_unit: 100
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - hành hoa
+    - hành
+    en:
+    - green onions
+    - scallions
+    - spring onions
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 295
+    foodkeeper_name: Onions — spring or green
+    note: Ngăn mát 7–7 ngày; lấy cận trên.
+- name_vi: hành tím
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4037'
+    source_name: Hành củ tươi
+    match: close
+    note: FCT 4037 'Hành củ tươi'.
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: cu
+    grams_per_unit: 10
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - hành củ
+    - hành khô
+    - củ hành
+    en:
+    - shallots
+    - shallot
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để nơi khô thoáng; không tính độ gấp.
+- name_vi: tỏi
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4103'
+    source_name: Tỏi ta
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: cu
+    grams_per_unit: 40
+    source: uoc_luong_nhom
+  - unit_code: tep
+    grams_per_unit: 3
+    source: usda_sr:169230 '1 clove' = 3 g
+  allergens: []
+  synonyms:
+    vi:
+    - tỏi ta
+    en:
+    - garlic
+    - garlic cloves
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để nơi khô thoáng; không tính độ gấp (FoodKeeper 285 ngăn mát 3–14 ngày).
+- name_vi: gừng
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '13003'
+    source_name: Gừng tươi
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: nhanh
+    grams_per_unit: 30
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - ginger
+    - fresh ginger
+    - ginger root
+  shelf_life:
+    days: 21
+    basis: foodkeeper
+    foodkeeper_id: 286
+    foodkeeper_name: Ginger root
+    note: Ngăn mát 14–21 ngày; lấy cận trên.
+- name_vi: riềng
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '13009'
+    source_name: Riềng
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: nhanh
+    grams_per_unit: 50
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - galangal
+  shelf_life:
+    days: 21
+    basis: estimate
+    note: 'Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng như gừng (FoodKeeper 286: 14–21 ngày).'
+- name_vi: nghệ
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '13007'
+    source_name: Nghệ tươi
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: nhanh
+    grams_per_unit: 20
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - nghệ tươi
+    en:
+    - turmeric
+    - fresh turmeric
+  shelf_life:
+    days: 21
+    basis: estimate
+    note: 'Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng như gừng (FoodKeeper 286: 14–21 ngày).'
+- name_vi: sả
+  food_group: rau_thom
+  comp_source:
+    source: usda
+    code: '168573'
+    source_name: Lemon grass (citronella), raw
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: cay
+    grams_per_unit: 25
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - lemongrass
+    - lemon grass
+  shelf_life:
+    days: 9
+    basis: foodkeeper
+    foodkeeper_id: 505
+    foodkeeper_name: Lemongrass
+    note: Ngăn mát 7–9 ngày; lấy cận trên.
+- name_vi: ớt
+  food_group: rau_thom
+  comp_source:
+    source: usda
+    code: '170106'
+    source_name: Peppers, hot chili, red, raw
+    match: exact
+    note: USDA 'Peppers, hot chili, red, raw'; FCT chỉ có ớt to (ớt chuông).
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 5
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - ớt hiểm
+    - ớt sừng
+    - ớt tươi
+    en:
+    - chili
+    - chilies
+    - red chili
+    - bird's eye chili
+    - chili pepper
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 548
+    foodkeeper_name: Hot peppers
+    note: Ngăn mát 7–7 ngày; lấy cận trên.
+- name_vi: lá chanh
+  food_group: rau_thom
+  comp_source:
+    source: null
+    reason: FCT và USDA không có lá chanh; dùng lượng nhỏ, đóng góp năng lượng không đáng kể.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - kaffir lime leaves
+    - lime leaves
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 288
+    foodkeeper_name: Herbs
+    note: Ngăn mát 7–10 ngày; lấy cận trên.
+- name_vi: rau răm
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4088'
+    source_name: Rau răm
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - vietnamese coriander
+    - laksa leaf
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 288
+    foodkeeper_name: Herbs
+    note: Ngăn mát 7–10 ngày; lấy cận trên.
+- name_vi: thì là
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4101'
+    source_name: Thìa là
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - dill
+    - dill weed
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 288
+    foodkeeper_name: Herbs
+    note: Ngăn mát 7–10 ngày; lấy cận trên.
+- name_vi: tía tô
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4102'
+    source_name: Tía tô
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - perilla
+    - shiso
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 288
+    foodkeeper_name: Herbs
+    note: Ngăn mát 7–10 ngày; lấy cận trên.
+- name_vi: lá lốt
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4046'
+    source_name: Lá lốt
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 100
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - betel leaves
+    - wild betel leaf
+    - lolot
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 288
+    foodkeeper_name: Herbs
+    note: Ngăn mát 7–10 ngày; lấy cận trên.
+- name_vi: rau mùi
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4081'
+    source_name: Rau mùi
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - ngò
+    - ngò rí
+    en:
+    - cilantro
+    - coriander
+    - coriander leaves
+  shelf_life:
+    days: 21
+    basis: foodkeeper
+    foodkeeper_id: 506
+    foodkeeper_name: Cilantro
+    note: Ngăn mát 14–21 ngày; lấy cận trên.
+- name_vi: ngò gai
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4082'
+    source_name: Rau mùi tàu
+    match: close
+    note: FCT 4082 'Rau mùi tàu' (tên tiếng Anh in là parsley, curley); ở Việt Nam mùi tàu là ngò gai.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - mùi tàu
+    en:
+    - culantro
+    - sawtooth coriander
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 288
+    foodkeeper_name: Herbs
+    note: Ngăn mát 7–10 ngày; lấy cận trên.
+- name_vi: húng quế
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4075'
+    source_name: Rau húng
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - rau húng
+    - é
+    en:
+    - thai basil
+    - basil
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 509
+    foodkeeper_name: Basil — fresh
+    note: Ngăn mát 10–10 ngày; lấy cận trên.
+- name_vi: húng lủi
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4094'
+    source_name: Rau thơm
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - rau thơm
+    - húng bạc hà
+    en:
+    - mint
+    - spearmint
+    - vietnamese mint
+  shelf_life:
+    days: 21
+    basis: foodkeeper
+    foodkeeper_id: 507
+    foodkeeper_name: Mint
+    note: Ngăn mát 14–21 ngày; lấy cận trên.
+- name_vi: kinh giới
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4077'
+    source_name: Rau kinh giới
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - vietnamese balm
+    - marjoram
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 288
+    foodkeeper_name: Herbs
+    note: Ngăn mát 7–10 ngày; lấy cận trên.
+- name_vi: rau ngổ
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4085'
+    source_name: Rau ngổ
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - ngò om
+    en:
+    - rice paddy herb
+    - limnophila
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 288
+    foodkeeper_name: Herbs
+    note: Ngăn mát 7–10 ngày; lấy cận trên.
+- name_vi: diếp cá
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4071'
+    source_name: Rau giấp cá, diếp cá
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - rau diếp cá
+    - giấp cá
+    en:
+    - fish mint
+    - houttuynia
+    - chameleon plant
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 288
+    foodkeeper_name: Herbs
+    note: Ngăn mát 7–10 ngày; lấy cận trên.
+- name_vi: hẹ
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4042'
+    source_name: Hẹ lá
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: bo
+    grams_per_unit: 100
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - lá hẹ
+    en:
+    - garlic chives
+    - chinese chives
+    - chives
+  shelf_life:
+    days: 21
+    basis: foodkeeper
+    foodkeeper_id: 512
+    foodkeeper_name: Chives
+    note: Ngăn mát 14–21 ngày; lấy cận trên.
+- name_vi: tỏi tây
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4104'
+    source_name: Tỏi tây (cả lá)
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: cay
+    grams_per_unit: 150
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - boa rô
+    en:
+    - leek
+    - leeks
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 289
+    foodkeeper_name: Leeks
+    note: Ngăn mát 7–14 ngày; lấy cận trên.
+- name_vi: ngải cứu
+  food_group: rau_thom
+  comp_source:
+    source: fct2007
+    code: '4057'
+    source_name: Ngải cứu
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - mugwort
+  shelf_life:
+    days: 10
+    basis: foodkeeper
+    foodkeeper_id: 288
+    foodkeeper_name: Herbs
+    note: Ngăn mát 7–10 ngày; lấy cận trên.
+- name_vi: chanh
+  food_group: trai_cay
+  comp_source:
+    source: fct2007
+    code: '5003'
+    source_name: Chanh
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 50
+    source: usda_sr:167746 '1 fruit (2-1/8" dia)' = 58 g (chanh vàng); chanh ta nhỏ hơn, nhóm ước lượng 50 g
+  allergens: []
+  synonyms:
+    vi:
+    - chanh ta
+    - chanh không hạt
+    en:
+    - lime
+    - limes
+    - lime juice
+    - lemon
+  shelf_life:
+    days: 21
+    basis: foodkeeper
+    foodkeeper_id: 256
+    foodkeeper_name: Citrus fruit — lemon, lime, orange, grapefruit, tangerines, clementines
+    note: Ngăn mát 10–21 ngày; lấy cận trên.
+- name_vi: dứa
+  food_group: trai_cay
+  comp_source:
+    source: fct2007
+    code: '5015'
+    source_name: Dứa tây
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 900
+    source: usda_sr:169124 '1 fruit' = 905 g
+  allergens: []
+  synonyms:
+    vi:
+    - thơm
+    - khóm
+    en:
+    - pineapple
+  shelf_life:
+    days: 7
+    basis: foodkeeper
+    foodkeeper_id: 267
+    foodkeeper_name: Pineapple
+    note: Ngăn mát 5–7 ngày; lấy cận trên.
+- name_vi: me chua
+  food_group: trai_cay
+  comp_source:
+    source: fct2007
+    code: '4065'
+    source_name: Quả me chua
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - me
+    - me vắt
+    - me chín
+    en:
+    - tamarind
+    - tamarind pulp
+  shelf_life:
+    days: 180
+    basis: foodkeeper
+    foodkeeper_id: 304
+    foodkeeper_name: Tamarind
+    note: Ngăn mát 180–180 ngày; lấy cận trên.
+- name_vi: sấu
+  food_group: trai_cay
+  comp_source:
+    source: fct2007
+    code: '4095'
+    source_name: Sấu xanh
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 15
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - sấu xanh
+    en:
+    - dracontomelon
+    - vietnamese sour fruit
+  shelf_life:
+    days: 7
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Ước lượng 5–7 ngày ngăn mát; sấu thường mua theo mùa.
+- name_vi: khế
+  food_group: trai_cay
+  comp_source:
+    source: fct2007
+    code: '4045'
+    source_name: Khế
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 150
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - khế chua
+    en:
+    - star fruit
+    - carambola
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 478
+    foodkeeper_name: Star fruit
+    note: Ngăn mát 7–14 ngày; lấy cận trên.
+- name_vi: nước dừa
+  food_group: trai_cay
+  comp_source:
+    source: fct2007
+    code: '14006'
+    source_name: Nước dừa non tươi
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - nước dừa tươi
+    en:
+    - coconut water
+  shelf_life:
+    days: 2
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Nước dừa tươi đã bổ, ước lượng 1–2 ngày ngăn mát.
+- name_vi: nước cốt dừa
+  food_group: trai_cay
+  comp_source:
+    source: usda
+    code: '170172'
+    source_name: Nuts, coconut milk, raw (liquid expressed from grated meat and water)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  allergen_note: Dừa không thuộc nhóm hạt cây bắt buộc của Codex 2024.
+  synonyms:
+    vi:
+    - cốt dừa
+    en:
+    - coconut milk
+    - coconut cream
+  shelf_life:
+    days: 3
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Nước cốt dừa tự vắt, ước lượng 2–3 ngày ngăn mát; loại đóng hộp chưa mở không tính độ gấp.
+- name_vi: chuối
+  food_group: trai_cay
+  comp_source:
+    source: fct2007
+    code: '5007'
+    source_name: Chuối tiêu
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 120
+    source: usda_sr:173944 '1 medium' = 118 g
+  allergens: []
+  synonyms:
+    vi:
+    - chuối tiêu
+    - chuối già
+    en:
+    - banana
+    - bananas
+  shelf_life:
+    days: 3
+    basis: foodkeeper
+    foodkeeper_id: 251
+    foodkeeper_name: Bananas
+    note: Ngăn mát 3–3 ngày; lấy cận trên.
+- name_vi: thịt ba chỉ
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7018'
+    source_name: Thịt lợn nửa nạc, nửa mỡ
+    match: close
+    note: FCT 7018 'Thịt lợn nửa nạc, nửa mỡ'. USDA 167812 'Pork, fresh, belly, raw' (518 kcal) béo hơn nhiều; chọn FCT vì gần thịt ba chỉ Việt hơn (cần đối chiếu NIN).
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - ba chỉ
+    - ba rọi
+    - thịt ba rọi
+    en:
+    - pork belly
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 74
+    foodkeeper_name: Pork — shoulder
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: thịt nạc vai
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7017'
+    source_name: Thịt lợn nạc
+    match: close
+    note: FCT 7017 'Thịt lợn nạc'.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - thịt nạc
+    - nạc vai
+    - thịt nạc dăm
+    en:
+    - pork shoulder
+    - pork butt
+    - lean pork
+    - pork loin
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 74
+    foodkeeper_name: Pork — shoulder
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: thịt băm
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7018'
+    source_name: Thịt lợn nửa nạc, nửa mỡ
+    match: close
+    note: Thịt xay ở chợ thường là nạc vai có mỡ; dùng FCT 7018. USDA 167902 'Pork, fresh, ground, raw' là phương án kiểm tra.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - thịt lợn xay
+    - thịt heo xay
+    - thịt xay
+    en:
+    - ground pork
+    - minced pork
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 73
+    foodkeeper_name: Pork — ground
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: sườn non
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7053'
+    source_name: Sườn lợn
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - sườn heo
+    - sườn lợn
+    en:
+    - pork ribs
+    - spare ribs
+    - baby back ribs
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 72
+    foodkeeper_name: Pork — ribs
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: chân giò
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7032'
+    source_name: Chân giò lợn
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - giò heo
+    - móng giò
+    en:
+    - pork hock
+    - pork knuckle
+    - pork leg
+    - pig trotters
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 74
+    foodkeeper_name: Pork — shoulder
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: gan lợn
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7041'
+    source_name: Gan lợn
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - gan heo
+    en:
+    - pork liver
+    - liver
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 77
+    foodkeeper_name: Variety meats — liver, tongue, chitterlings, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: xương ống lợn
+  food_group: thit
+  comp_source:
+    source: null
+    reason: FCT và USDA không có xương ống; phần ăn được chủ yếu là tủy và thịt bám, đóng góp vào nước dùng cần hệ số riêng.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - xương heo
+    - xương ống
+    en:
+    - pork bones
+    - pork marrow bones
+    - soup bones
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 74
+    foodkeeper_name: Pork — shoulder
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: mỡ lợn
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '6004'
+    source_name: Mỡ lợn nước
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - mỡ heo
+    - mỡ nước
+    en:
+    - lard
+    - pork fat
+  shelf_life:
+    days: 30
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Mỡ đã thắng để ngăn mát; ước lượng 30 ngày (FoodKeeper 525 'Bacon grease' 180 ngày, chọn thấp hơn cho mỡ tự thắng).
+- name_vi: thịt bò
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7003'
+    source_name: Thịt bò loại I
+    match: exact
+    note: FCT 7003 'Thịt bò loại I'.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - thịt bò thăn
+    - bò
+    en:
+    - beef
+    - beef sirloin
+    - beef tenderloin
+    - flank steak
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 40
+    foodkeeper_name: Beef — steaks
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: bắp bò
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7004'
+    source_name: Thịt bò loại II
+    match: close
+    note: FCT 7004 'Thịt bò loại II'; USDA 169441 'Beef, shank crosscuts' là phương án kiểm tra.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - bắp hoa
+    en:
+    - beef shank
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 39
+    foodkeeper_name: Beef — chuck roast, brisket
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: thịt bò xay
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7004'
+    source_name: Thịt bò loại II
+    match: close
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - bò băm
+    en:
+    - ground beef
+    - minced beef
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 43
+    foodkeeper_name: Beef — ground
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: giò lụa
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7069'
+    source_name: Giò lụa
+    match: exact
+  is_staple: false
+  countable: false
+  units:
+  - unit_code: goi
+    grams_per_unit: 500
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - chả lụa
+    en:
+    - vietnamese pork roll
+    - pork sausage
+    - cha lua
+  shelf_life:
+    days: 7
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Giò lụa gói lá, ngăn mát; ước lượng 5–7 ngày (FoodKeeper 192 thịt nguội đóng gói 14 ngày là loại có chất bảo quản).
+- name_vi: lạp xưởng
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7071'
+    source_name: Lạp xường
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - lạp xường
+    en:
+    - chinese sausage
+    - lap cheong
+  shelf_life:
+    days: 21
+    basis: foodkeeper
+    foodkeeper_id: 104
+    foodkeeper_name: Sausage — hard, dry (pepperoni), sliced
+    note: Ngăn mát 14–21 ngày; lấy cận trên.
+- name_vi: xúc xích
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7077'
+    source_name: Xúc xích
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - sausage
+    - hot dog
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 98
+    foodkeeper_name: Hot dogs
+    note: Ngăn mát 14–14 ngày; lấy cận trên.
+- name_vi: ếch
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7080'
+    source_name: Ếch (thịt đùi)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - thịt ếch
+    - đùi ếch
+    en:
+    - frog legs
+    - frog
+  shelf_life:
+    days: 2
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Thủy sản sống, làm sẵn; ước lượng như thịt sống 1–2 ngày.
+- name_vi: thịt gà
+  food_group: gia_cam
+  comp_source:
+    source: fct2007
+    code: '7013'
+    source_name: Thịt gà ta
+    match: exact
+    note: FCT 7013 'Thịt gà ta' là cả con (thải bỏ 52%).
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: con
+    grams_per_unit: 1500
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - gà ta
+    - gà
+    en:
+    - chicken
+    - whole chicken
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 113
+    foodkeeper_name: Chicken — whole
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cánh gà
+  food_group: gia_cam
+  comp_source:
+    source: usda
+    code: '172390'
+    source_name: Chicken, broilers or fryers, wing, meat and skin, raw
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: mieng
+    grams_per_unit: 100
+    source: usda_sr:172390 '1 piece' = 107 g, nhóm làm tròn 100
+  allergens: []
+  synonyms:
+    vi:
+    - cánh gà công nghiệp
+    en:
+    - chicken wings
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 118
+    foodkeeper_name: Chicken parts — legs or thighs
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: đùi gà
+  food_group: gia_cam
+  comp_source:
+    source: usda
+    code: '172385'
+    source_name: Chicken, broilers or fryers, thigh, meat and skin, raw
+    match: exact
+    note: USDA 'Chicken, broilers or fryers, thigh, meat and skin, raw'; đùi góc tư ở chợ Việt gồm cả má đùi và tỏi gà.
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: mieng
+    grams_per_unit: 250
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - đùi gà góc tư
+    - má đùi
+    en:
+    - chicken thighs
+    - chicken legs
+    - chicken drumsticks
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 118
+    foodkeeper_name: Chicken parts — legs or thighs
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: ức gà
+  food_group: gia_cam
+  comp_source:
+    source: usda
+    code: '171077'
+    source_name: Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - lườn gà
+    - phi lê gà
+    en:
+    - chicken breast
+    - boneless chicken breast
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 117
+    foodkeeper_name: Chicken parts — breast halves, boneless
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: thịt vịt
+  food_group: gia_cam
+  comp_source:
+    source: fct2007
+    code: '7028'
+    source_name: Thịt vịt
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: con
+    grams_per_unit: 2000
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi:
+    - vịt
+    en:
+    - duck
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 123
+    foodkeeper_name: Duckling — domestic or wild, whole
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: mề gà
+  food_group: gia_cam
+  comp_source:
+    source: fct2007
+    code: '7048'
+    source_name: Mề gà
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - chicken gizzards
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 130
+    foodkeeper_name: Giblets
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: chim cút
+  food_group: gia_cam
+  comp_source:
+    source: usda
+    code: '172418'
+    source_name: Quail, meat and skin, raw
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - quail
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 127
+    foodkeeper_name: Quail — whole
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá lóc
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8022'
+    source_name: Cá quả
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: con
+    grams_per_unit: 800
+    source: uoc_luong_nhom
+  allergens:
+  - ca
+  synonyms:
+    vi:
+    - cá quả
+    - cá chuối
+    en:
+    - snakehead fish
+    - snakehead
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 144
+    foodkeeper_name: Lean fish — cod, flounder, haddock, halibut, sole, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá basa
+  food_group: ca
+  comp_source:
+    source: usda
+    code: '175165'
+    source_name: Fish, catfish, channel, farmed, raw
+    match: proxy
+    note: Không có cá tra/basa trong FCT và USDA; USDA 'Fish, catfish, channel, farmed, raw' là gần nhất (cùng bộ cá da trơn).
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi:
+    - cá tra
+    - phi lê cá basa
+    en:
+    - basa fish
+    - pangasius
+    - swai
+    - catfish fillet
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 146
+    foodkeeper_name: Fatty fish — bluefish, catfish, mackerel, mullet, salmon, tuna, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá thu
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8026'
+    source_name: Cá thu
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi:
+    - cá thu cắt khúc
+    en:
+    - mackerel
+    - spanish mackerel
+    - king mackerel
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 146
+    foodkeeper_name: Fatty fish — bluefish, catfish, mackerel, mullet, salmon, tuna, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá nục
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8020'
+    source_name: Cá nục
+    match: exact
+    note: FCT 8020 không có tỷ lệ thải bỏ.
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: con
+    grams_per_unit: 100
+    source: uoc_luong_nhom
+  allergens:
+  - ca
+  synonyms:
+    vi: []
+    en:
+    - scad
+    - round scad
+    - mackerel scad
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 146
+    foodkeeper_name: Fatty fish — bluefish, catfish, mackerel, mullet, salmon, tuna, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá rô phi
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8024'
+    source_name: Cá rô phi
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: con
+    grams_per_unit: 500
+    source: uoc_luong_nhom
+  allergens:
+  - ca
+  synonyms:
+    vi: []
+    en:
+    - tilapia
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 144
+    foodkeeper_name: Lean fish — cod, flounder, haddock, halibut, sole, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá diêu hồng
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8024'
+    source_name: Cá rô phi
+    match: proxy
+    note: Cá diêu hồng là rô phi đỏ; dùng FCT 8024 'Cá rô phi'.
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: con
+    grams_per_unit: 700
+    source: uoc_luong_nhom
+  allergens:
+  - ca
+  synonyms:
+    vi:
+    - cá điêu hồng
+    en:
+    - red tilapia
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 144
+    foodkeeper_name: Lean fish — cod, flounder, haddock, halibut, sole, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá chép
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8003'
+    source_name: Cá chép
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: con
+    grams_per_unit: 1000
+    source: uoc_luong_nhom
+  allergens:
+  - ca
+  synonyms:
+    vi: []
+    en:
+    - carp
+    - common carp
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 146
+    foodkeeper_name: Fatty fish — bluefish, catfish, mackerel, mullet, salmon, tuna, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá trắm
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8029'
+    source_name: Cá trắm cỏ
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi:
+    - cá trắm cỏ
+    en:
+    - grass carp
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 146
+    foodkeeper_name: Fatty fish — bluefish, catfish, mackerel, mullet, salmon, tuna, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá bống
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8001'
+    source_name: Cá bống
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi: []
+    en:
+    - goby
+    - gudgeon
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 144
+    foodkeeper_name: Lean fish — cod, flounder, haddock, halibut, sole, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá ngừ
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8019'
+    source_name: Cá ngừ
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi:
+    - cá ngừ cắt khúc
+    en:
+    - tuna
+    - skipjack tuna
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 146
+    foodkeeper_name: Fatty fish — bluefish, catfish, mackerel, mullet, salmon, tuna, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá cơm
+  food_group: ca
+  comp_source:
+    source: usda
+    code: '174182'
+    source_name: Fish, anchovy, european, raw
+    match: close
+    note: USDA 'Fish, anchovy, european, raw'; FCT 8020 gộp scad/anchovy dưới tên cá nục.
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi: []
+    en:
+    - anchovies
+    - anchovy
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 146
+    foodkeeper_name: Fatty fish — bluefish, catfish, mackerel, mullet, salmon, tuna, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá rô đồng
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8023'
+    source_name: Cá rô đồng
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: con
+    grams_per_unit: 100
+    source: uoc_luong_nhom
+  allergens:
+  - ca
+  synonyms:
+    vi:
+    - cá rô
+    en:
+    - climbing perch
+    - anabas
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 144
+    foodkeeper_name: Lean fish — cod, flounder, haddock, halibut, sole, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá hồi
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8011'
+    source_name: Cá hồi
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi: []
+    en:
+    - salmon
+    - salmon fillet
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 146
+    foodkeeper_name: Fatty fish — bluefish, catfish, mackerel, mullet, salmon, tuna, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cá trê
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8030'
+    source_name: Cá trê
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi: []
+    en:
+    - walking catfish
+    - catfish
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 146
+    foodkeeper_name: Fatty fish — bluefish, catfish, mackerel, mullet, salmon, tuna, etc.
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: lươn
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '8038'
+    source_name: Lươn
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi: []
+    en:
+    - eel
+    - rice field eel
+  shelf_life:
+    days: 1
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Lươn làm sẵn; ước lượng 1 ngày như cá sống.
+- name_vi: chả cá thác lác
+  food_group: ca
+  comp_source:
+    source: usda
+    code: '173702'
+    source_name: Fish, surimi
+    match: proxy
+    note: USDA 'Fish, surimi' là gần nhất; chả cá Việt có thêm muối, tiêu, hành.
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi:
+    - chả cá
+    - cá thác lác nạo
+    en:
+    - fish paste
+    - fish cake
+    - surimi
+  shelf_life:
+    days: 2
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Chả cá sống, ước lượng 1–2 ngày ngăn mát.
+- name_vi: tôm
+  food_group: hai_san
+  comp_source:
+    source: fct2007
+    code: '8051'
+    source_name: Tôm biển
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - giap_xac
+  synonyms:
+    vi:
+    - tôm sú
+    - tôm thẻ
+    - tôm tươi
+    en:
+    - shrimp
+    - prawns
+    - tiger prawns
+  shelf_life:
+    days: 3
+    basis: foodkeeper
+    foodkeeper_id: 151
+    foodkeeper_name: Shrimp, crayfish
+    note: Ngăn mát 1–3 ngày; lấy cận trên.
+- name_vi: tép
+  food_group: hai_san
+  comp_source:
+    source: fct2007
+    code: '8049'
+    source_name: Tép gạo
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - giap_xac
+  synonyms:
+    vi:
+    - tép gạo
+    - tép đồng
+    en:
+    - tiny shrimp
+    - small shrimp
+  shelf_life:
+    days: 3
+    basis: foodkeeper
+    foodkeeper_id: 151
+    foodkeeper_name: Shrimp, crayfish
+    note: Ngăn mát 1–3 ngày; lấy cận trên.
+- name_vi: tôm khô
+  food_group: hai_san
+  comp_source:
+    source: fct2007
+    code: '8053'
+    source_name: Tôm khô
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - giap_xac
+  synonyms:
+    vi:
+    - tôm nõn
+    en:
+    - dried shrimp
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp hoặc ngăn đá.
+- name_vi: mực
+  food_group: hai_san
+  comp_source:
+    source: fct2007
+    code: '8040'
+    source_name: Mực tươi
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: con
+    grams_per_unit: 200
+    source: uoc_luong_nhom
+  allergens:
+  - nhuyen_the
+  synonyms:
+    vi:
+    - mực ống
+    - mực lá
+    en:
+    - squid
+    - calamari
+  shelf_life:
+    days: 3
+    basis: foodkeeper
+    foodkeeper_id: 152
+    foodkeeper_name: Squid
+    note: Ngăn mát 1–3 ngày; lấy cận trên.
+- name_vi: nghêu
+  food_group: hai_san
+  comp_source:
+    source: usda
+    code: '174214'
+    source_name: Mollusks, clam, mixed species, raw
+    match: exact
+    note: FCT không có nghêu (8037 'Hến' là loài khác); dùng USDA 'Mollusks, clam, mixed species, raw' — giá trị là phần thịt, khối lượng lúc mua có vỏ, cần tỷ lệ phần ăn được riêng.
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - nhuyen_the
+  synonyms:
+    vi:
+    - ngao
+    - nghêu trắng
+    en:
+    - clams
+    - clam
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 157
+    foodkeeper_name: Live clams, mussels, crab, and oysters
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: hến
+  food_group: hai_san
+  comp_source:
+    source: fct2007
+    code: '8037'
+    source_name: Hến
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - nhuyen_the
+  synonyms:
+    vi: []
+    en:
+    - baby clams
+    - river clams
+    - corbicula
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 157
+    foodkeeper_name: Live clams, mussels, crab, and oysters
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cua đồng
+  food_group: hai_san
+  comp_source:
+    source: fct2007
+    code: '8034'
+    source_name: Cua đồng
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - giap_xac
+  synonyms:
+    vi:
+    - cua xay
+    en:
+    - field crab
+    - freshwater crab
+    - paddy crab
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 157
+    foodkeeper_name: Live clams, mussels, crab, and oysters
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: ghẹ
+  food_group: hai_san
+  comp_source:
+    source: fct2007
+    code: '8035'
+    source_name: Ghẹ
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: con
+    grams_per_unit: 200
+    source: uoc_luong_nhom
+  allergens:
+  - giap_xac
+  synonyms:
+    vi: []
+    en:
+    - blue swimming crab
+    - flower crab
+    - crab
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 157
+    foodkeeper_name: Live clams, mussels, crab, and oysters
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: cua biển
+  food_group: hai_san
+  comp_source:
+    source: fct2007
+    code: '8033'
+    source_name: Cua bể
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: con
+    grams_per_unit: 400
+    source: uoc_luong_nhom
+  allergens:
+  - giap_xac
+  synonyms:
+    vi:
+    - cua thịt
+    - cua gạch
+    en:
+    - mud crab
+    - crab
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 157
+    foodkeeper_name: Live clams, mussels, crab, and oysters
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: ốc
+  food_group: hai_san
+  comp_source:
+    source: fct2007
+    code: '8041'
+    source_name: Ốc bươu
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - nhuyen_the
+  synonyms:
+    vi:
+    - ốc bươu
+    - ốc nhồi
+    en:
+    - snails
+    - apple snails
+    - river snails
+  shelf_life:
+    days: 1
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Ốc sống, ước lượng 1 ngày (FoodKeeper 157 động vật có vỏ còn sống 1–2 ngày).
+- name_vi: sò
+  food_group: hai_san
+  comp_source:
+    source: fct2007
+    code: '8048'
+    source_name: Sò
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - nhuyen_the
+  synonyms:
+    vi:
+    - hàu
+    - sò huyết
+    en:
+    - oysters
+    - cockles
+  shelf_life:
+    days: 2
+    basis: foodkeeper
+    foodkeeper_id: 157
+    foodkeeper_name: Live clams, mussels, crab, and oysters
+    note: Ngăn mát 1–2 ngày; lấy cận trên.
+- name_vi: trứng gà
+  food_group: trung
+  comp_source:
+    source: fct2007
+    code: '9001'
+    source_name: Trứng gà
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 50
+    source: thiết kế v2 BR-QTY-02; usda_sr:171287 '1 large' = 50 g
+  allergens:
+  - trung
+  synonyms:
+    vi:
+    - trứng
+    en:
+    - eggs
+    - egg
+    - chicken eggs
+  shelf_life:
+    days: 35
+    basis: foodkeeper
+    foodkeeper_id: 21
+    foodkeeper_name: Eggs — in shell
+    note: Ngăn mát 21–35 ngày; lấy cận trên.
+- name_vi: trứng vịt
+  food_group: trung
+  comp_source:
+    source: fct2007
+    code: '9004'
+    source_name: Trứng vịt
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 70
+    source: uoc_luong_nhom
+  allergens:
+  - trung
+  synonyms:
+    vi: []
+    en:
+    - duck eggs
+  shelf_life:
+    days: 35
+    basis: foodkeeper
+    foodkeeper_id: 21
+    foodkeeper_name: Eggs — in shell
+    note: Ngăn mát 21–35 ngày; lấy cận trên.
+- name_vi: trứng cút
+  food_group: trung
+  comp_source:
+    source: fct2007
+    code: '9007'
+    source_name: Trứng chim cút
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: qua
+    grams_per_unit: 10
+    source: uoc_luong_nhom
+  allergens:
+  - trung
+  synonyms:
+    vi: []
+    en:
+    - quail eggs
+  shelf_life:
+    days: 35
+    basis: foodkeeper
+    foodkeeper_id: 21
+    foodkeeper_name: Eggs — in shell
+    note: Ngăn mát 21–35 ngày; lấy cận trên.
+- name_vi: bơ
+  food_group: sua
+  comp_source:
+    source: fct2007
+    code: '6001'
+    source_name: Bơ
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - sua
+  synonyms:
+    vi:
+    - bơ lạt
+    - bơ động vật
+    en:
+    - butter
+    - unsalted butter
+  shelf_life:
+    days: 60
+    basis: foodkeeper
+    foodkeeper_id: 1
+    foodkeeper_name: Butter
+    note: Ngăn mát 30–60 ngày; lấy cận trên.
+- name_vi: sữa tươi
+  food_group: sua
+  comp_source:
+    source: fct2007
+    code: '10001'
+    source_name: Sữa bò tươi
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - sua
+  synonyms:
+    vi:
+    - sữa bò tươi
+    en:
+    - milk
+    - whole milk
+  shelf_life:
+    days: 7
+    basis: estimate
+    note: Ước lượng của nhóm, cần hiệu chỉnh. Sữa thanh trùng đã mở, ước lượng 5–7 ngày; loại tiệt trùng chưa mở không tính độ gấp.
+- name_vi: sữa chua
+  food_group: sua
+  comp_source:
+    source: fct2007
+    code: '10004'
+    source_name: Sữa chua (từ sữa bò)
+    match: exact
+  is_staple: false
+  countable: true
+  units:
+  - unit_code: hop
+    grams_per_unit: 100
+    source: uoc_luong_nhom
+  allergens:
+  - sua
+  synonyms:
+    vi: []
+    en:
+    - yogurt
+    - plain yogurt
+  shelf_life:
+    days: 14
+    basis: foodkeeper
+    foodkeeper_id: 33
+    foodkeeper_name: Yogurt
+    note: Ngăn mát 7–14 ngày; lấy cận trên.
+- name_vi: phô mai
+  food_group: sua
+  comp_source:
+    source: fct2007
+    code: '10009'
+    source_name: Pho mát
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - sua
+  synonyms:
+    vi:
+    - pho mát
+    en:
+    - cheese
+  shelf_life:
+    days: 28
+    basis: foodkeeper
+    foodkeeper_id: 6
+    foodkeeper_name: Cheese — processed slices
+    note: Ngăn mát 21–28 ngày; lấy cận trên.
+- name_vi: sữa đặc
+  food_group: sua
+  comp_source:
+    source: fct2007
+    code: '10008'
+    source_name: Sữa đặc có đường Việt Nam
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - sua
+  synonyms:
+    vi: []
+    en:
+    - sweetened condensed milk
+    - condensed milk
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Hộp chưa mở để tủ bếp.
+- name_vi: dầu ăn
+  food_group: dau_mo
+  comp_source:
+    source: fct2007
+    code: '6002'
+    source_name: Dầu thảo mộc (Lạc, vừng, cám...)
+    match: exact
+  is_staple: true
+  countable: false
+  units: []
+  allergens: []
+  allergen_note: Dầu hỗn hợp có thể chứa dầu đậu nành hoặc dầu lạc tinh luyện; dầu tinh luyện cao được Codex miễn ghi dị ứng. Người dị ứng nặng kiểm nhãn.
+  synonyms:
+    vi:
+    - dầu thực vật
+    en:
+    - vegetable oil
+    - cooking oil
+    - oil
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Gia vị luôn có.
+- name_vi: dầu vừng
+  food_group: dau_mo
+  comp_source:
+    source: fct2007
+    code: '6012'
+    source_name: Dầu mè
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - vung
+  synonyms:
+    vi:
+    - dầu mè
+    en:
+    - sesame oil
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để tủ bếp.
+- name_vi: dầu lạc
+  food_group: dau_mo
+  comp_source:
+    source: fct2007
+    code: '6011'
+    source_name: Dầu lạc
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - dau_phong
+  synonyms:
+    vi:
+    - dầu phộng
+    en:
+    - peanut oil
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để tủ bếp.
+- name_vi: dầu ô liu
+  food_group: dau_mo
+  comp_source:
+    source: fct2007
+    code: '6014'
+    source_name: Dầu oliu
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - olive oil
+    - extra virgin olive oil
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để tủ bếp.
+- name_vi: muối
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '13005'
+    source_name: Muối
+    match: exact
+  is_staple: true
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - muối ăn
+    - muối hạt
+    - muối i-ốt
+    en:
+    - salt
+    - kosher salt
+    - sea salt
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Gia vị luôn có.
+- name_vi: đường
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '12014'
+    source_name: Đường kính
+    match: exact
+  is_staple: true
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - đường kính
+    - đường trắng
+    - đường cát
+    en:
+    - sugar
+    - white sugar
+    - granulated sugar
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Gia vị luôn có.
+- name_vi: tiêu
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '13004'
+    source_name: Hạt tiêu
+    match: exact
+  is_staple: true
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - hạt tiêu
+    - tiêu xay
+    en:
+    - black pepper
+    - pepper
+    - ground black pepper
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Gia vị luôn có.
+- name_vi: bột ngọt
+  food_group: gia_vi
+  comp_source:
+    source: null
+    reason: FCT và USDA không có mục monosodium glutamate; năng lượng không đáng kể ở lượng dùng, natri cần ghi riêng (12,3 g Na/100 g theo công thức hoá học) khi tính natri.
+  is_staple: true
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - mì chính
+    en:
+    - msg
+    - monosodium glutamate
+    - accent seasoning
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Gia vị luôn có.
+- name_vi: nước tương
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '13022'
+    source_name: Xì dầu
+    match: exact
+  is_staple: true
+  countable: false
+  units: []
+  allergens:
+  - dau_nanh
+  - gluten
+  allergen_note: Nhiều loại nước tương lên men có lúa mì; kiểm nhãn nếu cần loại không gluten.
+  synonyms:
+    vi:
+    - xì dầu
+    - magi
+    en:
+    - soy sauce
+    - light soy sauce
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Gia vị luôn có.
+- name_vi: hạt nêm chay
+  food_group: gia_vi
+  comp_source:
+    source: null
+    reason: Sản phẩm thương mại nhiều thành phần (muối, đường, bột ngọt, chiết xuất nấm/rau củ); không có mục tương ứng.
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - dau_nanh
+  allergen_note: Một số loại có đạm đậu nành; đánh dấu đậu nành để an toàn, kiểm nhãn.
+  synonyms:
+    vi:
+    - hạt nêm nấm
+    en:
+    - vegetarian seasoning powder
+    - mushroom seasoning
+    - vegetable bouillon powder
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Gia vị để tủ bếp.
+- name_vi: giấm
+  food_group: gia_vi
+  comp_source:
+    source: usda
+    code: '172237'
+    source_name: Vinegar, distilled
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - giấm gạo
+    - giấm ăn
+    en:
+    - vinegar
+    - white vinegar
+    - rice vinegar
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để tủ bếp.
+- name_vi: tương ớt
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '13021'
+    source_name: Tương ớt
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - chili sauce
+    - sriracha
+    - hot sauce
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để tủ bếp hoặc ngăn mát sau khi mở; không tính độ gấp.
+- name_vi: tương cà
+  food_group: gia_vi
+  comp_source:
+    source: usda
+    code: '168556'
+    source_name: Catsup
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - sốt cà chua
+    en:
+    - ketchup
+    - tomato ketchup
+    - catsup
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để tủ bếp hoặc ngăn mát sau khi mở.
+- name_vi: tương bần
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '13020'
+    source_name: Tương nếp
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - dau_nanh
+  synonyms:
+    vi:
+    - tương nếp
+    - tương
+    en:
+    - fermented soybean paste
+    - soybean sauce
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Lọ đã lên men, không tính độ gấp.
+- name_vi: tương đen
+  food_group: gia_vi
+  comp_source:
+    source: usda
+    code: '172886'
+    source_name: Sauce, hoisin, ready-to-serve
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - dau_nanh
+  - gluten
+  synonyms:
+    vi:
+    - sốt hoisin
+    en:
+    - hoisin sauce
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để tủ bếp hoặc ngăn mát sau khi mở.
+- name_vi: mẻ
+  food_group: gia_vi
+  comp_source:
+    source: null
+    reason: FCT và USDA không có cơm mẻ (cơm lên men chua); dùng lượng nhỏ.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - cơm mẻ
+    en:
+    - fermented rice
+    - sour fermented rice
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Lọ mẻ nuôi để ngoài, không tính độ gấp.
+- name_vi: mật ong
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '12026'
+    source_name: Mật ong
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - honey
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để tủ bếp.
+- name_vi: đường thốt nốt
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '12013'
+    source_name: Đường cát
+    match: proxy
+    note: Dùng FCT 12013 'Đường cát' làm xấp xỉ.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - đường nâu
+    - đường vàng
+    en:
+    - palm sugar
+    - brown sugar
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Để tủ bếp.
+- name_vi: rượu vang đỏ
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '14013'
+    source_name: Rượu vang đỏ (cồn 9,5 g)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - vang đỏ
+    en:
+    - red wine
+    - dry red wine
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Chai để tủ bếp.
+- name_vi: rượu trắng
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '14012'
+    source_name: Rượu trắng (cồn 39 g)
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - rượu nếp
+    - rượu gạo
+    en:
+    - rice wine
+    - rice liquor
+    - vodka
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Chai để tủ bếp.
+- name_vi: hoa hồi
+  food_group: gia_vi
+  comp_source:
+    source: usda
+    code: '171316'
+    source_name: Spices, anise seed
+    match: proxy
+    note: USDA chỉ có 'Spices, anise seed' (hạt tiểu hồi), khác hoa hồi; dùng lượng rất nhỏ.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - đại hồi
+    en:
+    - star anise
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: quế
+  food_group: gia_vi
+  comp_source:
+    source: usda
+    code: '171320'
+    source_name: Spices, cinnamon, ground
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - thanh quế
+    - quế chi
+    en:
+    - cinnamon
+    - cinnamon stick
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: ngũ vị hương
+  food_group: gia_vi
+  comp_source:
+    source: null
+    reason: Hỗn hợp gia vị (hồi, quế, đinh hương, tiêu Tứ Xuyên, tiểu hồi); không có mục tương ứng, dùng lượng rất nhỏ.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - five spice powder
+    - chinese five spice
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: bột cà ri
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '13001'
+    source_name: Cary bột
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - cà ri bột
+    en:
+    - curry powder
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: bột nghệ
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '13006'
+    source_name: Nghệ khô, bột
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - turmeric powder
+    - ground turmeric
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: ớt bột
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '13008'
+    source_name: Ớt khô bột
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi: []
+    en:
+    - chili powder
+    - red pepper flakes
+    - cayenne
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: hạt điều màu
+  food_group: gia_vi
+  comp_source:
+    source: null
+    reason: FCT và USDA không có hạt điều màu (annatto); chỉ dùng tạo màu, lượng rất nhỏ.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  allergen_note: Hạt điều màu (Bixa orellana) không phải hạt điều (Anacardium); không thuộc nhóm hạt cây.
+  synonyms:
+    vi: []
+    en:
+    - annatto seeds
+    - achiote
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô để tủ bếp.
+- name_vi: sa tế
+  food_group: gia_vi
+  comp_source:
+    source: null
+    reason: Sản phẩm nhiều thành phần (ớt, sả, tỏi, dầu, có loại có tôm khô); không có mục tương ứng.
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  allergen_note: Một số loại có tôm khô hoặc nước mắm; kiểm nhãn.
+  synonyms:
+    vi: []
+    en:
+    - satay chili oil
+    - chili lemongrass oil
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Lọ để tủ bếp.
+- name_vi: mayonnaise
+  food_group: gia_vi
+  comp_source:
+    source: fct2007
+    code: '13023'
+    source_name: Sốt mayonnaise
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - trung
+  synonyms:
+    vi:
+    - sốt mayonnaise
+    en:
+    - mayonnaise
+    - mayo
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Lọ, ngăn mát sau khi mở; không tính độ gấp.
+- name_vi: nước mắm
+  food_group: gia_vi_dong_vat
+  comp_source:
+    source: fct2007
+    code: '13017'
+    source_name: Nước mắm cá
+    match: exact
+  is_staple: true
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi:
+    - nước mắm cá
+    - mắm
+    en:
+    - fish sauce
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Gia vị luôn có.
+- name_vi: hạt nêm
+  food_group: gia_vi_dong_vat
+  comp_source:
+    source: usda
+    code: '171562'
+    source_name: Soup, chicken broth or bouillon, dry
+    match: proxy
+    note: Hạt nêm thương mại thường có chiết xuất thịt, xương nên xếp nhóm gia vị nguồn động vật (loại khỏi chay). USDA 'Soup, chicken broth or bouillon, dry' là xấp xỉ.
+  is_staple: true
+  countable: false
+  units: []
+  allergens: []
+  allergen_note: Thành phần tuỳ hãng (có thể có sữa, trứng, đậu nành, lúa mì); kiểm nhãn.
+  synonyms:
+    vi:
+    - hạt nêm thịt
+    - bột canh
+    en:
+    - bouillon powder
+    - chicken bouillon
+    - pork bouillon powder
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Gia vị luôn có.
+- name_vi: dầu hào
+  food_group: gia_vi_dong_vat
+  comp_source:
+    source: usda
+    code: '174529'
+    source_name: Sauce, oyster, ready-to-serve
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - nhuyen_the
+  - gluten
+  allergen_note: Dầu hào thường có bột mì; kiểm nhãn.
+  synonyms:
+    vi:
+    - dầu hàu
+    en:
+    - oyster sauce
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Chai, ngăn mát sau khi mở; không tính độ gấp.
+- name_vi: mắm tôm
+  food_group: gia_vi_dong_vat
+  comp_source:
+    source: fct2007
+    code: '13011'
+    source_name: Mắm tôm đặc
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - giap_xac
+  synonyms:
+    vi: []
+    en:
+    - shrimp paste
+    - fermented shrimp paste
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Lọ đã lên men, không tính độ gấp.
+- name_vi: mắm tép
+  food_group: gia_vi_dong_vat
+  comp_source:
+    source: fct2007
+    code: '13013'
+    source_name: Mắm tép chua
+    match: exact
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - giap_xac
+  synonyms:
+    vi:
+    - mắm tép chua
+    en:
+    - fermented tiny shrimp paste
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Lọ đã lên men, không tính độ gấp.
+- name_vi: mắm ruốc
+  food_group: gia_vi_dong_vat
+  comp_source:
+    source: fct2007
+    code: '13012'
+    source_name: Mắm tôm loãng
+    match: close
+    note: FCT 13012 'Mắm tôm loãng'.
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - giap_xac
+  synonyms:
+    vi:
+    - ruốc
+    en:
+    - shrimp paste
+    - fine shrimp paste
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Lọ đã lên men, không tính độ gấp.
+- name_vi: mắm nêm
+  food_group: gia_vi_dong_vat
+  comp_source:
+    source: null
+    reason: FCT và USDA không có mắm nêm (mắm cá cơm lên men); dùng làm nước chấm.
+  is_staple: false
+  countable: false
+  units: []
+  allergens:
+  - ca
+  synonyms:
+    vi: []
+    en:
+    - fermented anchovy sauce
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Lọ đã lên men, không tính độ gấp.

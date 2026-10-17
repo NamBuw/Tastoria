@@ -1,0 +1,13 @@
+# Chế độ ăn (bảng catalog.diets + catalog.diet_exclusions). Căn cứ: thiết kế v2 BR-DIET-01.
+# v2 chỉ có một chế độ: chay.
+# Định nghĩa "chay" của Tastoria v2 (quyết định của nhóm, đổi được):
+#   - Loại mọi thịt, gia cầm, cá, tôm cua, nhuyễn thể, trứng và gia vị nguồn động vật
+#     (nước mắm, mắm tôm, mắm tép, dầu hào, hạt nêm thường).
+#   - Giữ sữa và sản phẩm sữa (kiểu ăn chay có sữa), giữ mật ong.
+#   - Chưa loại "ngũ vị tân" (hành, tỏi, hẹ, kiệu...) mà một số người ăn chay theo Phật giáo kiêng;
+#     nếu cần sẽ thêm chế độ riêng (ví dụ chay_ngu_vi_tan) với nhóm rau_thom tách nhỏ.
+version: 1
+diets:
+  - code: chay
+    name_vi: "Ăn chay (không thịt, cá, hải sản, trứng; có sữa)"
+    excluded_food_groups: [thit, gia_cam, ca, hai_san, trung, gia_vi_dong_vat]
