@@ -508,6 +508,13 @@ _DESCRIPTIONS = {
     "user_allergens": "Nhóm dị ứng đã khai.",
     "user_favorite_recipes": "Món hay ăn đã chọn.",
     "user_settings": "Cài đặt bếp: số họng bếp, số người mặc định, múi giờ.",
+    "pantry_lots": "Các lô trong kho: nguyên liệu, lượng ban đầu, ngày mua, trạng thái.",
+    "pantry_transactions": "Sổ thay đổi lượng của từng lô (thêm, sửa, bỏ, trừ khi nấu, hoàn tác).",
+    "meal_plans": "Các mâm cơm đã được gợi ý: bữa, số người, trạng thái, mục tiêu năng lượng, dòng lý do.",
+    "meal_plan_items": "Món trong từng mâm, kể cả món đã đổi ra và lý do đổi.",
+    "cook_sessions": "Các phiên nấu: giờ dọn mâm, lúc bắt đầu, nấu xong, hoàn tác.",
+    "interactions": "Tương tác với món (được gợi ý, xem, đổi, nấu, thích, không thích) khi bạn đồng ý cá nhân hoá.",
+    "shopping_items": "Danh sách đi chợ.",
 }
 
 

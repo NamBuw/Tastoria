@@ -1120,8 +1120,8 @@ paths:
       tags:
       - catalog
       summary: Xem chi tiết món
-      description: Gồm nguyên liệu (gam lúc mua cho servings khẩu phần), bước, nguồn, dinh dưỡng. Món retired vẫn đọc được
-        để mâm/phiên nấu cũ hiển thị đúng (BR-CATALOG-01).
+      description: Gồm nguyên liệu (gam lúc mua cho servings khẩu phần), bước, nguồn, dinh dưỡng, món làm sẵn. Món retired
+        vẫn đọc được để mâm/phiên nấu cũ hiển thị đúng (BR-CATALOG-01); món draft trả 404.
       x-use-cases:
       - UC15
       - UC19
@@ -1890,7 +1890,9 @@ paths:
       tags:
       - meal
       summary: Liệt kê mâm đã tạo
-      description: Lọc theo trạng thái và khoảng ngày (múi giờ người dùng). Dùng cho nhật ký tuần.
+      description: Lọc theo trạng thái và khoảng ngày tạo (múi giờ người dùng). Mới nhất trước; next_cursor là khoá
+        (created_at, id) của phần tử cuối trang. Trạng thái expired/abandoned được áp lúc đọc (FR-15-39, FR-15-41). Dùng
+        cho nhật ký tuần.
       x-use-cases:
       - UC22
       x-module: M11

@@ -295,3 +295,28 @@ def test_complete_applied_twice_deducts_once(kb_client: TestClient, kb_db, retri
         q(kb_db, "SELECT count(*) FROM interactions WHERE type = 'cooked' AND meal_plan_id = :p", p=p["id"]).scalar()
         == 3
     )
+
+
+def test_data_export_covers_pantry_plans_cooking_and_interactions(
+    kb_client: TestClient, kb_db, kb_app, h: dict
+) -> None:
+    import io
+    import json
+    import zipfile
+    from pathlib import Path
+
+    p = _accepted(kb_client, h, kb_db)
+    s = cook(kb_client, h, p["id"])
+    kb_client.post(f"{API}/cook-sessions/{s['id']}/complete", headers=h | key())
+    garlic = q(kb_db, "SELECT id::text FROM ingredients WHERE name_vi = 'tỏi'").scalar()
+    kb_client.post(f"{API}/shopping-items", json={"ingredient_id": garlic}, headers=h)
+    r = kb_client.post(f"{API}/me/data-requests", json={"type": "export"}, headers=h)
+    assert r.status_code == 202, r.text
+    storage = Path(kb_app.state.settings.storage_dir)
+    archive = zipfile.ZipFile(io.BytesIO((storage / f"exports/{r.json()['id']}.zip").read_bytes()))
+    files = {n: json.loads(archive.read(n)) for n in archive.namelist()}
+    for name in ("pantry_lots", "pantry_transactions", "meal_plans", "meal_plan_items", "cook_sessions",
+                 "interactions", "shopping_items"):  # fmt: skip
+        assert files[f"{name}.json"], name
+    readme = files["README.json"]["files"]
+    assert all(f["description_vi"] != f["file"].removesuffix(".json") for f in readme)

@@ -202,7 +202,7 @@ def test_too_little_time_is_no_feasible_tray(kb_client: TestClient, kb_db, h: di
 
 
 def test_urgent_lot_drives_the_reason_line(kb_client: TestClient, kb_db, h: dict) -> None:
-    stock_for(kb_client, h, kb_db, MAN, CANH)
+    stock_for(kb_client, h, kb_db, MAN, CANH, prefer=False)  # no favourites: taste ties, urgency decides
     add_lot(kb_client, h, kb_db, "tỏi", 100)
     add_lot(kb_client, h, kb_db, "bí ngòi", 400, days_ago=4)  # L ≈ 5–7 days → "nên dùng sớm" / "dùng ngay"
     add_lot(kb_client, h, kb_db, "cải cúc", 400)

@@ -1,8 +1,9 @@
 # Tastoria backend
 
-FastAPI modular monolith (ADR 0001). This first slice has `core`, `identity`, `privacy`, `profile` and the part
-of `catalog` that `profile` needs. Contract: `docs/api/openapi-v1.yaml`; schema: `db/schema.sql`; modules and
-their allowed dependencies: `docs/sad/model.yaml`.
+FastAPI modular monolith (ADR 0001). Slice 1: `core`, `identity`, `privacy`, `profile`. Slice 2: `catalog` (import of
+`data/kb`), `pantry`, `meal`, `substitute` (shopping list), `events`, `cooking`, `journal`, and `admin` (CLI side of
+the import). Contract: `docs/api/openapi-v1.yaml`; schema: `db/schema.sql` + later migrations; modules and their
+allowed dependencies: `docs/sad/model.yaml`.
 
 ## Layout
 
@@ -15,7 +16,8 @@ backend/
                          Idempotency-Key, auth dependency, health
     modules/<name>/      router.py · service.py (public) · models.py · schemas.py (+ private helpers)
     jobs/                cron entry points (python -m tastoria.jobs.sweep)
-    migrations/          Alembic; 0001 runs sql/0001_schema.sql = byte copy of db/schema.sql
+    migrations/          Alembic; 0001 runs sql/0001_schema.sql = byte copy of db/schema.sql; 0002 consent
+                         purposes; 0003 recipe_make_ahead
   scripts/gen_importlinter.py   writes .importlinter from model.yaml
   tests/unit, tests/integration
 ```
@@ -44,8 +46,18 @@ uv run --package tastoria-backend uvicorn tastoria.app:create_app --factory --ho
 Do not run `uv sync --package tastoria-backend` in the shared `.venv`: it removes the `ml` member's packages.
 `uv run --package ...` (inexact) or `uv sync --all-packages --inexact` is safe.
 
-Allergen groups and diets are catalog reference data loaded by the catalog import (next slice) from
-`data/kb/ref/`. Until then `PUT /me/allergens` and `PUT /me/diet` answer `unknown_code` for every code.
+Load the catalog (reference data, composition rows, ingredients, recipes, nutrition) once after `db upgrade`, and
+again whenever `data/kb` changes:
+
+```bash
+uv run --package tastoria-backend tastoria catalog import data/kb          # composition tables: data/processed
+uv run --package tastoria-backend tastoria catalog import data/kb --processed /path/to/processed
+```
+
+It prints a JSON report (changes per table, new recipe versions, drafts, `data_version`, E_bát) and exits 1 with every
+problem as `file:line: code: message` when the bundle does not validate; nothing is written then. Re-running an
+unchanged bundle reports `"changes": 0`. Until the first import `PUT /me/allergens` and `PUT /me/diet` answer
+`unknown_code` for every code and `POST /meal-plans` finds no recipe.
 
 Jobs:
 
@@ -68,12 +80,25 @@ services. They are labelled `tastoria-test=1` and removed at the end of the sess
 (`docker rm -f $(docker ps -aq --filter label=tastoria-test=1)` cleans up after a crash). Without Docker the
 integration tests are skipped; set `TASTORIA_REQUIRE_DOCKER=1` to make that a failure (CI).
 
+Tests that need the real catalog run against a second database, `kb`, migrated and loaded with
+`tastoria catalog import data/kb` once per session (`kb_client`, `kb_db` fixtures in `tests/conftest.py`); only
+personal data is wiped between those tests. Import tests that change the bundle get a fresh database each
+(`fresh_database`). Users made by `tests/kb_helpers.user()` get a fixed-offset time zone where it is morning, so
+plans do not expire mid-test whatever the hour.
+
 What the suite checks besides endpoint behaviour:
 - migration 0001 gives the same `pg_dump --schema-only` as applying `db/schema.sql` directly; the copy in
   `migrations/sql/` is byte-identical to `db/schema.sql`;
 - every ORM-mapped table matches the migrated catalog (alembic `compare_metadata`, comments ignored);
-- every implemented operation exists in `openapi-v1.yaml` with the same method, path and operationId;
-- `ProblemCode` equals the contract enum (plus backend-only `internal_error`);
+- every implemented operation exists in `openapi-v1.yaml` with the same method, path and operationId, and every field
+  the backend puts in a 2xx JSON body is declared in the contract's schema for that response;
+- `openapi-v1.yaml` is valid OpenAPI 3.1 (openapi-spec-validator);
+- `ProblemCode` equals the contract enum, in order;
+- BR-ALG-01: every published recipe × every allergen group, and random user + co-eater allergen sets and diets,
+  against raw SQL (staples, optional lines and made-ahead items included);
+- composer: every tray returned for random pantries, pins, persons and time limits fits the pooled stock, the pins,
+  the makespan bound and the structure; cooking: every CP-SAT schedule of random trays of the catalog passes the
+  BR-COOK-01 checker; completing a session again (same or new Idempotency-Key) deducts once;
 - published policy texts still hash to the SHA-256 frozen in migration 0002.
 
 ## Environment variables
@@ -114,7 +139,7 @@ Generate keys: `python -c "import os,base64;print(base64.b64encode(os.urandom(32
 The health-column key must be backed up apart from the database backup (ADR 0005): losing it loses the
 metrics (`GET /me/profile` → 500 `decryption_failed`).
 
-## Decisions taken in this slice
+## Decisions taken in slice 1
 
 - Login lock counts per (email, IP) in Valkey only; if Valkey is down, login answers 503 (UC02 3b, fail
   closed). `users.failed_logins` / `locked_until` mirror the last lock for display (UC02 step 3).
@@ -126,3 +151,120 @@ metrics (`GET /me/profile` → 500 `decryption_failed`).
 - `get_meal_constraints()` reads `kcal_target` (plain column) and does not decrypt metrics, so meal planning
   writes no audit row.
 - Policy texts in `modules/privacy/policies/` are team drafts, marked in the text as not legally reviewed.
+
+## Decisions taken in slice 2
+
+Catalog import (UC25, `modules/catalog/{bundle,importer,nutrition}.py`, CLI in `modules/admin`):
+- The bundle is a full sync of the catalog: recipes and ingredients missing from it are retired / deactivated, never
+  deleted. Identity across imports is `name_vi` (ingredients: active name; recipes: non-retired name).
+- A recipe is published when it has ≥ 2 sources and every non-seasoning, non-optional ingredient has a composition
+  row; otherwise it is imported as draft with a warning (FR-25-08). On `data/kb` today: 171 published, 9 drafts
+  (5 with one source, 4 with an unmapped main ingredient). Seasonings without composition carry an explicit reason in
+  `ingredients.yaml` and are accepted.
+- Any content change of a published recipe (lines, grams, steps, tags, sources, notes, servings, method, make-ahead)
+  retires it and inserts a new published version (BR-CATALOG-01). Drafts are edited in place.
+- Only composition rows the ingredients use (+ FCT 1004 gạo tẻ for E_bát) go into `food_items` / `food_nutrients`.
+  USDA glucid = carb − fibre (carb is "by difference"), as in the ML nutrition module.
+- `recipe_nutrition` comes from `tastoria_ml.kb.nutrition` when that package is importable (it carries the documented
+  refuse / moisture / sodium overrides); otherwise from the fallback EuroFIR formula in `catalog/nutrition.py`. The
+  two write different `data_version` prefixes (`nut-r1+…` / `catalog-nut-r1+…`); 164 of 171 published recipes agree within
+  0.2 kcal, the rest differ by the ML overrides. Run the import where `tastoria-ml` is installed to store the
+  reference numbers.
+- E_bát (150 g cooked rice, BR-TRAY-03) = FCT 1004 energy × 150 / 2.98 / 100 (cooked yield 2.98, Bognár 2002): 173.2
+  kcal. The import also sets the database GUC `tastoria.rice_bowl_kcal` for `v_journal_days`; meal and journal read
+  E_bát from the table, because a GUC set by `ALTER DATABASE` reaches only connections opened afterwards.
+- After writing, the import re-checks the hard filter against raw SQL for every published recipe × allergen group /
+  diet and the `vegetarian` flags of `dish_list.yaml`; any violation rolls everything back. Every run, failed or not,
+  writes one `audit_log` row (`catalog.import`, actor_role `curator`, outcome in `purpose`; the CLI has no logged-in
+  actor, `actor_user_id` is NULL — UC25 open question 1).
+
+Make-ahead recipes (passive step > 120 min: Dưa cải muối, Cà pháo muối, Dưa giá, Canh măng nấu chân giò):
+- Tagged `lam_san` (system tag, kind `occasion`, added by the import) and mapped in `data/kb/make_ahead.yaml` to the
+  made-ahead item the user must hold. The mapping is stored in `recipe_make_ahead` (migration 0003, immutable like
+  `recipe_steps`); `make_ahead.yaml` also defines the two products missing from `ingredients.yaml` (cà pháo muối,
+  dưa giá; no composition, shelf life not tracked yet). The import fails when a long passive step has no entry, when
+  the item of a whole-dish make-ahead lacks an allergen group or diet-excluded food group of the recipe, or when a
+  partial item is not an ingredient of the recipe.
+- Steps 1..through_step_no (the last long passive step) are left out of the cook schedule and the makespan.
+- Whole dish made ahead (the three pickles): proposed only when the item has usable stock (presence, no amount check:
+  no yield data); its raw lines are neither stock-checked nor deducted; cooking deducts from the item Σ raw grams ×
+  n / servings (1:1 yield, uncalibrated). Partial (ngâm măng khô): the item is an ordinary line of the recipe, only the
+  soaking steps leave the schedule.
+
+Pantry (UC14):
+- `POST /pantry/lots` stores the amount as the lot's initial interval and writes no transaction (the openapi text said
+  manual_edit; initial + Σ delta is the balance, a transaction would count it twice).
+- Counting works with any `ingredient_units` row (2 bó rau muống) even when the ingredient is not `countable`;
+  ít/vừa/nhiều only for non-countable ingredients.
+- Lots without a shelf life and without freshness probabilities have `urgency = null`, label `chua_ro`, are available
+  and never rewarded (FR-14-05); their deductions record `urgency_at_event = NULL` rather than a made-up number.
+- Deducting from intervals uses interval arithmetic over the lots in order (pinned lots of the plan, then most
+  urgent): the remaining [lo, hi] of lot i is [lo − max(0, need − Σ previous lo), hi − max(0, need − Σ previous hi)]
+  floored at 0 (UC20 open question 1). Shortfalls are reported for non-staple, non-optional ingredients only.
+
+Meal (UC15–UC17):
+- Objective weights are provisional (`tray-p0-provisional`: α = 1, β = 1, γ = 0.5, K = 20); spec §6.2 fixes them
+  later by the pre-registered scenario rule. `kcal_low` / `kcal_high` stay NULL ("đang hiệu chỉnh") until the
+  BR-NUT-06 half width is measured (`meal.service.KCAL_HALF_WIDTH`).
+- Ranker: `meal/ranker.py` `Ranker` protocol; the served `BaselineRanker` = shrunk popularity of consenting users'
+  interactions + content-based cosine to the 5 favourites (+ the user's own signal with consent). No ranker model is
+  deployed (mlops has no code yet), so `ranker_version_id` is NULL and propensity is 1.
+- Options that cannot fit the stock alone are dropped before the top-K cut (they can never be in a feasible tray), so
+  the K = 20 cut is taken among dishes the pantry can make.
+- Makespan (BR-TRAY-05) uses the same CP-SAT solver as cooking (`meal/schedule.py`, exposed through meal.service; the
+  solver lives in meal because cooking depends on meal, not the reverse — UC15 TBD-02). The composer prunes with a
+  lower bound; the best trays are then solved exactly in objective order.
+- When the 5-minute serving window is impossible (one burner, long braise + stir-fry), the schedule is solved again
+  without the window (`relaxed`; stir-fry still last) before the sequential fallback.
+- Plan lifecycle is applied when plans are read or written: a plan is for the first lunch end (15:00) / dinner end
+  (24:00) after its creation (a lunch plan made at 16:00 is tomorrow's lunch); past it, proposed → expired, accepted
+  without a live cook session → abandoned; a new plan for the same meal occurrence supersedes the open one.
+- Whether a plan has a live cook session, and whether a plan item belongs to a user (for `POST /shopping-items`), are
+  installed by `tastoria.app` as callables (`MealDeps`, `SubstituteDeps`) — the allowed module dependencies forbid
+  the direct imports.
+- Swapping is refused (409 `conflict_state`) while the plan is being cooked (UC16 open question 1).
+- Substitute candidates come from `substitution_pairs` only (exact context, slot-only, method-only, generic; then
+  score), filtered by food group, activity and the allergens / diet of the user and the co-eaters. Embedding and
+  nutrition-vector neighbours are not served: there is no deployed substitution model, and the DB enum
+  `substitution_origin_t` has no value for a nutrition neighbour. `data/kb` has no curated pairs yet, so "Thiếu gì?"
+  lists the missing ingredients with empty candidate lists until `tastoria catalog substitutes import` (UC26) exists.
+
+Cooking (UC19–UC21):
+- `POST /cook-sessions` with a schedule longer than the plan's `max_minutes` answers 409 `conflict_state` with
+  `over_time_minutes`, `makespan_s`, `solver_status` and creates nothing; `confirm_over_time: true` creates it
+  (FR-19-10; UC19 9a said 200 without a session, which no response schema can carry).
+- `serve_at` earlier than now + makespan is moved to that earliest time (UC19 1a); the response shows the moved value.
+- `completed_at` is server time (the undo window and the journal use it); the client's `completed_at` only becomes
+  `occurred_at` of the interactions.
+
+Journal (UC22): kcal per person = Σ dish snapshots + Σ rice bowls × E_bát; days without a cooked tray have
+`kcal_per_person = null`.
+
+Privacy: pantry, meal, cooking, events and substitute export their tables in data-subject exports; withdrawing
+`personalization` deletes the user's interactions (BR-CONSENT-04).
+
+## Contract changes made in slice 2 (`docs/api/openapi-v1.yaml`)
+
+- Declared fields slice 1 already sent: `Profile.target_stale`, `Profile.suggested_kcal`; `EnergySuggestion.goal`,
+  `age_years`, `equation`, `source`, `bmr_mifflin_kcal`; `DataRequestCreate.password`; `EnergyTargetResult` (response of
+  `PUT /me/energy-target`); `ConsentWithdrawResult.data_request_id`. `ProblemCode` gained `internal_error`.
+- `Recipe.make_ahead` (schema `MakeAhead`); `IngredientUnit.unit_code` + `cay`, `tep`, `con`.
+- `PantryLot.urgency` nullable, `freshness_label` + `chua_ro`; `PantryLotPatch.status` + `used_up`; `POST /pantry/lots`
+  description (no transaction).
+- `GET /meal-plans/{id}/items/{itemId}/substitutes?ingredient_id=` (FR-17-02); `SubstituteCandidate.available_g_min`,
+  `available_g_max` (FR-17-08).
+- `POST /shopping-items` answers 200 when it merges into an open row (FR-18-05).
+- `CookSessionCreate.confirm_over_time`; 409 `conflict_state` for an over-long schedule; `CookCompletion.shortfalls`.
+- Descriptions: `GET /meal-plans` newest first; `GET /recipes/{id}` 404 for drafts.
+
+## Next steps
+
+- `tastoria catalog substitutes import` (UC26) and a curated `data/kb/substitutions.yaml`; then UC17 has candidates.
+- mlops module (model_versions / model_deployments mapping) to serve a trained ranker through the `Ranker` protocol
+  and to record `ranker_version_id`; scan module (UC12/UC13) writing lots and freshness probabilities.
+- Calibrate: objective weights (§6.2 rule), kcal half width (BR-NUT-06, ≥ 30 dishes vs Viện Dinh dưỡng), qty_levels,
+  made-ahead yields, shelf lives of the made-ahead products.
+- Refresh the derived documents for migration 0003 (`docs/sad/05-tu-dien-du-lieu.md`, `db/schema_vp.sql`, ERD).
+- A role for the CLI actor in `audit_log` (UC25 open question 1); `Idempotency-Key` on `POST /pantry/lots` (UC14 open
+  question 2).
+

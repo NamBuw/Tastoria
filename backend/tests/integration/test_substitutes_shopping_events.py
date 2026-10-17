@@ -118,11 +118,18 @@ def test_bad_substitution_writes_nothing(kb_client: TestClient, kb_db, h: dict, 
 def test_substitution_against_a_coeater_allergen_is_refused(kb_client: TestClient, kb_db, h: dict) -> None:
     stock_for(kb_client, h, kb_db, MAN, RAU, CANH)
     p = plan(kb_client, h, coeater_allergen_codes=["giap_xac"])
-    man = _item(p, "man")  # Ba chỉ chiên nước mắm: nước mắm → mắm tôm is the same food group, but crustacean
-    body = {"original_ingredient_id": ingredient_id(kb_db, "nước mắm"),
-            "substitute_ingredient_id": ingredient_id(kb_db, "mắm tôm"), "origin": "user"}  # fmt: skip
-    r = kb_client.post(f"{API}/meal-plans/{p['id']}/items/{man['id']}/substitutions", json=body, headers=h)
-    assert r.status_code == 422 and r.json()["errors"][0]["code"] == "allergen"  # FR-17-10
+    fish_sauce = ingredient_id(kb_db, "nước mắm")
+    with_sauce = [
+        i
+        for i in p["items"]
+        if q(kb_db, "SELECT count(*) FROM recipe_ingredients WHERE recipe_id = :r AND ingredient_id = :i",
+             r=i["recipe_id"], i=fish_sauce).scalar()
+    ]  # fmt: skip
+    assert with_sauce, p  # nước mắm → mắm tôm: the same food group, but crustacean
+    body = {"original_ingredient_id": fish_sauce, "substitute_ingredient_id": ingredient_id(kb_db, "mắm tôm"),
+            "origin": "user"}  # fmt: skip
+    r = kb_client.post(f"{API}/meal-plans/{p['id']}/items/{with_sauce[0]['id']}/substitutions", json=body, headers=h)
+    assert r.status_code == 422 and r.json()["errors"][0]["code"] == "allergen", r.text  # FR-17-10
     assert q(kb_db, "SELECT count(*) FROM meal_plan_item_substitutions").scalar() == 0
 
 

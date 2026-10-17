@@ -74,14 +74,22 @@ def add_lot(client: TestClient, h: dict, db, name: str, grams: float, *, days_ag
     return r.json()
 
 
-def stock_for(client: TestClient, h: dict, db, *recipes: str, factor: float = 3.0) -> dict[str, float]:
-    """Lots covering `factor` × the recipes' stock-checked needs (one lot per ingredient)."""
+def stock_for(client: TestClient, h: dict, db, *recipes: str, factor: float = 3.0, prefer: bool = True) -> dict:
+    """Lots covering `factor` × the recipes' stock-checked needs (one lot per ingredient).
+
+    With `prefer`, the recipes (first five) also become the user's favourites, so the content-based baseline ranks
+    them first in their slot: without it, ties between equally feasible dishes fall back to the recipe ids, which
+    change with every test database."""
     total: dict[str, float] = {}
     for r in recipes:
         for name, grams, _ in stock_needs(db, r):
             total[name] = total.get(name, 0.0) + grams * factor
     for name, g in total.items():
         add_lot(client, h, db, name, round(g, 1))
+    if prefer:
+        ids = [recipe_id(db, r) for r in recipes][:5]
+        r = client.put(f"{API}/me/favorites", json={"recipe_ids": ids}, headers=h)
+        assert r.status_code == 200, r.text
     return total
 
 
