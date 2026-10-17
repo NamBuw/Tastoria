@@ -1,0 +1,27 @@
+slug: gio-heo-kho
+name_vi: "Giò heo kho"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, beo, mem, cuoi_tuan, troi_lanh]
+ingredients:
+  - {name: chân giò, grams: 1000, role: main, note: "Giò heo cả xương và da, chặt khúc, cân lúc mua"}
+  - {name: nước mắm, grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 36, role: seasoning, note: "3 muỗng canh, một phần thắng nước màu (1 muỗng canh ≈ 12 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: tiêu, grams: 5, role: seasoning, note: "2 muỗng cà phê tiêu xay hoặc tiêu hạt đập dập"}
+  - {name: tỏi, grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+steps:
+  - {step_no: 1, text_vi: "Cạo sạch lông, rửa giò với muối, chặt khúc rồi chần sôi khoảng 5 phút và xả nước lạnh.", kind: active, minutes: 12, uses_burner: true}
+  - {step_no: 2, text_vi: "Băm hành tím, tỏi; ướp giò với nước mắm, phần lớn số đường, tiêu và hành tỏi băm.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Để giò ngấm gia vị.", kind: passive, minutes: 30, uses_burner: false}
+  - {step_no: 4, text_vi: "Thắng chỗ đường còn lại với dầu đến màu cánh gián, cho giò vào đảo săn và lên màu.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 5, text_vi: "Đổ nước ngập giò, đun sôi, hớt bọt rồi hạ lửa nhỏ kho đến khi da và thịt mềm, xiên đũa dễ.", kind: passive, minutes: 60, uses_burner: true}
+  - {step_no: 6, text_vi: "Nêm lại cho vừa, để nước kho sánh, rắc thêm tiêu và ớt rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-gio-heo-kho-nuoc-tuong-mem-ngon-dam-da-cuc-dua-com-23881", title: "Cách làm giò heo kho nước tương mềm ngon đậm đà cực đưa cơm (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-gio-heo-kho-tau-mem-beo-thom-ngon-tan-ngay-trong-07457", title: "Cách làm giò heo kho tàu mềm béo thơm ngon tan ngay trong miệng (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/gio-heo-kho-que/", title: "Giò heo kho quế (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "Nguồn kho bằng nước tương, nước dừa hoặc quế; bản này kho nước mắm tiêu theo dish_list. Nguồn dùng 1,2 kg giò (có xương) và kho 1–2 giờ; chọn 1 kg cho 4 người. Nguồn ướp 1–2 giờ, ghi 30 phút."

@@ -1,0 +1,30 @@
+slug: nem-ran
+name_vi: "Nem rán (chả giò)"
+slot: man
+servings: 4
+method: chien
+tags: [gion, beo, dam_da, cuoi_tuan]
+ingredients:
+  - {name: thịt băm, grams: 300, role: main}
+  - {name: bánh đa nem, grams: 100, role: main, note: "1/2 gói (≈ 20–25 cái)"}
+  - {name: miến, grams: 30, role: main, note: "Miến khô"}
+  - {name: mộc nhĩ, grams: 10, role: main, note: "4–5 tai khô"}
+  - {name: cà rốt, grams: 100, role: main, note: "1 củ"}
+  - {name: trứng gà, grams: 50, role: main, note: "1 quả"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: dầu ăn, grams: 440, role: seasoning, note: "≈ 480 ml dầu cho vào chảo để chiên ngập"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm miến và mộc nhĩ trong nước cho nở mềm.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 2, text_vi: "Thái sợi nhỏ cà rốt và mộc nhĩ, cắt miến đoạn ngắn, băm hành tím.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 3, text_vi: "Trộn thịt với rau củ, trứng, nước mắm, đường, hạt nêm và tiêu thành nhân.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 4, text_vi: "Làm mềm bánh đa nem, đặt nhân, gập hai mép rồi cuốn chặt tay.", kind: active, minutes: 20, uses_burner: false}
+  - {step_no: 5, text_vi: "Chiên nem ngập dầu ở lửa vừa theo từng mẻ đến khi vàng giòn, vớt ra để ráo dầu.", kind: active, minutes: 15, uses_burner: true}
+sources:
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-lam-nem-ran-163876", title: "Cách làm nem rán giòn rụm, hấp dẫn chuẩn hương vị truyền thống (FPT Shop)", accessed_on: 2026-10-17}
+  - {url: "https://hoanghamobile.com/tin-tuc/cach-lam-cha-gio-nem-ran/", title: "Cách làm chả giò (nem rán) giòn rụm, nhân đậm đà (Hoàng Hà Mobile)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/cha-gio-chien/", title: "Chả giò chiên (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "Chiên ngập dầu: phần lớn dầu còn lại; dinh dưỡng dùng hệ số hấp thu chất béo (BR-NUT-05). Các nguồn có thêm tôm; bản này chỉ dùng thịt theo dish_list. Nước chấm chua ngọt không tính."

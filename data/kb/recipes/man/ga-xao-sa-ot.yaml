@@ -1,0 +1,28 @@
+slug: ga-xao-sa-ot
+name_vi: "Gà xào sả ớt"
+slot: man
+servings: 4
+method: xao
+tags: [cay, thom_sa_gung, dam_da, kho_rao, bua_thuong, com_hop]
+ingredients:
+  - {name: thịt gà, grams: 500, role: main, note: "gà chặt miếng nhỏ, cân cả xương"}
+  - {name: sả, grams: 100, role: seasoning, note: "4 cây (1 cây ≈ 25 g)"}
+  - {name: ớt, grams: 15, role: seasoning, note: "3 quả (1 quả ≈ 5 g)"}
+  - {name: nước mắm, grams: 20, role: seasoning, note: "4 muỗng cà phê (1 muỗng cà phê ≈ 5 g)"}
+  - {name: đường, grams: 8, role: seasoning, note: "2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: nghệ, grams: 10, role: seasoning, note: "nửa nhánh nghệ tươi (1 nhánh ≈ 20 g), giã lấy nước ướp cho gà lên màu"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: dầu hào, grams: 18, role: seasoning, note: "1 muỗng canh (≈ 18 g)"}
+  - {name: lá chanh, grams: 2, role: seasoning, optional: true, note: "khoảng 5 lá, thái chỉ"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Làm sạch gà, chặt miếng nhỏ vừa ăn rồi để ráo.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Băm một nửa số sả, thái lát phần còn lại; băm tỏi, cắt ớt, giã nghệ lấy nước.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Ướp gà với sả băm, tỏi, nước nghệ, nước mắm, đường và dầu hào.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi sả lát và tỏi cho thơm, cho gà vào xào lửa lớn đến khi thịt săn lại.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 5, text_vi: "Thêm chút nước sôi, đậy nắp để lửa nhỏ cho gà chín mềm.", kind: passive, minutes: 6, uses_burner: true}
+  - {step_no: 6, text_vi: "Mở nắp, tăng lửa đảo cho cạn nước, cho ớt và lá chanh vào rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/doi-song-cooking-cach-lam-mon-ga-xao-sa-ot-4882412.html", title: "Cách làm món gà xào sả ớt (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/ga-xao-sa-ot-2829496.html", title: "Gà xào sả ớt (VnExpress)", accessed_on: 2026-10-17}
+notes: "Hai nguồn dùng 300–500 g gà; chọn 500 g có xương cho 4 người. Hai nguồn không dùng nghệ; nghệ có trong định nghĩa món (dish_list) nên giữ lượng nhỏ để tạo màu."

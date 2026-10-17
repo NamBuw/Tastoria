@@ -1,0 +1,25 @@
+slug: tep-rang-khe
+name_vi: "Tép rang khế"
+slot: man
+servings: 4
+method: rang
+tags: [chua, dam_da, kho_rao, nau_nhanh, bua_thuong, troi_nong]
+ingredients:
+  - {name: tép, grams: 400, role: main, note: "tép tươi để nguyên vỏ"}
+  - {name: khế, grams: 300, role: main, note: "2 quả khế chua (1 quả ≈ 150 g), thái lát mỏng"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay (1 muỗng cà phê ≈ 2,5 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: đường, grams: 8, role: seasoning, note: "2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: hạt nêm, grams: 2, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh (≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa tép, cắt bớt râu, để ráo; thái khế lát mỏng, băm hành tím, cắt hành lá.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi hành tím với dầu, cho tép vào rang lửa vừa đến khi đỏ và săn vỏ.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 3, text_vi: "Thêm khế, nêm nước mắm, đường, hạt nêm, đảo đến khi khế mềm và tép thấm vị chua.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 4, text_vi: "Rắc hành lá, tiêu, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-tep-rang-khe-chua-thom-ngon-dan-da-chuan-vi-mien-tay-05843", title: "Cách làm tép rang khế chua thơm ngon dân dã (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/tep-rang-khe-doi-vi-cuoi-tuan-voi-mon-an-dan-da-mien-tay-1255961", title: "Tép rang khế đổi vị cuối tuần (Bách hóa XANH)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 200–500 g tép với 2 quả khế cho 4 người; chọn 400 g tép."

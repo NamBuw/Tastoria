@@ -1,0 +1,28 @@
+slug: luon-xao-sa-ot
+name_vi: "Lươn xào sả ớt"
+slot: man
+servings: 4
+method: xao
+tags: [dam_da, cay, thom_sa_gung, kho_rao, troi_lanh, com_hop]
+ingredients:
+  - {name: lươn, grams: 500, role: main, note: "lươn đã làm sạch nhớt, bỏ ruột, cắt khúc"}
+  - {name: sả, grams: 75, role: seasoning, note: "3 cây (1 cây ≈ 25 g), băm nhuyễn"}
+  - {name: ớt, grams: 15, role: seasoning, note: "3 quả (1 quả ≈ 5 g)"}
+  - {name: nghệ, grams: 10, role: seasoning, note: "1/2 nhánh (1 nhánh ≈ 20 g), giã lấy nước"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: rau răm, grams: 20, role: seasoning, note: "nắm nhỏ"}
+  - {name: tỏi, grams: 18, role: seasoning, note: "6 tép (1 tép ≈ 3 g)"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê (≈ 4 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay (≈ 2,5 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Tuốt nhớt lươn bằng muối hoặc chanh, rửa sạch, bỏ ruột và cắt khúc khoảng 4 cm.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Băm sả, tỏi, ớt; ướp lươn với nước nghệ, nước mắm, đường, tiêu và một nửa sả băm.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Để lươn ngấm gia vị.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi thơm phần sả, tỏi, ớt còn lại trong dầu nóng.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho lươn vào xào lửa vừa, đảo nhẹ tay đến khi thịt săn chín và khô ráo.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 6, text_vi: "Thả rau răm cắt khúc, đảo đều rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/cach-lam-luon-xao-sa-ot-thom-cay-rat-dua-com-1237913", title: "4 cách làm lươn xào sả ớt ngon, thơm cay cực đưa cơm (Bách hóa XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-luon-xao-lan-va-xao-sa-ot-bat-com-thom-ngon-hap-04836", title: "2 cách làm lươn xào sả ớt đơn giản thơm lừng (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Hai nguồn cùng dùng 400–500 g lươn. Nguồn không ghi lượng nghệ; ghi 10 g nghệ tươi. Muối/chanh để tuốt nhớt bỏ đi, không tính."

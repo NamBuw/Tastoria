@@ -1,0 +1,25 @@
+slug: canh-ga-chien-nuoc-mam
+name_vi: "Cánh gà chiên nước mắm"
+slot: man
+servings: 4
+method: chien
+tags: [dam_da, thom_toi, gion, cuoi_tuan]
+ingredients:
+  - {name: cánh gà, grams: 600, role: main, note: "khoảng 6 cánh, cân cả xương"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g), một ít ướp, phần lớn làm sốt"}
+  - {name: đường, grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: tỏi, grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g), một phần ướp, phần còn lại phi làm sốt"}
+  - {name: hành tím, grams: 10, role: seasoning, note: "1 củ"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: bột chiên giòn, grams: 40, role: seasoning, note: "5 muỗng canh (1 muỗng canh ≈ 8 g) để áo cánh gà"}
+  - {name: dầu ăn, grams: 300, role: seasoning, note: "dầu cho vào chảo để chiên ngập; thêm 1 muỗng canh phi tỏi làm sốt"}
+steps:
+  - {step_no: 1, text_vi: "Rửa cánh gà, để thật ráo rồi chặt mỗi cánh làm 2–3 khúc.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Trộn cánh gà với một ít nước mắm, tỏi băm và tiêu rồi để thấm gia vị.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Lăn từng miếng gà qua bột chiên giòn cho phủ đều.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 4, text_vi: "Đun nóng dầu, chiên cánh gà đến khi vàng giòn, vớt ra để ráo dầu.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 5, text_vi: "Phi thơm tỏi và hành tím, thêm nước mắm, đường và ít nước, đun sánh rồi cho cánh gà vào đảo cho áo đều sốt.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://monngonmoingay.com/canh-ga-chien-nuoc-mam/", title: "Cánh gà chiên nước mắm (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/canh-ga-chien-nuoc-mam-4606058.html", title: "Cánh gà chiên nước mắm (VnExpress)", accessed_on: 2026-10-17}
+notes: "Chiên ngập dầu: phần lớn dầu còn lại; dinh dưỡng dùng hệ số hấp thu chất béo (BR-NUT-05). Một nguồn dùng 600 g cánh gà cho 4 người và áo bột chiên giòn; nguồn kia không áo bột."

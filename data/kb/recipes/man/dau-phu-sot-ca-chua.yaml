@@ -1,0 +1,25 @@
+slug: dau-phu-sot-ca-chua
+name_vi: "Đậu phụ sốt cà chua"
+slot: man
+servings: 4
+method: om
+tags: [chua_ngot, mem, sot_sanh, bua_thuong, com_hop]
+ingredients:
+  - {name: đậu phụ, grams: 600, role: main, note: "4 miếng (1 miếng ≈ 150 g)"}
+  - {name: cà chua, grams: 360, role: main, note: "3 quả (1 quả ≈ 120 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: muối, grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: nước tương, grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: hạt nêm chay, grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: đường, grams: 4, role: seasoning, optional: true, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: dầu ăn, grams: 52, role: seasoning, note: "4 muỗng canh: 3 để rán đậu, 1 để xào cà chua (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt đậu thành miếng vừa ăn, thấm khô; cà chua cắt múi cau, hành lá thái khúc.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Rán đậu trong chảo dầu nóng đến khi vàng hai mặt rồi gắp ra.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 3, text_vi: "Xào cà chua với chút dầu đến khi nhừ, nêm muối, nước tương, hạt nêm chay và đường.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho đậu vào sốt, thêm ít nước, om nhỏ lửa cho đậu ngấm.", kind: passive, minutes: 8, uses_burner: true}
+  - {step_no: 5, text_vi: "Thả hành lá vào, đảo nhẹ rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-dau-hu-sot-ca-chua-chay-don-gian-de-lam-cho-bua-com-10227", title: "2 cách làm đậu hũ sốt cà chua chay đơn giản dễ làm cho bữa cơm thanh đạm (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/dau-phu-sot-ca-chua-2919946.html", title: "Đậu phụ sốt cà chua (VnExpress)", accessed_on: 2026-10-17}
+notes: "Món chay: không dùng nước mắm; nêm bằng muối, nước tương, hạt nêm chay. Rán đậu ít dầu (áp chảo), không chiên ngập."

@@ -1,0 +1,30 @@
+slug: ca-chep-om-dua
+name_vi: "Cá chép om dưa"
+slot: man
+servings: 4
+method: om
+tags: [chua, nhieu_nuoc, troi_lanh, cuoi_tuan]
+ingredients:
+  - {name: cá chép, grams: 1000, role: main, note: "1 con, cân nguyên con"}
+  - {name: dưa cải chua, grams: 350, role: main, note: "rửa qua, vắt ráo"}
+  - {name: cà chua, grams: 240, role: main, note: "2 quả (1 quả ≈ 120 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: thì là, grams: 50, role: seasoning, note: "một nắm lớn"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: thịt ba chỉ, grams: 150, role: side, optional: true, note: "thái mỏng xào cùng dưa"}
+  - {name: nghệ, grams: 10, role: seasoning, optional: true, note: "nửa nhánh, thái sợi"}
+  - {name: mẻ, grams: 30, role: seasoning, optional: true, note: "2 muỗng canh (1 muỗng canh ≈ 15 g), lọc lấy nước"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: dầu ăn, grams: 39, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 13 g) để rán cá và xào dưa"}
+  - {name: hành lá, grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+steps:
+  - {step_no: 1, text_vi: "Làm sạch cá, cắt khúc hoặc để nguyên; bổ cà chua, thái hành tím, cắt thì là và hành lá.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 2, text_vi: "Rán cá với dầu đến khi vàng hai mặt, gắp ra để ráo.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 3, text_vi: "Phi hành tím, xào thịt cho săn rồi cho nghệ, cà chua và dưa cải vào đảo đều.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 4, text_vi: "Đổ khoảng 3 bát nước, đun sôi, nêm nước mắm và hạt nêm rồi thả cá vào om nhỏ lửa.", kind: passive, minutes: 18, uses_burner: true}
+  - {step_no: 5, text_vi: "Thêm nước mẻ, nêm lại, rắc thì là, hành lá và ớt rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-ca-chep-om-dua-ha-noi-ngon-chuan-vi-dam-da-khong-23859", title: "Cách làm cá chép om dưa Hà Nội ngon chuẩn vị (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/ca-chep-om-dua-cai-chua-2331263.html", title: "Cá chép om dưa cải chua (VnExpress)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng cá 900 g–1 kg và 250–350 g dưa. Thịt ba chỉ, nghệ, mẻ theo bài Điện Máy XANH, để tuỳ chọn vì bài VnExpress không dùng. Bài Điện Máy XANH dùng 100 g thì là; chọn 50 g."

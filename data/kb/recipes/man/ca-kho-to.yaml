@@ -1,0 +1,27 @@
+slug: ca-kho-to
+name_vi: "Cá kho tộ"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, cay, kho_rao, bua_thuong, com_hop]
+ingredients:
+  - {name: cá lóc, grams: 600, role: main, note: "cá làm sạch, cắt khúc"}
+  - {name: nước mắm, grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g), một nửa thắng nước màu"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: ớt, grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: tỏi, grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh (≈ 13 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, optional: true, note: "2 cây (1 cây ≈ 15 g)"}
+steps:
+  - {step_no: 1, text_vi: "Làm sạch cá, chà muối cho hết nhớt, rửa lại và cắt khúc dày vừa ăn.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Băm hành tím, tỏi; trộn cá với nước mắm, một nửa số đường, tiêu và hành tỏi băm.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Để cá ngấm gia vị.", kind: passive, minutes: 20, uses_burner: false}
+  - {step_no: 4, text_vi: "Thắng phần đường còn lại với dầu trong tộ đất đến màu cánh gián, xếp cá vào cho săn mặt.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 5, text_vi: "Rưới nước ướp và ít nước sôi xâm xấp cá, kho nhỏ lửa.", kind: passive, minutes: 20, uses_burner: true}
+  - {step_no: 6, text_vi: "Rưới nước kho lên mặt cá cho đều màu đến khi nước sánh, thêm ớt, tiêu và hành lá.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/cach-lam-mon-ca-kho-to-don-gian-tai-nha-4439059.html", title: "Cách làm món cá kho tộ đơn giản tại nhà (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/doi-song-cooking-ca-bop-kho-to-4653994.html", title: "Cách làm cá bớp kho tộ kiểu miền Nam (VnExpress)", accessed_on: 2026-10-17}
+notes: "Định lượng theo bài cá lóc 600 g; thời gian ướp và kho lấy từ bài cá bớp kho tộ (cùng cách kho tộ, khác loại cá)."

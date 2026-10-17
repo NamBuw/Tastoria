@@ -1,0 +1,29 @@
+slug: suon-xao-chua-ngot
+name_vi: "Sườn xào chua ngọt"
+slot: man
+servings: 4
+method: xao
+tags: [chua_ngot, thom_toi, sot_sanh, bua_thuong, com_hop]
+ingredients:
+  - {name: sườn non, grams: 600, role: main, note: "Sườn có xương, cân lúc mua"}
+  - {name: giấm, grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 30, role: seasoning, note: "2,5 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g), một ít để ướp"}
+  - {name: tương cà, grams: 34, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 17 g)"}
+  - {name: tỏi, grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: hành tím, grams: 10, role: seasoning, note: "1 củ"}
+  - {name: bột năng, grams: 8, role: seasoning, note: "1 muỗng canh, áo sườn khi ướp"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay"}
+  - {name: dầu ăn, grams: 39, role: seasoning, note: "3 muỗng canh để rán sườn (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Chặt sườn miếng vừa ăn, rửa nước muối, chần sôi khoảng 3 phút rồi xả lại và để ráo.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 2, text_vi: "Ướp sườn với một ít nước mắm, chút đường, tiêu và bột năng.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Để sườn ngấm gia vị.", kind: passive, minutes: 20, uses_burner: false}
+  - {step_no: 4, text_vi: "Rán sườn trong dầu nóng theo từng mẻ đến khi vàng đều các mặt, không rán quá khô.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 5, text_vi: "Pha giấm, đường, nước mắm còn lại, tương cà với ít nước; phi thơm hành tỏi băm, cho sườn và bát sốt vào đảo đều.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 6, text_vi: "Đậy nắp, rim lửa nhỏ đến khi sốt sánh lại bám quanh miếng sườn.", kind: passive, minutes: 10, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-suon-xao-chua-ngot-bang-chanh-thom-mem-bat-vi-cho-23742", title: "Cách làm sườn xào chua ngọt bằng chanh thơm mềm, bắt vị cho bữa cơm nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/suon-xao-chua-ngot-4817970.html", title: "Cách làm sườn xào chua ngọt mềm thơm và đơn giản tại nhà (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-lam-suon-xao-chua-ngot-156247", title: "Bật mí cách làm sườn xào chua ngọt thơm ngon bất bại tại nhà (FPT Shop)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 500–900 g sườn; chọn 600 g cho 4 người. Ba nguồn đã đọc tạo vị chua bằng giấm hoặc chanh và không ghi tương cà; tương cà thêm theo dish_list (2 muỗng canh). Rán sườn bằng lượng dầu vừa phải, không chiên ngập."

@@ -1,0 +1,25 @@
+slug: trung-duc-thit
+name_vi: "Trứng đúc thịt"
+slot: man
+servings: 4
+method: chien
+tags: [dam_da, beo, mem, bua_thuong, com_hop]
+ingredients:
+  - {name: trứng gà, grams: 300, role: main, note: "6 quả (1 quả ≈ 50 g)"}
+  - {name: thịt băm, grams: 300, role: main, note: "nạc vai băm có chút mỡ"}
+  - {name: hành lá, grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: hành tím, grams: 10, role: seasoning, optional: true, note: "1 củ (1 củ ≈ 10 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay (1 muỗng cà phê ≈ 2,5 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Thái nhỏ hành lá, băm hành tím.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 2, text_vi: "Cho thịt băm, trứng, hành, nước mắm và tiêu vào tô, đánh thật đều tay.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Đun nóng dầu, đổ hỗn hợp vào dàn đều, đậy vung rán lửa nhỏ đến khi mặt dưới vàng.", kind: passive, minutes: 7, uses_burner: true}
+  - {step_no: 4, text_vi: "Lật mặt bánh trứng bằng đĩa hoặc xẻng.", kind: active, minutes: 1, uses_burner: true}
+  - {step_no: 5, text_vi: "Rán tiếp lửa nhỏ đến khi mặt còn lại vàng và thịt chín.", kind: passive, minutes: 5, uses_burner: true}
+  - {step_no: 6, text_vi: "Để ráo dầu rồi cắt miếng vừa ăn.", kind: active, minutes: 2, uses_burner: false}
+sources:
+  - {url: "https://vnexpress.net/trung-duc-thit-mon-an-quoc-dan-4860439.html", title: "Cách làm trứng đúc thịt - món ăn 'quốc dân' (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/trung-duc-thit-189774", title: "Học ngay cách làm món trứng đúc thịt thơm ngon, đơn giản (FPT Shop)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 200–300 g thịt và 4–6 trứng; chọn 300 g thịt, 6 trứng gà cho 4 người."

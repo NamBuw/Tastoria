@@ -1,0 +1,27 @@
+slug: tom-rim-thit-ba-chi
+name_vi: "Tôm rim thịt ba chỉ"
+slot: man
+servings: 4
+method: rim
+tags: [dam_da, beo, kho_rao, bua_thuong, com_hop]
+ingredients:
+  - {name: tôm, grams: 400, role: main, note: "tôm tươi còn vỏ, cắt râu, rút chỉ (bóc vỏ còn khoảng 300 g tôm nõn)"}
+  - {name: thịt ba chỉ, grams: 300, role: main}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 18, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 12 g), một phần thắng nước màu"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay (≈ 2,5 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh (≈ 13 g)"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+steps:
+  - {step_no: 1, text_vi: "Làm sạch tôm; cạo rửa thịt ba chỉ, thái miếng mỏng vừa ăn; băm hành tím.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp riêng tôm và thịt với một ít nước mắm, đường, tiêu và hành tím.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Cho thịt vào chảo với chút dầu, đảo đến khi xém cạnh và ra bớt mỡ.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi thơm phần hành tím còn lại, thêm tôm vào đảo đến khi tôm đỏ săn.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Nêm phần nước mắm, đường còn lại cùng ít nước, đậy nắp rim nhỏ lửa.", kind: passive, minutes: 10, uses_burner: true}
+  - {step_no: 6, text_vi: "Mở nắp đảo đến khi nước rim sánh lại, rắc hành lá, tiêu, ớt rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/tom-non-rim-thit-ba-chi-4903313.html", title: "Tôm nõn rim thịt ba chỉ (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-tom-non-rim-thom-mem-dam-vi-cho-bua-com-chieu-voi-23007", title: "Cách làm tôm nõn rim thơm mềm đậm vị cho bữa cơm chiều (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 300–500 g tôm nõn với 300 g ba chỉ; ở đây ghi tôm còn vỏ như lúc mua. Tổng 44 phút (gồm 15 phút ướp) so với ước lượng 30 phút."

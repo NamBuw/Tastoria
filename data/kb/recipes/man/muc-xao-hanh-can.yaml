@@ -1,0 +1,27 @@
+slug: muc-xao-hanh-can
+name_vi: "Mực xào hành cần"
+slot: man
+servings: 4
+method: xao
+tags: [dam_da, thom_toi, gion, bua_thuong, com_hop]
+ingredients:
+  - {name: mực, grams: 500, role: main, note: "mực ống tươi, khoảng 2–3 con (1 con ≈ 200 g)"}
+  - {name: cần tây, grams: 150, role: main, note: "cắt khúc 4 cm"}
+  - {name: hành tây, grams: 110, role: main, note: "1 củ, cắt múi cau"}
+  - {name: tỏi, grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay (≈ 2,5 g)"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê (≈ 4 g)"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê (≈ 4 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Làm sạch mực, bỏ túi mực và da, rửa nước muối loãng rồi khứa và cắt miếng vừa ăn.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp mực với nước mắm, tiêu, đường, hạt nêm và một ít tỏi băm.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Để mực ngấm gia vị; trong lúc chờ cắt cần tây, hành tây.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi tỏi, cho mực vào xào nhanh ở lửa lớn đến khi vừa săn rồi trút ra.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Xào hành tây khoảng 2 phút, thêm cần tây và mực, đảo đều, nêm lại rồi tắt bếp.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/cach-lam-muc-xao-can-tay-don-gian-thom-ngon-dung-dieu-1166952", title: "Cách làm mực xào hành cần đơn giản, thơm ngon đúng điệu (Bách hóa XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-lam-mon-muc-xao-voi-rau-cu-gion-ngot-ai-cung-lam-duoc-1512", title: "3 cách làm món mực xào với rau củ giòn ngọt (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://dienmaycholon.com/mon-ngon/cach-lam-muc-xao-can-tay", title: "Cách làm mực xào cần tây (Điện máy Chợ Lớn)", accessed_on: 2026-10-17}
+notes: "Theo dish_list dùng cần tây; nhiều nhà miền Bắc dùng cần ta (rau cần) cho món này. Nguồn dùng 300 g mực cho 2 người; tăng lên 500 g cho 4 người. Tổng 30 phút gồm 15 phút ướp."

@@ -1,0 +1,19 @@
+slug: trung-ga-luoc
+name_vi: "Trứng gà luộc"
+slot: man
+servings: 4
+method: luoc
+tags: [thanh, mem, bua_thuong, nau_nhanh, com_hop]
+ingredients:
+  - {name: trứng gà, grams: 400, role: main, note: "8 quả, 2 quả mỗi người (1 quả ≈ 50 g)"}
+  - {name: muối, grams: 6, role: seasoning, note: "1 muỗng cà phê cho vào nước luộc (1 muỗng cà phê ≈ 6 g); phần lớn ở lại trong nước"}
+steps:
+  - {step_no: 1, text_vi: "Xếp trứng vào nồi, đổ nước ngập trứng và thêm muối.", kind: active, minutes: 1, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun đến khi nước sôi, thỉnh thoảng đảo nhẹ cho trứng chín đều.", kind: passive, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Hạ lửa giữ sôi nhẹ đến khi trứng chín kỹ.", kind: passive, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Vớt trứng ngâm vào nước lạnh cho nguội nhanh.", kind: passive, minutes: 2, uses_burner: false}
+  - {step_no: 5, text_vi: "Gõ nứt vỏ và bóc trứng.", kind: active, minutes: 2, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-luoc-trung-ga-ngon-dung-thoi-gian-va-nhiet-do-de-boc-vo-23630", title: "Cách luộc trứng gà ngon đúng thời gian và nhiệt độ dễ bóc vỏ (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://viettelstore.vn/tin-tuc/luoc-trung-bao-nhieu-phut", title: "Luộc trứng bao nhiêu phút là ngon? (Viettel Store)", accessed_on: 2026-10-17}
+notes: "Trứng chín kỹ cần khoảng 8–12 phút sau khi sôi tuỳ cỡ trứng; lòng đào chỉ 5–6 phút. Muối trong nước luộc gần như không vào trứng."

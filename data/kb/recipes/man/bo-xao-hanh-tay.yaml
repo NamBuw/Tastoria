@@ -1,0 +1,25 @@
+slug: bo-xao-hanh-tay
+name_vi: "Bò xào hành tây"
+slot: man
+servings: 4
+method: xao
+tags: [thom_toi, mem, nau_nhanh, bua_thuong, com_hop]
+ingredients:
+  - {name: thịt bò, grams: 400, role: main}
+  - {name: hành tây, grams: 220, role: main, note: "2 củ (1 củ ≈ 110 g)"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: dầu hào, grams: 18, role: seasoning, note: "1 muỗng canh (≈ 18 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay (≈ 2,5 g)"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê (≈ 4 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây"}
+steps:
+  - {step_no: 1, text_vi: "Thái bò lát mỏng ngang thớ, trộn với dầu hào, tiêu, một nửa tỏi băm và chút dầu.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Bóc hành tây, cắt múi cau.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi tỏi còn lại, xào bò thật nhanh trên lửa lớn đến khi tái rồi trút ra đĩa.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Xào hành tây với hạt nêm đến khi hơi trong, cho bò vào đảo đều, nêm lại và tắt bếp.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-lam-thit-bo-xao-hanh-tay-la-lot-va-ca-chua-don-gian-04090", title: "3 cách làm thịt bò xào hành tây, lá lốt và cà chua (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-don-gian-lam-mon-thit-bo-xao-ngon-la-mieng-01751", title: "3 cách đơn giản làm món thịt bò xào ngon lạ miệng (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/tong-hop-16-cach-lam-cac-mon-xao-hanh-tay-thom-ngon-don-gian-16468", title: "Tổng hợp 16 cách làm các món xào hành tây (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "ĐMX dùng 300 g bò và 1 củ hành tây cho 2 người; ở đây 400 g bò và 2 củ hành cho 4 người (hành tây cũng là nguyên liệu chính). Hai nguồn sau chỉ mô tả món, không có định lượng."

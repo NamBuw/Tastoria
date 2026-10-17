@@ -1,0 +1,20 @@
+slug: trung-chien-hanh
+name_vi: "Trứng chiên hành lá"
+slot: man
+servings: 4
+method: chien
+tags: [mem, nau_nhanh, bua_thuong, com_hop]
+ingredients:
+  - {name: trứng gà, grams: 300, role: main, note: "6 quả (1 quả ≈ 50 g)"}
+  - {name: hành lá, grams: 45, role: main, note: "3 cây (1 cây ≈ 15 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay (1 muỗng cà phê ≈ 2,5 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Thái nhỏ hành lá, đập trứng vào tô, thêm nước mắm, tiêu và hành rồi đánh tan.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun nóng dầu, đổ trứng vào dàn đều mặt chảo, chiên lửa vừa đến khi mặt dưới vàng.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Lật trứng chiên thêm cho mặt kia vàng rồi cắt miếng.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/bi-quyet-chien-trung-thom-ngon-979580", title: "Cách làm trứng chiên và trứng chiên hành thơm ngon, mềm xốp (Bách hóa XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/cach-lam-trung-chien-nuoc-mam-an-com-banh-mi-deu-ngon-1338096", title: "2 cách làm trứng chiên nước mắm ăn cơm, bánh mì đều ngon (Bách hóa XANH)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 3 trứng cho 2–3 người và 5 trứng cho 2–3 người; chọn 6 trứng cho 4 người. Nguồn thứ hai là biến thể trứng chiên hành lá rưới nước mắm, chỉ lấy số trứng/hành lá. Chiên ít dầu, không ngập."

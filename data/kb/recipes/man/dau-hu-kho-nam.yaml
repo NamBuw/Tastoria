@@ -1,0 +1,26 @@
+slug: dau-hu-kho-nam
+name_vi: "Đậu hũ kho nấm"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, mem, sot_sanh, bua_thuong, com_hop]
+ingredients:
+  - {name: đậu phụ, grams: 600, role: main, note: "4 miếng (1 miếng ≈ 150 g)"}
+  - {name: nấm rơm, grams: 200, role: main}
+  - {name: nước tương, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 12, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay (1 muỗng cà phê ≈ 2,5 g)"}
+  - {name: hạt nêm chay, grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: dầu ăn, grams: 39, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 13 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây (1 cây ≈ 15 g)"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+steps:
+  - {step_no: 1, text_vi: "Cắt đậu miếng vuông; nấm rơm ngâm nước muối loãng, rửa sạch, cắt đôi.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Chiên đậu với dầu đến khi vàng mặt rồi gắp ra.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 3, text_vi: "Xào nấm cho săn, cho đậu vào, nêm nước tương, đường, hạt nêm chay và thêm ít nước.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Kho nhỏ lửa đến khi nước sánh lại và đậu thấm màu.", kind: passive, minutes: 12, uses_burner: true}
+  - {step_no: 5, text_vi: "Rắc tiêu, hành lá, ớt rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-dau-hu-kho-nam-rom-ca-chua-mem-thom-cho-bua-com-them-15447", title: "Cách làm đậu hũ kho nấm rơm, cà chua mềm thơm cho bữa cơm thêm tròn vị (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-dau-hu-kho-nam-dong-co-nam-huong-thom-ngon-bat-vi-13955", title: "Cách làm đậu hũ kho nấm đông cô - nấm hương thơm ngon, bắt vị tại nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Món chay: dùng hạt nêm chay thay hạt nêm thường, không nước mắm. Nguồn nấm rơm dùng 100 g nấm cho 2 miếng đậu; tăng lên 200 g nấm, 4 miếng đậu cho 4 người."

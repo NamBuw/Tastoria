@@ -1,0 +1,25 @@
+slug: trung-sot-ca-chua
+name_vi: "Trứng sốt cà chua"
+slot: man
+servings: 4
+method: om
+tags: [chua_ngot, mem, sot_sanh, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: trứng gà, grams: 300, role: main, note: "6 quả (1 quả ≈ 50 g)"}
+  - {name: cà chua, grams: 360, role: main, note: "3 quả (1 quả ≈ 120 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 8, role: seasoning, note: "2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: muối, grams: 1.5, role: seasoning, note: "1/4 muỗng cà phê, đánh cùng trứng (1 muỗng cà phê ≈ 6 g)"}
+  - {name: tiêu, grams: 1, role: seasoning, optional: true, note: "một ít tiêu xay"}
+  - {name: dầu ăn, grams: 39, role: seasoning, note: "3 muỗng canh: 1 để chiên trứng, 2 để làm sốt (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt cà chua hạt lựu, băm hành tím và thái nhỏ hành lá.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Đánh tan trứng với muối, chiên thành tấm mỏng rồi cắt miếng vừa ăn.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 3, text_vi: "Phi thơm hành tím, cho cà chua vào xào nhừ, nêm nước mắm và đường.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho trứng vào chảo sốt, thêm vài thìa nước, om nhỏ lửa cho trứng thấm.", kind: passive, minutes: 4, uses_burner: true}
+  - {step_no: 5, text_vi: "Rắc hành lá, đảo nhẹ rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-trung-sot-ca-chua-don-gian-ngon-mieng-cho-bua-com-23530", title: "Cách làm trứng sốt cà chua đơn giản, ngon miệng cho bữa cơm nhà tròn vị (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Chỉ tìm được 1 nguồn có định lượng (5 trứng, 400 g cà chua cho 3–4 người); tăng lên 6 trứng cho 4 người. Bỏ dầu hào, tương ớt, hạt nêm của nguồn để món đơn giản."

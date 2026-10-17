@@ -1,0 +1,25 @@
+slug: bo-xao-sa-ot
+name_vi: "Bò xào sả ớt"
+slot: man
+servings: 4
+method: xao
+tags: [cay, thom_sa_gung, dam_da, nau_nhanh, bua_thuong]
+ingredients:
+  - {name: thịt bò, grams: 500, role: main}
+  - {name: sả, grams: 75, role: seasoning, note: "3 cây (1 cây ≈ 25 g)"}
+  - {name: ớt, grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: tỏi, grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: dầu hào, grams: 18, role: seasoning, note: "1 muỗng canh (≈ 18 g)"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê (≈ 4 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Thái bò lát mỏng, trộn với nước mắm, dầu hào, đường và một nửa tỏi băm.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Băm nhỏ sả, cắt ớt lát, băm hành tím và tỏi còn lại.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi sả, hành, tỏi, ớt với dầu đến khi vàng thơm.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho bò vào đảo nhanh trên lửa lớn đến khi vừa chín, nêm lại và tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-thit-bo-xao-sa-ot-cay-cay-mem-ngon-dam-da-huong-vi-09299", title: "2 cách làm thịt bò xào sả ớt cay cay mềm ngon (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-don-gian-lam-mon-thit-bo-xao-ngon-la-mieng-01751", title: "3 cách đơn giản làm món thịt bò xào ngon lạ miệng (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Định lượng theo ĐMX (500 g bò, 3 cây sả, 4 tép tỏi, 2 củ hành tím cho 4 người), nêm nước mắm theo dish_list thay một phần nước tương. ĐMX ướp 15 phút; ở đây trộn gia vị ngay lúc thái để giữ món nhanh (bò thái mỏng ngấm nhanh). Nguồn thứ hai chỉ mô tả món."

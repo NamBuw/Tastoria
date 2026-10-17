@@ -1,0 +1,23 @@
+slug: dau-hu-chien-sa
+name_vi: "Đậu hũ chiên sả"
+slot: man
+servings: 4
+method: chien
+tags: [thom_sa_gung, cay, gion, kho_rao, bua_thuong]
+ingredients:
+  - {name: đậu phụ, grams: 600, role: main, note: "4 miếng (1 miếng ≈ 150 g)"}
+  - {name: sả, grams: 100, role: seasoning, note: "4 cây (1 cây ≈ 25 g)"}
+  - {name: ớt, grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: nước tương, grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: muối, grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: đường, grams: 4, role: seasoning, optional: true, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: dầu ăn, grams: 140, role: seasoning, note: "khoảng 150 ml cho vào chảo để chiên ngập đậu"}
+steps:
+  - {step_no: 1, text_vi: "Cắt đậu thành khối vuông nhỏ, thấm thật khô.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 2, text_vi: "Băm nhuyễn sả và ớt.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Chiên đậu trong dầu nóng đến khi vàng giòn, vớt ra để ráo.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Chắt bớt dầu, phi sả ớt đến vàng thơm, cho đậu vào cùng muối, nước tương và đường, đảo đều cho áo sả.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-dau-hu-chien-sa-ot-gion-rum-thom-ngon-chay-man-deu-11220", title: "3 cách làm đậu hũ chiên sả ớt ngon, giòn rụm chay mặn đều dùng được (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-dau-hu-chien-sa-ot-va-chien-trung-muoi-thom-ngon-01930", title: "2 cách làm đậu hũ chiên sả và đậu hũ chiên trứng muối (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Chiên ngập dầu: phần lớn dầu còn lại; dinh dưỡng dùng hệ số hấp thu chất béo (BR-NUT-05). Món chay: nêm muối và nước tương, không dùng nước mắm. Nguồn dùng 2 cây sả và 100 ml dầu cho 2 người."

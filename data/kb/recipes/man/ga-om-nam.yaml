@@ -1,0 +1,29 @@
+slug: ga-om-nam
+name_vi: "Gà om nấm"
+slot: man
+servings: 4
+method: om
+tags: [dam_da, mem, sot_sanh, troi_lanh, bua_thuong]
+ingredients:
+  - {name: thịt gà, grams: 700, role: main, note: "nửa con gà, chặt miếng, cân cả xương"}
+  - {name: nấm hương khô, grams: 20, role: main, note: "khoảng 10–12 tai"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: dầu hào, grams: 18, role: seasoning, note: "1 muỗng canh (≈ 18 g)"}
+  - {name: nước tương, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: gừng, grams: 15, role: seasoning, note: "nửa nhánh (1 nhánh ≈ 30 g)"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, optional: true, note: "2 cây (1 cây ≈ 15 g)"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm nấm hương trong nước ấm cho nở mềm, cắt chân rồi rửa sạch.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 2, text_vi: "Làm sạch gà, chặt miếng vừa ăn rồi chần qua nước sôi khoảng 2 phút, vớt ra để ráo.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 3, text_vi: "Băm hành tím, tỏi; thái gừng sợi; cắt hành lá.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi thơm hành, tỏi, gừng; cho gà vào đảo săn rồi thêm nấm, nước mắm, dầu hào, nước tương và đường.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 5, text_vi: "Đổ nước xâm xấp mặt gà, đun sôi rồi đậy nắp om nhỏ lửa đến khi gà mềm.", kind: passive, minutes: 20, uses_burner: true}
+  - {step_no: 6, text_vi: "Mở nắp đun thêm cho nước sốt sánh lại, nêm vừa ăn và rắc hành lá.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/ga-om-nam-3175612.html", title: "Gà om nấm (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/ga-kho-nam/", title: "Gà kho nấm (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "Nguồn VnExpress om 30 phút với nửa con gà 700 g và 12 tai nấm hương; chọn 20 phút om cho gà chặt nhỏ. Bước ngâm nấm chạy song song với sơ chế gà nên tổng thời gian thực tế ngắn hơn tổng số phút."

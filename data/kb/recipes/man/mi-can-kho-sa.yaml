@@ -1,0 +1,23 @@
+slug: mi-can-kho-sa
+name_vi: "Mì căn kho sả"
+slot: man
+servings: 4
+method: kho
+tags: [thom_sa_gung, cay, dam_da, kho_rao, bua_thuong, com_hop]
+ingredients:
+  - {name: mì căn, grams: 400, role: main}
+  - {name: sả, grams: 100, role: seasoning, note: "4 cây (1 cây ≈ 25 g)"}
+  - {name: ớt, grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: nước tương, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 12, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: hạt nêm chay, grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: dầu ăn, grams: 52, role: seasoning, note: "4 muỗng canh: chiên sơ mì căn và phi sả (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt mì căn thành miếng vừa ăn, băm nhuyễn sả và ớt.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp mì căn với nước tương, đường, hạt nêm chay và một nửa phần sả băm.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Chiên sơ mì căn với dầu đến khi vàng mặt.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi phần sả ớt còn lại cho thơm, cho mì căn cùng nước ướp và chút nước vào, kho nhỏ lửa đến khi cạn sệt.", kind: passive, minutes: 9, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-mi-can-kho-chay-ngon-tuyet-voi-don-gian-tai-nha-13201", title: "2 cách làm mì căn kho chay ngon tuyệt vời, đơn giản tại nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-mon-mi-can-xao-sa-ot-thom-nong-hap-dan-cuc-ky-bat-24201", title: "Cách làm món mì căn xào sả ớt thơm nồng hấp dẫn cực kỳ bắt cơm tại nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Không tìm được bài riêng cho mì căn kho sả: cách kho lấy từ bài mì căn kho chay, lượng sả ớt lấy từ bài mì căn xào sả ớt (400 g mì căn, 100 g sả). Món chay: không nước mắm, nêm bằng nước tương và hạt nêm chay. Tổng 36 phút so với 25 phút trong dish_list do có bước ướp."

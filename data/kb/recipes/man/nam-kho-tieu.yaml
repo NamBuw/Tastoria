@@ -1,0 +1,25 @@
+slug: nam-kho-tieu
+name_vi: "Nấm kho tiêu"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, cay, kho_rao, bua_thuong, com_hop]
+ingredients:
+  - {name: nấm đùi gà, grams: 400, role: main, note: "2 gói (1 gói ≈ 200 g)"}
+  - {name: nước tương, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 12, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: tiêu, grams: 5, role: seasoning, note: "2 muỗng cà phê tiêu xay và tiêu đập dập (1 muỗng cà phê ≈ 2,5 g)"}
+  - {name: hạt nêm chay, grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: tỏi tây, grams: 30, role: seasoning, note: "phần trắng khoảng 1/5 cây, băm (1 cây ≈ 150 g)"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 13 g)"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+steps:
+  - {step_no: 1, text_vi: "Rửa nấm, để ráo rồi xé hoặc cắt lát dày.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp nấm với nước tương, đường, hạt nêm chay và một nửa lượng tiêu.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm tỏi tây băm, cho nấm vào đảo đến khi săn lại.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 4, text_vi: "Thêm chút nước, kho nhỏ lửa đến khi nước keo lại bám vào nấm.", kind: passive, minutes: 10, uses_burner: true}
+  - {step_no: 5, text_vi: "Rắc phần tiêu còn lại và ớt cắt lát, tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-nam-dui-ga-kho-tieu-va-kho-me-don-gian-thanh-dam-04477", title: "4 cách làm nấm đùi gà kho tiêu và kho me đậm đà thơm ngon cho bữa cơm chay (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-nam-dui-ga-kho-xi-dau-thom-ngon-dam-da-don-gian-tai-18335", title: "Cách làm nấm đùi gà kho xì dầu thơm ngon đậm đà đơn giản tại nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Món chay: bỏ dầu hào trong nguồn, nêm bằng nước tương và hạt nêm chay. Hành boa rô của nguồn ghi là tỏi tây. Tổng thời gian dài hơn dish_list (35 so với 25 phút) do có bước ướp."

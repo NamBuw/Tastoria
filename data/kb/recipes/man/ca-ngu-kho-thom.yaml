@@ -1,0 +1,30 @@
+slug: ca-ngu-kho-thom
+name_vi: "Cá ngừ kho thơm"
+slot: man
+servings: 4
+method: kho
+tags: [chua_ngot, dam_da, cay, bua_thuong, com_hop]
+ingredients:
+  - {name: cá ngừ, grams: 500, role: main, note: "cắt khúc dày khoảng 3 cm"}
+  - {name: dứa, grams: 225, role: main, note: "1/4 quả (1 quả ≈ 900 g, cân cả vỏ)"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: ớt, grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: đường, grams: 12, role: seasoning, note: "1 muỗng canh (≈ 12 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, optional: true, note: "2 cây (1 cây ≈ 15 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa cá với nước muối loãng, thấm khô rồi cắt khúc.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp cá với hành tím băm, tiêu và một ít nước mắm.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Gọt dứa, bỏ lõi và thái lát; băm tỏi, cắt ớt và hành lá.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 4, text_vi: "Áp chảo cá với dầu đến khi thịt săn và hơi vàng mặt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 5, text_vi: "Xếp cá vào nồi, nêm nước mắm, đường, thêm ít nước sôi rồi kho nhỏ lửa.", kind: passive, minutes: 12, uses_burner: true}
+  - {step_no: 6, text_vi: "Cho dứa vào kho tiếp đến khi dứa thấm màu và nước kho sệt lại.", kind: passive, minutes: 8, uses_burner: true}
+  - {step_no: 7, text_vi: "Thêm tỏi, ớt, hành lá, rắc tiêu rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/ca-ngu-kho-dua-2823882.html", title: "Cá ngừ kho dứa (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/ca-ngu-kho-dua-2307892.html", title: "Cá ngừ kho dứa (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/ca-ngu-kho-nuoc-mia/", title: "Cá ngừ kho nước mía (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "Khẩu phần theo bài Món Ngon Mỗi Ngày (500 g cá ngừ, 1/4 quả thơm cho 4 người); bài đó kho với nước mía, chỉ lấy định lượng cá và thơm."

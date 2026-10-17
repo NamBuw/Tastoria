@@ -1,0 +1,24 @@
+slug: bo-cuon-nam-kim-cham
+name_vi: "Bò cuộn nấm kim châm"
+slot: man
+servings: 4
+method: chien
+tags: [mem, dam_da, thom_toi, cuoi_tuan, com_hop]
+ingredients:
+  - {name: thịt bò, grams: 400, role: main, note: "Thăn hoặc ba chỉ bò thái lát thật mỏng"}
+  - {name: nấm kim châm, grams: 300, role: main, note: "2 gói (1 gói ≈ 150 g)"}
+  - {name: dầu hào, grams: 36, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 18 g)"}
+  - {name: tỏi, grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay (≈ 2,5 g)"}
+  - {name: nước tương, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: đường, grams: 8, role: seasoning, note: "2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh để áp chảo (1 muỗng canh ≈ 13 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây, chần mềm để buộc cuộn"}
+steps:
+  - {step_no: 1, text_vi: "Trải lát bò, rắc tiêu và một ít tỏi băm, dầu hào cho thấm mặt thịt.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Cắt gốc nấm, tách thành từng nhúm nhỏ; đặt nấm lên lát bò rồi cuộn chặt.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 3, text_vi: "Áp chảo các cuộn với dầu, mép cuộn úp xuống trước, lăn đều đến khi vàng các mặt.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi tỏi còn lại, đổ dầu hào, nước tương, đường và chút nước vào chảo, đảo cho cuộn thấm sốt.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://monngonmoingay.com/bo-cuon-nam-kim-cham/", title: "Bò cuộn nấm kim châm (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "Chỉ tìm được 1 nguồn. MNMN (4 người) dùng 100 g bò phi lê + 100 g ba rọi xông khói, 100 g nấm và chấm sốt mayonnaise–tương ớt; ở đây làm bản thuần bò kiểu sốt dầu hào nên tăng lên 400 g bò, 300 g nấm. Áp chảo (chiên ít dầu), dầu ghi theo lượng dùng."

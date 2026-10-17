@@ -1,0 +1,25 @@
+slug: muc-hap-gung
+name_vi: "Mực hấp gừng"
+slot: man
+servings: 4
+method: hap
+tags: [thanh, thom_sa_gung, mem, troi_lanh, bua_thuong]
+ingredients:
+  - {name: mực, grams: 500, role: main, note: "mực ống tươi, khoảng 2–3 con (1 con ≈ 200 g)"}
+  - {name: gừng, grams: 60, role: seasoning, note: "2 nhánh (1 nhánh ≈ 30 g), một phần thái sợi, một phần giã làm nước chấm"}
+  - {name: hành lá, grams: 60, role: seasoning, note: "4 cây (1 cây ≈ 15 g)"}
+  - {name: muối, grams: 6, role: seasoning, note: "1 muỗng cà phê (≈ 6 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay (≈ 2,5 g)"}
+  - {name: nước mắm, grams: 30, role: seasoning, optional: true, note: "2 muỗng canh (1 muỗng canh ≈ 15 g), pha nước chấm gừng"}
+  - {name: đường, grams: 12, role: seasoning, optional: true, note: "1 muỗng canh (≈ 12 g), pha nước chấm"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+steps:
+  - {step_no: 1, text_vi: "Làm sạch mực, bóp với chút gừng giã cho bớt tanh, rửa lại rồi khứa vảy rồng trên thân.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Thái gừng sợi, cắt hành lá khúc; trộn mực với muối, tiêu và một nửa gừng sợi.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Đun sôi nước trong nồi hấp, lót gừng và hành lá lên xửng rồi đặt mực vào.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Đậy nắp hấp đến khi mực trắng đục, không hấp lâu để mực khỏi dai.", kind: passive, minutes: 10, uses_burner: true}
+  - {step_no: 5, text_vi: "Trong lúc hấp, giã gừng với ớt, pha nước mắm và đường làm nước chấm.", kind: active, minutes: 2, uses_burner: false}
+sources:
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/cach-lam-muc-hap-gung-ngon-com-am-bung-ngay-mua-1204819", title: "2 cách làm mực hấp gừng ngon cơm, ấm bụng ngày mưa (Bách hóa XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/huong-dan-cach-lam-mon-muc-hap-gung-thom-ngon-01423", title: "Cách làm mực trứng hấp gừng thơm ngon (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nguồn ướp 15–20 phút; ở đây trộn gia vị ngay trước khi hấp để giữ thời gian gần ước lượng 15 phút (tổng 22 phút). Nguồn dùng 300–600 g mực và 70 g gừng cho 300 g mực."

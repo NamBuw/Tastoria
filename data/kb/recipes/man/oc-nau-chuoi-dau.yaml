@@ -1,0 +1,33 @@
+slug: oc-nau-chuoi-dau
+name_vi: "Ốc nấu chuối đậu"
+slot: man
+servings: 4
+method: om
+tags: [dam_da, mam_ruoc, nhieu_nuoc, troi_lanh, cuoi_tuan]
+ingredients:
+  - {name: ốc, grams: 1000, role: main, note: "ốc bươu cả vỏ (khều được khoảng 300 g thịt ốc)"}
+  - {name: chuối xanh, grams: 400, role: main, note: "4 quả (1 quả ≈ 100 g)"}
+  - {name: đậu phụ, grams: 300, role: main, note: "2 miếng (1 miếng ≈ 150 g)"}
+  - {name: thịt ba chỉ, grams: 200, role: main}
+  - {name: nghệ, grams: 20, role: seasoning, note: "1 nhánh (≈ 20 g), giã lấy nước"}
+  - {name: mẻ, grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g), lọc lấy nước"}
+  - {name: mắm tôm, grams: 18, role: seasoning, note: "1 muỗng canh (≈ 18 g)"}
+  - {name: tía tô, grams: 30, role: seasoning, note: "nắm vừa"}
+  - {name: lá lốt, grams: 50, role: seasoning, note: "1/2 bó (1 bó ≈ 100 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê (≈ 4 g)"}
+  - {name: giấm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g), pha nước ngâm chuối"}
+  - {name: dầu ăn, grams: 39, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 13 g), rán đậu và xào"}
+steps:
+  - {step_no: 1, text_vi: "Luộc ốc đã ngâm sạch nhớt khoảng 5 phút, khều lấy thịt, bỏ ruột và rửa lại.", kind: active, minutes: 20, uses_burner: true}
+  - {step_no: 2, text_vi: "Gọt vỏ chuối, cắt khúc rồi ngâm nước pha giấm và chút nghệ cho khỏi thâm; thái thịt ba chỉ, cắt đậu miếng vuông.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 3, text_vi: "Ướp ốc và thịt với nước nghệ, nước mẻ, mắm tôm và hành tím băm.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 4, text_vi: "Rán đậu phụ đến khi vàng hai mặt rồi vớt ra.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 5, text_vi: "Xào thịt ba chỉ cho săn và ra mỡ, thêm ốc đảo cùng đến khi thấm gia vị.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 6, text_vi: "Đổ nước xâm xấp, cho chuối và đậu vào, đậy nắp om nhỏ lửa đến khi chuối bở mềm.", kind: passive, minutes: 25, uses_burner: true}
+  - {step_no: 7, text_vi: "Nêm nước mắm, đường cho vừa, thả tía tô và lá lốt thái chỉ, đun thêm chút rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/troi-se-se-lanh-thu-ngay-mon-oc-nau-chuoi-dau-chuan-vi-mien-bac-cho-ca-gia-dinh-1320877", title: "Cách làm món ốc nấu chuối đậu chuẩn vị miền Bắc (Bách hóa XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-oc-chuoi-dau-thom-ngon-khong-tanh-don-gian-nhat-01692", title: "Cách làm ốc nấu chuối đậu lạ miệng đơn giản (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 300–400 g thịt ốc (khoảng 1 kg ốc cả vỏ), 2–7 quả chuối, 1–2 miếng đậu, 200 g ba chỉ. Thời gian ngâm ốc cho sạch nhớt (khoảng 2 giờ) không tính vào các bước. Rán đậu ít dầu, không ngập."

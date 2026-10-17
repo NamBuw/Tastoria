@@ -1,0 +1,34 @@
+slug: vit-om-sau
+name_vi: "Vịt om sấu"
+slot: man
+servings: 4
+method: om
+tags: [chua, thom_sa_gung, nhieu_nuoc, troi_nong, cuoi_tuan]
+ingredients:
+  - {name: thịt vịt, grams: 1200, role: main, note: "chặt miếng, cân cả xương"}
+  - {name: sấu, grams: 120, role: main, note: "8 quả (1 quả ≈ 15 g)"}
+  - {name: khoai sọ, grams: 500, role: side, note: "khoảng 8 củ (1 củ ≈ 60 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: sả, grams: 75, role: seasoning, note: "3 cây (1 cây ≈ 25 g)"}
+  - {name: rau mùi, grams: 20, role: seasoning, note: "một nắm nhỏ (≈ 20 g)"}
+  - {name: gừng, grams: 30, role: seasoning, note: "1 nhánh, một nửa đập dập để khử mùi, một nửa băm ướp"}
+  - {name: tỏi, grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: muối, grams: 6, role: seasoning, note: "1 muỗng cà phê để ướp (không tính muối chà khử mùi)"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: rau ngổ, grams: 20, role: seasoning, optional: true, note: "một nắm nhỏ"}
+steps:
+  - {step_no: 1, text_vi: "Bóp vịt với muối và gừng đập dập để khử mùi, rửa lại rồi chặt miếng vừa ăn.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Gọt khoai sọ ngâm nước muối loãng; đập dập sả, băm hành tím, tỏi và gừng.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 3, text_vi: "Ướp vịt với nước mắm, muối, hạt nêm, tiêu và một nửa phần hành tỏi gừng băm.", kind: passive, minutes: 20, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi thơm sả và phần hành tỏi còn lại, cho vịt vào xào lửa lớn đến khi săn thịt.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 5, text_vi: "Đổ nước ngập thịt, cho sấu vào, đun sôi rồi hạ lửa đậy nắp om.", kind: passive, minutes: 25, uses_burner: true}
+  - {step_no: 6, text_vi: "Cho khoai sọ vào om tiếp đến khi khoai bở và thịt mềm.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 7, text_vi: "Vớt sấu dầm lấy thịt cho lại vào nồi, nêm vừa ăn rồi rắc hành lá, rau mùi, rau ngổ.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-vit-om-sau-khoai-so-chuan-vi-mien-bac-thom-ngon-kho-23990", title: "Cách làm vịt om sấu khoai sọ chuẩn vị miền Bắc (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/cach-lam-vit-om-sau-don-gian-4298558.html", title: "Cách làm vịt om sấu đơn giản (VnExpress)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 1,5–1,7 kg vịt cho 4–5 người; chọn 1,2 kg có xương cho 4 người. Nước om không ghi thành nguyên liệu. Rau mùi trong dish_list tương ứng mùi tàu/ngò trong nguồn."

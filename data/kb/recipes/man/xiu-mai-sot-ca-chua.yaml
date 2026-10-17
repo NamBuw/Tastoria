@@ -1,0 +1,31 @@
+slug: xiu-mai-sot-ca-chua
+name_vi: "Xíu mại sốt cà chua"
+slot: man
+servings: 4
+method: om
+tags: [mem, sot_sanh, chua_ngot, bua_thuong, com_hop]
+ingredients:
+  - {name: thịt băm, grams: 400, role: main}
+  - {name: cà chua, grams: 360, role: main, note: "3 quả (1 quả ≈ 120 g)"}
+  - {name: củ đậu, grams: 150, role: main, note: "Khoảng 1/3 củ (1 củ ≈ 400 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: bột năng, grams: 16, role: seasoning, note: "2 muỗng canh: 1,5 trộn viên, 0,5 làm sánh sốt (1 muỗng canh ≈ 8 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: đường, grams: 8, role: seasoning, note: "2 muỗng cà phê"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh để xào sốt (1 muỗng canh ≈ 13 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây"}
+steps:
+  - {step_no: 1, text_vi: "Gọt củ đậu, băm nhỏ và vắt bớt nước; băm hành tím.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Trộn thịt với củ đậu, một nửa hành tím, nước mắm, tiêu, một nửa số đường và phần lớn bột năng.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Để hỗn hợp ngấm gia vị.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 4, text_vi: "Vo thịt thành viên nhỏ cỡ quả táo ta.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 5, text_vi: "Hấp các viên xíu mại đến khi chín.", kind: passive, minutes: 12, uses_burner: true}
+  - {step_no: 6, text_vi: "Phi hành tím còn lại với dầu, xào cà chua thái nhỏ đến nhừ, thêm khoảng một bát nước, hạt nêm và đường.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 7, text_vi: "Thả viên vào sốt, om nhỏ lửa rồi khuấy chút bột năng pha nước cho sốt sánh, rắc hành lá.", kind: passive, minutes: 8, uses_burner: true}
+sources:
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-lam-xiu-mai-163366", title: "Cách làm xíu mại sốt cà chua mềm ngon, đậm đà ngay tại nhà (FPT Shop)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/banh-mi-xiu-mai/", title: "Cách làm bánh mì xíu mại tại nhà ngon như ngoài hàng (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-lam-xiu-mai-an-banh-mi-163374", title: "Cách làm xíu mại ăn bánh mì ngon khó cưỡng chuẩn vị Đà Lạt (FPT Shop)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 200–300 g thịt cho 3–4 người (món ăn kèm bánh mì); tăng lên 400 g khi là món mặn chính. Viên được hấp chín (theo Món Ngon Mỗi Ngày) thay vì chiên ngập dầu như một nguồn FPT Shop."

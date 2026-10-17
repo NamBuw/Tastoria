@@ -1,0 +1,29 @@
+slug: dau-phu-nhoi-thit-sot-ca-chua
+name_vi: "Đậu phụ nhồi thịt sốt cà chua"
+slot: man
+servings: 4
+method: om
+tags: [chua, mem, sot_sanh, bua_thuong, com_hop]
+ingredients:
+  - {name: đậu phụ, grams: 600, role: main, note: "4 miếng (1 miếng ≈ 150 g)"}
+  - {name: thịt băm, grams: 200, role: main}
+  - {name: cà chua, grams: 360, role: main, note: "3 quả (1 quả ≈ 120 g)"}
+  - {name: mộc nhĩ, grams: 3, role: side, optional: true, note: "2 tai khô, băm trộn nhân"}
+  - {name: nước mắm, grams: 23, role: seasoning, note: "1,5 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: đường, grams: 12, role: seasoning, note: "1 muỗng canh"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay"}
+  - {name: dầu ăn, grams: 52, role: seasoning, note: "4 muỗng canh: rán đậu áp chảo và xào sốt (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Băm hành tím, mộc nhĩ; trộn thịt với một nửa hành tím, hạt nêm, tiêu và một ít nước mắm.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Cắt mỗi miếng đậu làm đôi hoặc làm ba, rạch túi ở giữa và nhồi thịt vào cho chặt.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 3, text_vi: "Rán đậu trong chảo ít dầu, mặt có thịt xuống trước, đến khi vàng các mặt.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi hành tím còn lại, cho cà chua thái nhỏ vào xào nhừ, nêm nước mắm, đường và thêm chút nước.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 5, text_vi: "Xếp đậu vào chảo sốt, đậy nắp om nhỏ lửa cho đậu ngấm và sốt sánh lại.", kind: passive, minutes: 10, uses_burner: true}
+  - {step_no: 6, text_vi: "Rắc hành lá thái nhỏ rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/dau-phu-nhoi-thit-sot-ca-chua-173425", title: "Hướng dẫn cách làm đậu phụ nhồi thịt sốt cà chua đậm đà đưa cơm (FPT Shop)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/dau-nhoi-thit-163830", title: "Cách làm đậu nhồi thịt siêu dễ, không khéo tay cũng thành công (FPT Shop)", accessed_on: 2026-10-17}
+notes: "Hai nguồn là hai bài khác nhau trên FPT Shop, đều dùng 150 g thịt cho 4 miếng đậu, ở đây tăng lên 200 g. Một nguồn chiên ngập 200–300 ml dầu; bản này rán áp chảo."

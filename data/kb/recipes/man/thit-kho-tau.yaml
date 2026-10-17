@@ -1,0 +1,31 @@
+slug: thit-kho-tau
+name_vi: "Thịt kho tàu"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, beo, mem, nhieu_nuoc, cuoi_tuan, com_hop]
+ingredients:
+  - {name: thịt ba chỉ, grams: 600, role: main}
+  - {name: trứng vịt, grams: 280, role: main, note: "4 quả (1 quả ≈ 70 g)"}
+  - {name: nước dừa, grams: 400, role: main, note: "400 ml nước dừa tươi (≈ 1 quả)"}
+  - {name: nước mắm, grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 28, role: seasoning, note: "2 muỗng canh để ướp + 1 muỗng cà phê thắng nước màu (12 g + 4 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: tỏi, grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả, cho vào cuối"}
+steps:
+  - {step_no: 1, text_vi: "Rửa thịt với nước muối loãng, chần qua nước sôi rồi xả sạch và cắt khối vuông khoảng 3–4 cm.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 2, text_vi: "Băm hành tím, tỏi; trộn thịt với hành tỏi, nước mắm, 2 muỗng canh đường, hạt nêm và tiêu.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Đậy kín để thịt ngấm gia vị.", kind: passive, minutes: 30, uses_burner: false}
+  - {step_no: 4, text_vi: "Luộc trứng vịt khoảng 10 phút, ngâm nước lạnh rồi bóc vỏ.", kind: passive, minutes: 12, uses_burner: true}
+  - {step_no: 5, text_vi: "Thắng phần đường còn lại với dầu đến màu cánh gián, cho thịt vào đảo đến khi săn lại.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 6, text_vi: "Đổ nước dừa và thêm nước cho xâm xấp mặt thịt, đun sôi, hớt bọt rồi hạ lửa nhỏ kho liu riu.", kind: passive, minutes: 30, uses_burner: true}
+  - {step_no: 7, text_vi: "Thả trứng vào nồi, kho tiếp đến khi thịt mềm và trứng lên màu; nêm lại, thêm ớt nếu thích.", kind: passive, minutes: 30, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-thit-kho-tau-thom-ngon-00434", title: "Hướng dẫn cách làm thịt kho Tàu thơm ngon đúng vị, thịt mềm béo ngậy (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://hoanghamobile.com/tin-tuc/cach-lam-thit-kho-tau/", title: "Cách làm thịt kho tàu chuẩn miền Nam: mềm tan (Hoàng Hà Mobile)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/heo-kho-tau/", title: "Heo kho tàu (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "Nước lọc pha thêm khi kho không ghi thành nguyên liệu. Nguồn dùng 500 g ba chỉ + 5 trứng (6 người) đến 1 kg + 10 trứng; chọn 600 g + 4 trứng cho 4 người. Nguồn ướp 1 giờ trở lên, ở đây ghi 30 phút. Tổng thời gian (124 phút) dài hơn ước lượng 90 phút của dish_list vì kho hai chặng 30 + 30 phút như nguồn."

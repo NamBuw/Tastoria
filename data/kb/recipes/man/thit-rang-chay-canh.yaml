@@ -1,0 +1,27 @@
+slug: thit-rang-chay-canh
+name_vi: "Thịt rang cháy cạnh"
+slot: man
+servings: 4
+method: rang
+tags: [dam_da, beo, kho_rao, bua_thuong, com_hop]
+ingredients:
+  - {name: thịt ba chỉ, grams: 500, role: main}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: hành lá, grams: 45, role: seasoning, note: "3 cây (1 cây ≈ 15 g)"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 12, role: seasoning, note: "1 muỗng canh"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay"}
+  - {name: dầu ăn, grams: 5, role: seasoning, note: "1 muỗng cà phê tráng chảo"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+steps:
+  - {step_no: 1, text_vi: "Rửa thịt với nước muối loãng, để ráo rồi thái lát vừa, không quá mỏng để khỏi bị khô.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Băm hành tím; cắt hành lá thành khúc ngắn.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Rang thịt trong chảo tráng chút dầu ở lửa vừa, đảo đến khi thịt ra mỡ và các cạnh vàng sém.", kind: active, minutes: 12, uses_burner: true}
+  - {step_no: 4, text_vi: "Chắt bớt mỡ, cho hành tím vào phi thơm rồi thêm nước mắm, hạt nêm và tiêu, đảo đều.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Rắc đường vào chảo cho bắt màu, đảo đến khi thịt sánh bóng; cho hành lá, ớt rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/cach-lam-thit-ba-chi-rang-chay-canh-don-gian-4298428.html", title: "Cách làm thịt rang cháy cạnh đơn giản mà ngon như nhà hàng (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-thit-ba-chi-rang-chay-canh-don-gian-sieu-ngon-an-la-06765", title: "Cách làm thịt ba chỉ rang cháy cạnh đơn giản siêu ngon (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.vinmec.com/vie/bai-viet/cach-lam-thit-rang-chay-canh-ngon-vi", title: "Cách làm thịt rang cháy cạnh ngon (Vinmec)", accessed_on: 2026-10-17}
+notes: "Các nguồn dùng 300–500 g ba chỉ; chọn 500 g cho 4 người. Gia vị nêm trực tiếp khi rang, không ướp riêng."

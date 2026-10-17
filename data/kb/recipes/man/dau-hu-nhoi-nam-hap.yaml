@@ -1,0 +1,26 @@
+slug: dau-hu-nhoi-nam-hap
+name_vi: "Đậu hũ nhồi nấm hấp"
+slot: man
+servings: 4
+method: hap
+tags: [thanh, mem, bua_thuong, troi_nong]
+ingredients:
+  - {name: đậu phụ, grams: 600, role: main, note: "4 miếng (1 miếng ≈ 150 g)"}
+  - {name: nấm hương tươi, grams: 150, role: main}
+  - {name: cà rốt, grams: 50, role: main, note: "1/2 củ (1 củ ≈ 100 g)"}
+  - {name: nước tương, grams: 30, role: seasoning, note: "2 muỗng canh, làm nước rưới (1 muỗng canh ≈ 15 g)"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay (1 muỗng cà phê ≈ 2,5 g)"}
+  - {name: hạt nêm chay, grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: bột năng, grams: 8, role: seasoning, note: "1 muỗng canh trộn vào nhân cho kết dính (1 muỗng canh ≈ 8 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây (1 cây ≈ 15 g)"}
+  - {name: dầu vừng, grams: 5, role: seasoning, optional: true, note: "1 muỗng cà phê"}
+steps:
+  - {step_no: 1, text_vi: "Băm thật nhỏ nấm hương và cà rốt.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Trộn nhân với hạt nêm chay, tiêu và bột năng.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 3, text_vi: "Cắt đậu thành miếng dày, khoét một lỗ giữa mỗi miếng rồi nhồi nhân vào cho chặt.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 4, text_vi: "Xếp đậu vào đĩa, hấp cách thủy đến khi nhân chín.", kind: passive, minutes: 12, uses_burner: true}
+  - {step_no: 5, text_vi: "Đun nước tương với ít nước và dầu vừng, rưới lên đậu, rắc hành lá.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-dau-hu-hap-nam-chay-don-gian-cho-bua-com-thanh-dam-14569", title: "Cách làm đậu hũ hấp nấm chay đơn giản cho bữa cơm thanh đạm (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-mon-dau-hu-nhoi-nam-thom-ngon-thanh-dam-cho-bua-com-16233", title: "Cách làm món đậu hũ nhồi nấm thơm ngon thanh đạm cho bữa cơm gia đình (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Bài đậu hũ nhồi nấm của nguồn thứ hai làm theo kiểu rán rồi rim; ở đây làm hấp theo nguồn thứ nhất (đậu cuộn nhân nấm, cà rốt hấp). Món chay: bỏ dầu hào, nêm bằng nước tương và hạt nêm chay."

@@ -1,0 +1,26 @@
+slug: suon-ram-man
+name_vi: "Sườn ram mặn"
+slot: man
+servings: 4
+method: rim
+tags: [dam_da, thom_toi, sot_sanh, bua_thuong, com_hop]
+ingredients:
+  - {name: sườn non, grams: 600, role: main, note: "Sườn có xương, cân lúc mua"}
+  - {name: nước mắm, grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 24, role: seasoning, note: "2 muỗng canh, một phần thắng nước màu (1 muỗng canh ≈ 12 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: tỏi, grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả hoặc ít tương ớt"}
+steps:
+  - {step_no: 1, text_vi: "Chặt sườn miếng nhỏ, rửa nước muối, chần sôi khoảng 3 phút rồi xả sạch, để ráo.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 2, text_vi: "Băm hành tím, tỏi; ướp sườn với một nửa hành tỏi, nước mắm, phần lớn số đường và tiêu.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Để sườn ngấm gia vị.", kind: passive, minutes: 20, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi thơm phần hành tỏi còn lại với dầu, thắng chỗ đường còn lại lấy màu rồi cho sườn vào đảo săn.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 5, text_vi: "Thêm chút nước gần ngập sườn, đun sôi rồi hạ nhỏ lửa ram đến khi sườn mềm và nước cạn bớt.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 6, text_vi: "Đảo liên tục ở lửa vừa cho nước sệt lại bám quanh sườn, nêm lại và rắc tiêu.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/suon-ram-man-kieu-nam-bo-4881457.html", title: "Sườn ram mặn kiểu Nam Bộ (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-suon-rim-man-ngot-ngon-dam-da-cuc-hao-com-don-gian-10045", title: "Cách làm sườn rim mặn ngọt ngon đậm đà cực hao cơm đơn giản tại nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 500–800 g sườn; chọn 600 g cho 4 người. Nguồn VnExpress ướp 30 phút và ram với nước dừa; bản này dùng nước lọc (không ghi thành nguyên liệu)."

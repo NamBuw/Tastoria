@@ -1,0 +1,22 @@
+slug: dau-phu-tam-hanh
+name_vi: "Đậu phụ rán tẩm hành"
+slot: man
+servings: 4
+method: chien
+tags: [dam_da, beo, mem, troi_nong, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: đậu phụ, grams: 600, role: main, note: "4 miếng (1 miếng ≈ 150 g)"}
+  - {name: hành lá, grams: 100, role: side, note: "1 bó (1 bó ≈ 100 g)"}
+  - {name: nước tương, grams: 45, role: seasoning, note: "3 muỗng canh, pha với 8–10 muỗng nước sôi để nguội (1 muỗng canh ≈ 15 g)"}
+  - {name: muối, grams: 1, role: seasoning, note: "1 nhúm nhỏ trộn với hành cho giữ màu xanh"}
+  - {name: đường, grams: 4, role: seasoning, optional: true, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: dầu ăn, grams: 78, role: seasoning, note: "6 muỗng canh: 5 để rán đậu, 1 tưới nóng vào hành (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt đậu thành miếng vừa ăn rồi thấm thật khô.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 2, text_vi: "Thái nhỏ hành lá, trộn với chút muối; pha nước tương với nước sôi để nguội và đường.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Rán đậu từng mẻ ở lửa vừa nhỏ, lật đều đến khi vàng các mặt.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 4, text_vi: "Rưới một thìa dầu nóng lên hành, hoà vào nước tương rồi thả đậu còn nóng vào trộn cho thấm.", kind: active, minutes: 2, uses_burner: false}
+sources:
+  - {url: "https://vnexpress.net/dau-phu-tam-hanh-4298478.html", title: "Cách làm đậu tẩm hành dễ làm mà ngon hết ý (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/doi-song-cooking-dau-tam-hanh-4629288.html", title: "Cách làm đậu tẩm hành, món ngon hè thời bao cấp (VnExpress)", accessed_on: 2026-10-17}
+notes: "Món chay: nguồn gốc dùng nước mắm và mỡ lợn; ở đây thay bằng nước tương và dầu ăn. Rán ít dầu (áp chảo), không chiên ngập."

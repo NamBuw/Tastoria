@@ -1,0 +1,24 @@
+slug: bo-xao-ca-chua
+name_vi: "Bò xào cà chua"
+slot: man
+servings: 4
+method: xao
+tags: [chua, sot_sanh, mem, nau_nhanh, bua_thuong]
+ingredients:
+  - {name: thịt bò, grams: 400, role: main}
+  - {name: cà chua, grams: 360, role: main, note: "3 quả (1 quả ≈ 120 g)"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: hành lá, grams: 45, role: seasoning, note: "3 cây (1 cây ≈ 15 g)"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê (≈ 4 g)"}
+  - {name: tiêu, grams: 1, role: seasoning, optional: true, note: "Vài hạt tiêu xay rắc cuối"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Thái bò lát mỏng, trộn với một nửa nước mắm và một nửa tỏi băm.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Cắt cà chua múi cau, hành lá cắt khúc.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi một nửa tỏi còn lại, xào bò lửa lớn đến khi tái rồi trút ra.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi tỏi còn lại, xào cà chua với nước mắm và đường đến khi mềm, ra nước sánh.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho bò và hành lá vào đảo đều, nêm lại rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-lam-thit-bo-xao-hanh-tay-la-lot-va-ca-chua-don-gian-04090", title: "3 cách làm thịt bò xào hành tây, lá lốt và cà chua (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Chỉ tìm được 1 nguồn, và phần cà chua của bài không đọc được đầy đủ; định lượng tự ước cho bữa nhà 4 người (400 g bò, 3 quả cà chua). Xào bò riêng cho khỏi dai rồi mới trộn với cà chua."

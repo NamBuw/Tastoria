@@ -1,0 +1,22 @@
+slug: ca-ro-phi-chien
+name_vi: "Cá rô phi chiên giòn"
+slot: man
+servings: 4
+method: chien
+tags: [gion, kho_rao, bua_thuong]
+ingredients:
+  - {name: cá rô phi, grams: 600, role: main, note: "1 con, cân nguyên con trước khi làm sạch"}
+  - {name: muối, grams: 6, role: seasoning, note: "1 muỗng cà phê để ướp (không tính muối chà nhớt)"}
+  - {name: dầu ăn, grams: 400, role: seasoning, note: "dầu cho vào chảo để chiên ngập"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: bột chiên giòn, grams: 32, role: seasoning, note: "4 muỗng canh (1 muỗng canh ≈ 8 g)"}
+  - {name: chanh, grams: 25, role: seasoning, optional: true, note: "nửa quả, khử tanh"}
+steps:
+  - {step_no: 1, text_vi: "Đánh vảy, bỏ mang và ruột, chà muối với chanh cho sạch nhớt rồi rửa lại; khứa vài đường chéo hai bên thân.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Xát muối và tiêu lên cá, để ngấm.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Thấm khô cá rồi áo đều một lớp bột chiên giòn.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 4, text_vi: "Chiên cá trong chảo dầu thật nóng, lật một lần, đến khi hai mặt vàng giòn thì vớt ra để ráo dầu.", kind: active, minutes: 10, uses_burner: true}
+sources:
+  - {url: "https://monngonmoingay.com/ca-ro-phi-chien-xot-ca/", title: "Cá rô phi chiên xốt cà (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/ca-ro-phi-sot-ca-chua-4311598.html", title: "Cá rô phi sốt cà chua (VnExpress)", accessed_on: 2026-10-17}
+notes: "Chiên ngập dầu: phần lớn dầu còn lại; dinh dưỡng dùng hệ số hấp thu chất béo (BR-NUT-05). Không tìm được bài riêng cho cá rô phi chiên giòn; hai nguồn là món chiên rồi rưới sốt, chỉ lấy phần sơ chế và chiên (500–600 g cá, ướp 15 phút, áo bột chiên giòn)."

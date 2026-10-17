@@ -1,0 +1,29 @@
+slug: kho-quet
+name_vi: "Kho quẹt"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, cay, beo, sot_sanh, bua_thuong]
+ingredients:
+  - {name: thịt ba chỉ, grams: 200, role: main}
+  - {name: tôm khô, grams: 50, role: main}
+  - {name: nước mắm, grams: 60, role: seasoning, note: "4 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 48, role: seasoning, note: "4 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay (≈ 2,5 g)"}
+  - {name: ớt, grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh để rán thịt (≈ 13 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm tôm khô trong nước ấm cho mềm rồi vớt ra để ráo.", kind: passive, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Cắt thịt hạt lựu; băm hành tím, tỏi, ớt; pha nước mắm với đường và vài muỗng nước.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 3, text_vi: "Rán thịt với chút dầu đến khi ra mỡ và vàng giòn, chắt bớt mỡ.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi hành tỏi trong mỡ còn lại, cho tôm và thịt vào đảo vài phút.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Đổ nước mắm đường vào, kho liu riu đến khi sệt lại.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 6, text_vi: "Nêm lại, rắc tiêu, ớt và hành lá rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-lam-kho-quet-162878", title: "Cách làm kho quẹt tôm thịt ba chỉ đậm đà (FPT Shop)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/chia-se-cach-kho-quet-thit-ba-roi-man-ngot-dam-da-thom-nuc-ca-24194", title: "Chia sẻ cách kho quẹt thịt ba rọi mặn ngọt đậm đà (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://vietnamnet.vn/cach-lam-kho-quet-thit-ba-chi-ngon-va-don-gian-cham-rau-cu-2129699.html", title: "Cách làm kho quẹt thịt ba chỉ chấm rau củ (VietNamNet)", accessed_on: 2026-10-17}
+notes: "Món chấm ăn kèm rau luộc; một mẻ đủ cho 4 người. Nguồn dùng 150–200 g ba chỉ, 50 g tôm khô; FPT Shop dùng 6 muỗng canh nước mắm và 5 muỗng canh đường, giảm còn 4/4 cho bớt mặn ngọt. Tổng 45 phút so với ước lượng 30 phút vì có bước ngâm tôm."

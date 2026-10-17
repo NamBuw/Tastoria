@@ -1,0 +1,23 @@
+slug: trung-cuon-rau-cu
+name_vi: "Trứng cuộn rau củ"
+slot: man
+servings: 4
+method: chien
+tags: [thanh, mem, bua_thuong, nau_nhanh, com_hop]
+ingredients:
+  - {name: trứng gà, grams: 400, role: main, note: "8 quả (1 quả ≈ 50 g)"}
+  - {name: cà rốt, grams: 100, role: side, note: "1 củ (1 củ ≈ 100 g)"}
+  - {name: hành lá, grams: 45, role: side, note: "3 cây (1 cây ≈ 15 g)"}
+  - {name: hành tây, grams: 55, role: side, optional: true, note: "1/2 củ (1 củ ≈ 110 g)"}
+  - {name: muối, grams: 6, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: tiêu, grams: 1, role: seasoning, optional: true, note: "một ít tiêu xay"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh, tráng chảo nhiều lần (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Thái hạt lựu thật nhỏ cà rốt, hành tây; thái nhỏ hành lá.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Đánh tan trứng với muối, tiêu rồi trộn rau củ vào.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Tráng chảo dầu, đổ một lớp trứng mỏng, khi mặt hơi se thì cuộn lại; đổ tiếp lớp mới và cuộn nối đến hết.", kind: active, minutes: 9, uses_burner: true}
+  - {step_no: 4, text_vi: "Để cuộn trứng nguội bớt rồi cắt khoanh vừa ăn.", kind: active, minutes: 2, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-trung-cuon-rau-cu-thom-ngon-bo-duong-cho-gia-dinh-08718", title: "2 cách làm trứng cuộn rau củ thơm ngon, bổ dưỡng cho gia đình (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://voh.com.vn/nau-nuong/cach-lam-trung-cuon-nhanh-tich-tac-chi-qua-4-buoc-don-gian-326686.html", title: "Cách làm trứng cuộn nhanh tích tắc chỉ qua 4 bước đơn giản (VOH)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 4 trứng, 1/2 củ cà rốt, 2 cây hành lá, 1 muỗng cà phê muối cho 2 người; nhân đôi trứng cho 4 người, giữ muối 1 muỗng cà phê."

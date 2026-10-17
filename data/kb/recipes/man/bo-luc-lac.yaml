@@ -1,0 +1,27 @@
+slug: bo-luc-lac
+name_vi: "Bò lúc lắc"
+slot: man
+servings: 4
+method: xao
+tags: [dam_da, thom_toi, mem, beo, cuoi_tuan]
+ingredients:
+  - {name: thịt bò, grams: 500, role: main, note: "Thăn hoặc phi lê"}
+  - {name: ớt chuông, grams: 300, role: main, note: "2 quả (1 quả ≈ 150 g)"}
+  - {name: hành tây, grams: 110, role: main, note: "1 củ"}
+  - {name: tỏi, grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: dầu hào, grams: 18, role: seasoning, note: "1 muỗng canh (≈ 18 g)"}
+  - {name: nước tương, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu đập dập (≈ 2,5 g)"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê (≈ 4 g)"}
+  - {name: bơ, grams: 20, role: seasoning}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cắt bò thành khối vuông khoảng 2 cm, trộn với dầu hào, nước tương, đường, tiêu và một nửa tỏi băm.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Để bò ngấm gia vị.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Cắt ớt chuông và hành tây thành miếng vuông cỡ khối bò.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 4, text_vi: "Xào nhanh ớt chuông và hành tây trên lửa lớn cho vừa chín, trút ra.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 5, text_vi: "Đun nóng chảo với dầu và bơ, phi tỏi, cho bò vào lắc chảo lửa lớn đến khi xém cạnh rồi trộn rau vào.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-bo-luc-lac-mem-ngon-hap-dan-khong-bi-dai-cung-01485", title: "Cách làm bò lúc lắc ngon mềm, đậm đà (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/bo-luc-lac/", title: "Bò lúc lắc Mayo (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "ĐMX dùng 500 g bò, 3 quả ớt chuông, 1/2 củ hành tây cho 4 người (kèm khoai tây chiên, không tính ở đây); MNMN dùng 300 g phi lê. Tổng 30 phút so với ước lượng 20 phút vì có bước ướp 15 phút."

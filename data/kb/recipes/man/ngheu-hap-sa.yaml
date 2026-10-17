@@ -1,0 +1,23 @@
+slug: ngheu-hap-sa
+name_vi: "Nghêu hấp sả"
+slot: man
+servings: 4
+method: hap
+tags: [thanh, thom_sa_gung, nhieu_nuoc, troi_nong, cuoi_tuan]
+ingredients:
+  - {name: nghêu, grams: 1000, role: main, note: "nghêu sống cả vỏ"}
+  - {name: sả, grams: 100, role: seasoning, note: "4 cây (1 cây ≈ 25 g), đập dập cắt khúc"}
+  - {name: ớt, grams: 15, role: seasoning, note: "3 quả (1 quả ≈ 5 g)"}
+  - {name: lá chanh, grams: 3, role: seasoning, note: "khoảng 6 lá, thái sợi"}
+  - {name: muối, grams: 6, role: seasoning, note: "1 muỗng cà phê (≈ 6 g)"}
+  - {name: gừng, grams: 15, role: seasoning, optional: true, note: "1/2 nhánh (1 nhánh ≈ 30 g), thái lát"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm nghêu trong nước muối loãng có vài lát ớt cho nhả cát.", kind: passive, minutes: 20, uses_burner: false}
+  - {step_no: 2, text_vi: "Chà rửa lại nghêu; đập dập sả, cắt ớt và thái sợi lá chanh.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Lót một nửa sả dưới nồi, cho nghêu, phần sả còn lại, gừng, muối và một ít nước vào nồi.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 4, text_vi: "Đậy nắp đun lửa lớn đến khi nghêu há miệng.", kind: passive, minutes: 8, uses_burner: true}
+  - {step_no: 5, text_vi: "Thả lá chanh và ớt, đảo nhẹ một lượt rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-ngheu-hap-sa-thom-ngon-ngot-nuoc-cuc-hap-dan-00617", title: "2 cách làm nghêu (ngao) hấp sả thơm nức mũi (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-ngao-ngheu-hap-sa-dua-ngot-thom-cho-bua-com-nha-them-15995", title: "Cách làm ngao (nghêu) hấp sả dứa ngọt thơm (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 300 g–1 kg nghêu cho 2 người; 1 kg cả vỏ cho 4 người. Nguồn ngâm nghêu 45 phút–2 giờ; ghi 20 phút ngâm tối thiểu, nên tổng 35 phút vượt ước lượng 15 phút (ước lượng không tính ngâm)."

@@ -1,0 +1,29 @@
+slug: thit-nuong-sa
+name_vi: "Thịt nướng sả"
+slot: man
+servings: 4
+method: nuong
+tags: [thom_sa_gung, dam_da, cuoi_tuan, com_hop]
+ingredients:
+  - {name: thịt nạc vai, grams: 500, role: main}
+  - {name: sả, grams: 50, role: seasoning, note: "2 cây băm nhuyễn (1 cây ≈ 25 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 12, role: seasoning, note: "1 muỗng canh"}
+  - {name: mật ong, grams: 21, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 21 g), một nửa để phết khi nướng"}
+  - {name: tỏi, grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: hành tím, grams: 10, role: seasoning, note: "1 củ"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh"}
+steps:
+  - {step_no: 1, text_vi: "Thái thịt lát mỏng vừa; băm nhuyễn sả, tỏi và hành tím.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Trộn thịt với sả, hành tỏi, nước mắm, đường, nửa phần mật ong, hạt nêm, tiêu và dầu ăn.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Để thịt ngấm gia vị.", kind: passive, minutes: 20, uses_burner: false}
+  - {step_no: 4, text_vi: "Xếp thịt một lớp lên khay, nướng lò khoảng 200–220°C.", kind: passive, minutes: 12, uses_burner: false}
+  - {step_no: 5, text_vi: "Lấy khay ra, phết phần mật ong còn lại và lật mặt thịt.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 6, text_vi: "Nướng tiếp đến khi thịt chín và cạnh hơi sém.", kind: passive, minutes: 6, uses_burner: false}
+sources:
+  - {url: "https://monngonmoingay.com/bun-thit-heo-xien-sa-nuong/", title: "Bún thịt heo xiên sả nướng (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-uop-thit-nuong-160729", title: "3 cách ướp thịt nướng nồi chiên không dầu ngon bá cháy (FPT Shop)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/banh-mi-thit-nuong-sa-mayo/", title: "Bánh mì thịt nướng sả mayo (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "Nguồn ướp tới 2 giờ; ghi 20 phút. Có thể nướng bằng nồi chiên không dầu (160°C 10 phút rồi 180°C 5 phút) hoặc than. Các nguồn là phần thịt nướng trong món bún/bánh mì hoặc bài ướp thịt, không có bài riêng cho món này."

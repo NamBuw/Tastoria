@@ -1,0 +1,29 @@
+slug: thit-kho-mang
+name_vi: "Thịt kho măng"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, beo, bua_thuong, troi_lanh, cuoi_tuan]
+ingredients:
+  - {name: thịt ba chỉ, grams: 500, role: main}
+  - {name: măng khô, grams: 150, role: main, note: "Cân lúc còn khô, trước khi ngâm"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: tỏi, grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: nước mắm, grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 24, role: seasoning, note: "2 muỗng canh, một nửa thắng nước màu (1 muỗng canh ≈ 12 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay (≈ 2,5 g)"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh (≈ 13 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây"}
+steps:
+  - {step_no: 1, text_vi: "Luộc măng đã ngâm mềm hai ba lượt, thay nước mỗi lượt cho bớt chua và hết mùi, rồi xé sợi.", kind: passive, minutes: 20, uses_burner: true}
+  - {step_no: 2, text_vi: "Chần thịt qua nước sôi, rửa lại và cắt miếng vuông khoảng 3 cm.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 3, text_vi: "Ướp thịt với nước mắm, một nửa số đường, tiêu và hành tím băm.", kind: passive, minutes: 30, uses_burner: false}
+  - {step_no: 4, text_vi: "Thắng phần đường còn lại với dầu đến màu cánh gián, cho thịt vào đảo săn.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 5, text_vi: "Thêm nước ngập xâm xấp, hớt bọt rồi kho nhỏ lửa có nắp.", kind: passive, minutes: 30, uses_burner: true}
+  - {step_no: 6, text_vi: "Phi tỏi, xào sơ măng cho thấm rồi trút vào nồi thịt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 7, text_vi: "Kho tiếp đến khi thịt mềm, măng ngấm màu và nước sánh; rắc tiêu, hành lá.", kind: passive, minutes: 20, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/thit-kho-mang-kho-4560595.html", title: "Cách làm thịt kho măng khô - món ngon Tết miền Trung (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-thit-kho-mang-bang-noi-nau-cham-cuc-ngon-ma-de-lam-03747", title: "Cách làm thịt kho măng bằng nồi nấu chậm (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-lam-thit-kho-mang-kho-mien-trung-190103", title: "Cách làm thịt kho măng khô miền Trung (FPT Shop)", accessed_on: 2026-10-17}
+notes: "Măng khô phải ngâm qua đêm trước (không tính vào thời gian bước). Nguồn: 500 g thịt/100 g măng khô (ĐMX, 4 người) đến 1 kg thịt/500 g măng (VnExpress, 6–8 người); chọn 500 g thịt và 150 g măng khô. Tổng 120 phút, dài hơn ước lượng 90 phút do luộc măng nhiều lượt."

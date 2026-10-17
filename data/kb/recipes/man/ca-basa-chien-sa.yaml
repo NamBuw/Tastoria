@@ -1,0 +1,26 @@
+slug: ca-basa-chien-sa
+name_vi: "Cá basa chiên sả"
+slot: man
+servings: 4
+method: chien
+tags: [dam_da, cay, thom_sa_gung, gion, bua_thuong, com_hop]
+ingredients:
+  - {name: cá basa, grams: 500, role: main, note: "phi lê cá basa"}
+  - {name: sả, grams: 100, role: seasoning, note: "4 cây (1 cây ≈ 25 g), băm nhuyễn"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: ớt, grams: 15, role: seasoning, note: "3 quả (1 quả ≈ 5 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: muối, grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê (≈ 4 g)"}
+  - {name: bột nghệ, grams: 3, role: seasoning, optional: true, note: "1 muỗng cà phê (≈ 3 g), tạo màu vàng"}
+  - {name: dầu ăn, grams: 52, role: seasoning, note: "4 muỗng canh (1 muỗng canh ≈ 13 g), chiên ít dầu"}
+steps:
+  - {step_no: 1, text_vi: "Rửa cá với nước muối pha chanh cho bớt tanh, thấm khô rồi cắt miếng vừa ăn.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Băm sả, hành tím, ớt; trộn một nửa vào cá cùng nước mắm, muối, đường và bột nghệ.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Để cá ngấm gia vị.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi phần sả ớt còn lại trong dầu nóng đến khi vàng giòn, vớt ra để riêng.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 5, text_vi: "Chiên cá bằng dầu đó ở lửa vừa, lật đều đến khi hai mặt vàng; xếp ra đĩa, rắc sả phi lên.", kind: active, minutes: 8, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/2-cach-lam-ca-basa-chien-sa-ot-va-chien-nuoc-mam-dam-da-cuc-04184", title: "2 cách làm cá basa chiên sả ớt và chiên nước mắm đậm đà (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://toplist.vn/top-list/cach-lam-ca-chien-sa-ot-thom-ngon-hap-dan-nhat-49856.htm", title: "Top 10 cách làm cá chiên sả ớt thơm ngon, hấp dẫn nhất (Toplist)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 400 g–1,5 kg phi lê; chọn 500 g cho 4 người. Chiên ít dầu (áp chảo), không chiên ngập. Tổng thời gian 35 phút, dài hơn ước lượng 25 phút vì có 15 phút ướp."

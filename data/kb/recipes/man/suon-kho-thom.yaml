@@ -1,0 +1,28 @@
+slug: suon-kho-thom
+name_vi: "Sườn kho thơm"
+slot: man
+servings: 4
+method: kho
+tags: [chua_ngot, dam_da, bua_thuong, com_hop]
+ingredients:
+  - {name: sườn non, grams: 500, role: main, note: "Cân cả xương"}
+  - {name: dứa, grams: 450, role: main, note: "1/2 quả (1 quả ≈ 900 g, cân cả vỏ)"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 24, role: seasoning, note: "2 muỗng canh, một phần thắng nước màu (1 muỗng canh ≈ 12 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay (≈ 2,5 g)"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh (≈ 13 g)"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây"}
+steps:
+  - {step_no: 1, text_vi: "Chặt sườn miếng vừa ăn, chần qua nước sôi rồi rửa lại.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 2, text_vi: "Ướp sườn với nước mắm, một nửa số đường, tiêu và hành tỏi băm.", kind: passive, minutes: 20, uses_burner: false}
+  - {step_no: 3, text_vi: "Gọt dứa, bỏ mắt và lõi, cắt miếng vừa.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 4, text_vi: "Thắng đường còn lại với dầu cho có màu, cho sườn vào đảo săn.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 5, text_vi: "Thêm nước xâm xấp, đậy nắp kho nhỏ lửa cho sườn mềm.", kind: passive, minutes: 22, uses_burner: true}
+  - {step_no: 6, text_vi: "Cho dứa vào kho thêm đến khi nước sệt, nêm lại, rắc hành lá và ớt.", kind: passive, minutes: 5, uses_burner: true}
+sources:
+  - {url: "https://mytour.vn/vi/blog/bai-viet/bi-quyet-nau-suon-kho-thom-kho-dua-thom-ngon-mem-min-chua-ngot-de-an-sach-noi-com.html", title: "Bí quyết nấu sườn kho thơm (kho dứa) chua ngọt (Mytour)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/tong-hop-14-cach-nau-suon-kho-thom-ngon-hap-dan-bat-com-cho-11350", title: "Tổng hợp 14 cách nấu sườn kho thơm ngon (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Mytour dùng 500 g sườn non với 1/2 quả dứa, ướp 30–45 phút, kho 30–45 phút; rút ngắn còn 20/22 phút cho bữa thường. Tổng 65 phút, dài hơn ước lượng 45 phút vì có bước ướp."

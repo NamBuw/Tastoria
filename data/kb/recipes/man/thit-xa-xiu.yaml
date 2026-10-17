@@ -1,0 +1,31 @@
+slug: thit-xa-xiu
+name_vi: "Thịt xá xíu"
+slot: man
+servings: 4
+method: nuong
+tags: [dam_da, mem, cuoi_tuan, com_hop]
+ingredients:
+  - {name: thịt nạc vai, grams: 600, role: main, note: "Cắt thỏi dày 4–5 cm"}
+  - {name: mật ong, grams: 42, role: seasoning, note: "2 muỗng canh: 1 ướp, 1 phết khi nướng (1 muỗng canh ≈ 21 g)"}
+  - {name: nước tương, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: tỏi, grams: 21, role: seasoning, note: "7 tép (1 tép ≈ 3 g)"}
+  - {name: ngũ vị hương, grams: 2, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: hạt điều màu, grams: 3, role: seasoning, note: "1 muỗng cà phê, phi với dầu lấy màu"}
+  - {name: đường, grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: dầu hào, grams: 18, role: seasoning, note: "1 muỗng canh"}
+  - {name: hành tím, grams: 10, role: seasoning, note: "1 củ"}
+  - {name: muối, grams: 3, role: seasoning, note: "1/2 muỗng cà phê"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh để làm dầu điều"}
+steps:
+  - {step_no: 1, text_vi: "Cắt thịt thành thỏi dài dày khoảng 4–5 cm; băm tỏi và hành tím.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Phi hạt điều màu với dầu cho ra màu đỏ rồi lọc bỏ hạt; trộn dầu điều với mật ong, nước tương, dầu hào, đường, muối, ngũ vị hương và hành tỏi.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 3, text_vi: "Ướp thịt trong hỗn hợp sốt, giữ lại một ít sốt để phết.", kind: passive, minutes: 30, uses_burner: false}
+  - {step_no: 4, text_vi: "Nướng thịt trong lò khoảng 180°C.", kind: passive, minutes: 20, uses_burner: false}
+  - {step_no: 5, text_vi: "Lấy thịt ra, phết sốt pha mật ong và lật mặt.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 6, text_vi: "Nướng tiếp đến khi mặt thịt bóng, cạnh hơi cháy xém.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 7, text_vi: "Để thịt nghỉ vài phút rồi thái lát mỏng.", kind: passive, minutes: 5, uses_burner: false}
+sources:
+  - {url: "https://hoanghamobile.com/tin-tuc/cach-lam-thit-xa-xiu/", title: "Cách làm thịt xá xíu Quảng Đông tại nhà (Hoàng Hà Mobile)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-lam-thit-xa-xiu-182696", title: "Cách làm thịt xá xíu ngon mềm, lạ miệng siêu bắt cơm (FPT Shop)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-thit-xa-xiu-bang-goi-gia-vi-cholimex-mem-ngon-chuan-24373", title: "Cách làm thịt xá xíu bằng gói gia vị Cholimex mềm ngon, chuẩn vị tại nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nguồn ướp 1–12 giờ (tốt nhất qua đêm); ghi 30 phút theo quy ước. Nguồn nướng 40–60 phút ở 170–220°C. Bản này tự pha sốt, không dùng gói gia vị hay tương đen."

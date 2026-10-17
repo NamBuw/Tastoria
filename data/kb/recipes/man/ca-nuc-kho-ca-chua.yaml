@@ -1,0 +1,29 @@
+slug: ca-nuc-kho-ca-chua
+name_vi: "Cá nục kho cà chua"
+slot: man
+servings: 4
+method: kho
+tags: [chua_ngot, dam_da, sot_sanh, bua_thuong, com_hop]
+ingredients:
+  - {name: cá nục, grams: 500, role: main, note: "khoảng 5 con (1 con ≈ 100 g), cân nguyên con"}
+  - {name: cà chua, grams: 360, role: main, note: "3 quả (1 quả ≈ 120 g)"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: ớt, grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: đường, grams: 8, role: seasoning, note: "2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: tỏi, grams: 6, role: seasoning, note: "2 tép (1 tép ≈ 3 g)"}
+  - {name: gừng, grams: 15, role: seasoning, note: "nửa nhánh (1 nhánh ≈ 30 g), đập dập"}
+  - {name: tiêu, grams: 1, role: seasoning, note: "khoảng 1/2 muỗng cà phê tiêu xay"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây"}
+steps:
+  - {step_no: 1, text_vi: "Bỏ mang, ruột cá, chà muối rồi rửa sạch và để ráo.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Bổ cà chua múi cau, thái hành tím, băm tỏi, đập gừng, cắt ớt.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Rán sơ cá hai mặt cho thịt săn để khi kho không nát.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi hành, tỏi, gừng; cho cà chua vào xào mềm rồi xếp cá vào, nêm nước mắm, đường, tiêu và ớt.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 5, text_vi: "Thêm chút nước, kho nhỏ lửa đến khi nước sốt sệt lại và cá thấm.", kind: passive, minutes: 20, uses_burner: true}
+  - {step_no: 6, text_vi: "Nêm lại, rắc hành lá rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/ca-nuc-kho-ca-chua-vi-dam-da-4350605.html", title: "Cá nục kho cà chua vị đậm đà (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/cong-thuc-lam-ca-nuc-kho-4298443.html", title: "Cách nấu món cá nục kho đậm đà, không bị tanh (VnExpress)", accessed_on: 2026-10-17}
+notes: "Theo bài cá nục kho cà chua (500 g cá, kho 20 phút). Bài thứ hai kho rục 2,5 giờ với nước dừa; ở đây chọn cách kho nhanh để ăn trong bữa thường."

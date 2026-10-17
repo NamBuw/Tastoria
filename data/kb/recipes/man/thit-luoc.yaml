@@ -1,0 +1,20 @@
+slug: thit-luoc
+name_vi: "Thịt luộc"
+slot: man
+servings: 4
+method: luoc
+tags: [thanh, mem, bua_thuong, troi_nong]
+ingredients:
+  - {name: thịt ba chỉ, grams: 500, role: main, note: "Để nguyên miếng có da"}
+  - {name: muối, grams: 6, role: seasoning, note: "1 muỗng cà phê cho vào nước luộc"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ đập dập (1 củ ≈ 10 g)"}
+  - {name: gừng, grams: 15, role: seasoning, optional: true, note: "1/2 nhánh, đập dập (1 nhánh ≈ 30 g)"}
+steps:
+  - {step_no: 1, text_vi: "Cạo sạch da, chà muối rồi rửa thịt; chần qua nước sôi khoảng 3 phút và xả lại nước lạnh.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 2, text_vi: "Cho thịt vào nồi nước ngập cùng muối, hành tím và gừng đập dập, đun sôi rồi hạ lửa nhỏ luộc đến khi xiên không thấy nước hồng.", kind: passive, minutes: 25, uses_burner: true}
+  - {step_no: 3, text_vi: "Tắt bếp, đậy nắp để thịt ngâm thêm trong nồi nước luộc.", kind: passive, minutes: 5, uses_burner: false}
+  - {step_no: 4, text_vi: "Vớt thịt ngâm vào nước đá cho săn rồi thái lát mỏng ngang thớ.", kind: active, minutes: 6, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/huong-dan-cach-luoc-thit-ba-chi-ngon-trang-gion-ai-cung-lam-07371", title: "Hướng dẫn cách luộc thịt ba chỉ ngon, trắng, giòn ai cũng làm được (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-luoc-thit-ba-chi-169073", title: "Mách bạn cách luộc thịt ba chỉ thơm mềm, ngọt nước (FPT Shop)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 300–400 g ba chỉ; chọn 500 g cho 4 người. Nước chấm (nước mắm, mắm tôm...) ăn kèm không tính vào công thức. Nước luộc không ghi thành nguyên liệu."

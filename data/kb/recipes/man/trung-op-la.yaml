@@ -1,0 +1,19 @@
+slug: trung-op-la
+name_vi: "Trứng ốp la"
+slot: man
+servings: 4
+method: chien
+tags: [beo, mem, nau_nhanh, bua_thuong]
+ingredients:
+  - {name: trứng gà, grams: 400, role: main, note: "8 quả, 2 quả mỗi người (1 quả ≈ 50 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+  - {name: nước tương, grams: 30, role: seasoning, note: "2 muỗng canh, rưới hoặc chấm khi ăn (1 muỗng canh ≈ 15 g)"}
+  - {name: tiêu, grams: 1, role: seasoning, note: "một ít tiêu xay rắc lên"}
+steps:
+  - {step_no: 1, text_vi: "Làm nóng chảo ở lửa vừa, cho dầu vào tráng đều mặt chảo.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 2, text_vi: "Đập trứng vào chảo, chiên lửa nhỏ vừa đến khi lòng trắng đông, lòng đỏ chín tới.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Xúc trứng ra đĩa, rắc tiêu và rưới nước tương.", kind: active, minutes: 1, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/5-cach-lam-trung-op-la-beo-ngon-hap-dan-cuc-dep-mat-04415", title: "5 cách làm trứng ốp la béo ngon hấp dẫn cực đẹp mắt (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/doi-song-cooking-chien-trung-op-la-4683250.html", title: "Cách làm chiên trứng ốp la không cần chảo chống dính (VnExpress)", accessed_on: 2026-10-17}
+notes: "Chiên 2 mẻ trên chảo lớn. Nguồn Điện Máy XANH ghi 50 ml dầu cho 2 quả (thừa dầu); ở đây chỉ tính 2 muỗng canh dầu cho 8 quả vì ốp la chỉ cần tráng chảo."

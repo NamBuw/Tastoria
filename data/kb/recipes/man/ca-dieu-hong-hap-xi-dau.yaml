@@ -1,0 +1,31 @@
+slug: ca-dieu-hong-hap-xi-dau
+name_vi: "Cá diêu hồng hấp xì dầu"
+slot: man
+servings: 4
+method: hap
+tags: [thanh, thom_sa_gung, mem, troi_nong, bua_thuong]
+ingredients:
+  - {name: cá diêu hồng, grams: 700, role: main, note: "1 con, cân nguyên con"}
+  - {name: nước tương, grams: 60, role: seasoning, note: "4 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: gừng, grams: 30, role: seasoning, note: "1 nhánh, thái sợi"}
+  - {name: hành lá, grams: 45, role: seasoning, note: "3 cây (1 cây ≈ 15 g)"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: dầu hào, grams: 9, role: seasoning, note: "1/2 muỗng canh (1 muỗng canh ≈ 18 g)"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: dầu vừng, grams: 5, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: muối, grams: 6, role: seasoning, note: "1 muỗng cà phê để ướp (không tính muối chà nhớt)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh để phi tỏi"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+  - {name: rau mùi, grams: 10, role: seasoning, optional: true, note: "vài cây"}
+steps:
+  - {step_no: 1, text_vi: "Làm sạch cá, chà muối cho hết nhớt, khứa hai mặt rồi xát muối và tiêu.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Thái gừng và ớt sợi, cắt hành lá; trộn nước tương, dầu hào, đường và dầu vừng làm nước sốt.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Đặt cá lên đĩa sâu lót hành lá, rải gừng lên trên rồi hấp cách thủy khi nước đã sôi.", kind: passive, minutes: 18, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi tỏi với dầu cho vàng, đổ nước sốt vào đun sôi.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Rưới sốt lên cá, thêm hành lá, ớt, rau mùi và hấp thêm cho thấm.", kind: passive, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://monngonmoingay.com/ca-hap-nuoc-tuong/", title: "Cá hấp nước tương (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-ca-dieu-hong-hap-hanh-gung-thom-ngon-dam-da-cuc-don-24230", title: "Cách làm cá diêu hồng hấp hành gừng (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/ca-hap-xi-dau-2330774.html", title: "Cá hấp xì dầu (VnExpress)", accessed_on: 2026-10-17}
+notes: "Thời gian hấp ở các nguồn 15–40 phút tuỳ cỡ cá; chọn 18 phút cho cá 700 g. Phần lớn nước sốt còn lại trên đĩa."

@@ -1,0 +1,32 @@
+slug: ca-thu-sot-ca-chua
+name_vi: "Cá thu sốt cà chua"
+slot: man
+servings: 4
+method: om
+tags: [chua_ngot, dam_da, sot_sanh, bua_thuong, com_hop]
+ingredients:
+  - {name: cá thu, grams: 500, role: main, note: "cá thu cắt khúc"}
+  - {name: cà chua, grams: 480, role: main, note: "4 quả (1 quả ≈ 120 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: tương cà, grams: 34, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 17 g)"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: muối, grams: 3, role: seasoning, note: "1/2 muỗng cà phê (1 muỗng cà phê ≈ 6 g)"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: gừng, grams: 15, role: seasoning, note: "nửa nhánh (1 nhánh ≈ 30 g), thái sợi"}
+  - {name: thì là, grams: 20, role: seasoning, optional: true, note: "một nắm nhỏ"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+  - {name: dầu ăn, grams: 39, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 13 g) để rán cá và làm sốt"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm cá qua nước muối loãng cho bớt tanh, rửa lại rồi thấm thật khô.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Băm nhỏ cà chua; thái hành tím, gừng sợi, hành lá và thì là.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 3, text_vi: "Rán cá trong chảo dầu nóng đến khi vàng đều hai mặt, gắp ra.", kind: active, minutes: 10, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi hành tím, cho cà chua vào xào nhuyễn, nêm tương cà, nước mắm, đường, muối, hạt nêm và tiêu.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho cá vào chảo sốt, om nhỏ lửa đến khi sốt sánh và thấm vào cá.", kind: passive, minutes: 10, uses_burner: true}
+  - {step_no: 6, text_vi: "Thêm gừng, ớt, hành lá và thì là, đảo nhẹ rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://vnexpress.net/doi-song-cooking-ca-thu-sot-ca-chua-4555370.html", title: "Cách làm cá thu sốt cà chua (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/ca-thu-sot-ca-2824778.html", title: "Cá thu sốt cà (VnExpress)", accessed_on: 2026-10-17}
+notes: "Định lượng chủ yếu theo bài 500 g cá thu, 4 quả cà chua cho 4–6 người; bài thứ hai không ghi định lượng."

@@ -1,0 +1,25 @@
+slug: tom-rang-me
+name_vi: "Tôm rang me"
+slot: man
+servings: 4
+method: rang
+tags: [chua_ngot, dam_da, thom_toi, sot_sanh, bua_thuong, com_hop]
+ingredients:
+  - {name: tôm, grams: 500, role: main, note: "tôm tươi còn vỏ"}
+  - {name: me chua, grams: 50, role: main, note: "me chín bóc vỏ, dầm với khoảng 100 ml nước sôi lấy nước cốt"}
+  - {name: đường, grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: tỏi, grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: ớt, grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh (≈ 13 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây"}
+steps:
+  - {step_no: 1, text_vi: "Cắt râu, chân và gai đầu tôm, rửa sạch rồi để ráo.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Dầm me với nước sôi, lọc bỏ hạt lấy nước cốt; băm tỏi và ớt.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi tỏi ớt trong dầu nóng, cho tôm vào đảo lửa lớn đến khi vỏ đỏ, thịt săn.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Thêm nước me, đường, nước mắm, đảo đều ở lửa vừa đến khi sốt sệt lại bám vào tôm.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 5, text_vi: "Rắc hành lá cắt nhỏ, đảo thêm vài lần rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-tom-rang-me-tom-rim-me-ngon-kho-cuong-cuc-bat-com-15229", title: "Cách làm tôm rang me, tôm rim me ngon khó cưỡng (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/tom-rang-me-163729", title: "Vào bếp làm tôm rang me đậm đà (FPT Shop)", accessed_on: 2026-10-17}
+notes: "Hai nguồn cùng dùng 500 g tôm, 50 g me, 2 muỗng canh đường và 2 muỗng canh nước mắm; giữ nguyên cho 4 người."

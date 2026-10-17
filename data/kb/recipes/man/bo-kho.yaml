@@ -1,0 +1,33 @@
+slug: bo-kho
+name_vi: "Bò kho"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, thom_sa_gung, nhieu_nuoc, troi_lanh, cuoi_tuan]
+ingredients:
+  - {name: thịt bò, grams: 700, role: main, note: "Nạm hoặc bắp bò có gân mỡ"}
+  - {name: cà rốt, grams: 300, role: main, note: "3 củ (1 củ ≈ 100 g)"}
+  - {name: sả, grams: 75, role: seasoning, note: "3 cây (1 cây ≈ 25 g)"}
+  - {name: hoa hồi, grams: 4, role: seasoning, note: "3–4 bông"}
+  - {name: quế, grams: 3, role: seasoning, note: "1 thanh nhỏ"}
+  - {name: hạt điều màu, grams: 6, role: seasoning, note: "2 muỗng cà phê, phi lấy dầu điều (1 muỗng cà phê ≈ 3 g)"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: tỏi, grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: gừng, grams: 15, role: seasoning, note: "1/2 nhánh (1 nhánh ≈ 30 g)"}
+  - {name: đường, grams: 8, role: seasoning, note: "2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: muối, grams: 3, role: seasoning, note: "1/2 muỗng cà phê (≈ 3 g)"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh (≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa bò với nước muối và gừng đập dập, cắt khối khoảng 4 cm.", kind: active, minutes: 12, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp bò với nước mắm, đường, muối, hành tỏi băm và sả băm.", kind: passive, minutes: 30, uses_burner: false}
+  - {step_no: 3, text_vi: "Rang thơm hoa hồi và quế, cho vào túi lọc; cắt cà rốt khúc, đập dập sả cây.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 4, text_vi: "Phi hạt điều màu với dầu lấy màu, cho bò vào xào săn.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 5, text_vi: "Đổ nước ngập thịt, thả túi hồi quế và sả, hầm nhỏ lửa có nắp đến khi bò mềm.", kind: passive, minutes: 60, uses_burner: true}
+  - {step_no: 6, text_vi: "Thêm cà rốt, hầm tiếp đến khi cà rốt chín mềm.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 7, text_vi: "Vớt túi gia vị, nêm lại cho vừa rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-bo-kho-truyen-thong-bi-quyet-uop-gia-vi-tham-mem-24364", title: "Cách nấu bò kho truyền thống (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-bo-kho-mien-nam-chuan-vi-thom-ngon-beo-ngay-bat-mat-24218", title: "Cách nấu bò kho miền Nam chuẩn vị (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/bo-kho/", title: "Bò kho (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 800 g nạm (MNMN, 4 người) đến 1 kg nạm + 200 g gân (ĐMX, 4–6 người); chọn 700 g. ĐMX ướp 1 giờ, rút còn 30 phút. Có thể thay một phần nước bằng nước dừa. Thường dùng gói bột bò kho; ở đây quy về sả, hồi, quế, hạt điều màu."

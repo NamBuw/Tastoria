@@ -1,0 +1,27 @@
+slug: bo-nuong-la-lot
+name_vi: "Bò nướng lá lốt"
+slot: man
+servings: 4
+method: nuong
+tags: [thom_sa_gung, dam_da, mem, cuoi_tuan]
+ingredients:
+  - {name: thịt bò, grams: 500, role: main, note: "Băm hoặc xay"}
+  - {name: lá lốt, grams: 50, role: main, note: "Khoảng 30 lá to"}
+  - {name: mỡ lợn, grams: 60, role: side, optional: true, note: "Mỡ heo băm trộn nhân cho mềm, hoặc mỡ chài để bọc"}
+  - {name: sả, grams: 25, role: seasoning, note: "1 cây (≈ 25 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay (≈ 2,5 g)"}
+  - {name: đường, grams: 8, role: seasoning, note: "2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: ngũ vị hương, grams: 1, role: seasoning, optional: true, note: "1/2 muỗng cà phê (≈ 1 g)"}
+  - {name: dầu ăn, grams: 10, role: seasoning, note: "2 muỗng cà phê quét lên cuốn (1 muỗng cà phê ≈ 5 g)"}
+steps:
+  - {step_no: 1, text_vi: "Băm nhuyễn bò cùng sả, hành tím, tỏi; trộn với nước mắm, đường, tiêu.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Để nhân thịt ngấm gia vị.", kind: passive, minutes: 20, uses_burner: false}
+  - {step_no: 3, text_vi: "Rửa lá lốt, lau khô; đặt một ít nhân lên mặt sau lá rồi cuộn chặt.", kind: active, minutes: 15, uses_burner: false}
+  - {step_no: 4, text_vi: "Quét dầu, xếp cuốn vào nồi chiên không dầu nướng 180 °C, giữa chừng lật mặt.", kind: passive, minutes: 20, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-bo-la-lot-mo-chai-thom-nuc-mui-de-lam-tai-nha-voi-23897", title: "Cách làm bò lá lốt mỡ chài với nồi chiên (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/bo-la-lot/", title: "Bò lá lốt chiên (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "ĐMX dùng 800 g bò, 200 g mỡ chài, 15 lá lốt, nướng nồi chiên 180 °C khoảng 25 phút; MNMN dùng 350 g bò + 100 g nạc dăm + 100 g mỡ heo, 30 lá lốt và chiên. Chọn 500 g bò cho 4 người. Có thể nướng than thay nồi chiên."

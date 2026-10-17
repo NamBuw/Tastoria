@@ -1,0 +1,22 @@
+slug: vit-luoc
+name_vi: "Vịt luộc"
+slot: man
+servings: 4
+method: luoc
+tags: [thanh, mem, troi_nong, bua_thuong]
+ingredients:
+  - {name: thịt vịt, grams: 1500, role: main, note: "1 con vịt nhỏ nguyên con đã làm sạch, cân cả xương"}
+  - {name: gừng, grams: 30, role: seasoning, note: "1 nhánh, đập dập"}
+  - {name: muối, grams: 12, role: seasoning, note: "2 muỗng cà phê cho vào nước luộc (1 muỗng cà phê ≈ 6 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g), đập dập cho vào nồi luộc"}
+  - {name: rượu trắng, grams: 15, role: seasoning, optional: true, note: "khoảng 1 muỗng canh, khử mùi"}
+steps:
+  - {step_no: 1, text_vi: "Cắt phao câu, nhổ sạch lông tơ, chà vịt với muối hạt và gừng rồi rửa lại cho sạch.", kind: active, minutes: 15, uses_burner: false}
+  - {step_no: 2, text_vi: "Đun nồi nước đủ ngập vịt cùng gừng, hành tím và muối.", kind: passive, minutes: 10, uses_burner: true}
+  - {step_no: 3, text_vi: "Thả vịt vào, thêm chút rượu, khi sôi lại thì hạ nhỏ lửa luộc.", kind: passive, minutes: 18, uses_burner: true}
+  - {step_no: 4, text_vi: "Tắt bếp, đậy nắp ngâm vịt trong nồi cho chín đều tới xương.", kind: passive, minutes: 12, uses_burner: false}
+  - {step_no: 5, text_vi: "Vớt vịt ra để nguội bớt rồi chặt miếng bày đĩa.", kind: active, minutes: 10, uses_burner: false}
+sources:
+  - {url: "https://vnexpress.net/doi-song-cooking-bi-quyet-lam-mon-thit-vit-luoc-4739252.html", title: "Bí quyết làm món thịt vịt luộc (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/doi-song-cooking-cach-luoc-vit-mem-ngot-khong-kho-khong-hoi-4640269.html", title: "Cách luộc vịt mềm ngọt, không khô, không hôi (VnExpress)", accessed_on: 2026-10-17}
+notes: "Hai nguồn không ghi cân nặng; chọn vịt 1,5 kg nguyên con cho 4 người. Muối phần lớn nằm lại trong nước luộc. Nước chấm (mắm gừng) không tính vào món."

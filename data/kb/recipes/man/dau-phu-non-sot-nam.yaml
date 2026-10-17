@@ -1,0 +1,26 @@
+slug: dau-phu-non-sot-nam
+name_vi: "Đậu phụ non sốt nấm"
+slot: man
+servings: 4
+method: om
+tags: [thanh, mem, sot_sanh, bua_thuong, nau_nhanh]
+ingredients:
+  - {name: đậu phụ non, grams: 600, role: main, note: "2 hộp (1 hộp ≈ 300 g)"}
+  - {name: nấm hương tươi, grams: 200, role: main}
+  - {name: nước tương, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: bột năng, grams: 8, role: seasoning, note: "1 muỗng canh, hoà với nước (1 muỗng canh ≈ 8 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, note: "1 cây (1 cây ≈ 15 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+  - {name: hạt nêm chay, grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: đường, grams: 4, role: seasoning, note: "1 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: dầu vừng, grams: 5, role: seasoning, optional: true, note: "1 muỗng cà phê"}
+steps:
+  - {step_no: 1, text_vi: "Cắt đậu non thành khối vuông, nấm hương thái lát, hành lá thái nhỏ.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 2, text_vi: "Xào nấm với dầu ăn đến khi mềm và dậy mùi.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 3, text_vi: "Thêm ít nước, nước tương, hạt nêm chay, đường rồi xếp đậu vào, om nhỏ lửa cho đậu nóng và thấm.", kind: passive, minutes: 6, uses_burner: true}
+  - {step_no: 4, text_vi: "Rưới bột năng đã hoà nước vào, lắc nhẹ chảo cho sốt sánh lại.", kind: active, minutes: 2, uses_burner: true}
+  - {step_no: 5, text_vi: "Rắc hành lá, rưới chút dầu vừng rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/3-cach-lam-dau-hu-non-sot-nam-dong-co-nam-huong-chay-thom-beo-07549", title: "3 cách làm đậu hũ non sốt nấm đông cô (nấm hương) chay thơm béo dễ làm (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/4-cach-lam-dau-hu-non-sot-nam-thom-nuc-mui-de-lam-tai-nha-07554", title: "4 cách làm đậu hũ non sốt nấm thơm nức mũi dễ làm tại nhà (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Món chay: bỏ dầu hào trong nguồn, nêm bằng nước tương và hạt nêm chay. Nguồn dùng 600 g đậu non cho 4 người."

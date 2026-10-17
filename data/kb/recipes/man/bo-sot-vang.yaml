@@ -1,0 +1,32 @@
+slug: bo-sot-vang
+name_vi: "Bò sốt vang"
+slot: man
+servings: 4
+method: om
+tags: [dam_da, mem, sot_sanh, troi_lanh, cuoi_tuan]
+ingredients:
+  - {name: thịt bò, grams: 600, role: main, note: "Nạm hoặc bắp bò"}
+  - {name: cà rốt, grams: 200, role: main, note: "2 củ (1 củ ≈ 100 g)"}
+  - {name: cà chua, grams: 240, role: side, note: "2 quả (1 quả ≈ 120 g)"}
+  - {name: rượu vang đỏ, grams: 100, role: seasoning, note: "100 ml ≈ 100 g, chia một phần ướp, phần còn lại cho lúc om"}
+  - {name: hoa hồi, grams: 3, role: seasoning, note: "2–3 bông"}
+  - {name: quế, grams: 3, role: seasoning, note: "1 thanh nhỏ"}
+  - {name: tương cà, grams: 34, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 17 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: gừng, grams: 15, role: seasoning, note: "1/2 nhánh (1 nhánh ≈ 30 g)"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (≈ 15 g)"}
+  - {name: đường, grams: 8, role: seasoning, note: "2 muỗng cà phê (1 muỗng cà phê ≈ 4 g)"}
+  - {name: bột năng, grams: 8, role: seasoning, note: "1 muỗng canh pha nước để làm sánh (≈ 8 g)"}
+  - {name: bơ, grams: 20, role: seasoning, optional: true}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh (≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa bò với gừng, cắt khối vừa ăn; ướp với một ít rượu vang, nước mắm, đường, hành tỏi băm.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Để bò ngấm gia vị.", kind: passive, minutes: 30, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi hành tỏi, cho cà chua băm và tương cà vào xào nhuyễn, thêm bò đảo săn.", kind: active, minutes: 7, uses_burner: true}
+  - {step_no: 4, text_vi: "Đổ nước ngập thịt, thả hoa hồi và quế, om nhỏ lửa có nắp đến khi bò mềm.", kind: passive, minutes: 60, uses_burner: true}
+  - {step_no: 5, text_vi: "Thêm cà rốt và phần rượu vang còn lại, om tiếp đến khi cà rốt chín.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 6, text_vi: "Cho bơ và nước bột năng vào khuấy cho sốt sánh, nêm lại rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-nau-bo-sot-vang-mien-bac-thom-lung-ngon-dung-dieu-13488", title: "Cách nấu bò sốt vang miền Bắc thơm lừng (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Chỉ tìm được 1 nguồn. ĐMX dùng 500 g nạm cho 3 người, 60 ml vang đỏ, 2 quả cà chua, 70 g cà rốt, 30 g bơ, 20 g bột năng, ướp 30 phút và hầm khoảng 75 phút; tăng lên 600 g bò, 100 ml vang cho 4 người. Giả định vang đỏ 1 ml ≈ 1 g. ĐMX dùng gói sốt bò kho; ở đây quy về hồi, quế."

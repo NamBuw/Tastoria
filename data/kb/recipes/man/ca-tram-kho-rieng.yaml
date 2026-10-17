@@ -1,0 +1,27 @@
+slug: ca-tram-kho-rieng
+name_vi: "Cá trắm kho riềng"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, thom_sa_gung, kho_rao, troi_lanh, com_hop]
+ingredients:
+  - {name: cá trắm, grams: 600, role: main, note: "cá trắm cắt khúc dày"}
+  - {name: riềng, grams: 60, role: seasoning, note: "khoảng 1 nhánh (1 nhánh ≈ 50 g), một phần giã ướp, phần còn lại thái lát lót nồi"}
+  - {name: nước mắm, grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g), một nửa thắng nước màu"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: thịt ba chỉ, grams: 100, role: side, note: "thái lát, xếp xen với cá"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: ớt, grams: 10, role: seasoning, optional: true, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây"}
+steps:
+  - {step_no: 1, text_vi: "Cạo sạch màng đen trong bụng cá, chà muối rồi rửa lại và cắt khúc.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Giã một phần riềng, thái lát phần còn lại; băm hành tím; thái mỏng thịt ba chỉ.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 3, text_vi: "Ướp cá với riềng giã, hành tím, nước mắm, một nửa số đường và tiêu.", kind: passive, minutes: 20, uses_burner: false}
+  - {step_no: 4, text_vi: "Thắng đường còn lại thành nước màu; lót riềng lát dưới nồi, xếp thịt và cá lên, rưới nước ướp và nước màu, thêm nước xâm xấp rồi đun sôi.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 5, text_vi: "Hạ lửa thật nhỏ, kho liu riu đến khi cá mềm, thấm và nước kho sánh lại.", kind: passive, minutes: 45, uses_burner: true}
+  - {step_no: 6, text_vi: "Rắc hành lá, ớt và tiêu rồi tắt bếp.", kind: active, minutes: 2, uses_burner: true}
+sources:
+  - {url: "https://monngonmoingay.com/ca-tram-kho-rieng/", title: "Cá trắm kho riềng (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/doi-song-cooking-ca-tram-kho-rieng-kieu-pho-co-ha-noi-4700557.html", title: "Cách làm cá trắm kho riềng kiểu phố cổ Hà Nội (VnExpress)", accessed_on: 2026-10-17}
+notes: "Bài Món Ngon Mỗi Ngày (4 người) dùng 300 g cá, 100 g ba chỉ, kho 45 phút; bài VnExpress kho truyền thống 3 lửa (hơn 10 giờ, ướp ≥ 1 giờ). Ở đây chọn cách kho 45 phút cho bữa thường, ướp 20 phút; tăng cá lên 600 g cho 4 người. Tổng số phút cao hơn ước lượng 60 phút của dish_list khoảng 40%."

@@ -1,0 +1,29 @@
+slug: thit-kho-dau-phu
+name_vi: "Thịt kho đậu phụ"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, beo, mem, bua_thuong, com_hop]
+ingredients:
+  - {name: thịt ba chỉ, grams: 400, role: main}
+  - {name: đậu phụ, grams: 450, role: main, note: "3 miếng (1 miếng ≈ 150 g)"}
+  - {name: nước mắm, grams: 45, role: seasoning, note: "3 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: đường, grams: 24, role: seasoning, note: "2 muỗng canh, một nửa thắng nước màu (1 muỗng canh ≈ 12 g)"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay"}
+  - {name: dầu ăn, grams: 52, role: seasoning, note: "3 muỗng canh rán đậu + 1 muỗng canh thắng đường (1 muỗng canh ≈ 13 g)"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+steps:
+  - {step_no: 1, text_vi: "Thái thịt miếng vừa ăn, chần qua nước sôi khoảng 3 phút cho sạch rồi để ráo.", kind: active, minutes: 6, uses_burner: true}
+  - {step_no: 2, text_vi: "Băm hành tím, tỏi; ướp thịt với nước mắm, một nửa số đường và một ít hành tỏi băm.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 3, text_vi: "Để thịt ngấm gia vị.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 4, text_vi: "Cắt đậu thành khối vuông, rán trong chảo dầu đến khi vàng các mặt rồi vớt ra.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 5, text_vi: "Phi hành tỏi còn lại, thắng phần đường còn lại đến màu cánh gián, cho thịt vào đảo săn rồi thêm khoảng nửa bát nước.", kind: active, minutes: 4, uses_burner: true}
+  - {step_no: 6, text_vi: "Kho nhỏ lửa, không đậy nắp, đến khi nước kho cạn bớt và thịt mềm.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 7, text_vi: "Cho đậu vào kho thêm cho thấm, rắc tiêu và hành lá rồi tắt bếp.", kind: passive, minutes: 5, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-thit-kho-dau-hu-don-gian-thom-ngon-dam--02418", title: "Cách làm thịt kho đậu hũ đơn giản, thơm ngon, đậm đà hết ý (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/thit-kho-dau-hu-163821", title: "Vào bếp trổ tài với món thịt kho đậu hũ đơn giản, hương vị đậm đà (FPT Shop)", accessed_on: 2026-10-17}
+notes: "Hai nguồn đều dùng 700 g ba chỉ cho 2–3 người; giảm còn 400 g thịt + 450 g đậu cho 4 người. Đậu rán áp chảo, không chiên ngập. Nguồn ướp 30–40 phút; tổng thời gian (56 phút) dài hơn ước lượng 40 phút do bước ướp."

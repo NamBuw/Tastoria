@@ -1,0 +1,27 @@
+slug: ga-nuong-mat-ong
+name_vi: "Gà nướng mật ong"
+slot: man
+servings: 4
+method: nuong
+tags: [dam_da, thom_toi, mem, cuoi_tuan]
+ingredients:
+  - {name: đùi gà, grams: 800, role: main, note: "khoảng 3–4 đùi góc tư, cân cả xương"}
+  - {name: mật ong, grams: 42, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 21 g), một nửa ướp, một nửa phết khi nướng"}
+  - {name: tỏi, grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: nước tương, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay"}
+  - {name: dầu hào, grams: 18, role: seasoning, note: "1 muỗng canh (≈ 18 g)"}
+  - {name: hành tím, grams: 10, role: seasoning, note: "1 củ"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh (≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa đùi gà, thấm khô và khứa vài đường ở mặt thịt cho dễ thấm.", kind: active, minutes: 6, uses_burner: false}
+  - {step_no: 2, text_vi: "Băm tỏi, hành tím rồi trộn với nước tương, dầu hào, tiêu, dầu ăn và một nửa mật ong.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Xoa hỗn hợp lên gà và để ngấm gia vị.", kind: passive, minutes: 30, uses_burner: false}
+  - {step_no: 4, text_vi: "Xếp gà lên khay lót giấy bạc, nướng ở khoảng 200°C.", kind: passive, minutes: 20, uses_burner: false}
+  - {step_no: 5, text_vi: "Lấy khay ra, lật gà và phết phần mật ong còn lại lên da.", kind: active, minutes: 2, uses_burner: false}
+  - {step_no: 6, text_vi: "Nướng tiếp đến khi da vàng óng và thịt chín tới xương.", kind: passive, minutes: 10, uses_burner: false}
+sources:
+  - {url: "https://vnexpress.net/doi-vi-voi-mon-ga-nuong-mat-ong-4298490.html", title: "Cách làm gà nướng mật ong (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/canh-ga-nuong-mat-ong-bang-lo-nuong-4398268.html", title: "Cánh gà nướng mật ong bằng lò nướng (VnExpress)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/dui-ga-mat-ong/", title: "Đùi gà mật ong (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "Nguồn ướp 1–3 giờ; ghi 30 phút. Nhiệt độ lò 200°C lấy từ bài cánh gà nướng lò; bài gà nguyên con nướng 15 phút rồi phết mật ong nướng thêm 15–20 phút. Bài đùi gà mật ong của Món Ngon Mỗi Ngày làm theo cách luộc rồi chiên, chỉ dùng để đối chiếu khẩu phần (2 đùi 300 g cho 4 người)."

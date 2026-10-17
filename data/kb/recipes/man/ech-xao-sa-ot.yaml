@@ -1,0 +1,26 @@
+slug: ech-xao-sa-ot
+name_vi: "Ếch xào sả ớt"
+slot: man
+servings: 4
+method: xao
+tags: [dam_da, cay, thom_sa_gung, kho_rao, bua_thuong, com_hop]
+ingredients:
+  - {name: ếch, grams: 500, role: main, note: "ếch đã làm sạch, còn xương, chặt miếng"}
+  - {name: sả, grams: 75, role: seasoning, note: "3 cây (1 cây ≈ 25 g), băm nhuyễn"}
+  - {name: ớt, grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: nghệ, grams: 10, role: seasoning, note: "1/2 nhánh (1 nhánh ≈ 20 g), giã lấy nước; có thể thay 1 muỗng cà phê bột nghệ"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: đường, grams: 12, role: seasoning, note: "1 muỗng canh (≈ 12 g)"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê (≈ 4 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Bóp ếch với muối cho sạch nhớt, rửa lại và chặt miếng vừa ăn.", kind: active, minutes: 7, uses_burner: false}
+  - {step_no: 2, text_vi: "Băm sả, hành tím, ớt; ướp ếch với nước nghệ, một nửa nước mắm, hạt nêm và ít hành sả băm.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Để ếch ngấm gia vị.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 4, text_vi: "Phi sả, hành tím, ớt trong dầu nóng đến khi thơm vàng.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Cho ếch vào đảo lửa lớn đến khi săn, nêm nước mắm còn lại, đường và chút nước, đảo đến khi sốt keo lại.", kind: active, minutes: 7, uses_burner: true}
+sources:
+  - {url: "https://www.bachhoaxanh.com/kinh-nghiem-hay/cach-lam-ech-xao-sa-ot-tieu-diet-gon-noi-com-1156804", title: "2 cách làm ếch xào sả ớt thơm ngon đơn giản (Bách hóa XANH)", accessed_on: 2026-10-17}
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-ech-xao-sa-ot-don-gian-cay-ngon-dam-da-cho-bua-com-14584", title: "Cách làm ếch xào sả ớt đơn giản cay ngon đậm đà (Điện Máy XANH)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 400–500 g ếch; nghệ chỉ xuất hiện ở bước khử mùi/tạo màu, ở đây cho vào nước ướp. Tổng 37 phút gồm 15 phút ướp."

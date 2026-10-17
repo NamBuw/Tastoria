@@ -1,0 +1,28 @@
+slug: cha-trung-hap
+name_vi: "Chả trứng hấp"
+slot: man
+servings: 4
+method: hap
+tags: [mem, thanh, bua_thuong, com_hop]
+ingredients:
+  - {name: thịt băm, grams: 200, role: main}
+  - {name: trứng gà, grams: 250, role: main, note: "5 quả (1 quả ≈ 50 g): 4 quả trộn nhân, 1 lòng đỏ phết mặt"}
+  - {name: mộc nhĩ, grams: 5, role: main, note: "3–4 tai khô"}
+  - {name: miến, grams: 20, role: main, note: "1 nắm nhỏ miến khô"}
+  - {name: nước mắm, grams: 15, role: seasoning, note: "1 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: hành lá, grams: 30, role: seasoning, note: "2 cây (1 cây ≈ 15 g)"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay"}
+  - {name: hành tím, grams: 10, role: seasoning, note: "1 củ băm"}
+  - {name: đường, grams: 2, role: seasoning, note: "1/2 muỗng cà phê"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: dầu ăn, grams: 5, role: seasoning, note: "1 muỗng cà phê thoa khuôn"}
+steps:
+  - {step_no: 1, text_vi: "Ngâm mộc nhĩ và miến trong nước ấm cho mềm.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 2, text_vi: "Thái nhỏ mộc nhĩ, cắt ngắn miến, băm hành tím và thái hành lá; trộn cùng thịt băm, nước mắm, đường, hạt nêm, tiêu.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 3, text_vi: "Đập 4 quả trứng và lòng trắng quả còn lại vào thịt, khuấy đều rồi đổ vào khuôn đã thoa dầu.", kind: active, minutes: 3, uses_burner: false}
+  - {step_no: 4, text_vi: "Hấp cách thủy đến khi chả đông chắc, có thể phủ màng bọc để hơi nước không đọng xuống mặt.", kind: passive, minutes: 20, uses_burner: true}
+  - {step_no: 5, text_vi: "Phết lòng đỏ đánh tan lên mặt chả rồi hấp thêm cho mặt se lại.", kind: passive, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://monngonmoingay.com/cha-trung-hap/", title: "Chả trứng hấp (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-lam-cha-trung-172784", title: "Học lỏm cách làm chả trứng mềm thơm, ngon như tiệm cơm tấm (FPT Shop)", accessed_on: 2026-10-17}
+notes: "Hai nguồn dùng trứng vịt (và Món Ngon Mỗi Ngày thêm trứng muối); bản này dùng trứng gà theo dish_list. Nguồn hấp 22–25 phút."

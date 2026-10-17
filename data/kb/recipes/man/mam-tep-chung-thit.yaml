@@ -1,0 +1,27 @@
+slug: mam-tep-chung-thit
+name_vi: "Mắm tép chưng thịt"
+slot: man
+servings: 4
+method: rim
+tags: [dam_da, mam_ruoc, cay, thom_sa_gung, bua_thuong, com_hop]
+ingredients:
+  - {name: thịt ba chỉ, grams: 400, role: main, note: "Có thể thay một phần bằng nạc vai cho bớt béo"}
+  - {name: mắm tép, grams: 80, role: main, note: "Khoảng 4–5 muỗng canh"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: tỏi, grams: 12, role: seasoning, note: "4 tép (1 tép ≈ 3 g)"}
+  - {name: sả, grams: 50, role: seasoning, note: "2 cây (1 cây ≈ 25 g)"}
+  - {name: ớt, grams: 10, role: seasoning, note: "2 quả (1 quả ≈ 5 g)"}
+  - {name: đường, grams: 12, role: seasoning, note: "1 muỗng canh (≈ 12 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay (≈ 2,5 g)"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh (≈ 13 g)"}
+steps:
+  - {step_no: 1, text_vi: "Rửa thịt với nước muối loãng, thái nhỏ hoặc băm thô, không băm quá nhuyễn.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Băm nhỏ sả, hành tím, tỏi và ớt.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Phi thơm sả, hành, tỏi với dầu ăn.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho thịt vào đảo đến khi săn và ra bớt mỡ.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 5, text_vi: "Thêm mắm tép, đường, ớt và chút nước, chưng nhỏ lửa đến khi sánh lại, rắc tiêu.", kind: passive, minutes: 15, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-mon-mam-tep-chung-thit-don-gian-thom-ngon-02764", title: "Cách làm món mắm tép chưng thịt đơn giản, thơm ngon (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/cach-lam-thit-chung-mam-tep-dam-da-dua-com-cho-ca-gia-dinh-163823", title: "Cách làm thịt chưng mắm tép đậm đà đưa cơm (FPT Shop)", accessed_on: 2026-10-17}
+  - {url: "https://dienmaycholon.com/mon-ngon/cach-lam-mam-tep-chung-thit", title: "Cách làm mắm tép chưng thịt (Điện Máy Chợ Lớn)", accessed_on: 2026-10-17}
+notes: "Nguồn dùng 500 g thịt với 50–200 g mắm tép; chọn 400 g ba chỉ và 80 g mắm tép vì món ăn mặn, ăn ít mỗi bữa. Mắm tép đã mặn nên không thêm nước mắm."

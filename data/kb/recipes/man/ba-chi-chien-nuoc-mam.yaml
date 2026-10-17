@@ -1,0 +1,25 @@
+slug: ba-chi-chien-nuoc-mam
+name_vi: "Ba chỉ chiên nước mắm"
+slot: man
+servings: 4
+method: chien
+tags: [dam_da, beo, gion, thom_toi, com_hop]
+ingredients:
+  - {name: thịt ba chỉ, grams: 500, role: main}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: tỏi, grams: 15, role: seasoning, note: "5 tép (1 tép ≈ 3 g)"}
+  - {name: dầu ăn, grams: 26, role: seasoning, note: "2 muỗng canh tráng chảo (1 muỗng canh ≈ 13 g)"}
+  - {name: muối, grams: 3, role: seasoning, note: "1/2 muỗng cà phê"}
+  - {name: tiêu, grams: 1.25, role: seasoning, note: "1/2 muỗng cà phê tiêu xay"}
+  - {name: ớt, grams: 5, role: seasoning, optional: true, note: "1 quả"}
+steps:
+  - {step_no: 1, text_vi: "Rửa thịt, luộc sơ trong nước sôi có muối khoảng 5 phút rồi vớt ra để ráo.", kind: active, minutes: 8, uses_burner: true}
+  - {step_no: 2, text_vi: "Thái thịt miếng dày khoảng 1 cm, rắc chút muối và tiêu; băm tỏi, ớt.", kind: active, minutes: 4, uses_burner: false}
+  - {step_no: 3, text_vi: "Chiên thịt trong chảo nóng có ít dầu đến khi hai mặt vàng giòn, chắt bớt mỡ thừa.", kind: active, minutes: 12, uses_burner: true}
+  - {step_no: 4, text_vi: "Khuấy nước mắm, đường với tỏi ớt băm, đổ vào chảo và đảo ở lửa nhỏ đến khi sốt keo lại bám quanh thịt.", kind: active, minutes: 4, uses_burner: true}
+sources:
+  - {url: "https://hoanghamobile.com/tin-tuc/thit-ba-chi/", title: "Thịt ba chỉ làm món gì ngon? 12 món dễ nấu cho bữa cơm (Hoàng Hà Mobile)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/thit-chien-nuoc-mam-164790", title: "Công thức làm thịt chiên nước mắm ăn cực kỳ hấp dẫn và đưa cơm (FPT Shop)", accessed_on: 2026-10-17}
+  - {url: "https://fptshop.com.vn/tin-tuc/dien-may/ba-chi-chien-mam-168355", title: "Ba chỉ chiên mắm giòn rụm thơm lừng (FPT Shop)", accessed_on: 2026-10-17}
+notes: "Bản này chiên áp chảo bằng ít dầu (thịt tự ra mỡ). Một nguồn FPT Shop lăn bột và chiên ngập 300 ml dầu; không chọn cách đó. Nguồn dùng 500–600 g ba chỉ."

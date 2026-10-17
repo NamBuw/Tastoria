@@ -1,0 +1,28 @@
+slug: ca-bong-kho-tieu
+name_vi: "Cá bống kho tiêu"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, cay, kho_rao, bua_thuong, com_hop]
+ingredients:
+  - {name: cá bống, grams: 400, role: main, note: "cá nhỏ cỡ ngón tay, cân nguyên con"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: tiêu, grams: 5, role: seasoning, note: "2 muỗng cà phê tiêu xay (1 muỗng cà phê ≈ 2,5 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: đường, grams: 16, role: seasoning, note: "1 muỗng canh + 1 muỗng cà phê, phần lớn thắng nước màu"}
+  - {name: mỡ lợn, grams: 50, role: seasoning, note: "mỡ thái hạt lựu, thắng lấy mỡ và tóp"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: nghệ, grams: 10, role: seasoning, optional: true, note: "nửa nhánh, giã nhỏ"}
+  - {name: ớt, grams: 15, role: seasoning, optional: true, note: "3 quả (1 quả ≈ 5 g)"}
+  - {name: hành lá, grams: 15, role: seasoning, optional: true, note: "1 cây"}
+steps:
+  - {step_no: 1, text_vi: "Chà cá với muối cho sạch nhớt, đánh vảy, bỏ mang và ruột rồi rửa lại, để ráo.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Ướp cá với hành tím băm, nước mắm, một ít đường, một nửa số tiêu và nghệ giã.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 3, text_vi: "Thắng mỡ cho ra tóp, vớt tóp ra; cho đường vào nồi đất thắng màu cánh gián rồi phi tỏi.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 4, text_vi: "Cho cá vào lắc nhẹ cho cá săn và bắt màu nước đường.", kind: active, minutes: 3, uses_burner: true}
+  - {step_no: 5, text_vi: "Thêm ớt và nước nóng xâm xấp cá, kho nhỏ lửa đến khi nước gần cạn.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 6, text_vi: "Cho tóp mỡ lại vào, rắc tiêu còn lại và hành lá rồi tắt bếp.", kind: active, minutes: 1, uses_burner: true}
+sources:
+  - {url: "https://monngonmoingay.com/ca-bong-trung-kho-tieu/", title: "Cá bống trứng kho tiêu (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/cay-nong-ca-bong-kho-tieu-2761628.html", title: "Cay nồng cá bống kho tiêu (VnExpress)", accessed_on: 2026-10-17}
+notes: "Bài Món Ngon Mỗi Ngày dùng 250 g cá cho 4 người; tăng lên 400 g cho món mặn chính. Bài VnExpress ướp khoảng 30 phút với nghệ tươi; ghi 15 phút."

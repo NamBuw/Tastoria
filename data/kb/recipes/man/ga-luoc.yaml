@@ -1,0 +1,25 @@
+slug: ga-luoc
+name_vi: "Gà luộc"
+slot: man
+servings: 4
+method: luoc
+tags: [thanh, mem, bua_thuong, cuoi_tuan]
+ingredients:
+  - {name: thịt gà, grams: 1500, role: main, note: "1 con gà ta nguyên con, cân cả xương"}
+  - {name: lá chanh, grams: 10, role: seasoning, note: "Khoảng 20 lá (≈ 10 g), một phần thái chỉ rắc lên"}
+  - {name: gừng, grams: 60, role: seasoning, note: "2 nhánh (1 nhánh ≈ 30 g)"}
+  - {name: hành tím, grams: 30, role: seasoning, note: "3 củ (1 củ ≈ 10 g)"}
+  - {name: muối, grams: 18, role: seasoning, note: "1 muỗng canh, phần lớn chà da và nêm nước luộc, một ít pha muối chấm (≈ 18 g)"}
+  - {name: tiêu, grams: 2.5, role: seasoning, note: "1 muỗng cà phê tiêu xay cho muối chấm (≈ 2,5 g)"}
+  - {name: chanh, grams: 50, role: seasoning, note: "1 quả vắt vào muối tiêu"}
+steps:
+  - {step_no: 1, text_vi: "Làm sạch gà, chà muối và gừng giã lên da rồi rửa lại; đập dập gừng, nướng sơ hành tím.", kind: active, minutes: 10, uses_burner: false}
+  - {step_no: 2, text_vi: "Cho gà vào nồi nước lạnh ngập cùng gừng, hành tím và chút muối, đun đến khi sôi.", kind: passive, minutes: 15, uses_burner: true}
+  - {step_no: 3, text_vi: "Hạ nhỏ lửa, hớt bọt, luộc liu riu và lật gà một lần cho chín đều.", kind: passive, minutes: 12, uses_burner: true}
+  - {step_no: 4, text_vi: "Tắt bếp, đậy nắp ủ gà trong nồi cho chín tới xương.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 5, text_vi: "Vớt gà ra nước lạnh cho da căng giòn; thái chỉ lá chanh, pha muối tiêu chanh.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 6, text_vi: "Chặt gà miếng vừa ăn, xếp đĩa và rắc lá chanh.", kind: active, minutes: 7, uses_burner: false}
+sources:
+  - {url: "https://www.dienmayxanh.com/vao-bep/cach-lam-ga-luoc-la-chanh-thom-ngon-da-vang-gion-khong-bi-nut-24337", title: "Cách làm gà luộc lá chanh da vàng giòn không bị nứt (Điện Máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://monngonmoingay.com/ga-luoc/", title: "Gà luộc xôi gấc (Món Ngon Mỗi Ngày)", accessed_on: 2026-10-17}
+notes: "ĐMX (4 người) dùng 1 con gà ta 1,5–1,8 kg, 20 lá chanh, 2 nhánh gừng, 3 củ hành tím; luộc nhỏ lửa khoảng 10 phút sau khi sôi rồi ủ 15–20 phút. Nước luộc giữ lại nấu canh/cháo, không tính là nguyên liệu. Nguồn MNMN là gà luộc ăn kèm xôi gấc, chỉ lấy phần luộc gà."
