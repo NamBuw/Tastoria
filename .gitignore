@@ -37,3 +37,4 @@ ml/mlruns/
 .idea/
 __pycache__/
 dist/
+data/processed/foodcom/
