@@ -1,0 +1,20 @@
+{
+  "name": "yolo26n_640_none",
+  "onnx": "ml/runs/detect/yolo26n_640_none/weights/best.onnx",
+  "onnx_bytes": 9803051,
+  "onnxruntime": "1.31.0",
+  "intra_op_num_threads": 2,
+  "n_images": 100,
+  "imgsz": 640,
+  "model_ms": {
+    "p50": 22.982928901910782,
+    "p95": 23.808716842904687,
+    "mean": 22.963720406405628
+  },
+  "letterbox_plus_model_ms": {
+    "p50": 26.459840824827552,
+    "p95": 32.04525058390573
+  },
+  "cpu": "INTEL(R) XEON(R) GOLD 6542Y",
+  "note": "measured on the shared training server (other jobs running), not on the target VPS; post-processing (score threshold) not included"
+}
