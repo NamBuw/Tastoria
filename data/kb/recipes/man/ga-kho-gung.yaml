@@ -1,0 +1,28 @@
+slug: ga-kho-gung
+name_vi: "Gà kho gừng"
+slot: man
+servings: 4
+method: kho
+tags: [dam_da, thom_sa_gung, troi_lanh, com_hop, bua_thuong]
+ingredients:
+  - {name: thịt gà, grams: 700, role: main, note: "nửa con gà, chặt miếng, cân cả xương"}
+  - {name: gừng, grams: 50, role: seasoning, note: "khoảng 1 nhánh lớn, một nửa băm để ướp, nửa còn lại thái sợi"}
+  - {name: nước mắm, grams: 30, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 15 g)"}
+  - {name: đường, grams: 24, role: seasoning, note: "2 muỗng canh (1 muỗng canh ≈ 12 g)"}
+  - {name: hành tím, grams: 20, role: seasoning, note: "2 củ (1 củ ≈ 10 g)"}
+  - {name: tỏi, grams: 9, role: seasoning, note: "3 tép (1 tép ≈ 3 g)"}
+  - {name: hạt nêm, grams: 4, role: seasoning, note: "1 muỗng cà phê"}
+  - {name: dầu ăn, grams: 13, role: seasoning, note: "1 muỗng canh"}
+  - {name: tiêu, grams: 2.5, role: seasoning, optional: true, note: "1 muỗng cà phê tiêu xay"}
+  - {name: ớt, grams: 10, role: seasoning, optional: true, note: "2 quả (1 quả ≈ 5 g)"}
+steps:
+  - {step_no: 1, text_vi: "Xát gà với muối rồi rửa lại cho hết mùi, chặt miếng vừa ăn và để ráo.", kind: active, minutes: 8, uses_burner: false}
+  - {step_no: 2, text_vi: "Gọt gừng, băm một nửa và thái sợi nửa còn lại; băm hành tím, tỏi; thái lát ớt.", kind: active, minutes: 5, uses_burner: false}
+  - {step_no: 3, text_vi: "Trộn gà với gừng băm, hành tím, nước mắm, đường và hạt nêm, để yên cho thấm.", kind: passive, minutes: 15, uses_burner: false}
+  - {step_no: 4, text_vi: "Đun nóng dầu, phi tỏi và gừng sợi cho thơm, cho gà vào đảo đến khi thịt săn lại.", kind: active, minutes: 5, uses_burner: true}
+  - {step_no: 5, text_vi: "Đổ nước xâm xấp mặt gà, đun sôi rồi hạ nhỏ lửa kho đến khi gà mềm.", kind: passive, minutes: 20, uses_burner: true}
+  - {step_no: 6, text_vi: "Mở to lửa cho nước kho sánh lại, nêm lại vừa ăn, thêm tiêu và ớt rồi tắt bếp.", kind: active, minutes: 3, uses_burner: true}
+sources:
+  - {url: "https://www.dienmayxanh.com/kinh-nghiem-hay/huong-dan-cach-lam-mon-ga-kho-gung-thom-phuc-dua-c-1188367", title: "2 cách làm gà kho gừng cay nồng thơm ngon (Điện máy XANH)", accessed_on: 2026-10-17}
+  - {url: "https://vnexpress.net/ga-kho-gung-nghe-ngon-com-2903149.html", title: "Gà kho gừng, nghệ ngon cơm (VnExpress)", accessed_on: 2026-10-17}
+notes: "Bài Điện máy XANH (4 người) dùng cả con gà 2 kg, 100 g gừng, ướp 30 phút, kho 20 phút; bài VnExpress dùng 300 g gà, 1 củ gừng và thêm bột nghệ (ở đây bỏ nghệ để giữ đúng món gà kho gừng). Chọn nửa con gà 700 g cho 4 người, ướp 15 phút. Tổng số phút cao hơn ước lượng 40 phút của dish_list vì tính cả thời gian ướp."
