@@ -107,7 +107,9 @@ def test_success_resets_counter(client: TestClient) -> None:
     for _ in range(3):
         client.post(f"{AUTH}/login", json={"email": "a@x.vn", "password": "sai-mat-khau-1"})
     login(client, "a@x.vn")
-    codes = [client.post(f"{AUTH}/login", json={"email": "a@x.vn", "password": "sai-1234567"}).status_code for _ in range(4)]
+    codes = [
+        client.post(f"{AUTH}/login", json={"email": "a@x.vn", "password": "sai-1234567"}).status_code for _ in range(4)
+    ]
     assert codes == [401, 401, 401, 401]
 
 
@@ -294,7 +296,10 @@ def test_new_reset_token_invalidates_old(make_app, clean_db, engine) -> None:
         t1, t2 = (_reset_token(m.body) for m in app.state.mailer.sent)
         r = c.post(f"{AUTH}/password-reset/confirm", json={"token": t1, "new_password": "mat-khau-moi-123"})
         assert (r.status_code, r.json()["code"]) == (400, "reset_token_invalid")
-        assert c.post(f"{AUTH}/password-reset/confirm", json={"token": t2, "new_password": "mat-khau-moi-123"}).status_code == 204
+        assert (
+            c.post(f"{AUTH}/password-reset/confirm", json={"token": t2, "new_password": "mat-khau-moi-123"}).status_code
+            == 204
+        )
 
 
 def test_reset_token_invalid_cases(client: TestClient, db) -> None:

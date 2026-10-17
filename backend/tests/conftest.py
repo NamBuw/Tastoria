@@ -122,9 +122,8 @@ def app(make_app: Callable[..., object]):
 
 @pytest.fixture
 def client(app, clean_db: None) -> Iterator[object]:
-    from fastapi.testclient import TestClient
-
     from fakes import FakeMailer
+    from fastapi.testclient import TestClient
 
     app.state.mailer = FakeMailer()
     with TestClient(app) as c:

@@ -5,8 +5,10 @@ blocking DB call never blocks the event loop; with a few dozen concurrent users 
 keeps services plain functions that take a `Session`.
 
 One request = one transaction: `get_uow` opens a session, the endpoint calls services (which never commit),
-and the dependency commits once after the endpoint returns. Work outside the database (sending mail, running a
-job, deleting files) is registered with `uow.after_commit(fn)` and runs only after a successful commit.
+and the dependency commits once after the endpoint returns. It is declared with `scope="function"` (`Uow`
+below), so the commit happens *before* the response is sent: a failing COMMIT becomes a 5xx, never a 200.
+Work outside the database (sending mail, running a job, deleting files) is registered with
+`uow.after_commit(fn)` and runs only after a successful commit.
 """
 
 from __future__ import annotations
@@ -14,8 +16,9 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
+from typing import Annotated
 
-from fastapi import Request
+from fastapi import Depends, Request
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
@@ -94,3 +97,7 @@ def get_uow(request: Request) -> Iterator[UnitOfWork]:
             raise
         session.commit()
     uow.run_after_commit()
+
+
+# Use this everywhere (routers and dependencies) so a request shares one Unit of Work.
+Uow = Annotated[UnitOfWork, Depends(get_uow, scope="function")]

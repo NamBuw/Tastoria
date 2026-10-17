@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from conftest import REPO_ROOT
+
 from tastoria.migrations import MIGRATIONS_DIR
 
 

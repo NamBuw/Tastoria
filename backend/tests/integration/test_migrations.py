@@ -54,6 +54,6 @@ def test_upgrade_downgrade_upgrade(pg: ds.Container) -> None:
     command.upgrade(cfg, "head")
     command.downgrade(cfg, "base")
     command.upgrade(cfg, "head")
-    r = pg.exec("psql", "-tA", "-U", ds.PG_USER, "-d", "roundtrip", "-c",
-                "SELECT count(*) FROM pg_tables WHERE schemaname = 'public' AND tablename <> 'alembic_version'")  # fmt: skip
+    sql = "SELECT count(*) FROM pg_tables WHERE schemaname = 'public' AND tablename <> 'alembic_version'"
+    r = pg.exec("psql", "-tA", "-U", ds.PG_USER, "-d", "roundtrip", "-c", sql)
     assert r.stdout.strip() == "62"

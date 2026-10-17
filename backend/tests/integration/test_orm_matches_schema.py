@@ -12,7 +12,10 @@ from tastoria.models_registry import target_metadata
 
 def _is_comment_diff(diff: object) -> bool:
     ops = diff if isinstance(diff, list) else [diff]
-    return all(isinstance(op, tuple) and str(op[0]) in {"modify_comment", "add_table_comment", "remove_table_comment"} for op in ops)
+    return all(
+        isinstance(op, tuple) and str(op[0]) in {"modify_comment", "add_table_comment", "remove_table_comment"}
+        for op in ops
+    )
 
 
 @pytest.mark.filterwarnings("ignore:Did not recognize type 'vector'")

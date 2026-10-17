@@ -43,3 +43,10 @@ markers = [
 
 [tool.uv.build-backend]
 module-name = "tastoria"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

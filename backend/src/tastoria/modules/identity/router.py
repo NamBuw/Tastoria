@@ -6,7 +6,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request, Response, status
 
-from tastoria.core.db import UnitOfWork, get_uow
+from tastoria.core.db import Uow
 from tastoria.modules.identity import service
 from tastoria.modules.identity.schemas import (
     AuthSession,
@@ -21,7 +21,6 @@ from tastoria.modules.identity.service import CurrentUser, IdentityDeps, identit
 
 router = APIRouter(prefix="/auth", tags=["identity"])
 
-Uow = Annotated[UnitOfWork, Depends(get_uow)]
 Deps = Annotated[IdentityDeps, Depends(identity_deps)]
 
 
@@ -50,7 +49,9 @@ def login(body: LoginRequest, request: Request, uow: Uow, deps: Deps) -> AuthSes
 
 @router.post("/refresh", operation_id="identity_refresh_token")
 def refresh(body: RefreshRequest, request: Request, uow: Uow, deps: Deps) -> AuthSession:
-    return service.refresh(uow.session, deps, refresh_token=body.refresh_token, user_agent=request.headers.get("user-agent"))
+    return service.refresh(
+        uow.session, deps, refresh_token=body.refresh_token, user_agent=request.headers.get("user-agent")
+    )
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT, operation_id="identity_logout_session")

@@ -246,7 +246,11 @@ def install_error_handlers(app: FastAPI) -> None:
         errs = exc.errors()
         status = 400 if any(_is_syntax_error(e.get("type", "")) for e in errs) else 422
         items = [
-            {"pointer": _pointer(tuple(e.get("loc", ()))), "code": e.get("type", "invalid"), "message": e.get("msg", "")}
+            {
+                "pointer": _pointer(tuple(e.get("loc", ()))),
+                "code": e.get("type", "invalid"),
+                "message": e.get("msg", ""),
+            }
             for e in errs
         ]
         return problem_response(status, ProblemCode.validation_error, instance=request.url.path, errors=items)
@@ -267,4 +271,5 @@ def install_error_handlers(app: FastAPI) -> None:
         return problem_response(
             503, ProblemCode.temporarily_unavailable, instance=request.url.path, headers={"Retry-After": "1"}
         )
+
     # Anything else is caught by RequestContextMiddleware (500 internal_error, keeps X-Request-ID).

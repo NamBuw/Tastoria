@@ -20,7 +20,7 @@ from sqlalchemy.orm import Session
 
 from tastoria.core.clock import utcnow
 from tastoria.core.config import Settings
-from tastoria.core.db import UnitOfWork, get_uow
+from tastoria.core.db import UnitOfWork, Uow
 from tastoria.core.errors import ApiError, ProblemCode
 from tastoria.modules.identity import passwords, tokens
 from tastoria.modules.identity.mailer import Mailer
@@ -58,9 +58,7 @@ def identity_deps(request: Request) -> IdentityDeps:
 # ---------------------------------------------------------------- current user (bearer access token)
 
 
-def current_user(
-    request: Request, uow: Annotated[UnitOfWork, Depends(get_uow)]
-) -> AuthUser:
+def current_user(request: Request, uow: Uow) -> AuthUser:
     """FastAPI dependency for every `auth: user` endpoint. 401 unauthenticated / token_revoked (FR-02-09)."""
     settings: Settings = request.app.state.settings
     header = request.headers.get("authorization", "")
