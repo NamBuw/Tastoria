@@ -1,0 +1,101 @@
+@startuml
+title AD04 — Vòng dữ liệu và mô hình (UC12, UC28, UC29, UC30, UC31)
+' Hai luồng độc lập, mỗi luồng có initial node riêng; chúng chỉ gặp nhau qua kho dữ liệu scan_images/contrib.
+' Làn theo container hoặc người: api (HTTP và CLI tastoria, module admin), worker, GPU lab ngoài hệ thống.
+' Công cụ gán nhãn (A10) là Label Studio tự host.
+
+|Người dùng|
+start
+note right
+  Luồng 1: thu thập ảnh góp
+  (mỗi lần quét, UC12–UC13)
+end note
+:Gửi ảnh quét (POST /scans);
+|api|
+:has_consent(user_id, 'photo_contribution');
+if (Đồng ý photo_contribution?) then (có)
+  :Ghi ảnh vào tmp/ và chép sang contrib/;
+  :INSERT scan_images contributed = true;
+else (không)
+  :Ghi ảnh chỉ vào tmp/ (xoá sau 30 ngày, BR-RETAIN-01);
+  :INSERT scan_images contributed = false;
+endif
+|Người dùng|
+:Sửa chip khi xác nhận quét
+(đổi nhãn, số lượng, độ tươi);
+|api|
+:Ghi scan_items.user_action, original_ingredient_id
+(tín hiệu chọn ảnh cho học chủ động);
+:«datastore» scan_images, scan_items, contrib/;
+stop
+
+|Người vận hành mô hình|
+start
+note right
+  Luồng 2: huấn luyện và triển khai,
+  do người vận hành chủ động chạy;
+  không do luồng 1 kích hoạt
+end note
+:tastoria mlops export-training-data --since <date>;
+|api|
+:Đọc «datastore» scan_images, scan_items, interactions;
+:Lọc theo đồng ý hiện hành (v_current_consents):
+ảnh cần photo_contribution, tương tác cần personalization;
+:Loại tài khoản đã xoá hoặc đang chờ xoá;
+:Bí danh hoá user_id bằng HMAC-SHA256
+(khoá tách riêng), ghi audit_log;
+|Người vận hành mô hình|
+:tastoria labeling push;
+|api|
+:Chọn ảnh theo học chủ động: ưu tiên ảnh có chip
+bị sửa, chỉ lấy ảnh có contributed = true;
+:Đẩy ảnh lên công cụ gán nhãn;
+|Người gán nhãn|
+:Gán khung và nhãn độ tươi;
+|Người vận hành mô hình|
+:tastoria labeling pull;
+|GPU lab|
+:Kiểm nvidia-smi, một job một lúc;
+:Huấn luyện có giới hạn bộ nhớ
+(set_per_process_memory_fraction, chạy thử 1 epoch);
+:Ghi run vào MLflow: commit, sha256 dữ liệu,
+seed, danh sách id test, phiên bản thư viện;
+:Xuất ONNX;
+|Người vận hành mô hình|
+:tastoria mlops register <name> <artifact> --metrics <json>;
+|api|
+:Tạo model_versions (candidate, sha256, metrics,
+mlflow_run_id);
+|Người vận hành mô hình|
+:tastoria mlops gate <name> <version>;
+|api|
+:So bản ứng viên với bản đang chạy trên tập test khoá;
+if (Không kém hơn quá biên định trước?) then (đạt)
+  :model_versions → validated, lưu gate_report_key;
+else (không đạt)
+  :model_versions → rejected, lưu gate_report_key;
+  stop
+endif
+|Người vận hành mô hình|
+:tastoria mlops deploy <name> <version>;
+|api|
+:Bản đang ở previous_version_id (nếu có) → retired;
+:Đổi con trỏ model_deployments
+(previous_version_id = bản đang chạy, giữ validated,
+active_version_id = bản mới, switched_by, switched_at);
+:Restart api và worker;
+|worker|
+:Nạp phiên ONNX mới theo con trỏ, kiểm sha256;
+|api|
+:Theo dõi /readyz và số đo vận hành;
+|Người vận hành mô hình|
+if (Bản mới có sự cố?) then (có)
+  :tastoria mlops rollback <name>;
+  |api|
+  :Đổi chỗ active_version_id ↔ previous_version_id,
+  không đổi model_versions.status, restart
+  (quay lui < 5 phút);
+else (không)
+endif
+stop
+@enduml

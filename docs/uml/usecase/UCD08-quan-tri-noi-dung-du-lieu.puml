@@ -1,0 +1,27 @@
+@startuml
+title UCD08 — Gói PK8 Quản trị nội dung & dữ liệu
+' Sinh từ docs/sad/model.yaml (actors, use_cases, rels). Không sửa tay mã định danh.
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle stick
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Người biên soạn\ncông thức\n(A05)" as A05
+actor "Quản trị viên\n(A04)" as A04
+
+rectangle "Tastoria" {
+  package "PK8 Quản trị nội dung & dữ liệu" as PK8 {
+    usecase "UC25 Nhập và kiểm tra kho công\nthức, nguyên liệu" as UC25
+    usecase "UC26 Quản lý cặp thay thế\nnguyên liệu" as UC26
+    usecase "UC27 Xử lý yêu cầu dữ liệu và\nxem nhật ký kiểm toán" as UC27
+  }
+}
+
+A05 -- UC25
+A05 -- UC26
+A04 -- UC27
+
+@enduml

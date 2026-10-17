@@ -1,0 +1,127 @@
+@startuml PG01-goi
+title PG01 — Sơ đồ gói: bố cục mã nguồn backend và app
+
+' Backend: backend/src/tastoria. Mỗi module trong tastoria.modules có service.py là giao diện công khai;
+' module khác chỉ import <module>.service (cưỡng chế bằng import-linter, NFR-MAINT-01).
+' Phụ thuộc chi tiết giữa các module con: xem CP01 (bằng đúng model.yaml modules[].deps).
+
+skinparam packageStyle folder
+hide empty members
+hide circle
+
+package "backend/src/tastoria" as tastoria {
+  package "tastoria.core" as core <<M01>> {
+    class "db.py" as core_db
+    class "uow.py" as core_uow
+    class "errors.py (RFC 9457)" as core_err
+    class "idempotency.py" as core_idem
+    class "config.py" as core_cfg
+    class "storage.py" as core_sto
+    class "security.py" as core_sec
+  }
+  package "tastoria.modules" as modules {
+    package "tastoria.modules.identity" as m_identity <<M02>> {
+    }
+    package "tastoria.modules.privacy" as m_privacy <<M03>> {
+    }
+    package "tastoria.modules.catalog" as m_catalog <<M04>> {
+    }
+    package "tastoria.modules.profile" as m_profile <<M05>> {
+    }
+    package "tastoria.modules.pantry" as m_pantry <<M06>> {
+    }
+    package "tastoria.modules.mlops" as m_mlops <<M07>> {
+    }
+    package "tastoria.modules.scan" as m_scan <<M08>> {
+    }
+    package "tastoria.modules.events" as m_events <<M09>> {
+    }
+    package "tastoria.modules.substitute" as m_substitute <<M10>> {
+    }
+    package "tastoria.modules.meal" as m_meal <<M11>> {
+      class "router.py" as meal_router
+      class "service.py" as meal_service <<public>>
+      class "repository.py" as meal_repo
+      class "domain.py" as meal_domain
+      class "schemas.py" as meal_schemas
+      class "tables.py" as meal_tables
+    }
+    package "tastoria.modules.cooking" as m_cooking <<M12>> {
+    }
+    package "tastoria.modules.journal" as m_journal <<M13>> {
+    }
+    package "tastoria.modules.survey" as m_survey <<M14>> {
+    }
+    package "tastoria.modules.admin" as m_admin <<M15>> {
+    }
+  }
+  package "tastoria.jobs" as jobs <<M16>> {
+    class "purge_images.py" as j_purge
+    class "backup.py" as j_backup
+    class "sweep.py" as j_sweep
+  }
+  package "tastoria.cli" as cli {
+    class "catalog, survey, mlops, labeling" as cli_cmds
+  }
+}
+
+package "backend/migrations (Alembic)" as migrations {
+
+}
+
+package "app (Expo, TypeScript)" as app {
+  package "app/app (expo-router)" as app_routes {
+    class "(auth): đăng ký, đăng nhập, quên mật khẩu" as r_auth
+    class "onboarding: hồ sơ 60 giây, đồng ý" as r_onb
+    class "(tabs): trang chủ, kho, mâm, nhật ký, cài đặt" as r_tabs
+    class "scan: quét, xác nhận nguyên liệu" as r_scan
+    class "meal: đổi món, thiếu gì, đi chợ" as r_meal
+    class "cook: nấu cả mâm, nấu xong" as r_cook
+    class "survey: khảo sát gu (không cần tài khoản)" as r_survey
+  }
+  package "app/src/api" as app_api {
+    class "client sinh từ openapi-v1.yaml" as a_client
+  }
+  package "app/src/offline" as app_off {
+    class "sqlite: catalog snapshot, phiên nấu" as a_sqlite
+    class "outbox: nấu xong, sự kiện, sửa chip" as a_outbox
+  }
+  package "app/src/ui" as app_ui {
+    class "thành phần, theme, nhãn độ tươi" as a_ui
+  }
+}
+
+package "landing (HTML/CSS tĩnh)" as landing {
+
+}
+
+' ---- phụ thuộc gói
+modules ..> core : <<import>>
+jobs ..> core : <<import>>
+jobs ..> m_scan : <<import>>
+jobs ..> m_identity : <<import>>
+jobs ..> m_privacy : <<import>>
+cli ..> m_admin : <<import>>
+migrations ..> modules : <<import>> tables.py
+
+meal_router ..> meal_service
+meal_service ..> meal_repo
+meal_service ..> meal_domain
+meal_router ..> meal_schemas
+meal_repo ..> meal_tables
+
+app_routes ..> app_api : <<import>>
+app_routes ..> app_off : <<import>>
+app_routes ..> app_ui : <<import>>
+app_off ..> app_api : <<import>>
+app_api ..> modules : HTTP /api/v1 (không import mã)
+
+note right of m_meal
+  Mọi module trong tastoria.modules có cùng bố cục:
+  router.py (FastAPI APIRouter), service.py (giao diện công khai),
+  repository.py (SQL), domain.py (đối tượng miền, luật nghiệp vụ),
+  schemas.py (DTO Pydantic), tables.py (bảng SQLAlchemy của module).
+  Module scan có thêm jobs.py (InferenceJob chạy trong worker).
+end note
+
+@enduml

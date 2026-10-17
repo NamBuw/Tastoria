@@ -1,0 +1,121 @@
+@startuml
+title ERD07 — Khảo sát gu (survey) và vận hành mô hình (mlops)
+hide circle
+
+entity "model_versions" as model_versions {
+  * id : uuid <<PK>>
+  --
+  * name : model_name_t
+  * version : text
+  * artifact_key : text
+  * sha256 : bytea
+    preprocess_version : text
+  * metrics : jsonb
+    gate_report_key : text
+    mlflow_run_id : text
+  * status : model_status_t
+  * created_at : timestamptz
+  .. UNIQUE(name, version) ..
+  .. UNIQUE(id, name) ..
+}
+entity "model_version_classes" as model_version_classes {
+  * model_version_id : uuid <<PK, FK>>
+  * class_index : smallint <<PK>>
+  --
+  * vision_class_id : smallint <<FK>>
+  .. UNIQUE(model_version_id, vision_class_id) ..
+}
+entity "model_deployments" as model_deployments {
+  * name : model_name_t <<PK, FK>>
+  --
+  * active_version_id : uuid <<FK, UQ>>
+    previous_version_id : uuid <<FK>>
+  * switched_at : timestamptz
+    switched_by : uuid <<FK>>
+}
+entity "survey_forms" as survey_forms {
+  * id : uuid <<PK>>
+  --
+  * version : text <<UQ>>
+  * n_anchor : smallint
+  * n_random : smallint
+  * is_open : boolean
+  * created_at : timestamptz
+}
+entity "survey_form_anchors" as survey_form_anchors {
+  * form_id : uuid <<PK, FK>>
+  * recipe_id : uuid <<PK, FK>>
+  --
+}
+entity "survey_respondents" as survey_respondents {
+  * id : uuid <<PK>>
+  --
+  * form_id : uuid <<FK>>
+  * policy_version_id : uuid <<FK>>
+  * consented_at : timestamptz
+    completed_at : timestamptz
+  * channel : survey_channel_t
+}
+entity "survey_assignments" as survey_assignments {
+  * respondent_id : uuid <<PK, FK>>
+  * recipe_id : uuid <<PK, FK>>
+  --
+  * display_order : smallint
+  * is_anchor : boolean
+  .. UNIQUE(respondent_id, display_order) ..
+}
+entity "survey_ratings" as survey_ratings {
+  * respondent_id : uuid <<PK, FK>>
+  * recipe_id : uuid <<PK, FK>>
+  --
+    rating : smallint
+  * never_eaten : boolean
+  * answered_at : timestamptz
+}
+entity "survey_favorites" as survey_favorites {
+  * respondent_id : uuid <<PK, FK>>
+  * recipe_id : uuid <<PK, FK>>
+  --
+}
+entity "vision_classes" as vision_classes #EEEEEE {
+  * id : smallint <<PK>>
+  .. chi tiết ở ERD03 ..
+}
+entity "users" as users #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01 ..
+}
+entity "recipes" as recipes #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD04 ..
+}
+entity "policy_versions" as policy_versions #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01 ..
+}
+
+model_versions ||--o{ model_version_classes : model_version_id
+vision_classes ||--o{ model_version_classes : vision_class_id
+model_versions ||--o| model_deployments : active_version_id, name
+model_versions |o--o| model_deployments : previous_version_id, name
+users |o--o{ model_deployments : switched_by (set_null)
+survey_forms ||--o{ survey_form_anchors : form_id
+recipes ||--o{ survey_form_anchors : recipe_id
+survey_forms ||--o{ survey_respondents : form_id
+policy_versions ||--o{ survey_respondents : policy_version_id
+survey_respondents ||--o{ survey_assignments : respondent_id (cascade)
+recipes ||--o{ survey_assignments : recipe_id
+survey_assignments ||--o| survey_ratings : respondent_id, recipe_id (cascade)
+survey_respondents ||--o{ survey_favorites : respondent_id (cascade)
+recipes ||--o{ survey_favorites : recipe_id
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  UNIQUE(...) WHERE ...: chỉ mục duy nhất một phần (không phải khoá của cả bảng)
+  ||  đúng một; |o  không hoặc một
+  o{  không hoặc nhiều; o|  không hoặc một
+  (cascade), (set_null): hành vi ON DELETE; không ghi = NO ACTION
+  Thực thể nền xám: bảng thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+
+@enduml

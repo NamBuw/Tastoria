@@ -1,0 +1,198 @@
+@startuml
+title ERD06 — Mâm cơm, thay thế, phiên nấu và tương tác (meal, substitute, cooking, events)
+hide circle
+
+entity "substitution_pairs" as substitution_pairs {
+  * id : uuid <<PK>>
+  --
+  * ingredient_id : uuid <<FK>>
+  * substitute_id : uuid <<FK>>
+    context_slot : slot_t
+    context_method_code : text <<FK>>
+  * ratio : numeric
+  * score : real
+  * source : text
+  * curated : boolean
+  .. UNIQUE(ingredient_id, substitute_id, context_slot, context_method_code) ..
+}
+entity "ingredient_embeddings" as ingredient_embeddings {
+  * ingredient_id : uuid <<PK, FK>>
+  * model_version_id : uuid <<PK, FK>>
+  --
+  * vector : vector(100)
+}
+entity "shopping_items" as shopping_items {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * ingredient_id : uuid <<FK>>
+    qty_g : numeric
+    note : text
+  * status : shopping_status_t
+    source_meal_plan_item_id : uuid <<FK>>
+  * created_at : timestamptz
+  * updated_at : timestamptz
+}
+entity "meal_plans" as meal_plans {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * meal : meal_t
+  * persons : smallint
+  * max_minutes : smallint
+  * status : meal_plan_status_t
+    e_target_kcal : numeric
+    kcal_low : numeric
+    kcal_high : numeric
+    rice_bowls_per_person : numeric
+  * reason_vi : text
+    ranker_version_id : uuid <<FK>>
+  * params_version : text
+  * created_at : timestamptz
+  * updated_at : timestamptz
+  .. UNIQUE(id, user_id) ..
+}
+entity "meal_plan_coeater_allergens" as meal_plan_coeater_allergens {
+  * meal_plan_id : uuid <<PK, FK>>
+  * allergen_code : text <<PK, FK>>
+  --
+}
+entity "meal_plan_pins" as meal_plan_pins {
+  * meal_plan_id : uuid <<PK, FK>>
+  * lot_id : uuid <<PK, FK>>
+  --
+}
+entity "meal_plan_items" as meal_plan_items {
+  * id : uuid <<PK>>
+  --
+  * meal_plan_id : uuid <<FK>>
+  * slot : slot_t <<FK>>
+  * recipe_id : uuid <<FK>>
+  * status : plan_item_status_t
+    replaced_item_id : uuid <<FK, UQ>>
+    swap_reason : swap_reason_t
+  * rank_score : real
+  * servings_scale : numeric
+    kcal_per_person : numeric
+  * created_at : timestamptz
+  .. UNIQUE(id, meal_plan_id, recipe_id) ..
+  .. UNIQUE(meal_plan_id, slot) WHERE status = 'active' ..
+}
+entity "meal_plan_item_substitutions" as meal_plan_item_substitutions {
+  * item_id : uuid <<PK, FK>>
+  * original_ingredient_id : uuid <<PK, FK>>
+  --
+  * substitute_ingredient_id : uuid <<FK>>
+  * grams : numeric
+  * origin : substitution_origin_t
+  * created_at : timestamptz
+}
+entity "cook_sessions" as cook_sessions {
+  * id : uuid <<PK>>
+  --
+  * meal_plan_id : uuid <<FK>>
+  * status : cook_status_t
+  * serve_at : timestamptz
+  * burners : smallint
+  * started_at : timestamptz
+    completed_at : timestamptz
+    reverted_at : timestamptz
+  * created_at : timestamptz
+  .. UNIQUE(meal_plan_id) WHERE status IN ('in_progress', 'completed') ..
+}
+entity "cook_schedule_entries" as cook_schedule_entries {
+  * cook_session_id : uuid <<PK, FK>>
+  * recipe_id : uuid <<PK, FK>>
+  * step_no : smallint <<PK, FK>>
+  --
+  * start_offset_s : integer
+  * end_offset_s : integer
+}
+entity "interactions" as interactions {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * recipe_id : uuid <<FK>>
+    meal_plan_id : uuid <<FK>>
+    meal_plan_item_id : uuid <<FK>>
+  * type : interaction_type_t
+    position : smallint
+    swap_reason : swap_reason_t
+    ranker_version_id : uuid <<FK>>
+    propensity : real
+  * occurred_at : timestamptz
+  * received_at : timestamptz
+}
+entity "ingredients" as ingredients #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD03 ..
+}
+entity "cooking_methods" as cooking_methods #EEEEEE {
+  * code : text <<PK>>
+  .. chi tiết ở ERD04 ..
+}
+entity "model_versions" as model_versions #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD07 ..
+}
+entity "users" as users #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01 ..
+}
+entity "allergen_groups" as allergen_groups #EEEEEE {
+  * code : text <<PK>>
+  .. chi tiết ở ERD03 ..
+}
+entity "pantry_lots" as pantry_lots #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD05 ..
+}
+entity "recipes" as recipes #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD04 ..
+}
+entity "recipe_steps" as recipe_steps #EEEEEE {
+  * recipe_id : uuid <<PK>>
+  * step_no : smallint <<PK>>
+  .. chi tiết ở ERD04 ..
+}
+
+ingredients ||--o{ substitution_pairs : ingredient_id
+ingredients ||--o{ substitution_pairs : substitute_id
+cooking_methods |o--o{ substitution_pairs : context_method_code
+ingredients ||--o{ ingredient_embeddings : ingredient_id
+model_versions ||--o{ ingredient_embeddings : model_version_id
+users ||--o{ shopping_items : user_id (cascade)
+ingredients ||--o{ shopping_items : ingredient_id
+meal_plan_items |o--o{ shopping_items : source_meal_plan_item_id (set_null)
+users ||--o{ meal_plans : user_id (cascade)
+model_versions |o--o{ meal_plans : ranker_version_id
+meal_plans ||--o{ meal_plan_coeater_allergens : meal_plan_id (cascade)
+allergen_groups ||--o{ meal_plan_coeater_allergens : allergen_code
+meal_plans ||--o{ meal_plan_pins : meal_plan_id (cascade)
+pantry_lots ||--o{ meal_plan_pins : lot_id (cascade)
+meal_plans ||--o{ meal_plan_items : meal_plan_id (cascade)
+meal_plan_items |o--o| meal_plan_items : replaced_item_id
+recipes ||--o{ meal_plan_items : recipe_id, slot
+meal_plan_items ||--o{ meal_plan_item_substitutions : item_id (cascade)
+ingredients ||--o{ meal_plan_item_substitutions : original_ingredient_id
+ingredients ||--o{ meal_plan_item_substitutions : substitute_ingredient_id
+meal_plans ||--o{ cook_sessions : meal_plan_id (cascade)
+cook_sessions ||--o{ cook_schedule_entries : cook_session_id (cascade)
+recipe_steps ||--o{ cook_schedule_entries : recipe_id, step_no
+users ||--o{ interactions : user_id (cascade)
+recipes ||--o{ interactions : recipe_id
+meal_plan_items |o--o{ interactions : meal_plan_item_id, meal_plan_id, recipe_id (set_null)
+model_versions |o--o{ interactions : ranker_version_id
+meal_plans |o--o{ interactions : meal_plan_id, user_id (cascade)
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  UNIQUE(...) WHERE ...: chỉ mục duy nhất một phần (không phải khoá của cả bảng)
+  ||  đúng một; |o  không hoặc một
+  o{  không hoặc nhiều; o|  không hoặc một
+  (cascade), (set_null): hành vi ON DELETE; không ghi = NO ACTION
+  Thực thể nền xám: bảng thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+
+@enduml

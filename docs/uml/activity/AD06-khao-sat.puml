@@ -1,0 +1,53 @@
+@startuml
+title AD06 — Khảo sát gu món ăn (UC23, UC24)
+
+|Người vận hành mô hình|
+start
+:tastoria survey create-form --anchors 10 --random 35;
+|api|
+:Tạo survey_forms (version, n_anchor = 10,
+n_random = 35), chọn survey_form_anchors;
+:Mở phiếu (is_open);
+|Người tham gia khảo sát|
+:Mở link hoặc quét QR khảo sát;
+|api|
+:GET /policies/{purpose}/current (purpose = survey),
+hiện điều khoản mục đích survey;
+|Người tham gia khảo sát|
+if (Đồng ý? (không tích sẵn, BR-CONSENT-01)) then (không)
+  :Rời trang, không có dữ liệu được lưu;
+  stop
+else (có)
+endif
+|api|
+:POST /survey/respondents: tạo survey_respondents
+(policy_version_id, consented_at, channel);
+:Phân công 10 món neo + 35 món ngẫu nhiên phân tầng
+vào survey_assignments (display_order, is_anchor);
+:Trả mã người tham gia (respondent_token);
+|Người tham gia khảo sát|
+repeat
+  :Chấm món hiện tại 1–5
+  hoặc chọn "chưa ăn bao giờ";
+  |api|
+  :PUT /survey/respondents/{id}/ratings/{recipeId},
+  ghi survey_ratings (lũy đẳng);
+  |Người tham gia khảo sát|
+repeat while (Còn món được phân công?) is (có) not (không)
+:Chọn 5 món hay ăn;
+|api|
+:PUT /survey/respondents/{id}/favorites,
+ghi survey_favorites;
+|Người tham gia khảo sát|
+:Bấm Hoàn tất;
+|api|
+:POST /survey/respondents/{id}/complete,
+ghi completed_at;
+|Người vận hành mô hình|
+:Theo dõi đợt khảo sát (GET /admin/surveys);
+:tastoria survey export <form_version>;
+|api|
+:Xuất điểm và 5 món hay ăn theo người tham gia
+ẩn danh (không có thông tin định danh);
+stop
+@enduml

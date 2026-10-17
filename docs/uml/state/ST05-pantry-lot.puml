@@ -1,0 +1,43 @@
+@startuml
+title ST05 — Máy trạng thái PantryLot (bảng pantry_lots; UC13, UC14, UC20, UC21)
+hide empty description
+
+state "in_stock" as in_stock
+state "not_seen" as not_seen : entry / app hỏi người dùng lô còn hay không (BR-PANTRY-03)
+state "used_up" as used_up
+state "discarded" as discarded : entry / pantry_transactions reason = discard,\ndelta = −số dư
+state cSrc <<choice>>
+
+in_stock : PATCH /pantry/lots/{id} / pantry_transactions reason = manual_edit
+in_stock : PATCH /pantry/lots/{id} [nhãn 'kiểm tra'] / user_checked_at := now() (BR-FRESH-04)
+in_stock : scan confirmed thấy lại cùng ingredient / cập nhật p_*, freshness_observed_at
+
+[*] --> cSrc : / tạo lô mới
+cSrc --> in_stock : [từ POST /scans/{id}/confirm]\n/ acquired_basis = first_seen | purchase_date_entered,\nsource_scan_item_id, giao dịch scan_add (BR-PANTRY-01)
+cSrc --> in_stock : [từ POST /pantry/lots]\n/ acquired_basis = purchase_date_entered
+in_stock --> not_seen : POST /scans/{id}/confirm\n[scans.mode = fridge, lô không có trong lần quét]
+not_seen --> in_stock : PATCH /pantry/lots/{id} (người dùng xác nhận còn)
+not_seen --> in_stock : POST /scans/{id}/confirm\n[scans.mode = fridge, lô được ghép với chip trong lần quét]
+not_seen --> discarded : POST /pantry/lots/{id}/discard
+in_stock --> discarded : POST /pantry/lots/{id}/discard
+in_stock --> used_up : cook_session completed\n[g_max của v_pantry_lot_balance = 0 sau cook_deduct]
+in_stock --> used_up : PATCH /pantry/lots/{id}\n[g_max sau manual_edit = 0]
+used_up --> in_stock : cook_session reverted [≤ 10 phút]\n/ giao dịch reason = undo, reverses_id (BR-PANTRY-02)
+in_stock --> [*] : xoá tài khoản (CASCADE)
+not_seen --> [*] : xoá tài khoản (CASCADE)
+used_up --> [*] : xoá tài khoản (CASCADE)
+discarded --> [*] : xoá tài khoản (CASCADE)
+
+note as Nmap
+  <b>Trạng thái ↔ cột lưu trữ</b> (pantry_lots.status lưu trực tiếp)
+  in_stock: status = 'in_stock', số dư g_max > 0
+  not_seen: status = 'not_seen'
+  used_up: status = 'used_up', số dư g_max = 0
+  discarded: status = 'discarded', có giao dịch reason = 'discard'
+  Số dư [g_min, g_max] = initial + Σ delta (view v_pantry_lot_balance, chặn dưới 0).
+  Nhãn độ tươi (tươi / nên dùng sớm / dùng ngay / kiểm tra) KHÔNG phải trạng thái:
+  u tính lúc đọc (BR-FRESH-05); lô 'kiểm tra' vẫn in_stock nhưng bị loại
+  khỏi lượng khả dụng cho tới khi có user_checked_at (BR-FRESH-04).
+  Mỗi lần chuyển cập nhật updated_at.
+end note
+@enduml

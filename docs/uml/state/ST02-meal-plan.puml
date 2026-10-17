@@ -1,0 +1,55 @@
+@startuml
+title ST02 — Máy trạng thái MealPlan (bảng meal_plans; UC15–UC17, UC19–UC21)
+hide empty description
+
+state "proposed" as proposed
+state "accepted" as accepted
+state "cooked" as cooked
+state "abandoned" as abandoned
+state "expired" as expired
+
+proposed : POST /meal-plans/{id}/items/{itemId}/swap [lý do hợp lệ]\n / item cũ → swapped_out, item mới active (BR-SWAP-01)
+proposed : POST /meal-plans/{id}/items/{itemId}/substitutions\n / ghi meal_plan_item_substitutions, tính lại dinh dưỡng
+proposed : POST /cook-sessions / từ chối 409 conflict_state (mâm phải accepted)
+accepted : POST /meal-plans/{id}/accept / lũy đẳng, trả lại mâm
+accepted : POST /meal-plans/{id}/items/{itemId}/swap [lý do hợp lệ]\n / item cũ → swapped_out, item mới active (BR-SWAP-01)
+accepted : POST /meal-plans/{id}/items/{itemId}/substitutions\n / ghi meal_plan_item_substitutions
+accepted : POST /cook-sessions / tạo cook_session in_progress (ST03)
+accepted : cook_session abandoned / giữ nguyên, có thể nấu lại
+
+[*] --> proposed : / tạo bởi POST /meal-plans (Idempotency-Key): ghép mâm (BR-TRAY-01..08),\nghi e_target_kcal, kcal_low/high, ranker_version_id, params_version
+proposed --> accepted : POST /meal-plans/{id}/accept
+proposed --> expired : POST /meal-plans tạo mâm mới\n[cùng user_id, cùng meal]
+proposed --> expired : truy cập kế tiếp của module meal\n[now() > hết giờ bữa theo user_settings.timezone]\n/ UPDATE có điều kiện trước khi trả (đánh giá lười)
+accepted --> cooked : cook_session completed\n/ cùng Unit of Work với POST /cook-sessions/{id}/complete
+cooked --> accepted : cook_session reverted\n[now() − completed_at ≤ 10 phút]\n/ cùng giao dịch với POST /cook-sessions/{id}/undo
+accepted --> abandoned : POST /meal-plans tạo mâm mới\n[cùng user_id, cùng meal,\nkhông có cook_session in_progress]
+accepted --> abandoned : truy cập kế tiếp của module meal\n[now() > hết giờ bữa, không có cook_session in_progress]\n/ UPDATE có điều kiện (đánh giá lười)
+proposed --> [*] : xoá tài khoản (CASCADE)
+accepted --> [*] : xoá tài khoản (CASCADE)
+cooked --> [*] : xoá tài khoản (CASCADE)
+abandoned --> [*] : xoá tài khoản (CASCADE)
+expired --> [*] : xoá tài khoản (CASCADE)
+
+note as Nmap
+  <b>Trạng thái ↔ cột lưu trữ</b> (meal_plans.status lưu trực tiếp)
+  proposed: status = 'proposed'
+  accepted: status = 'accepted'
+  cooked: status = 'cooked'; có cook_sessions.status = 'completed'
+  abandoned: status = 'abandoned'
+  expired: status = 'expired'
+  Mỗi lần chuyển cập nhật meal_plans.updated_at.
+  <b>Hết giờ bữa</b>: chưa có tác vụ định kỳ nào sở hữu việc này
+  (UC34/jobs.sweep chỉ dọn scan, token, khoá lũy đẳng; jobs không
+  phụ thuộc meal). Vì vậy chuyển theo giờ được đánh giá lười:
+  mọi đọc/ghi qua meal.service (GET /meal-plans*, accept, swap,
+  substitutions, get_plan_for_cooking) chạy UPDATE ... SET status
+  WHERE status IN ('proposed','accepted') AND hết giờ bữa trước khi
+  trả kết quả. Mâm không ai đọc lại thì giữ trạng thái cũ trong DB;
+  báo cáo và v_journal_days chỉ đếm cooked nên không sai số liệu.
+  Sau 10 phút kể từ completed_at, cooked không còn quay về
+  accepted (cửa sổ hoàn tác BR-PANTRY-02, xem ST03).
+  Mâm proposed bị bỏ qua (expired) là tín hiệu âm yếu;
+  chỉ swap với lý do khong_hop_gu là nhãn âm về gu (BR-SWAP-01).
+end note
+@enduml

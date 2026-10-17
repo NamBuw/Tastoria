@@ -1,0 +1,54 @@
+@startuml
+title ST01 — Máy trạng thái Scan (bảng scans; UC12, UC13, UC34)
+hide empty description
+
+state "queued" as queued : entry / chờ worker; enqueued_at := now() mỗi lần job\nđược đưa vào hàng đợi thành công
+state "processing" as processing : entry / started_at := now(); attempts := attempts + 1
+state "done" as done : entry / finished_at := now(); ghi scan_items + detections
+state "failed" as failed : entry / finished_at := now(); error_code := mã lỗi suy luận
+state "expired" as expired : entry / finished_at := now(); error_code := 'stuck'
+state "confirmed" as confirmed : entry / confirmed_at := now()
+state "discarded" as discarded
+state cErr <<choice>>
+
+queued : sweeper [enqueued_at IS NULL và created_at < now() − 60 s]\n/ enqueue lại (job_id = scan_id); enqueued_at := now()
+done : POST /scans/{id}/items / thêm chip (origin = user_added)
+done : PATCH, DELETE /scans/{id}/items/{itemId} / sửa chip, không ghi kho (BR-SCAN-02)
+confirmed : POST /scans/{id}/confirm / trả lại kết quả đã có, không ghi kho lần hai
+
+[*] --> queued : / tạo bởi POST /scans (Idempotency-Key): lưu ≤ 2 scan_images,\nenqueued_at = NULL; enqueue sau COMMIT rồi đặt enqueued_at; trả 202 + Location
+queued --> processing : worker nhận job\n/ ghi detector_version_id, classifier_version_id\ntheo model_deployments
+processing --> done : suy luận xong\n/ gộp đếm theo shelf_group (BR-SCAN-01)
+processing --> cErr : worker: lỗi suy luận hoặc RQ ngắt job sau 30 s
+cErr --> queued : [attempts < 3]\n/ worker ghi error_code; RQ xếp lại job (cùng job_id)
+cErr --> failed : [attempts = 3]\n/ PUBLISH scan:<id> "failed"
+queued --> expired : sweeper [enqueued_at < now() − 60 s]\n(job mất trong Valkey hoặc hàng đợi không chạy)\n/ PUBLISH scan:<id> "expired"
+processing --> expired : sweeper [started_at < now() − 60 s]\n(worker chết giữa job, không kịp vào cErr)\n/ PUBLISH scan:<id> "expired"
+done --> confirmed : POST /scans/{id}/confirm\n/ Unit of Work: tạo pantry_lots + pantry_transactions\n(reason = scan_add); mode = fridge: lô không thấy → not_seen\n(BR-SCAN-02, BR-PANTRY-03, xem ST05)
+done --> discarded : POST /scans/{id}/discard\n(chỉ từ done, FR-13-18)
+confirmed --> [*] : xoá tài khoản (CASCADE)
+discarded --> [*] : xoá tài khoản (CASCADE)
+failed --> [*] : xoá tài khoản (CASCADE)
+expired --> [*] : xoá tài khoản (CASCADE)
+
+note as Nmap
+  <b>Trạng thái ↔ cột lưu trữ</b> (scans.status lưu trực tiếp)
+  queued: status = 'queued', started_at NULL ở lần đầu;
+    enqueued_at NULL chỉ trong khoảng giữa COMMIT và enqueue
+  processing: status = 'processing', started_at NOT NULL, finished_at NULL
+  done: status = 'done', finished_at NOT NULL, confirmed_at NULL
+  failed: status = 'failed', error_code NOT NULL, attempts = 3
+  expired: status = 'expired', error_code = 'stuck'
+  confirmed: status = 'confirmed', confirmed_at NOT NULL
+  discarded: status = 'discarded', confirmed_at NULL
+  cErr: điểm chọn, không lưu
+  <b>Ai làm gì</b>: timeout 30 s và thử lại thuộc worker (RQ, Retry max = 2);
+  attempts = 3 nghĩa là 1 lần chạy + tối đa 2 lần thử lại (spec §8).
+  Sweeper (jobs.sweep → scan.sweep_stuck_scans, mỗi phút, ngưỡng kẹt 60 s)
+  chỉ xử lý lần quét mà worker không còn quản: enqueue bù khi enqueued_at rỗng,
+  còn lại đánh expired; không thử lại, nên không có vòng lặp vô hạn.
+  Trạng thái chưa kết thúc cũng bị xoá khi xoá tài khoản (không vẽ).
+  Ảnh gốc xoá sau 30 ngày (UC32, BR-RETAIN-01) chỉ đặt
+  scan_images.purged_at, không đổi scans.status.
+end note
+@enduml

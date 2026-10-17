@@ -1,0 +1,82 @@
+@startuml
+title SD04 — Đổi một món trong mâm (UC16 mở rộng UC15; BR-SWAP-01, BR-ALG-01)
+autonumber
+hide footbox
+
+actor "Người dùng (A02)" as U
+participant "App" as APP
+participant "nginx" as NGX
+participant "api:meal" as MEAL
+participant "api:profile" as PRO
+participant "api:pantry" as PAN
+participant "api:catalog" as CAT
+participant "api:privacy" as PRIV
+participant "api:events" as EVT
+database "PostgreSQL" as DB
+
+note over APP, NGX : Mọi phản hồi đi qua nginx; chiều trả về\nvẽ gộp thành một mũi tên tới App.
+
+U -> APP : bấm "Đổi món" ở một slot, chọn lý do\n(không hợp gu / mới ăn / thiếu thời gian / khác)
+APP -> NGX : POST /api/v1/meal-plans/<id>/items/<itemId>/swap\n{reason}, Idempotency-Key: <k>
+NGX -> MEAL : chuyển tiếp
+activate MEAL
+critical Unit of Work (một giao dịch DB, từ khoá hàng tới COMMIT)
+  MEAL -> DB : pg_advisory_xact_lock(hash(user_id, key));\nSELECT FROM idempotency_keys WHERE user_id = ? AND key = ?
+  DB --> MEAL : dòng hoặc rỗng
+  alt khoá đã có, cùng request_sha256
+    MEAL --> APP : trả lại nguyên văn phản hồi đã lưu (200)
+  else khoá đã có, khác request_sha256
+    MEAL --> APP : 422 problem+json (code = idempotency_key_reused)
+  else khoá mới
+    MEAL -> DB : SELECT meal_plans WHERE id = ? AND user_id = ? FOR UPDATE;\nSELECT meal_plan_items WHERE id = ? AND meal_plan_id = ?
+    DB --> MEAL : mâm (đã khoá) + món, hoặc rỗng
+    alt không thấy mâm hoặc món
+      MEAL -> DB : ROLLBACK
+      MEAL --> APP : 404 problem+json (code = not_found)
+    else mâm không ở 'proposed' / 'accepted' hoặc món đã 'swapped_out'
+      MEAL -> DB : ROLLBACK
+      MEAL --> APP : 409 problem+json (code = conflict_state)
+    else hợp lệ
+      MEAL -> PRO : get_meal_constraints(user_id, meal)
+      PRO --> MEAL : MealConstraints {allergen_codes, diet_code, E_mâm, burners}
+      MEAL -> DB : SELECT meal_plan_coeater_allergens, meal_plan_pins;\nSELECT recipe_id FROM meal_plan_items\nWHERE meal_plan_id = ? AND status = 'swapped_out'
+      DB --> MEAL : dị ứng người ăn cùng, lô ghim, món đã bị đổi ra
+      MEAL -> PAN : list_available_lots(user_id, at = now())
+      PAN --> MEAL : list[LotView] (u tính lúc đọc)
+      MEAL -> CAT : list_published_recipes()
+      CAT --> MEAL : list[RecipeView]
+      MEAL -> MEAL : HardFilter.filter(recipes, constraints, coeater_allergens) cho slot cần đổi
+      MEAL -> MEAL : TrayComposer.resolve_swap(plan, slot, excluded):\ngiữ nguyên các slot còn lại, loại món đang có và mọi món\nđã bị đổi ra trong mâm này (BR-SWAP-01);\nkiểm khả thi kho gộp, ghim, makespan (BR-TRAY-04, 05, 08)
+      alt không còn ứng viên khả thi
+        MEAL -> DB : INSERT idempotency_keys (status_code = 422, response_body)
+        MEAL -> DB : COMMIT
+        MEAL --> APP : 422 problem+json InfeasibleTrayProblem (code = infeasible_tray)
+      else có món thay
+        MEAL -> DB : UPDATE meal_plan_items SET status = 'swapped_out', swap_reason = ?\nWHERE id = ? AND status = 'active'
+        MEAL -> DB : INSERT meal_plan_items (slot, recipe_id mới, status = 'active',\nreplaced_item_id = itemId, rank_score, servings_scale, kcal_per_person)
+        alt vi phạm UNIQUE(meal_plan_id, slot) WHERE status = 'active'
+          note right of DB : Không xảy ra khi mọi lần đổi đều qua khoá\nFOR UPDATE ở trên; nhánh này là lưới an toàn\n(ví dụ ghi từ đường khác không khoá mâm).
+          MEAL -> DB : ROLLBACK
+          MEAL --> APP : 409 problem+json (code = conflict_state)
+        else ghi được
+          MEAL -> DB : UPDATE meal_plans SET rice_bowls_per_person, kcal_low, kcal_high,\nreason_vi, updated_at
+          MEAL -> EVT : record(uow, user_id, [swapped: meal_plan_item_id = itemId, swap_reason;\nserved: meal_plan_item_id = món mới, position])
+          EVT -> PRIV : has_consent(user_id, 'personalization')
+          PRIV --> EVT : true / false
+          opt có đồng ý (BR-CONSENT-03)
+            EVT -> DB : INSERT interactions ... ON CONFLICT (id) DO NOTHING
+            note right of EVT : Chỉ swap_reason = 'khong_hop_gu'\nđược dùng làm nhãn âm về gu khi huấn luyện.
+          end
+          EVT --> MEAL : xong
+          MEAL -> DB : INSERT idempotency_keys (status_code = 200, response_body)
+          MEAL -> DB : COMMIT
+          MEAL --> APP : 200 MealPlanOut {item mới, rice_bowls_per_person, kcal_range, reason_vi}
+          APP -> U : cập nhật mâm, món cũ không quay lại trong mâm này
+        end
+      end
+    end
+  end
+end
+deactivate MEAL
+note right of MEAL : Hai lần đổi đồng thời cùng mâm xếp hàng ở\nSELECT meal_plans ... FOR UPDATE; bên đến sau\nthấy món đã 'swapped_out' và nhận 409 conflict_state.
+@enduml

@@ -1,0 +1,161 @@
+@startuml
+title SD06 — Nấu cả mâm, nấu xong và hoàn tác (UC19, UC20, UC21; BR-COOK-01, BR-COOK-02, BR-PANTRY-02, BR-CONSENT-03)
+autonumber
+hide footbox
+
+actor "Người dùng (A02)" as U
+participant "App" as APP
+participant "nginx" as NGX
+participant "api:cooking" as COOK
+participant "api:meal" as MEAL
+participant "api:catalog" as CAT
+participant "api:pantry" as PAN
+participant "api:events" as EVT
+participant "api:privacy" as PRIV
+database "PostgreSQL" as DB
+
+note over APP, NGX : Mọi phản hồi đi qua nginx; chiều trả về\nvẽ gộp thành một mũi tên tới App.
+
+== Mở phiên nấu và lập lịch (UC19) ==
+U -> APP : "Nấu cả mâm", chọn giờ dọn mâm
+APP -> NGX : POST /api/v1/cook-sessions {meal_plan_id, serve_at}\nIdempotency-Key: <k1>
+NGX -> COOK : chuyển tiếp
+activate COOK
+critical Unit of Work (một giao dịch DB)
+  COOK -> DB : pg_advisory_xact_lock(hash(user_id, k1));\nSELECT FROM idempotency_keys WHERE user_id = ? AND key = <k1>
+  DB --> COOK : dòng hoặc rỗng
+  alt khoá đã có, cùng request_sha256
+    COOK --> APP : trả lại nguyên văn phản hồi đã lưu (201)
+  else khoá đã có, khác request_sha256
+    COOK --> APP : 422 problem+json (code = idempotency_key_reused)
+  else khoá mới
+    COOK -> MEAL : get_plan_for_cooking(user_id, meal_plan_id)
+    MEAL -> DB : SELECT meal_plans, meal_plan_items (status = 'active'),\nmeal_plan_item_substitutions WHERE id = ? AND user_id = ?
+    DB --> MEAL : mâm hoặc rỗng
+    MEAL --> COOK : PlanForCooking {status, persons, burners, items[]} hoặc not_found
+    alt không thấy (không tồn tại hoặc không thuộc người gọi)
+      COOK --> APP : 404 problem+json (code = not_found)
+    else mâm ở 'proposed' (chưa nhận) hoặc cooked / abandoned / expired
+      COOK --> APP : 409 problem+json (code = conflict_state; detail: mâm phải ở accepted)
+    else mâm ở 'accepted' nhưng đã có phiên in_progress
+      COOK --> APP : 409 problem+json (code = conflict_state)
+    else mâm ở 'accepted'
+      loop mỗi món trong PlanForCooking.items
+        COOK -> CAT : get_recipe(recipe_id)
+        CAT -> DB : SELECT recipe_steps (kind, minutes, uses_burner)
+        DB --> CAT : bước
+        CAT --> COOK : RecipeDetail
+      end
+      COOK -> COOK : CookScheduler.solve(steps, burners, serve_at) — CP-SAT (BR-COOK-01):\nNoOverlap bước chủ động, Cumulative theo số họng bếp,\nthứ tự bước trong món, mọi món xong trong 5 phút trước serve_at
+      COOK -> DB : INSERT cook_sessions (status = 'in_progress', serve_at,\nburners = PlanForCooking.burners (ảnh chụp), started_at)
+      COOK -> DB : INSERT cook_schedule_entries (recipe_id, step_no,\nstart_offset_s, end_offset_s)
+      COOK -> DB : INSERT idempotency_keys (status_code = 201, response_body)
+      COOK -> DB : COMMIT
+      COOK --> APP : 201 Created, Location: /api/v1/cook-sessions/<id>\nCookSessionOut {burners, makespan_s, schedule[]}
+    end
+  end
+end
+deactivate COOK
+APP -> APP : lưu lịch vào SQLite (chạy được khi mất mạng), giữ màn hình sáng
+
+== Nấu xong một chạm (UC20) ==
+U -> APP : bấm "Nấu xong", đánh giá thích / không thích từng món
+APP -> APP : sinh Idempotency-Key <k2>; ghi vào outbox
+loop đến khi nhận phản hồi 2xx/4xx (outbox gửi lại khi mất mạng)
+  APP -> NGX : POST /api/v1/cook-sessions/<id>/complete\nCookCompleteRequest {completed_at, feedback[{meal_plan_item_id, liked}]}\nIdempotency-Key: <k2>
+  NGX -> COOK : chuyển tiếp
+  activate COOK
+  critical Unit of Work (một giao dịch DB, BR-COOK-02)
+    COOK -> DB : pg_advisory_xact_lock(hash(user_id, k2));\nSELECT FROM idempotency_keys WHERE user_id = ? AND key = <k2>
+    DB --> COOK : dòng hoặc rỗng
+    alt khoá đã có, cùng request_sha256 (gửi lại)
+      COOK --> APP : trả lại nguyên văn phản hồi đã lưu (200), không trừ kho lần hai
+    else khoá đã có, khác request_sha256
+      COOK --> APP : 422 problem+json (code = idempotency_key_reused)
+    else khoá mới
+      COOK -> DB : SELECT cook_sessions WHERE id = ? FOR UPDATE
+      DB --> COOK : phiên (meal_plan_id, status) hoặc rỗng
+      COOK -> MEAL : get_plan_for_cooking(user_id, meal_plan_id)
+      MEAL --> COOK : PlanForCooking hoặc not_found (kiểm chủ sở hữu)
+      alt không thấy phiên hoặc mâm không thuộc người gọi
+        COOK -> DB : ROLLBACK
+        COOK --> APP : 404 problem+json (code = not_found)
+      else phiên không ở 'in_progress' (completed / reverted / abandoned)
+        COOK -> DB : ROLLBACK
+        COOK --> APP : 409 problem+json (code = conflict_state)
+      else phiên 'in_progress'
+        COOK -> DB : UPDATE cook_sessions SET status = 'completed', completed_at\nWHERE id = ? AND meal_plan_id = ? AND status = 'in_progress'
+        COOK -> CAT : get_recipe(recipe_id) cho từng món
+        CAT --> COOK : RecipeDetail (recipe_ingredients, is_staple)
+        COOK -> COOK : NeedCalculator.needs(plan, recipes): need theo BR-TRAY-02,\nđã áp thay thế đã chọn, bỏ gia vị luôn có
+        COOK -> PAN : deduct_for_cooking(uow, user_id, needs, cook_session_id)
+        loop mỗi nguyên liệu trong needs
+          PAN -> DB : SELECT pantry_lots JOIN v_pantry_lot_balance\nWHERE user_id = ? AND ingredient_id = ? AND status = 'in_stock' FOR UPDATE
+          PAN -> PAN : sắp lô theo u giảm dần (tính lúc đọc) (BR-PANTRY-02)
+          PAN -> DB : INSERT pantry_transactions (reason = 'cook_deduct', delta âm,\nref_type = 'cook_session', ref_id, urgency_at_event)
+          PAN -> DB : UPDATE pantry_lots SET status = 'used_up' (lô về 0)
+        end
+        PAN --> COOK : list[Deduction]
+        COOK -> EVT : record(uow, user_id, [cooked mỗi món; liked / disliked theo feedback])
+        EVT -> PRIV : has_consent(user_id, 'personalization')
+        PRIV -> DB : SELECT FROM v_current_consents
+        PRIV --> EVT : true / false
+        opt có đồng ý (BR-CONSENT-03)
+          EVT -> DB : INSERT interactions (id = uuid5(cook_session_id, meal_plan_item_id, type))\nON CONFLICT (id) DO NOTHING
+        end
+        EVT --> COOK : interactions_recorded
+        COOK -> MEAL : mark_cooked(uow, meal_plan_id)
+        MEAL -> DB : UPDATE meal_plans SET status = 'cooked'\nWHERE id = ? AND status = 'accepted'
+        COOK -> DB : INSERT idempotency_keys (user_id, k2, request_sha256,\nstatus_code = 200, response_body)
+        COOK -> DB : COMMIT
+        COOK --> APP : 200 CookCompletion {cook_session (undo_deadline = completed_at + 10 phút),\ndeductions[], interactions_recorded}
+      end
+    end
+  end
+  deactivate COOK
+end
+note right of COOK : Ghi idempotency_keys trong cùng giao dịch với trừ kho:\nhoặc cả hai cùng có, hoặc không có gì.\nHai yêu cầu đồng thời cùng khoá xếp hàng ở advisory lock;\nkhác khoá thì xếp hàng ở SELECT cook_sessions ... FOR UPDATE,\nbên đến sau thấy 'completed' và nhận 409 conflict_state.
+
+== Hoàn tác trừ kho (UC21, trong 10 phút) ==
+opt người dùng bấm "Hoàn tác"
+  APP -> NGX : POST /api/v1/cook-sessions/<id>/undo
+  NGX -> COOK : chuyển tiếp
+  activate COOK
+  critical Unit of Work (một giao dịch DB)
+    COOK -> DB : SELECT cook_sessions WHERE id = ? FOR UPDATE
+    DB --> COOK : phiên hoặc rỗng
+    COOK -> MEAL : get_plan_for_cooking(user_id, meal_plan_id)
+    MEAL --> COOK : PlanForCooking hoặc not_found (kiểm chủ sở hữu)
+    alt không thấy
+      COOK -> DB : ROLLBACK
+      COOK --> APP : 404 problem+json (code = not_found)
+    else phiên đã 'reverted' (gửi lại)
+      COOK -> DB : ROLLBACK
+      COOK --> APP : 200 CookSessionOut {status: "reverted"} (lũy đẳng)
+    else phiên không ở 'completed' (in_progress / abandoned)
+      COOK -> DB : ROLLBACK
+      COOK --> APP : 409 problem+json (code = conflict_state)
+    else 'completed' nhưng now() > completed_at + 10 phút (UndoPolicy)
+      COOK -> DB : ROLLBACK
+      COOK --> APP : 409 problem+json (code = undo_window_closed)
+    else 'completed' và trong 10 phút
+      COOK -> DB : UPDATE cook_sessions SET status = 'reverted', reverted_at = now()\nWHERE id = ? AND meal_plan_id = ? AND status = 'completed'
+      COOK -> PAN : revert_cooking(uow, user_id, cook_session_id)
+      PAN -> DB : INSERT pantry_transactions (reason = 'undo', delta đảo dấu,\nreverses_id = id giao dịch cook_deduct) cho mỗi giao dịch của phiên
+      PAN -> DB : UPDATE pantry_lots SET status = 'in_stock' (lô 'used_up' có lại lượng)
+      PAN --> COOK : list[int] (id giao dịch đảo)
+      COOK -> EVT : record(uow, user_id, [undone × mỗi món])
+      EVT -> PRIV : has_consent(user_id, 'personalization')
+      PRIV --> EVT : true / false
+      opt có đồng ý
+        EVT -> DB : INSERT interactions ON CONFLICT (id) DO NOTHING
+      end
+      COOK -> MEAL : revert_cooked(uow, meal_plan_id)
+      MEAL -> DB : UPDATE meal_plans SET status = 'accepted'\nWHERE id = ? AND status = 'cooked'
+      COOK -> DB : COMMIT
+      COOK --> APP : 200 CookSessionOut {status: "reverted"}
+    end
+  end
+  deactivate COOK
+end
+@enduml

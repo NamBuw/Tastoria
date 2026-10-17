@@ -1,0 +1,31 @@
+@startuml
+title UCD09 — Gói PK9 Vận hành mô hình
+' Sinh từ docs/sad/model.yaml (actors, use_cases, rels). Không sửa tay mã định danh.
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle stick
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Người vận hành mô\nhình\n(A06)" as A06
+actor "Người gán nhãn\n(A07)" as A07
+actor "Công cụ gán nhãn\n(A10)" as A10 <<system>>
+
+rectangle "Tastoria" {
+  package "PK9 Vận hành mô hình" as PK9 {
+    usecase "UC28 Xuất dữ liệu huấn luyện\nđã bí danh hoá" as UC28
+    usecase "UC29 Đăng ký và kiểm định\nphiên bản mô hình" as UC29
+    usecase "UC30 Triển khai và quay lui\nphiên bản mô hình" as UC30
+    usecase "UC31 Gán nhãn ảnh góp" as UC31
+  }
+}
+
+A06 -- UC28
+A06 -- UC29
+A06 -- UC30
+A07 -- UC31
+UC31 -- A10
+
+@enduml

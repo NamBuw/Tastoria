@@ -1,0 +1,73 @@
+@startuml
+title ERD02 — Hồ sơ người dùng (profile) và danh mục được tham chiếu
+hide circle
+
+entity "profiles" as profiles {
+  * user_id : uuid <<PK, FK>>
+  --
+    sex_enc : bytea
+    birth_year_enc : bytea
+    height_cm_enc : bytea
+    weight_kg_enc : bytea
+    enc_key_id : text
+    activity_level : activity_level_t
+    goal : goal_t
+    kcal_target : integer
+    kcal_source : kcal_source_t
+    diet_code : text <<FK>>
+  * updated_at : timestamptz
+}
+entity "user_allergens" as user_allergens {
+  * user_id : uuid <<PK, FK>>
+  * allergen_code : text <<PK, FK>>
+  --
+}
+entity "user_favorite_recipes" as user_favorite_recipes {
+  * user_id : uuid <<PK, FK>>
+  * recipe_id : uuid <<PK, FK>>
+  --
+  * created_at : timestamptz
+}
+entity "user_settings" as user_settings {
+  * user_id : uuid <<PK, FK>>
+  --
+  * burners : smallint
+  * default_persons : smallint
+  * timezone : text
+  * updated_at : timestamptz
+}
+entity "users" as users #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01 ..
+}
+entity "diets" as diets #EEEEEE {
+  * code : text <<PK>>
+  .. chi tiết ở ERD03 ..
+}
+entity "allergen_groups" as allergen_groups #EEEEEE {
+  * code : text <<PK>>
+  .. chi tiết ở ERD03 ..
+}
+entity "recipes" as recipes #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD04 ..
+}
+
+users ||--o| profiles : user_id (cascade)
+diets |o--o{ profiles : diet_code
+users ||--o{ user_allergens : user_id (cascade)
+allergen_groups ||--o{ user_allergens : allergen_code
+users ||--o{ user_favorite_recipes : user_id (cascade)
+recipes ||--o{ user_favorite_recipes : recipe_id
+users ||--o| user_settings : user_id (cascade)
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  UNIQUE(...) WHERE ...: chỉ mục duy nhất một phần (không phải khoá của cả bảng)
+  ||  đúng một; |o  không hoặc một
+  o{  không hoặc nhiều; o|  không hoặc một
+  (cascade), (set_null): hành vi ON DELETE; không ghi = NO ACTION
+  Thực thể nền xám: bảng thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+
+@enduml

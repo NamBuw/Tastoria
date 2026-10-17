@@ -1,0 +1,151 @@
+@startuml
+title UCD00 — Tổng quan use case hệ thống Tastoria
+' Sinh từ docs/sad/model.yaml (actors, use_cases, rels). Không sửa tay mã định danh.
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle stick
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Khách\n(A01)" as A01
+actor "Người dùng\n(A02)" as A02
+actor "Người tham gia\nkhảo sát\n(A03)" as A03
+actor "Quản trị viên\n(A04)" as A04
+actor "Người biên soạn\ncông thức\n(A05)" as A05
+actor "Người vận hành mô\nhình\n(A06)" as A06
+actor "Người gán nhãn\n(A07)" as A07
+actor "Bộ lập lịch\n(A08)" as A08 <<time>>
+actor "Dịch vụ email\n(A09)" as A09 <<system>>
+actor "Công cụ gán nhãn\n(A10)" as A10 <<system>>
+
+A02 --|> A01
+note right of A02
+  A02 kế thừa A01 (model.yaml: generalizes A01).
+  Ý nghĩa: người đã có tài khoản vẫn thực hiện được
+  UC02 Đăng nhập (khi phiên hết hạn hoặc trên thiết bị mới)
+  và UC04 Đặt lại mật khẩu (khi quên mật khẩu).
+  UC01 Đăng ký với người đã đăng nhập: app ẩn chức năng,
+  API trả 409 email_taken nếu dùng lại email.
+end note
+
+rectangle "Tastoria" {
+  package "PK1 Tài khoản & bảo mật" as PK1 {
+    usecase "UC01 Đăng ký tài khoản" as UC01
+    usecase "UC02 Đăng nhập" as UC02
+    usecase "UC03 Đăng xuất (một hoặc mọi\nthiết bị)" as UC03
+    usecase "UC04 Đặt lại mật khẩu" as UC04
+  }
+  package "PK2 Quyền riêng tư" as PK2 {
+    usecase "UC05 Quản lý đồng ý theo mục\nđích" as UC05
+    usecase "UC06 Tải về dữ liệu cá nhân" as UC06
+    usecase "UC07 Xoá tài khoản và toàn bộ\ndữ liệu" as UC07
+    usecase "UC08 Yêu cầu sửa, hạn chế hoặc\nphản đối xử lý" as UC08
+  }
+  package "PK3 Hồ sơ & mục tiêu" as PK3 {
+    usecase "UC09 Thiết lập hồ sơ 60 giây" as UC09
+    usecase "UC10 Cập nhật hồ sơ, dị ứng,\nchế độ ăn, cài đặt bếp" as UC10
+    usecase "UC11 Đặt mục tiêu năng lượng\n(gợi ý / tự nhập / chuyên gia)" as UC11
+  }
+  package "PK4 Kho & quét" as PK4 {
+    usecase "UC12 Quét nguyên liệu (toàn tủ\nhoặc đồ vừa mua)" as UC12
+    usecase "UC13 Xác nhận và sửa kết quả\nquét" as UC13
+    usecase "UC14 Quản lý kho (sửa lượng,\nngày mua, bỏ đồ, xác nhận đồ\ncần kiểm tra)" as UC14
+  }
+  package "PK5 Mâm cơm" as PK5 {
+    usecase "UC15 Nhận mâm cơm hôm nay" as UC15
+    usecase "UC16 Đổi một món" as UC16
+    usecase "UC17 Xem và chọn thay thế\nnguyên liệu thiếu (Thiếu gì?)" as UC17
+    usecase "UC18 Quản lý danh sách đi chợ" as UC18
+  }
+  package "PK6 Nấu & nhật ký" as PK6 {
+    usecase "UC19 Nấu cả mâm" as UC19
+    usecase "UC20 Hoàn tất bữa nấu (nấu\nxong một chạm)" as UC20
+    usecase "UC21 Hoàn tác trừ kho" as UC21
+    usecase "UC22 Xem nhật ký tuần" as UC22
+  }
+  package "PK7 Khảo sát gu" as PK7 {
+    usecase "UC23 Tham gia khảo sát gu món\năn" as UC23
+    usecase "UC24 Quản lý đợt khảo sát (tạo\nphiếu, xuất kết quả)" as UC24
+  }
+  package "PK8 Quản trị nội dung & dữ liệu" as PK8 {
+    usecase "UC25 Nhập và kiểm tra kho công\nthức, nguyên liệu" as UC25
+    usecase "UC26 Quản lý cặp thay thế\nnguyên liệu" as UC26
+    usecase "UC27 Xử lý yêu cầu dữ liệu và\nxem nhật ký kiểm toán" as UC27
+  }
+  package "PK9 Vận hành mô hình" as PK9 {
+    usecase "UC28 Xuất dữ liệu huấn luyện\nđã bí danh hoá" as UC28
+    usecase "UC29 Đăng ký và kiểm định\nphiên bản mô hình" as UC29
+    usecase "UC30 Triển khai và quay lui\nphiên bản mô hình" as UC30
+    usecase "UC31 Gán nhãn ảnh góp" as UC31
+  }
+  package "PK10 Tác vụ định kỳ" as PK10 {
+    usecase "UC32 Xoá ảnh quét quá hạn" as UC32
+    usecase "UC33 Sao lưu cơ sở dữ liệu" as UC33
+    usecase "UC34 Dọn job quét kẹt, token\nvà khoá lũy đẳng hết hạn" as UC34
+  }
+}
+
+A01 -- UC01
+A01 -- UC02
+A02 -- UC03
+A01 -- UC04
+A02 -- UC05
+A02 -- UC06
+A02 -- UC07
+A02 -- UC08
+A02 -- UC09
+A02 -- UC10
+A02 -- UC11
+A02 -- UC12
+A02 -- UC13
+A02 -- UC14
+A02 -- UC15
+A02 -- UC16
+A02 -- UC17
+A02 -- UC18
+A02 -- UC19
+A02 -- UC20
+A02 -- UC21
+A02 -- UC22
+A03 -- UC23
+A06 -- UC24
+A05 -- UC25
+A05 -- UC26
+A04 -- UC27
+A06 -- UC28
+A06 -- UC29
+A06 -- UC30
+A07 -- UC31
+A08 -- UC32
+A08 -- UC33
+A08 -- UC34
+UC04 -- A09
+UC08 -- A04
+UC31 -- A10
+
+UC09 ..> UC05 : <<include>>
+UC12 ..> UC13 : <<include>>
+UC16 ..> UC15 : <<extend>>
+UC17 ..> UC15 : <<extend>>
+UC18 ..> UC17 : <<extend>>
+UC18 ..> UC15 : <<extend>>
+UC21 ..> UC20 : <<extend>>
+' Điều kiện và điểm mở rộng của từng <<extend>> ghi ở sơ đồ gói UCD05, UCD06.
+' Điểm mở rộng ghi bằng note để plugin PlantUML-VP nhập được; tạo lại ExtensionPoint trong VP theo note.
+note bottom of UC15
+  extension points:
+  - Đổi món
+  - Thiếu nguyên liệu
+  - Không có mâm khả thi
+end note
+note bottom of UC17
+  extension points:
+  - Thêm vào danh sách đi chợ
+end note
+note bottom of UC20
+  extension points:
+  - Hoàn tác
+end note
+@enduml

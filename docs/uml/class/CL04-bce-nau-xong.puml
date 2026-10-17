@@ -1,0 +1,95 @@
+@startuml CL04-bce-nau-xong
+title CL04 — Lớp phân tích BCE: UC20 Hoàn tất bữa nấu (nấu xong một chạm)
+
+' Quy tắc sơ đồ robustness: actor chỉ nối boundary; boundary chỉ nối control;
+' entity chỉ nối control; control nối control khi một bước gọi bước khác.
+' UC21 (hoàn tác trừ kho) mở rộng UC20, xem đặc tả riêng.
+
+left to right direction
+hide empty members
+skinparam classAttributeIconSize 0
+
+class "A02 Người dùng" as A02 <<actor>>
+
+package "Boundary" {
+  class "Màn hình Nấu xong" as B_NauXong <<boundary>> {
+    {field} nút "Nấu xong"
+    {field} thích / không thích theo từng món
+    {field} thông báo đã trừ kho, nút Hoàn tác trong 10 phút
+    {field} mất mạng: yêu cầu nằm trong outbox, gửi lại cùng khoá
+  }
+}
+
+package "Control" {
+  class "Hoàn tất phiên nấu" as C_HoanTat <<control>> {
+    {field} POST /cook-sessions/{id}/complete (Idempotency-Key)
+    {field} BR-COOK-02: một Unit of Work
+    {field} in_progress -> completed
+  }
+  class "Tính lượng đã dùng" as C_LuongDung <<control>> {
+    {field} need = gam × n / servings, theo thay thế đã chọn
+    {field} bỏ qua gia vị luôn có (is_staple)
+  }
+  class "Trừ kho theo độ gấp" as C_TruKho <<control>> {
+    {field} BR-PANTRY-02: lô gấp nhất trước
+    {field} ghi giao dịch âm cook_deduct
+    {field} lưu urgency_at_event
+  }
+  class "Tính độ gấp lô" as C_DoGap <<control>> {
+    {field} BR-FRESH-01..05
+  }
+  class "Chuyển trạng thái mâm" as C_Mam <<control>> {
+    {field} accepted -> cooked
+  }
+  class "Ghi tương tác" as C_SuKien <<control>> {
+    {field} cooked, liked, disliked theo từng món
+    {field} POST /events (event_id)
+  }
+  class "Kiểm đồng ý cá nhân hoá" as C_DongY <<control>> {
+    {field} BR-CONSENT-03: không đồng ý thì không ghi
+  }
+}
+
+package "Entity" {
+  class "Phiên nấu (cook_sessions)" as E_Phien <<entity>>
+  class "Mâm cơm (meal_plans)" as E_Mam <<entity>>
+  class "Món trong mâm (meal_plan_items)" as E_MonMam <<entity>>
+  class "Thay thế đã chọn (meal_plan_item_substitutions)" as E_ThayThe <<entity>>
+  class "Thành phần món (recipe_ingredients)" as E_ThanhPhan <<entity>>
+  class "Nguyên liệu (ingredients)" as E_NL <<entity>>
+  class "Lô kho (pantry_lots)" as E_Lo <<entity>>
+  class "Lượng lô hiện tại (v_pantry_lot_balance)" as E_SoDu <<entity>>
+  class "Giao dịch kho (pantry_transactions)" as E_GD <<entity>>
+  class "Tương tác (interactions)" as E_TuongTac <<entity>>
+  class "Đồng ý hiện hành (v_current_consents)" as E_DongYHH <<entity>>
+  class "Khoá lũy đẳng (idempotency_keys)" as E_Idem <<entity>>
+}
+
+A02 -- B_NauXong
+B_NauXong -- C_HoanTat
+B_NauXong -- C_SuKien
+
+C_HoanTat --> C_LuongDung
+C_HoanTat --> C_TruKho
+C_HoanTat --> C_Mam
+C_HoanTat --> C_SuKien
+C_TruKho --> C_DoGap
+C_SuKien --> C_DongY
+
+C_HoanTat -- E_Phien : đọc, cập nhật
+C_HoanTat -- E_Idem : lưu phản hồi
+C_LuongDung -- E_MonMam : đọc món active
+C_LuongDung -- E_ThayThe : đọc
+C_LuongDung -- E_ThanhPhan : đọc
+C_LuongDung -- E_NL : đọc is_staple
+C_TruKho -- E_Lo : đọc, đặt used_up
+C_TruKho -- E_SoDu : đọc
+C_TruKho -- E_GD : ghi
+C_DoGap -- E_Lo : đọc acquired_at, p_*
+C_DoGap -- E_NL : đọc shelf_life_days
+C_Mam -- E_Mam : cập nhật
+C_DongY -- E_DongYHH : đọc
+C_SuKien -- E_TuongTac : ghi, chống trùng event_id
+
+
+@enduml

@@ -1,0 +1,151 @@
+@startuml
+title SD01 — Quét ảnh bất đồng bộ (UC12, UC34; BR-SCAN-01, BR-FRESH-02, NFR-PERF-01)
+autonumber
+hide footbox
+
+actor "Người dùng (A02)" as U
+participant "App" as APP
+participant "nginx" as NGX
+participant "api:scan" as SCAN
+participant "api:privacy" as PRIV
+database "PostgreSQL" as DB
+collections "Kho tệp" as FS
+queue "Valkey" as VK
+participant "worker:scan" as WK
+actor "Bộ lập lịch (A08)" as CRON
+participant "scheduler:jobs.sweep" as SWP
+
+note over APP, NGX : Mọi phản hồi đi qua nginx; chiều trả về\nvẽ gộp thành một mũi tên tới App.
+
+== Khởi động worker (trước khi nhận job) ==
+WK -> DB : SELECT model_deployments JOIN model_versions\nWHERE name IN ('detector','freshness')
+DB --> WK : active_version_id, artifact_key, sha256
+WK -> FS : đọc models/<artifact_key>
+WK -> WK : kiểm sha256 = model_versions.sha256;\ntạo phiên ONNX (intra_op_num_threads = 2, tắt spin)
+note right of WK : Sai sha256 thì worker không nhận job\n(xem SD10). Phiên ONNX nạp một lần,\ndùng lại cho mọi job.
+
+== Gửi ảnh ==
+U -> APP : chọn chế độ (toàn tủ / đồ vừa mua),\nchụp 1–2 ảnh, đánh dấu "ngăn khác" nếu có
+APP -> APP : nén 1.280 px JPEG; sinh Idempotency-Key (UUID)
+APP -> NGX : POST /api/v1/scans (multipart: mode, images[1..2], shelf_group[])\nAuthorization: Bearer <access>, Idempotency-Key: <k>
+alt thân yêu cầu vượt client_max_body_size của nginx
+  NGX --> APP : 413 problem+json (code = image_too_large)
+else
+  NGX -> SCAN : chuyển tiếp yêu cầu
+  activate SCAN
+  SCAN -> SCAN : kiểm JWT (chữ ký, kid, hạn, token_version — xem SD08)
+  SCAN -> SCAN : số ảnh ≤ 2, mỗi ảnh ≤ 3 MB, ≤ 4096² điểm ảnh
+  alt quá số ảnh, quá cỡ hoặc quá điểm ảnh
+    SCAN --> APP : 413 problem+json (code = image_too_large)
+  else magic bytes không phải JPEG hoặc Pillow không giải mã được
+    SCAN --> APP : 422 problem+json (code = image_invalid)
+  else ảnh hợp lệ
+    SCAN -> SCAN : ImageSanitizer.sanitize: ImageOps.exif_transpose;\nmã hoá lại JPEG, bỏ metadata
+    critical Unit of Work (một giao dịch DB)
+      SCAN -> DB : pg_advisory_xact_lock(hash(user_id, key));\nSELECT request_sha256, status_code, response_body\nFROM idempotency_keys WHERE user_id = ? AND key = ?
+      DB --> SCAN : dòng hoặc rỗng
+      alt khoá đã có, cùng request_sha256 (gửi lại)
+        SCAN --> APP : trả lại nguyên văn phản hồi đã lưu (202)
+      else khoá đã có, khác request_sha256
+        SCAN --> APP : 422 problem+json (code = idempotency_key_reused)
+      else khoá mới
+        SCAN -> PRIV : has_consent(user_id, 'photo_contribution')
+        PRIV -> DB : SELECT FROM v_current_consents
+        PRIV --> SCAN : true / false
+        SCAN -> FS : ghi tmp/scans/<scan_id>/<ordinal>.jpg
+        opt có đồng ý photo_contribution
+          SCAN -> FS : chép sang contrib/<user>/<scan_id>/<ordinal>.jpg
+        end
+        SCAN -> DB : INSERT scans (id, user_id, mode, status = 'queued',\nattempts = 0, enqueued_at = NULL)
+        SCAN -> DB : INSERT scan_images (scan_id, ordinal, shelf_group,\nstorage_key, width, height, contributed = kết quả has_consent)
+        SCAN -> DB : INSERT idempotency_keys (user_id, key, request_sha256,\nstatus_code = 202, response_body)
+        SCAN -> DB : COMMIT
+        SCAN -> VK : enqueue job "scan.infer" (job_id = scan_id, timeout 30 s, Retry(max = 2))
+        VK --> SCAN : ok
+        SCAN -> DB : UPDATE scans SET enqueued_at = now() WHERE id = ? AND status = 'queued'
+        note right of SCAN : Enqueue sau COMMIT (ADR-0003, ADR-0007).\nTiến trình chết hoặc Valkey lỗi ở bước này thì\nenqueued_at còn rỗng: sweeper enqueue bù.\ncontributed đặt ngay lúc tạo: ảnh nằm đúng\nchỗ (tmp/ và contrib/) từ đầu.
+        SCAN --> APP : 202 Accepted\nLocation: /api/v1/scans/<id>, Retry-After: 1\n{id, status: "queued"}
+      end
+    end
+  end
+  deactivate SCAN
+end
+
+== Xử lý bất đồng bộ ==
+par worker xử lý job
+  VK -> WK : giao job scan.infer (scan_id)
+  activate WK
+  WK -> DB : UPDATE scans SET status = 'processing', started_at = now(),\nattempts = attempts + 1, detector_version_id, classifier_version_id,\npreprocess_version WHERE id = ? AND status = 'queued'
+  DB --> WK : 1 hàng (0 hàng: đã expired/xoá → bỏ job)
+  WK -> FS : đọc tmp/scans/<scan_id>/*.jpg
+  loop mỗi ảnh (1..2)
+    WK -> WK : tiền xử lý toàn ảnh theo preprocess_version\n(gray-world, CLAHE-L, letterbox)
+    WK -> WK : ONNX bộ phát hiện → khung + lớp + confidence; NMS
+    loop mỗi khung thuộc lớp có has_freshness_model
+      WK -> WK : cắt khung từ ảnh 1.280 px gốc (không tiền xử lý)
+      WK -> WK : ONNX độ tươi → p_tuoi, p_dung_som, p_dung_ngay, p_kiem_tra\n(đã hiệu chỉnh nhiệt độ)
+    end
+  end
+  WK -> DB : SELECT vision_class_ingredients WHERE is_default = true
+  DB --> WK : lớp → nguyên liệu mặc định
+  WK -> WK : gộp chip (BR-SCAN-01): theo lớp → nguyên liệu;\ncùng shelf_group lấy max số đếm giữa các ảnh,\nkhác shelf_group thì cộng
+  alt suy luận thành công
+    critical Giao dịch DB
+      WK -> DB : INSERT scan_items (origin = 'model', model_count,\nfinal_count = model_count, qty_level, user_action = 'kept')
+      WK -> DB : INSERT detections (scan_image_id, scan_item_id, vision_class_id,\nx1, y1, x2, y2 chuẩn hoá [0,1], confidence, p_*)
+      WK -> DB : UPDATE scans SET status = 'done', finished_at = now()\nWHERE id = ? AND status = 'processing'
+      WK -> DB : COMMIT
+    end
+    WK -> VK : PUBLISH scan:<id> "done"
+  else lỗi suy luận hoặc RQ ngắt job sau 30 s, attempts < 3
+    WK -> DB : UPDATE scans SET status = 'queued', error_code = ?, enqueued_at = now()\nWHERE id = ? AND status = 'processing'
+    WK -> VK : RQ xếp lại job (cùng job_id)
+  else lỗi ở lần chạy thứ 3 (attempts = 3)
+    WK -> DB : UPDATE scans SET status = 'failed', error_code = ?, finished_at = now()\nWHERE id = ? AND status = 'processing'
+    WK -> VK : PUBLISH scan:<id> "failed"
+  end
+  deactivate WK
+else sweeper (UC34, mỗi phút)
+  CRON -> SWP : cron chạy python -m tastoria.jobs.sweep
+  activate SWP
+  SWP -> SCAN : scan.sweep_stuck_scans(now)
+  note right of SCAN : Gọi hàm trong cùng mã nguồn\n(module scan), chạy trong tiến trình scheduler.
+  SCAN -> DB : SELECT id FROM scans WHERE status = 'queued'\nAND enqueued_at IS NULL AND created_at < now() − 60 s
+  DB --> SCAN : lần quét chưa từng vào hàng đợi
+  loop mỗi lần quét đó
+    SCAN -> VK : enqueue job "scan.infer" (job_id = scan_id)
+    SCAN -> DB : UPDATE scans SET enqueued_at = now() WHERE id = ? AND status = 'queued'
+  end
+  SCAN -> DB : UPDATE scans SET status = 'expired', error_code = 'stuck', finished_at = now()\nWHERE (status = 'queued' AND enqueued_at < now() − 60 s)\nOR (status = 'processing' AND started_at < now() − 60 s)\nRETURNING id
+  DB --> SCAN : các id vừa hết hạn
+  loop mỗi id
+    SCAN -> VK : PUBLISH scan:<id> "expired"
+  end
+  SCAN --> SWP : số lần quét đã xử lý
+  deactivate SWP
+else app chờ kết quả (long-poll)
+  loop đến khi status ∈ {done, failed, expired}
+    APP -> NGX : GET /api/v1/scans/<id>?wait=10
+    NGX -> SCAN : chuyển tiếp
+    SCAN -> DB : SELECT scans WHERE id = ? AND user_id = ? (chống BOLA)
+    DB --> SCAN : dòng hoặc rỗng
+    alt không thấy (không tồn tại hoặc không phải chủ)
+      SCAN --> APP : 404 problem+json (code = not_found)
+    else status ∈ {queued, processing}
+      SCAN -> VK : SUBSCRIBE scan:<id> (chờ tối đa 10 s)
+      VK --> SCAN : thông báo (done / failed / expired) hoặc hết 10 s
+      SCAN -> DB : SELECT lại scans (+ scan_items, detections khi done)
+      DB --> SCAN : trạng thái mới
+      SCAN --> APP : 200 {status, items?} (Retry-After: 1 khi chưa xong)
+    else đã ở trạng thái cuối
+      SCAN --> APP : 200 {status, items, error_code?}
+    end
+  end
+end
+
+alt status = done
+  APP -> U : hiện chip nguyên liệu để xác nhận (SD02)
+else failed hoặc expired
+  APP -> U : báo lỗi, cho chụp lại
+end
+@enduml

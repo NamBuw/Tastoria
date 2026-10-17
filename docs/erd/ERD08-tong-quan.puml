@@ -1,0 +1,194 @@
+@startuml
+title ERD08 — Tổng quan 62 bảng và mọi khoá ngoại (chi tiết cột ở ERD01–ERD07)
+hide circle
+hide empty members
+left to right direction
+
+package "core" {
+  entity "idempotency_keys" as idempotency_keys
+}
+package "identity" {
+  entity "users" as users
+  entity "refresh_tokens" as refresh_tokens
+  entity "password_resets" as password_resets
+}
+package "privacy" {
+  entity "consent_purposes" as consent_purposes
+  entity "policy_versions" as policy_versions
+  entity "consent_events" as consent_events
+  entity "dsr_requests" as dsr_requests
+  entity "audit_log" as audit_log
+}
+package "catalog" {
+  entity "food_groups" as food_groups
+  entity "nutrient_sources" as nutrient_sources
+  entity "food_items" as food_items
+  entity "nutrients" as nutrients
+  entity "food_nutrients" as food_nutrients
+  entity "allergen_groups" as allergen_groups
+  entity "diets" as diets
+  entity "diet_exclusions" as diet_exclusions
+  entity "ingredients" as ingredients
+  entity "ingredient_synonyms" as ingredient_synonyms
+  entity "ingredient_allergens" as ingredient_allergens
+  entity "ingredient_units" as ingredient_units
+  entity "qty_levels" as qty_levels
+  entity "vision_classes" as vision_classes
+  entity "vision_class_ingredients" as vision_class_ingredients
+  entity "cooking_methods" as cooking_methods
+  entity "tags" as tags
+  entity "recipes" as recipes
+  entity "recipe_ingredients" as recipe_ingredients
+  entity "recipe_steps" as recipe_steps
+  entity "recipe_tags" as recipe_tags
+  entity "recipe_sources" as recipe_sources
+  entity "recipe_nutrition" as recipe_nutrition
+}
+package "profile" {
+  entity "profiles" as profiles
+  entity "user_allergens" as user_allergens
+  entity "user_favorite_recipes" as user_favorite_recipes
+  entity "user_settings" as user_settings
+}
+package "pantry" {
+  entity "pantry_lots" as pantry_lots
+  entity "pantry_transactions" as pantry_transactions
+}
+package "scan" {
+  entity "scans" as scans
+  entity "scan_images" as scan_images
+  entity "scan_items" as scan_items
+  entity "detections" as detections
+}
+package "mlops" {
+  entity "model_versions" as model_versions
+  entity "model_version_classes" as model_version_classes
+  entity "model_deployments" as model_deployments
+}
+package "substitute" {
+  entity "substitution_pairs" as substitution_pairs
+  entity "ingredient_embeddings" as ingredient_embeddings
+  entity "shopping_items" as shopping_items
+}
+package "meal" {
+  entity "meal_plans" as meal_plans
+  entity "meal_plan_coeater_allergens" as meal_plan_coeater_allergens
+  entity "meal_plan_pins" as meal_plan_pins
+  entity "meal_plan_items" as meal_plan_items
+  entity "meal_plan_item_substitutions" as meal_plan_item_substitutions
+}
+package "cooking" {
+  entity "cook_sessions" as cook_sessions
+  entity "cook_schedule_entries" as cook_schedule_entries
+}
+package "events" {
+  entity "interactions" as interactions
+}
+package "survey" {
+  entity "survey_forms" as survey_forms
+  entity "survey_form_anchors" as survey_form_anchors
+  entity "survey_respondents" as survey_respondents
+  entity "survey_assignments" as survey_assignments
+  entity "survey_ratings" as survey_ratings
+  entity "survey_favorites" as survey_favorites
+}
+
+users ||--o{ idempotency_keys : user_id (cascade)
+users ||--o{ refresh_tokens : user_id (cascade)
+refresh_tokens |o--o| refresh_tokens : replaced_by_id
+users ||--o{ password_resets : user_id (cascade)
+consent_purposes ||--o{ policy_versions : purpose_code
+users ||--o{ consent_events : user_id (cascade)
+policy_versions ||--o{ consent_events : policy_version_id
+users |o--o{ dsr_requests : user_id (set_null)
+users |o--o{ audit_log : actor_user_id (set_null)
+nutrient_sources ||--o{ food_items : source_id
+nutrients ||--o{ food_nutrients : nutrient_code
+food_items ||--o{ food_nutrients : source_id, source_code
+diets ||--o{ diet_exclusions : diet_code
+food_groups ||--o{ diet_exclusions : food_group_code
+food_groups ||--o{ ingredients : food_group_code
+food_items |o--o{ ingredients : comp_source_id, comp_source_code
+ingredients ||--o{ ingredient_synonyms : ingredient_id
+ingredients ||--o{ ingredient_allergens : ingredient_id
+allergen_groups ||--o{ ingredient_allergens : allergen_code
+ingredients ||--o{ ingredient_units : ingredient_id
+food_groups ||--o{ qty_levels : food_group_code
+cooking_methods ||--o{ recipes : method_code
+recipes ||--o{ recipe_ingredients : recipe_id
+ingredients ||--o{ recipe_ingredients : ingredient_id
+recipes ||--o{ recipe_steps : recipe_id
+recipes ||--o{ recipe_tags : recipe_id
+tags ||--o{ recipe_tags : tag_code
+recipes ||--o{ recipe_sources : recipe_id
+recipes ||--o{ recipe_nutrition : recipe_id
+nutrients ||--o{ recipe_nutrition : nutrient_code
+vision_classes ||--o{ vision_class_ingredients : vision_class_id
+ingredients ||--o{ vision_class_ingredients : ingredient_id
+users ||--o| profiles : user_id (cascade)
+diets |o--o{ profiles : diet_code
+users ||--o{ user_allergens : user_id (cascade)
+allergen_groups ||--o{ user_allergens : allergen_code
+users ||--o{ user_favorite_recipes : user_id (cascade)
+recipes ||--o{ user_favorite_recipes : recipe_id
+users ||--o| user_settings : user_id (cascade)
+users ||--o{ pantry_lots : user_id (cascade)
+ingredients ||--o{ pantry_lots : ingredient_id
+model_versions |o--o{ pantry_lots : freshness_model_version_id
+scan_items |o--o{ pantry_lots : source_scan_item_id (set_null)
+pantry_lots ||--o{ pantry_transactions : lot_id (cascade)
+pantry_transactions |o--o| pantry_transactions : reverses_id
+model_versions ||--o{ model_version_classes : model_version_id
+vision_classes ||--o{ model_version_classes : vision_class_id
+model_versions ||--o| model_deployments : active_version_id, name
+model_versions |o--o| model_deployments : previous_version_id, name
+users |o--o{ model_deployments : switched_by (set_null)
+users ||--o{ scans : user_id (cascade)
+model_versions |o--o{ scans : detector_version_id
+model_versions |o--o{ scans : classifier_version_id
+scans ||--o{ scan_images : scan_id (cascade)
+scans ||--o{ scan_items : scan_id (cascade)
+ingredients ||--o{ scan_items : ingredient_id
+ingredients |o--o{ scan_items : original_ingredient_id
+scan_images ||--o{ detections : scan_image_id (cascade)
+scan_items |o--o{ detections : scan_item_id (set_null)
+vision_classes ||--o{ detections : vision_class_id
+ingredients ||--o{ substitution_pairs : ingredient_id
+ingredients ||--o{ substitution_pairs : substitute_id
+cooking_methods |o--o{ substitution_pairs : context_method_code
+ingredients ||--o{ ingredient_embeddings : ingredient_id
+model_versions ||--o{ ingredient_embeddings : model_version_id
+users ||--o{ shopping_items : user_id (cascade)
+ingredients ||--o{ shopping_items : ingredient_id
+meal_plan_items |o--o{ shopping_items : source_meal_plan_item_id (set_null)
+users ||--o{ meal_plans : user_id (cascade)
+model_versions |o--o{ meal_plans : ranker_version_id
+meal_plans ||--o{ meal_plan_coeater_allergens : meal_plan_id (cascade)
+allergen_groups ||--o{ meal_plan_coeater_allergens : allergen_code
+meal_plans ||--o{ meal_plan_pins : meal_plan_id (cascade)
+pantry_lots ||--o{ meal_plan_pins : lot_id (cascade)
+meal_plans ||--o{ meal_plan_items : meal_plan_id (cascade)
+meal_plan_items |o--o| meal_plan_items : replaced_item_id
+recipes ||--o{ meal_plan_items : recipe_id, slot
+meal_plan_items ||--o{ meal_plan_item_substitutions : item_id (cascade)
+ingredients ||--o{ meal_plan_item_substitutions : original_ingredient_id
+ingredients ||--o{ meal_plan_item_substitutions : substitute_ingredient_id
+meal_plans ||--o{ cook_sessions : meal_plan_id (cascade)
+cook_sessions ||--o{ cook_schedule_entries : cook_session_id (cascade)
+recipe_steps ||--o{ cook_schedule_entries : recipe_id, step_no
+users ||--o{ interactions : user_id (cascade)
+recipes ||--o{ interactions : recipe_id
+meal_plan_items |o--o{ interactions : meal_plan_item_id, meal_plan_id, recipe_id (set_null)
+model_versions |o--o{ interactions : ranker_version_id
+meal_plans |o--o{ interactions : meal_plan_id, user_id (cascade)
+survey_forms ||--o{ survey_form_anchors : form_id
+recipes ||--o{ survey_form_anchors : recipe_id
+survey_forms ||--o{ survey_respondents : form_id
+policy_versions ||--o{ survey_respondents : policy_version_id
+survey_respondents ||--o{ survey_assignments : respondent_id (cascade)
+recipes ||--o{ survey_assignments : recipe_id
+survey_assignments ||--o| survey_ratings : respondent_id, recipe_id (cascade)
+survey_respondents ||--o{ survey_favorites : respondent_id (cascade)
+recipes ||--o{ survey_favorites : recipe_id
+
+@enduml

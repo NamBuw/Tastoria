@@ -1,0 +1,183 @@
+@startuml CL06-thiet-ke-pantry
+title CL06 — Sơ đồ lớp thiết kế: module pantry (M06)
+
+' Tầng: router (HTTP) -> service (giao diện công khai) -> repository (SQL) -> bảng của module pantry.
+' Module pantry chỉ gọi service của: core, catalog (model.yaml).
+' Module được phép gọi pantry.service: scan, substitute, meal, cooking, journal (theo deps của các module đó).
+
+left to right direction
+hide empty members
+skinparam classAttributeIconSize 0
+
+package "tastoria.modules.pantry" as PPantry {
+  class PantryRouter <<router>> {
+    + list_lots(status: LotStatus | None) : list[LotOut] [GET /pantry/lots]
+    + add_lot(req: LotCreate) : LotOut [POST /pantry/lots]
+    + update_lot(id: UUID, req: LotPatch) : LotOut [PATCH /pantry/lots/{id}]
+    + discard_lot(id: UUID) : LotOut [POST /pantry/lots/{id}/discard]
+  }
+
+  class PantryService <<service>> {
+    + list_lots(user_id: UUID, status: LotStatus | None) : list[LotOut]
+    + add_lot(user_id: UUID, req: LotCreate) : LotOut
+    + update_lot(user_id: UUID, lot_id: UUID, req: LotPatch) : LotOut
+    + discard_lot(user_id: UUID, lot_id: UUID) : LotOut
+    .. dùng bởi scan, substitute, meal, cooking, journal ..
+    + convert_quantity(ingredient_id: UUID, count: int | None, level: QtyLevel | None) : GramRange
+    + list_available_lots(user_id: UUID, at: datetime) : list[LotView]
+    + add_lots_from_scan(uow: UnitOfWork, user_id: UUID, items: list[ConfirmedItem], scan_id: UUID) : list[UUID]
+    + mark_not_seen(uow: UnitOfWork, user_id: UUID, seen_ingredient_ids: set[UUID]) : int
+    + deduct_for_cooking(uow: UnitOfWork, user_id: UUID, needs: list[IngredientNeed], cook_session_id: UUID) : list[Deduction]
+    + revert_cooking(uow: UnitOfWork, user_id: UUID, cook_session_id: UUID) : list[int]
+  }
+
+  class UrgencyCalculator <<domain service>> {
+    - m: dict[FreshnessClass, float] = {tuoi: 0.25, dung_som: 0.65, dung_ngay: 0.9, kiem_tra: 1.2}
+    + u_time(acquired_at: datetime, shelf_life_days: float, now: datetime) : float
+    + u_img(probs: FreshnessProbs) : float
+    + urgency(lot: PantryLot, shelf_life_days: float | None, now: datetime) : Urgency
+    -- BR-FRESH-01..05: tính lúc đọc, không lưu --
+  }
+  class QuantityConverter <<domain service>> {
+    + from_count(grams_per_unit: float, count: int) : GramRange
+    + from_level(level_range: GramRange) : GramRange
+    -- BR-QTY-01, BR-QTY-02 --
+  }
+  class DeductionPlanner <<domain service>> {
+    + plan(needs: list[IngredientNeed], lots: list[LotView]) : list[Deduction]
+    -- BR-PANTRY-02: lô gấp nhất trước --
+  }
+
+  class PantryRepository <<repository>> {
+    + add_lot(lot: PantryLot) : None
+    + get_lot(user_id: UUID, lot_id: UUID) : PantryLot | None
+    + list_lots(user_id: UUID, status: LotStatus | None) : list[PantryLot]
+    + balances(lot_ids: list[UUID]) : dict[UUID, GramRange]
+    + add_transaction(tx: PantryTransaction) : int
+    + transactions_by_ref(ref_type: RefType, ref_id: UUID) : list[PantryTransaction]
+    + set_status(lot_id: UUID, status: LotStatus) : None
+  }
+
+  class PantryLot <<domain>> {
+    id : UUID
+    user_id : UUID
+    ingredient_id : UUID
+    initial : GramRange
+    acquired_at : datetime
+    acquired_basis : AcquiredBasis
+    status : LotStatus
+    freshness : FreshnessProbs | None
+    freshness_observed_at : datetime | None
+    freshness_model_version_id : UUID | None
+    user_checked_at : datetime | None
+    source_scan_item_id : UUID | None
+  }
+  class PantryTransaction <<domain>> {
+    id : int
+    lot_id : UUID
+    delta : GramRange
+    reason : TxReason
+    ref_type : RefType | None
+    ref_id : UUID | None
+    reverses_id : int | None
+    urgency_at_event : float | None
+  }
+  class GramRange <<value object>> {
+    g_min : Decimal
+    g_max : Decimal
+    + __add__(other: GramRange) : GramRange
+    + clamp_zero() : GramRange
+  }
+  class FreshnessProbs <<value object>> {
+    p_tuoi : float
+    p_dung_som : float
+    p_dung_ngay : float
+    p_kiem_tra : float
+  }
+  class Urgency <<value object>> {
+    u : float
+    label : FreshnessClass
+    usable : bool
+  }
+  class LotOut <<DTO>> {
+    id : UUID
+    ingredient_id : UUID
+    current : GramRange
+    acquired_at : datetime
+    status : LotStatus
+    urgency : Urgency
+  }
+  class LotCreate <<DTO>> {
+    ingredient_id : UUID
+    count : int | None
+    qty_level : QtyLevel | None
+    grams : GramRange | None
+    purchased_on : date | None
+  }
+  class LotPatch <<DTO>> {
+    grams : GramRange | None
+    purchased_on : date | None
+    confirm_checked : bool | None
+  }
+  enum LotStatus {
+    in_stock
+    not_seen
+    used_up
+    discarded
+  }
+  enum TxReason {
+    scan_add
+    cook_deduct
+    manual_edit
+    discard
+    undo
+  }
+  enum FreshnessClass {
+    tuoi
+    dung_som
+    dung_ngay
+    kiem_tra
+  }
+}
+
+package "Giao diện module khác (service.py)" as PDeps {
+  interface "core" as ICore <<service>> {
+    + UnitOfWork
+    + ProblemError(code, status)
+  }
+  interface "catalog" as ICatalog <<service>> {
+    + get_ingredient(ingredient_id) : IngredientView
+    + get_unit_grams(ingredient_id, unit_code) : float | None
+    + get_qty_level(food_group_code, level) : GramRange
+  }
+}
+
+PantryRouter ..> PantryService : gọi
+PantryRouter ..> LotCreate
+PantryRouter ..> LotPatch
+PantryRouter ..> LotOut
+PantryService --> PantryRepository
+PantryService --> UrgencyCalculator
+PantryService --> QuantityConverter
+PantryService --> DeductionPlanner
+DeductionPlanner ..> UrgencyCalculator
+PantryRepository ..> PantryLot
+PantryRepository ..> PantryTransaction
+PantryLot "1" *-- "0..*" PantryTransaction
+PantryTransaction "0..1" --> "0..1" PantryTransaction : reverses
+PantryLot *-- GramRange
+PantryLot *-- FreshnessProbs
+PantryLot --> LotStatus
+PantryTransaction --> TxReason
+UrgencyCalculator ..> Urgency
+Urgency --> FreshnessClass
+
+PantryService ..> ICore : <<use>>
+PantryService ..> ICatalog : <<use>>
+
+note bottom of PantryRepository
+  Bảng: pantry_lots, pantry_transactions; view v_pantry_lot_balance.
+  Giao dịch chỉ ghi thêm; hoàn tác = giao dịch đảo trỏ reverses_id.
+end note
+
+@enduml

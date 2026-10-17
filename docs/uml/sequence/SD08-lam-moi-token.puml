@@ -1,0 +1,45 @@
+@startuml
+title SD08 — Làm mới phiên bằng refresh token xoay vòng (UC02; NFR-SEC-01)
+autonumber
+hide footbox
+
+participant "App" as APP
+participant "nginx" as NGX
+participant "api:identity" as IDN
+database "PostgreSQL" as DB
+
+note over APP, NGX : Mọi phản hồi đi qua nginx; chiều trả về\nvẽ gộp thành một mũi tên tới App.
+
+APP -> APP : access token hết hạn (15 phút) hoặc nhận 401 unauthenticated;\nđọc refresh token từ secure-store
+APP -> NGX : POST /api/v1/auth/refresh {refresh_token}
+NGX -> IDN : chuyển tiếp
+activate IDN
+IDN -> IDN : h = SHA-256(refresh_token)
+critical Giao dịch DB
+  IDN -> DB : SELECT rt.*, u.status, u.token_version\nFROM refresh_tokens rt JOIN users u ON u.id = rt.user_id\nWHERE rt.token_sha256 = h FOR UPDATE OF rt
+  alt không thấy token
+    IDN -> DB : ROLLBACK
+    IDN --> APP : 401 problem+json (code = token_invalid)
+  else token đã thu hồi (revoked_at IS NOT NULL): dùng lại token cũ
+    IDN -> DB : UPDATE refresh_tokens SET revoked_at = now()\nWHERE family_id = rt.family_id AND revoked_at IS NULL
+    IDN -> IDN : ghi log bảo mật JSON (event = refresh_reuse_detected, family_id, request_id)
+    IDN -> DB : COMMIT
+    IDN --> APP : 401 problem+json (code = token_reused)
+    note right of IDN : Có thể token bị đánh cắp: thu hồi cả family,\nmọi thiết bị dùng family này phải đăng nhập lại.
+  else hết hạn (expires_at ≤ now()) hoặc users.status = 'deletion_requested'
+    IDN -> DB : UPDATE refresh_tokens SET revoked_at = now() WHERE id = rt.id
+    IDN -> DB : COMMIT
+    IDN --> APP : 401 problem+json (code = token_invalid)
+  else hợp lệ
+    IDN -> IDN : sinh refresh token ngẫu nhiên mới (256 bit), h' = SHA-256
+    IDN -> DB : INSERT refresh_tokens (id = new_id, user_id, family_id = rt.family_id,\ntoken_sha256 = h', issued_at = now(), expires_at = now() + 30 ngày, user_agent)
+    IDN -> DB : UPDATE refresh_tokens SET revoked_at = now(), replaced_by_id = new_id\nWHERE id = rt.id
+    IDN -> DB : COMMIT
+    IDN -> IDN : ký access JWT 15 phút (header kid; claim sub, role, tv = token_version)
+    IDN --> APP : 200 {access_token, refresh_token, expires_in: 900}\nCache-Control: no-store
+    APP -> APP : ghi refresh token mới vào secure-store, bỏ token cũ
+  end
+end
+deactivate IDN
+note over APP, DB : Hai yêu cầu làm mới đồng thời với cùng token: FOR UPDATE xếp chúng tuần tự;\nyêu cầu thứ hai thấy token đã thu hồi và kích hoạt thu hồi cả family.\nApp phải dùng một khoá đơn (single-flight) cho mọi lời gọi /auth/refresh.
+@enduml

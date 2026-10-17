@@ -1,0 +1,171 @@
+@startuml CL08-thiet-ke-cooking
+title CL08 — Sơ đồ lớp thiết kế: module cooking (M12)
+
+' Tầng: router (HTTP) -> service (giao diện công khai) -> repository (SQL) -> bảng của module cooking.
+' Module cooking chỉ gọi service của: core, catalog, meal, pantry, events (model.yaml).
+' Module được phép gọi cooking.service: journal.
+
+left to right direction
+hide empty members
+skinparam classAttributeIconSize 0
+
+package "tastoria.modules.cooking" as PCooking {
+  class CookingRouter <<router>> {
+    + start(req: CookStartRequest, idempotency_key: str) : CookSessionOut [POST /cook-sessions]
+    + get(id: UUID) : CookSessionOut [GET /cook-sessions/{id}]
+    + complete(id: UUID, req: CookCompleteRequest, idempotency_key: str) : CookCompletion [POST /cook-sessions/{id}/complete]
+    + undo(id: UUID) : CookSessionOut [POST /cook-sessions/{id}/undo]
+    + abandon(id: UUID) : CookSessionOut [POST /cook-sessions/{id}/abandon]
+  }
+
+  class CookingService <<service>> {
+    + start(uow: UnitOfWork, user_id: UUID, req: CookStartRequest) : CookSessionOut
+    + get(user_id: UUID, session_id: UUID) : CookSessionOut
+    + complete(uow: UnitOfWork, user_id: UUID, session_id: UUID, req: CookCompleteRequest) : CookCompletion
+    + undo(uow: UnitOfWork, user_id: UUID, session_id: UUID, now: datetime) : CookSessionOut
+    + abandon(user_id: UUID, session_id: UUID) : CookSessionOut
+    .. dùng bởi journal ..
+    + completed_sessions(user_id: UUID, start: date, end: date) : list[CookedSummary]
+  }
+
+  class CookScheduler <<domain service>> {
+    + solve(steps: list[StepView], burners: int, serve_at: datetime) : Schedule
+    -- OR-Tools CP-SAT; BR-COOK-01: NoOverlap bước chủ động, --
+    -- Cumulative theo số họng bếp, thứ tự bước, cửa sổ 5 phút --
+  }
+  class NeedCalculator <<domain service>> {
+    + needs(plan: PlanForCooking, recipes: dict[UUID, RecipeDetail]) : list[IngredientNeed]
+    -- BR-TRAY-02 + thay thế đã chọn; bỏ gia vị luôn có --
+  }
+  class UndoPolicy <<domain service>> {
+    - window: timedelta = 10 phút
+    + can_undo(session: CookSession, now: datetime) : bool
+    -- BR-PANTRY-02 --
+  }
+
+  class CookingRepository <<repository>> {
+    + add_session(s: CookSession) : None
+    + lock_session(session_id: UUID) : CookSession | None
+    -- SELECT ... FOR UPDATE; chủ sở hữu kiểm qua meal.get_plan_for_cooking --
+    + active_for_plan(meal_plan_id: UUID) : CookSession | None
+    + add_entries(session_id: UUID, entries: list[ScheduleEntry]) : None
+    + transition(session_id: UUID, meal_plan_id: UUID, from_: SessionStatus, to: SessionStatus, at: datetime) : bool
+    -- UPDATE cook_sessions WHERE id = ? AND meal_plan_id = ? AND status = from_ --
+  }
+
+  class CookSession <<domain>> {
+    id : UUID
+    meal_plan_id : UUID
+    status : SessionStatus
+    serve_at : datetime
+    burners : int
+    started_at : datetime
+    completed_at : datetime | None
+    reverted_at : datetime | None
+    entries : list[ScheduleEntry]
+  }
+  class ScheduleEntry <<domain>> {
+    recipe_id : UUID
+    step_no : int
+    start_offset_s : int
+    end_offset_s : int
+  }
+  class Schedule <<value object>> {
+    entries : list[ScheduleEntry]
+    makespan_s : int
+  }
+  class CookStartRequest <<DTO>> {
+    meal_plan_id : UUID
+    serve_at : datetime
+  }
+  class CookCompleteRequest <<DTO>> {
+    completed_at : datetime | None
+    feedback : list[DishFeedback] {≤ 3}
+  }
+  class DishFeedback <<DTO>> {
+    meal_plan_item_id : UUID
+    liked : bool | None
+  }
+  class CookSessionOut <<DTO>> {
+    burners : int
+    makespan_s : int
+    undo_deadline : datetime | None
+    schedule : list[ScheduleEntry]
+  }
+  class CookCompletion <<DTO>> {
+    cook_session : CookSessionOut
+    deductions : list[Deduction]
+    interactions_recorded : bool
+  }
+  enum SessionStatus {
+    in_progress
+    completed
+    reverted
+    abandoned
+  }
+}
+
+package "Giao diện module khác (service.py)" as PDeps {
+  interface "core" as ICore <<service>> {
+    + UnitOfWork
+    + IdempotencyStore.run(user_id, key, request_hash, fn)
+    + ProblemError(code, status)
+  }
+  interface "catalog" as ICatalog <<service>> {
+    + get_recipe(recipe_id) : RecipeDetail
+  }
+  interface "meal" as IMeal <<service>> {
+    + get_plan_for_cooking(user_id, plan_id) : PlanForCooking
+    + mark_cooked(uow, plan_id) : None
+    + revert_cooked(uow, plan_id) : None
+  }
+  interface "pantry" as IPantry <<service>> {
+    + deduct_for_cooking(uow, user_id, needs, cook_session_id) : list[Deduction]
+    + revert_cooking(uow, user_id, cook_session_id) : list[int]
+  }
+  interface "events" as IEvents <<service>> {
+    + record(uow, user_id, events: list[InteractionIn]) : None
+  }
+}
+
+CookingRouter ..> CookingService : gọi
+CookingRouter ..> CookStartRequest
+CookingRouter ..> CookCompleteRequest
+CookingRouter ..> CookCompletion
+CookingRouter ..> CookSessionOut
+CookCompleteRequest *-- DishFeedback
+CookingService --> CookingRepository
+CookingService --> CookScheduler
+CookingService --> NeedCalculator
+CookingService --> UndoPolicy
+CookScheduler ..> Schedule
+CookingRepository ..> CookSession
+CookSession "1" *-- "0..*" ScheduleEntry
+CookSession --> SessionStatus
+
+CookingService ..> ICore : <<use>>
+CookingService ..> ICatalog : <<use>>
+CookingService ..> IMeal : <<use>>
+CookingService ..> IPantry : <<use>>
+CookingService ..> IEvents : <<use>>
+
+note right of CookStartRequest
+  Không có burners: số họng bếp lấy từ user_settings
+  qua meal.get_plan_for_cooking (PlanForCooking.burners)
+  và chụp vào cook_sessions.burners (ST03).
+  DTO khớp CookSessionCreate, CookCompleteRequest,
+  DishFeedback, CookCompletion trong OpenAPI.
+end note
+
+note bottom of CookingService
+  start(): meal.get_plan_for_cooking (kiểm chủ, status phải accepted,
+  nếu không → 409 conflict_state); catalog.get_recipe từng món; CookScheduler.solve.
+  complete(): một Unit of Work (BR-COOK-02) gồm pantry.deduct_for_cooking,
+  events.record (cooked + liked/disliked từng món; events tự kiểm đồng ý personalization),
+  meal.mark_cooked, cook_sessions.status = completed. Gửi lại cùng Idempotency-Key trả lại phản hồi cũ.
+  interactions.id của cooked/liked/disliked = uuid5(cook_session_id, meal_plan_item_id, type)
+  nên ghi lại không tạo bản trùng.
+  undo(): trong 10 phút, pantry.revert_cooking + events.record(undone) + meal.revert_cooked.
+end note
+
+@enduml

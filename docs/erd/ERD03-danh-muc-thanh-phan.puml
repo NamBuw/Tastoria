@@ -1,0 +1,141 @@
+@startuml
+title ERD03 — Danh mục: thành phần thực phẩm, nguyên liệu, dị ứng, chế độ ăn, đơn vị, mức lượng, lớp thị giác
+hide circle
+
+entity "food_groups" as food_groups {
+  * code : text <<PK>>
+  --
+  * name_vi : text
+}
+entity "nutrient_sources" as nutrient_sources {
+  * id : smallint <<PK>>
+  --
+  * code : text <<UQ>>
+  * name : text
+  * version : text
+  * license : text
+  * url : text
+}
+entity "food_items" as food_items {
+  * source_id : smallint <<PK, FK>>
+  * source_code : text <<PK>>
+  --
+  * name : text
+    name_en : text
+    refuse_pct : numeric
+}
+entity "nutrients" as nutrients {
+  * code : text <<PK>>
+  --
+  * name_vi : text
+  * unit : text
+}
+entity "food_nutrients" as food_nutrients {
+  * source_id : smallint <<PK, FK>>
+  * source_code : text <<PK, FK>>
+  * nutrient_code : text <<PK, FK>>
+  --
+  * per_100g : numeric
+}
+entity "allergen_groups" as allergen_groups {
+  * code : text <<PK>>
+  --
+  * name_vi : text
+  * name_en : text
+  * basis : allergen_basis_t
+}
+entity "diets" as diets {
+  * code : text <<PK>>
+  --
+  * name_vi : text
+}
+entity "diet_exclusions" as diet_exclusions {
+  * diet_code : text <<PK, FK>>
+  * food_group_code : text <<PK, FK>>
+  --
+}
+entity "ingredients" as ingredients {
+  * id : uuid <<PK>>
+  --
+  * name_vi : text
+  * food_group_code : text <<FK>>
+    comp_source_id : smallint <<FK>>
+    comp_source_code : text <<FK>>
+  * is_staple : boolean
+  * countable : boolean
+    shelf_life_days : numeric
+    shelf_life_basis : text
+  * is_active : boolean
+  * created_at : timestamptz
+  * updated_at : timestamptz
+  .. UNIQUE(name_vi) WHERE is_active ..
+}
+entity "ingredient_synonyms" as ingredient_synonyms {
+  * ingredient_id : uuid <<PK, FK>>
+  * synonym : text <<PK>>
+  * lang : lang_t <<PK>>
+  --
+    source : text
+}
+entity "ingredient_allergens" as ingredient_allergens {
+  * ingredient_id : uuid <<PK, FK>>
+  * allergen_code : text <<PK, FK>>
+  --
+}
+entity "ingredient_units" as ingredient_units {
+  * ingredient_id : uuid <<PK, FK>>
+  * unit_code : text <<PK>>
+  --
+  * grams_per_unit : numeric
+  * source : text
+}
+entity "qty_levels" as qty_levels {
+  * food_group_code : text <<PK, FK>>
+  * level : qty_level_t <<PK>>
+  --
+  * g_min : numeric
+  * g_max : numeric
+}
+entity "vision_classes" as vision_classes {
+  * id : smallint <<PK>>
+  --
+  * code : text <<UQ>>
+  * name_vi : text
+  * name_en : text
+  * countable : boolean
+  * instance_def : instance_def_t
+  * has_freshness_model : boolean
+}
+entity "vision_class_ingredients" as vision_class_ingredients {
+  * vision_class_id : smallint <<PK, FK>>
+  * ingredient_id : uuid <<PK, FK>>
+  --
+  * is_default : boolean
+  .. UNIQUE(vision_class_id) WHERE is_default ..
+}
+
+nutrient_sources ||--o{ food_items : source_id
+nutrients ||--o{ food_nutrients : nutrient_code
+food_items ||--o{ food_nutrients : source_id, source_code
+diets ||--o{ diet_exclusions : diet_code
+food_groups ||--o{ diet_exclusions : food_group_code
+food_groups ||--o{ ingredients : food_group_code
+food_items |o--o{ ingredients : comp_source_id, comp_source_code
+ingredients ||--o{ ingredient_synonyms : ingredient_id
+ingredients ||--o{ ingredient_allergens : ingredient_id
+allergen_groups ||--o{ ingredient_allergens : allergen_code
+ingredients ||--o{ ingredient_units : ingredient_id
+food_groups ||--o{ qty_levels : food_group_code
+vision_classes ||--o{ vision_class_ingredients : vision_class_id
+ingredients ||--o{ vision_class_ingredients : ingredient_id
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  UNIQUE(...) WHERE ...: chỉ mục duy nhất một phần (không phải khoá của cả bảng)
+  ||  đúng một; |o  không hoặc một
+  o{  không hoặc nhiều; o|  không hoặc một
+  (cascade), (set_null): hành vi ON DELETE; không ghi = NO ACTION
+  Thực thể nền xám: bảng thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+
+@enduml

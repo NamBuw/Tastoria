@@ -35,3 +35,5 @@ ml/mlruns/
 .DS_Store
 .vscode/
 .idea/
+__pycache__/
+dist/

@@ -1,0 +1,59 @@
+@startuml
+title UCD05 — Gói PK5 Mâm cơm
+' Sinh từ docs/sad/model.yaml (actors, use_cases, rels). Không sửa tay mã định danh.
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle stick
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Người dùng\n(A02)" as A02
+
+rectangle "Tastoria" {
+  package "PK5 Mâm cơm" as PK5 {
+    usecase "UC15 Nhận mâm cơm hôm nay" as UC15
+    usecase "UC16 Đổi một món" as UC16
+    usecase "UC17 Xem và chọn thay thế\nnguyên liệu thiếu (Thiếu gì?)" as UC17
+    usecase "UC18 Quản lý danh sách đi chợ" as UC18
+  }
+}
+
+A02 -- UC15
+A02 -- UC16
+A02 -- UC17
+A02 -- UC18
+
+UC16 ..> UC15 : <<extend>>
+note on link
+  condition: {người dùng chọn đổi một món của mâm (BR-SWAP-01)}
+  extension point: Đổi món
+end note
+UC17 ..> UC15 : <<extend>>
+note on link
+  condition: {người dùng mở "Thiếu gì?" cho một món của mâm}
+  extension point: Thiếu nguyên liệu
+end note
+UC18 ..> UC17 : <<extend>>
+note on link
+  condition: {người dùng đưa nguyên liệu còn thiếu vào danh sách đi chợ}
+  extension point: Thêm vào danh sách đi chợ
+end note
+UC18 ..> UC15 : <<extend>>
+note on link
+  condition: {không có mâm khả thi (BR-TRAY-06)}
+  extension point: Không có mâm khả thi
+end note
+' Điểm mở rộng ghi bằng note để plugin PlantUML-VP nhập được; tạo lại ExtensionPoint trong VP theo note.
+note bottom of UC15
+  extension points:
+  - Đổi món
+  - Thiếu nguyên liệu
+  - Không có mâm khả thi
+end note
+note bottom of UC17
+  extension points:
+  - Thêm vào danh sách đi chợ
+end note
+@enduml

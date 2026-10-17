@@ -1,0 +1,119 @@
+@startuml
+title SD10 — Đăng ký, kiểm định, triển khai và quay lui phiên bản mô hình (UC29, UC30)
+autonumber
+hide footbox
+
+actor "Người vận hành mô hình (A06)" as OP
+participant "CLI tastoria\n(container api, module admin)" as CLI
+participant "mlops" as ML
+database "PostgreSQL" as DB
+collections "Kho tệp" as FS
+participant "Docker Compose" as DC
+participant "api" as API
+participant "Worker" as WK
+
+== Đăng ký (UC29) ==
+OP -> CLI : tastoria mlops register <name> <artifact> --metrics <json>
+CLI -> ML : register(name, artifact, metrics)
+ML -> ML : tính sha256 của artifact; đọc preprocess_version, bản đồ lớp
+ML -> FS : chép vào models/<name>/<version>/ (artifact_key)
+critical Giao dịch DB
+  ML -> DB : INSERT model_versions (name, version, artifact_key, sha256,\npreprocess_version, metrics, mlflow_run_id, status = 'candidate')
+  opt name = 'detector'
+    ML -> DB : INSERT model_version_classes (class_index → vision_class_id)
+  end
+  ML -> DB : COMMIT
+end
+alt trùng (name, version)
+  ML --> CLI : lỗi UNIQUE → thoát mã ≠ 0, không ghi gì
+else
+  ML --> CLI : version_id
+  CLI --> OP : "đã đăng ký <name> <version> (candidate)"
+end
+
+== Kiểm định (UC29) ==
+OP -> CLI : tastoria mlops gate <name> <version>
+CLI -> ML : gate(name, version)
+ML -> DB : SELECT model_versions WHERE name = ? AND version = ? AND status = 'candidate'
+ML -> DB : SELECT bản đang chạy qua model_deployments (để so sánh)
+ML -> ML : so metrics với ngưỡng cổng của loại mô hình\n(và với bản đang chạy); kiểm bản đồ lớp khớp vision_classes
+ML -> FS : ghi báo cáo cổng (gate_report_key)
+alt đạt
+  ML -> DB : UPDATE model_versions SET status = 'validated', gate_report_key = ?
+  CLI --> OP : "đạt cổng", thoát mã 0
+else không đạt
+  ML -> DB : UPDATE model_versions SET status = 'rejected', gate_report_key = ?
+  CLI --> OP : "không đạt" + lý do, thoát mã ≠ 0
+end
+
+== Triển khai (UC30) ==
+OP -> CLI : tastoria mlops deploy <name> <version>
+CLI -> ML : deploy(name, version)
+critical Giao dịch DB
+  ML -> DB : SELECT model_versions WHERE name = ? AND version = ? AND status = 'validated'
+  alt không ở 'validated'
+    ML -> DB : ROLLBACK
+    ML --> CLI : lỗi, thoát mã ≠ 0 (không đổi con trỏ)
+  else
+    ML -> DB : SELECT model_deployments WHERE name = ? FOR UPDATE
+    DB --> ML : D (active_version_id, previous_version_id) hoặc rỗng
+    opt D.previous_version_id khác NULL và khác new_id
+      ML -> DB : UPDATE model_versions SET status = 'retired'\nWHERE id = D.previous_version_id AND status = 'validated'
+      note right of ML : Bản rời khỏi previous_version_id thì không còn\nlà đích quay lui → 'retired' (ST07).
+    end
+    ML -> DB : INSERT model_deployments ... ON CONFLICT (name) DO UPDATE SET\nprevious_version_id = active_version_id, active_version_id = new_id,\nswitched_at = now(), switched_by = ?
+    ML --> CLI : đã đổi con trỏ (chưa COMMIT)
+    CLI -> DB : privacy.audit: INSERT audit_log (action = 'model_deploy',\nentity = 'model_deployments', entity_id = name)
+    CLI -> DB : COMMIT
+    CLI --> OP : "con trỏ <name> → <version>; bản trước giữ ở previous_version_id"
+  end
+end
+note right of DB : Unit of Work do module admin mở; mlops không phụ thuộc\nprivacy nên audit_log do admin ghi trong cùng giao dịch.\nmodel_deployments là nơi duy nhất xác định bản đang chạy.\nDeploy và rollback chỉ đổi con trỏ: bản vừa bị thay\nvẫn 'validated' để quay lui được; chỉ bản bị đẩy ra khỏi\nprevious_version_id mới chuyển 'retired'.
+
+OP -> DC : docker compose restart api worker
+DC -> API : khởi động lại
+DC -> WK : khởi động lại
+par api nạp ranker, substitution
+  API -> DB : SELECT model_deployments JOIN model_versions (active_version_id)
+  API -> FS : đọc models/<artifact_key>
+  API -> API : kiểm sha256 = model_versions.sha256
+  alt khớp
+    API -> API : nạp vector NumPy; GET /readyz → 200
+  else sai sha256 hoặc thiếu tệp
+    API -> API : không nạp; GET /readyz → 503, log lỗi kèm version_id
+  end
+else worker nạp detector, freshness
+  WK -> DB : SELECT model_deployments JOIN model_versions
+  WK -> FS : đọc models/<artifact_key>
+  WK -> WK : kiểm sha256
+  alt khớp
+    WK -> WK : tạo phiên ONNX, bắt đầu nhận job
+  else sai
+    WK -> WK : không nhận job, thoát với mã lỗi (Compose khởi động lại)
+  end
+end
+OP -> API : GET /readyz (qua nginx)
+API --> OP : 200 sẵn sàng / 503 lỗi nạp
+
+== Quay lui (UC30, mục tiêu < 5 phút) ==
+opt bản mới có vấn đề
+  OP -> CLI : tastoria mlops rollback <name>
+  CLI -> ML : rollback(name)
+  critical Giao dịch DB
+    ML -> DB : SELECT model_deployments WHERE name = ? FOR UPDATE
+    DB --> ML : D hoặc rỗng
+    alt previous_version_id IS NULL
+      ML -> DB : ROLLBACK
+      ML --> CLI : lỗi "không có bản trước", thoát mã ≠ 0
+    else
+      ML -> DB : UPDATE model_deployments SET active_version_id = previous_version_id,\nprevious_version_id = active_version_id, switched_at = now(), switched_by = ?
+      note right of ML : Không UPDATE model_versions: cả hai bản\nđều giữ status = 'validated' (ST07).
+      CLI -> DB : privacy.audit: INSERT audit_log (action = 'model_rollback')
+      CLI -> DB : COMMIT
+    end
+  end
+  OP -> DC : docker compose restart api worker
+  DC -> API : khởi động lại, nạp theo con trỏ + kiểm sha256 (như trên)
+  DC -> WK : khởi động lại, nạp theo con trỏ + kiểm sha256
+end
+@enduml

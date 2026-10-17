@@ -1,0 +1,41 @@
+@startuml
+title UCD01 — Gói PK1 Tài khoản & bảo mật
+' Sinh từ docs/sad/model.yaml (actors, use_cases, rels). Không sửa tay mã định danh.
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle stick
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Khách\n(A01)" as A01
+actor "Người dùng\n(A02)" as A02
+actor "Dịch vụ email\n(A09)" as A09 <<system>>
+
+A02 --|> A01
+note right of A02
+  A02 kế thừa A01 (model.yaml: generalizes A01).
+  Ý nghĩa: người đã có tài khoản vẫn thực hiện được
+  UC02 Đăng nhập (khi phiên hết hạn hoặc trên thiết bị mới)
+  và UC04 Đặt lại mật khẩu (khi quên mật khẩu).
+  UC01 Đăng ký với người đã đăng nhập: app ẩn chức năng,
+  API trả 409 email_taken nếu dùng lại email.
+end note
+
+rectangle "Tastoria" {
+  package "PK1 Tài khoản & bảo mật" as PK1 {
+    usecase "UC01 Đăng ký tài khoản" as UC01
+    usecase "UC02 Đăng nhập" as UC02
+    usecase "UC03 Đăng xuất (một hoặc mọi\nthiết bị)" as UC03
+    usecase "UC04 Đặt lại mật khẩu" as UC04
+  }
+}
+
+A01 -- UC01
+A01 -- UC02
+A02 -- UC03
+A01 -- UC04
+UC04 -- A09
+
+@enduml

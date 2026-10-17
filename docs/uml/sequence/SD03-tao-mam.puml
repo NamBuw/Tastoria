@@ -1,0 +1,111 @@
+@startuml
+title SD03 — Tạo mâm cơm hôm nay (UC15; BR-TRAY-01..08, BR-ALG-01, BR-DIET-01, BR-NUT-04, BR-CONSENT-03, NFR-PERF-02)
+autonumber
+hide footbox
+
+actor "Người dùng (A02)" as U
+participant "App" as APP
+participant "nginx" as NGX
+participant "api:meal" as MEAL
+participant "api:profile" as PRO
+participant "api:pantry" as PAN
+participant "api:catalog" as CAT
+participant "api:mlops" as ML
+participant "api:privacy" as PRIV
+participant "api:events" as EVT
+database "PostgreSQL" as DB
+
+note over APP, NGX : Mọi phản hồi đi qua nginx; chiều trả về\nvẽ gộp thành một mũi tên tới App.
+
+U -> APP : chọn bữa (trưa/tối), số người n, thời gian tối đa,\ndị ứng người ăn cùng, ghim ≤ 2 lô "phải dùng"
+APP -> NGX : POST /api/v1/meal-plans\n{meal, persons, max_minutes, coeater_allergens[], pinned_lot_ids[]}\nIdempotency-Key: <k>
+NGX -> MEAL : chuyển tiếp
+activate MEAL
+MEAL -> MEAL : kiểm đầu vào: n ∈ [1,6], max_minutes ∈ [10,180], số lô ghim ≤ 2
+critical Unit of Work (một giao dịch DB)
+  MEAL -> DB : pg_advisory_xact_lock(hash(user_id, key));\nSELECT FROM idempotency_keys WHERE user_id = ? AND key = ?
+  DB --> MEAL : dòng hoặc rỗng
+  alt khoá đã có, cùng request_sha256
+    MEAL --> APP : trả lại nguyên văn status_code + response_body đã lưu (201 hoặc 422)
+  else khoá đã có, khác request_sha256
+    MEAL --> APP : 422 problem+json (code = idempotency_key_reused)
+  else khoá mới
+    MEAL -> PRO : get_meal_constraints(user_id, meal)
+    PRO -> DB : SELECT profiles, user_allergens, diet_code, user_settings
+    DB --> PRO : hàng hồ sơ
+    PRO -> PRIV : has_consent(user_id, 'health_profile')
+    PRIV --> PRO : true / false
+    opt có đồng ý health_profile
+      PRO -> PRO : giải mã cột *_enc (AES-GCM, enc_key_id);\nE theo BR-NUT-01..03 hoặc kcal_target;\nE_mâm = E × s (s = 0,35 trưa / 0,30 tối) (BR-NUT-04)
+      PRO -> PRIV : audit(actor = user_id, action = 'decrypt_health',\nentity = 'profiles', purpose = 'health_profile')
+      PRIV -> DB : INSERT audit_log
+    end
+    PRO --> MEAL : MealConstraints {allergen_codes, diet_code,\nE_mâm hoặc null (β = 0, BR-CONSENT-02), burners}
+    MEAL -> MEAL : gộp dị ứng người dùng + người ăn cùng (BR-ALG-01);\nE_mâm nhóm = E_mâm × n (BR-TRAY-07)
+    MEAL -> PAN : list_available_lots(user_id, at = now())
+    PAN -> DB : SELECT pantry_lots JOIN v_pantry_lot_balance\nWHERE user_id = ? AND status = 'in_stock'
+    DB --> PAN : lô + lượng hiện tại
+    PAN -> PAN : tính u lúc đọc cho từng lô (BR-FRESH-01..03, 05);\nloại lô "kiểm tra trước khi dùng" khỏi lượng khả dụng (BR-FRESH-04)
+    PAN --> MEAL : list[LotView] {lot_id, ingredient_id, [g_min, g_max], u}
+    MEAL -> CAT : list_published_recipes()
+    CAT -> DB : SELECT recipes WHERE status = 'published'\n+ recipe_ingredients, ingredient_allergens, ingredients.food_group_code,\nrecipe_steps, recipe_nutrition
+    DB --> CAT : món đã published
+    CAT --> MEAL : list[RecipeView] (mỗi món mang tập allergen_codes\nvà food_group_codes của mọi nguyên liệu, kể cả gia vị)
+    MEAL -> MEAL : HardFilter.filter(recipes, constraints, coeater_allergens):\nbỏ món chứa allergen_codes hoặc nhóm thực phẩm bị diet_exclusions loại\n(is_staple chỉ miễn kiểm kho, không miễn dị ứng)
+    MEAL -> PRIV : has_consent(user_id, 'personalization')
+    PRIV --> MEAL : true / false
+    MEAL -> ML : get_active('ranker') (vector NumPy đã nạp lúc khởi động)
+    ML --> MEAL : ActiveModel {model_version_id, ma trận điểm}
+    alt có đồng ý personalization
+      MEAL -> MEAL : TasteRanker.score(...): ŝ(u, r) từ vector gu của người dùng
+    else không đồng ý (BR-CONSENT-03)
+      MEAL -> MEAL : TasteRanker.score(...): ŝ = trung bình món + content-based từ 5 món hay ăn
+    end
+    MEAL -> MEAL : ŝ' = phân vị theo người trong từng slot;\nđiểm cấp món = ŝ' + α·U_r − β·lệch calo_r; cắt top-K = 20 mỗi slot
+    loop TrayComposer.compose: duyệt tổ hợp mâm theo BR-TRAY-01 (n = 1: 2 món; n ≥ 2: mặn + rau + canh)
+      MEAL -> MEAL : need = gam × n / servings (BR-TRAY-02);\nkhả thi kho gộp theo cận dưới g_min (BR-TRAY-04);\nlô ghim dùng ≥ 50% g_min (BR-TRAY-08)
+      MEAL -> MEAL : MakespanEstimator.estimate(recipe_steps, burners):\nloại mâm có cận dưới makespan > max_minutes (BR-TRAY-05)
+      MEAL -> MEAL : hàm mục tiêu Σŝ' + α·U(m) − β·|E(m) − E_mâm|/E_mâm − γ·D(m)
+    end
+    note right of MEAL : Hết mâm khả thi với top-K thì K = toàn bộ;\nn ≥ 2 thì thử thêm mâm 2 món rồi mới kết luận không khả thi.\nMakespan chỉ ước lượng cận dưới trong meal:\nmeal không được gọi cooking (chiều phụ thuộc là cooking → meal);\nlịch CP-SAT chính thức (BR-COOK-01) chỉ lập ở SD06.
+    alt có mâm khả thi
+      MEAL -> MEAL : số bát cơm/người (BR-TRAY-03); dòng lý do reason_vi
+      MEAL -> DB : INSERT meal_plans (status = 'proposed', e_target_kcal, kcal_low,\nkcal_high, rice_bowls_per_person, reason_vi, ranker_version_id, params_version)
+      MEAL -> DB : INSERT meal_plan_items (slot, recipe_id, status = 'active',\nrank_score, servings_scale, kcal_per_person)
+      MEAL -> DB : INSERT meal_plan_coeater_allergens, meal_plan_pins
+      MEAL -> EVT : record(uow, user_id, [served × mỗi món: position, ranker_version_id, propensity])
+      EVT -> PRIV : has_consent(user_id, 'personalization')
+      PRIV --> EVT : true / false
+      opt có đồng ý (BR-CONSENT-03)
+        EVT -> DB : INSERT interactions ... ON CONFLICT (id) DO NOTHING
+      end
+      EVT --> MEAL : xong
+      MEAL -> DB : INSERT idempotency_keys (status_code = 201, response_body)
+      MEAL -> DB : COMMIT
+      MEAL --> APP : 201 Created, Location: /api/v1/meal-plans/<id>\n{items[], rice_bowls_per_person, kcal_range | "đang hiệu chỉnh", reason_vi}
+      APP -> U : hiện mâm tròn 2–3 món + lý do
+    else không có mâm khả thi (BR-TRAY-06) hoặc không mâm nào dùng đủ lô ghim (BR-TRAY-08)
+      MEAL -> MEAL : lấy 3 mâm có hàm mục tiêu cao nhất khi bỏ ràng buộc kho,\ntính nguyên liệu còn thiếu; ghi lô ghim không mâm nào dùng được ≥ 50% g_min
+      MEAL -> DB : INSERT idempotency_keys (status_code = 422, response_body)\n(không INSERT meal_plans)
+      MEAL -> DB : COMMIT
+      MEAL --> APP : 422 problem+json InfeasibleTrayProblem (code = infeasible_tray)\n{shortfalls[≤ 3]: {rank, recipe_ids[], missing[{ingredient_id, name_vi, need_g, available_g_min}]},\n unmet_pinned_lot_ids[] (khác rỗng ⇔ lý do BR-TRAY-08)}
+      APP -> U : danh sách thiếu hoặc gợi ý bỏ ghim,\nnút "Thêm vào danh sách đi chợ" (UC18)
+    end
+  end
+end
+deactivate MEAL
+
+note right of DB : Phản hồi 422 infeasible_tray được lưu vào idempotency_keys\ncùng giao dịch: outbox gửi lại cùng khoá nhận đúng phản hồi cũ.\nNgười dùng thử lại sau khi đổi kho thì app sinh khoá mới.\n422 idempotency_key_reused và lỗi kiểm đầu vào không lưu.
+
+opt người dùng nhận mâm
+  APP -> NGX : POST /api/v1/meal-plans/<id>/accept
+  NGX -> MEAL : chuyển tiếp
+  MEAL -> DB : UPDATE meal_plans SET status = 'accepted'\nWHERE id = ? AND user_id = ? AND status IN ('proposed','accepted')
+  DB --> MEAL : số hàng cập nhật
+  alt 1 hàng
+    MEAL --> APP : 200 MealPlanOut (gọi lại vẫn 200)
+  else 0 hàng (mâm không thuộc người gọi, hoặc đã cooked/abandoned/expired)
+    MEAL --> APP : 404 not_found hoặc 409 problem+json (code = conflict_state)
+  end
+end
+@enduml

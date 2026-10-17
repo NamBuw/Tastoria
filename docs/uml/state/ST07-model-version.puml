@@ -1,0 +1,38 @@
+@startuml
+title ST07 — Máy trạng thái ModelVersion (model_versions, model_deployments; UC29, UC30)
+hide empty description
+
+state "candidate" as candidate
+state "validated" as validated : bản đã đạt cổng, không phải bản đang chạy;\ncó thể là D.previous_version_id (đích quay lui)
+state "rejected" as rejected
+state "active" as active : entry / model_deployments.active_version_id := id; switched_at := now();\nswitched_by := người vận hành; restart api + worker (nạp ONNX)
+state "retired" as retired
+state cGate <<choice>>
+
+[*] --> candidate : / tạo bởi tastoria mlops register <name> <artifact> --metrics <json>:\nghi sha256, artifact_key, metrics, preprocess_version,\nmodel_version_classes
+candidate --> cGate : tastoria mlops gate <name> <version>\n/ ghi gate_report_key
+cGate --> validated : [đạt cổng]\n/ status := 'validated'
+cGate --> rejected : [không đạt cổng]\n/ status := 'rejected'
+validated --> active : tastoria mlops deploy <name> <version>\n/ D.previous_version_id := bản đang chạy\n(status không đổi, vẫn 'validated')
+active --> validated : bản khác của cùng name được deploy\n/ D.previous_version_id := id (status vẫn 'validated')
+active --> validated : tastoria mlops rollback <name>\n/ đổi chỗ active ↔ previous trong D (< 5 phút)
+validated --> active : tastoria mlops rollback <name>\n[id = D.previous_version_id]\n/ đổi chỗ active ↔ previous trong D
+validated --> retired : tastoria mlops deploy (bản khác của cùng name)\n[id = D.previous_version_id]\n/ status := 'retired'; bản vừa bị thay\nthế chỗ trong previous_version_id
+retired --> [*]
+rejected --> [*]
+
+note as Nmap
+  <b>Trạng thái ↔ cột lưu trữ</b>
+  D = dòng model_deployments có name = model_versions.name
+  candidate: status = 'candidate'
+  validated: status = 'validated' và id ≠ D.active_version_id
+    (có thể id = D.previous_version_id)
+  rejected: status = 'rejected'
+  active: derived, status = 'validated' và id = D.active_version_id
+    (con trỏ duy nhất tới bản đang chạy, spec §8)
+  retired: status = 'retired' và id ∉ {D.active_version_id, D.previous_version_id}
+  Deploy và rollback chỉ đổi con trỏ trong D; lệnh UPDATE model_versions
+  duy nhất là đặt 'retired' cho bản bị đẩy ra khỏi previous_version_id
+  ở lần deploy kế tiếp (SD10, AD04). Bản retired không quay lại được.
+end note
+@enduml

@@ -1,0 +1,156 @@
+@startuml CL03-bce-mam
+title CL03 — Lớp phân tích BCE: UC15 Nhận mâm cơm hôm nay
+
+' Quy tắc sơ đồ robustness: actor chỉ nối boundary; boundary chỉ nối control;
+' entity chỉ nối control; control nối control khi một bước gọi bước khác.
+' UC16 (đổi món), UC17 (thay thế), UC18 (đi chợ) mở rộng UC15 và có sơ đồ/đặc tả riêng.
+
+left to right direction
+hide empty members
+skinparam classAttributeIconSize 0
+
+class "A02 Người dùng" as A02 <<actor>>
+
+package "Boundary" {
+  class "Màn hình Mâm cơm hôm nay" as B_Mam <<boundary>> {
+    {field} chọn bữa (trưa/tối), số người 1–6, thời gian tối đa
+    {field} khai dị ứng người ăn cùng của bữa
+    {field} ghim tối đa 2 lô "phải dùng"
+    {field} hiện 3 món, gợi ý x bát cơm, khoảng calo, dòng lý do
+    {field} nút Nhận mâm
+  }
+  class "Thông báo không có mâm khả thi" as B_KhongKhaThi <<boundary>> {
+    {field} nguyên liệu còn thiếu của 3 mâm tốt nhất
+    {field} lối sang danh sách đi chợ (UC18)
+  }
+}
+
+package "Control" {
+  class "Tạo mâm" as C_TaoMam <<control>> {
+    {field} POST /meal-plans (Idempotency-Key)
+    {field} điều phối các bước, lưu mâm proposed
+  }
+  class "Lấy ràng buộc bữa" as C_RangBuoc <<control>> {
+    {field} profile.get_meal_constraints()
+    {field} BR-NUT-04: E_mâm = E × s
+    {field} BR-TRAY-07: nhóm = E_mâm × n
+    {field} BR-CONSENT-02: không đồng ý health_profile thì β = 0
+  }
+  class "Lọc cứng món" as C_Loc <<control>> {
+    {field} BR-ALG-01: dị ứng người dùng + người ăn cùng, kể cả gia vị
+    {field} BR-DIET-01: loại theo diet_exclusions
+    {field} chỉ món published
+  }
+  class "Xếp hạng gu" as C_XepHang <<control>> {
+    {field} ŝ' = phân vị theo người trong slot
+    {field} BR-CONSENT-03: không đồng ý personalization thì
+    {field} dùng trung bình món + content-based từ 5 món hay ăn
+  }
+  class "Tính kho khả dụng" as C_Kho <<control>> {
+    {field} BR-TRAY-04: lượng cận dưới, lô ≤ "dùng ngay"
+    {field} BR-FRESH-04: loại lô "kiểm tra"
+    {field} độ gấp u tính lúc đọc (BR-FRESH-05)
+  }
+  class "Ghép mâm" as C_Ghep <<control>> {
+    {field} BR-TRAY-01: n = 1 hai món, n ≥ 2 ba món
+    {field} BR-TRAY-02: need = gam × n / servings
+    {field} BR-TRAY-05: makespan ước lượng ≤ thời gian tối đa
+    {field} BR-TRAY-08: mỗi lô ghim dùng ≥ 50% g_min
+    {field} top-K = 20 mỗi slot, mở rộng khi không khả thi
+  }
+  class "Tính calo và cơm" as C_Calo <<control>> {
+    {field} BR-TRAY-03: bát cơm/người, 0,5–3, làm tròn 0,5
+    {field} BR-NUT-06: khoảng calo hoặc "đang hiệu chỉnh"
+  }
+  class "Sinh dòng lý do" as C_LyDo <<control>>
+  class "Xử lý không khả thi" as C_KhongKhaThi <<control>> {
+    {field} BR-TRAY-06: thử mâm 2 món, rồi trả đồ còn thiếu
+  }
+  class "Xem mâm" as C_Xem <<control>> {
+    {field} GET /meal-plans/latest
+    {field} GET /meal-plans/{id}
+    {field} GET /recipes/{id}
+  }
+  class "Nhận mâm" as C_Nhan <<control>> {
+    {field} POST /meal-plans/{id}/accept
+  }
+  class "Ghi tương tác" as C_SuKien <<control>> {
+    {field} POST /events (event_id): served, viewed
+    {field} chỉ ghi khi có đồng ý personalization
+  }
+  class "Tra dữ liệu tham chiếu" as C_ThamChieu <<control>> {
+    {field} GET /reference, GET /pantry/lots
+  }
+}
+
+package "Entity" {
+  class "Mâm cơm (meal_plans)" as E_Mam <<entity>>
+  class "Món trong mâm (meal_plan_items)" as E_MonMam <<entity>>
+  class "Dị ứng người ăn cùng (meal_plan_coeater_allergens)" as E_DiUngCung <<entity>>
+  class "Ghim lô (meal_plan_pins)" as E_Ghim <<entity>>
+  class "Khoá lũy đẳng (idempotency_keys)" as E_Idem <<entity>>
+  class "Hồ sơ (profiles)" as E_HoSo <<entity>>
+  class "Dị ứng người dùng (user_allergens)" as E_DiUng <<entity>>
+  class "Món hay ăn (user_favorite_recipes)" as E_HayAn <<entity>>
+  class "Món (recipes)" as E_Mon <<entity>>
+  class "Thành phần món (recipe_ingredients)" as E_ThanhPhan <<entity>>
+  class "Bước nấu (recipe_steps)" as E_Buoc <<entity>>
+  class "Dinh dưỡng món (recipe_nutrition)" as E_DD <<entity>>
+  class "Nguyên liệu – dị ứng (ingredient_allergens)" as E_NLDiUng <<entity>>
+  class "Loại trừ theo chế độ ăn (diet_exclusions)" as E_CheDo <<entity>>
+  class "Lô kho (pantry_lots)" as E_Lo <<entity>>
+  class "Lượng lô hiện tại (v_pantry_lot_balance)" as E_SoDu <<entity>>
+  class "Triển khai mô hình (model_deployments)" as E_TKMH <<entity>>
+  class "Đồng ý hiện hành (v_current_consents)" as E_DongY <<entity>>
+  class "Tương tác (interactions)" as E_TuongTac <<entity>>
+}
+
+A02 -- B_Mam
+A02 -- B_KhongKhaThi
+
+B_Mam -- C_TaoMam
+B_Mam -- C_Xem
+B_Mam -- C_Nhan
+B_Mam -- C_SuKien
+B_Mam -- C_ThamChieu
+B_KhongKhaThi -- C_KhongKhaThi
+
+C_TaoMam --> C_RangBuoc
+C_TaoMam --> C_Loc
+C_TaoMam --> C_XepHang
+C_TaoMam --> C_Kho
+C_TaoMam --> C_Ghep
+C_Ghep --> C_Calo
+C_Ghep --> C_LyDo
+C_Ghep --> C_KhongKhaThi
+C_TaoMam --> C_SuKien
+
+C_TaoMam -- E_Mam : tạo (proposed)
+C_TaoMam -- E_MonMam : tạo
+C_TaoMam -- E_DiUngCung : tạo
+C_TaoMam -- E_Ghim : tạo
+C_TaoMam -- E_Idem : lưu phản hồi
+C_RangBuoc -- E_HoSo : đọc kcal_target, diet_code
+C_RangBuoc -- E_DiUng : đọc
+C_RangBuoc -- E_DongY : đọc health_profile
+C_Loc -- E_Mon : đọc
+C_Loc -- E_ThanhPhan : đọc
+C_Loc -- E_NLDiUng : đọc
+C_Loc -- E_CheDo : đọc
+C_XepHang -- E_HayAn : đọc
+C_XepHang -- E_TKMH : bộ xếp hạng đang chạy
+C_XepHang -- E_DongY : đọc personalization
+C_Kho -- E_Lo : đọc
+C_Kho -- E_SoDu : đọc
+C_Ghep -- E_ThanhPhan : đọc
+C_Ghep -- E_Buoc : đọc thời lượng
+C_Calo -- E_DD : đọc
+C_Xem -- E_Mam : đọc
+C_Xem -- E_MonMam : đọc
+C_Xem -- E_Mon : đọc
+C_Nhan -- E_Mam : proposed -> accepted
+C_SuKien -- E_DongY : đọc personalization
+C_SuKien -- E_TuongTac : ghi, chống trùng event_id
+C_ThamChieu -- E_Lo : đọc
+
+@enduml

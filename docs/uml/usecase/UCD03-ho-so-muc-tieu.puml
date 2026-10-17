@@ -1,0 +1,30 @@
+@startuml
+title UCD03 — Gói PK3 Hồ sơ & mục tiêu
+' Sinh từ docs/sad/model.yaml (actors, use_cases, rels). Không sửa tay mã định danh.
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle stick
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Người dùng\n(A02)" as A02
+
+rectangle "Tastoria" {
+  package "PK3 Hồ sơ & mục tiêu" as PK3 {
+    usecase "UC09 Thiết lập hồ sơ 60 giây" as UC09
+    usecase "UC10 Cập nhật hồ sơ, dị ứng,\nchế độ ăn, cài đặt bếp" as UC10
+    usecase "UC11 Đặt mục tiêu năng lượng\n(gợi ý / tự nhập / chuyên gia)" as UC11
+  }
+  package "PK2 Quyền riêng tư (tham chiếu)" as PK2 {
+    usecase "UC05 Quản lý đồng ý theo mục\nđích" as UC05
+  }
+}
+
+A02 -- UC09
+A02 -- UC10
+A02 -- UC11
+
+UC09 ..> UC05 : <<include>>
+@enduml

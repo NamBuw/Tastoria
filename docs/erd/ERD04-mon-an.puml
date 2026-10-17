@@ -1,0 +1,95 @@
+@startuml
+title ERD04 — Món ăn: công thức, bước, thẻ, nguồn, dinh dưỡng món
+hide circle
+
+entity "cooking_methods" as cooking_methods {
+  * code : text <<PK>>
+  --
+  * name_vi : text
+}
+entity "tags" as tags {
+  * code : text <<PK>>
+  --
+  * kind : tag_kind_t
+  * name_vi : text
+}
+entity "recipes" as recipes {
+  * id : uuid <<PK>>
+  --
+  * name_vi : text
+  * slot : slot_t
+  * servings : smallint
+  * method_code : text <<FK>>
+  * status : recipe_status_t
+    notes : text
+  * created_at : timestamptz
+  * updated_at : timestamptz
+  .. UNIQUE(id, slot) ..
+  .. UNIQUE(name_vi) WHERE status <> 'retired' ..
+}
+entity "recipe_ingredients" as recipe_ingredients {
+  * recipe_id : uuid <<PK, FK>>
+  * ingredient_id : uuid <<PK, FK>>
+  --
+  * grams : numeric
+  * role : ingredient_role_t
+  * is_optional : boolean
+}
+entity "recipe_steps" as recipe_steps {
+  * recipe_id : uuid <<PK, FK>>
+  * step_no : smallint <<PK>>
+  --
+  * text_vi : text
+  * kind : step_kind_t
+  * minutes : smallint
+  * uses_burner : boolean
+}
+entity "recipe_tags" as recipe_tags {
+  * recipe_id : uuid <<PK, FK>>
+  * tag_code : text <<PK, FK>>
+  --
+}
+entity "recipe_sources" as recipe_sources {
+  * recipe_id : uuid <<PK, FK>>
+  * url : text <<PK>>
+  --
+  * title : text
+  * accessed_on : date
+}
+entity "recipe_nutrition" as recipe_nutrition {
+  * recipe_id : uuid <<PK, FK>>
+  * nutrient_code : text <<PK, FK>>
+  --
+  * per_serving : numeric
+  * computed_at : timestamptz
+  * data_version : text
+}
+entity "ingredients" as ingredients #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD03 ..
+}
+entity "nutrients" as nutrients #EEEEEE {
+  * code : text <<PK>>
+  .. chi tiết ở ERD03 ..
+}
+
+cooking_methods ||--o{ recipes : method_code
+recipes ||--o{ recipe_ingredients : recipe_id
+ingredients ||--o{ recipe_ingredients : ingredient_id
+recipes ||--o{ recipe_steps : recipe_id
+recipes ||--o{ recipe_tags : recipe_id
+tags ||--o{ recipe_tags : tag_code
+recipes ||--o{ recipe_sources : recipe_id
+recipes ||--o{ recipe_nutrition : recipe_id
+nutrients ||--o{ recipe_nutrition : nutrient_code
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  UNIQUE(...) WHERE ...: chỉ mục duy nhất một phần (không phải khoá của cả bảng)
+  ||  đúng một; |o  không hoặc một
+  o{  không hoặc nhiều; o|  không hoặc một
+  (cascade), (set_null): hành vi ON DELETE; không ghi = NO ACTION
+  Thực thể nền xám: bảng thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+
+@enduml

@@ -1,0 +1,211 @@
+@startuml CL07-thiet-ke-scan
+title CL07 — Sơ đồ lớp thiết kế: module scan (M08)
+
+' Tầng: router (HTTP) -> service (giao diện công khai) -> repository (SQL) -> bảng của module scan.
+' Job suy luận chạy trong tiến trình worker (RQ trên Valkey), cùng mã nguồn module scan.
+' Module scan chỉ gọi service của: core, catalog, pantry, mlops, privacy (model.yaml).
+' Module được phép gọi scan.service: jobs (xoá ảnh quá hạn UC32, dọn job kẹt UC34).
+
+left to right direction
+hide empty members
+skinparam classAttributeIconSize 0
+
+package "tastoria.modules.scan" as PScan {
+  class ScanRouter <<router>> {
+    + create_scan(mode: ScanMode, images: list[UploadFile], shelf_groups: list[int], idempotency_key: str) : 202 ScanAccepted [POST /scans]
+    + get_scan(id: UUID, wait: int = 0) : ScanOut [GET /scans/{id}]
+    + get_image(id: UUID, ordinal: int) : X-Accel-Redirect [GET /scans/{id}/images/{ordinal}]
+    + add_item(id: UUID, req: ItemCreate) : ScanItemOut [POST /scans/{id}/items]
+    + update_item(id: UUID, itemId: UUID, req: ItemPatch) : ScanItemOut [PATCH /scans/{id}/items/{itemId}]
+    + delete_item(id: UUID, itemId: UUID) : 204 [DELETE /scans/{id}/items/{itemId}]
+    + confirm(id: UUID) : ConfirmOut [POST /scans/{id}/confirm]
+    + discard(id: UUID) : ScanOut [POST /scans/{id}/discard]
+  }
+
+  class ScanService <<service>> {
+    + create_scan(user_id: UUID, mode: ScanMode, images: list[bytes], shelf_groups: list[int]) : ScanAccepted
+    + get_scan(user_id: UUID, scan_id: UUID, wait_s: int) : ScanOut
+    + image_location(user_id: UUID, scan_id: UUID, ordinal: int) : str
+    + add_item(user_id: UUID, scan_id: UUID, req: ItemCreate) : ScanItemOut
+    + update_item(user_id: UUID, scan_id: UUID, item_id: UUID, req: ItemPatch) : ScanItemOut
+    + delete_item(user_id: UUID, scan_id: UUID, item_id: UUID) : None
+    + confirm(user_id: UUID, scan_id: UUID) : ConfirmOut
+    + discard(user_id: UUID, scan_id: UUID) : ScanOut
+    .. dùng bởi jobs ..
+    + purge_expired_images(now: datetime, retention_days: int = 30) : int
+    + sweep_stuck_scans(now: datetime) : int
+  }
+
+  class InferenceJob <<worker job>> {
+    - detector : OnnxSession
+    - classifier : OnnxSession
+    + warm_up() : None
+    + run(scan_id: UUID) : None
+    -- timeout 30 s, thử lại ≤ 2 lần; intra_op_num_threads = 2 --
+  }
+  class ImageSanitizer <<domain service>> {
+    + sanitize(data: bytes) : SanitizedImage
+    -- ≤ 3 MB, magic bytes, ≤ 4096², exif_transpose, JPEG không metadata --
+  }
+  class DetectionMerger <<domain service>> {
+    + merge(dets: list[Detection], shelf_groups: dict[UUID, int]) : dict[int, int]
+    -- BR-SCAN-01: cùng ngăn lấy max, khác ngăn cộng --
+  }
+  class ChipBuilder <<domain service>> {
+    + build(counts: dict[int, int], class_map: ClassMap) : list[ScanItem]
+    -- lớp thị giác -> nguyên liệu mặc định --
+  }
+
+  class ScanRepository <<repository>> {
+    + add_scan(scan: Scan) : None
+    + get_scan(user_id: UUID, scan_id: UUID) : Scan | None
+    + set_status(scan_id: UUID, status: ScanStatus, error_code: str | None) : None
+    + add_detections(dets: list[Detection]) : None
+    + upsert_item(item: ScanItem) : None
+    + images_older_than(cutoff: datetime) : list[ScanImage]
+    + stuck_scans(now: datetime) : list[Scan]
+  }
+
+  class Scan <<domain>> {
+    id : UUID
+    user_id : UUID
+    mode : ScanMode
+    status : ScanStatus
+    error_code : str | None
+    attempts : int
+    detector_version_id : UUID | None
+    classifier_version_id : UUID | None
+    preprocess_version : str | None
+    images : list[ScanImage]
+    items : list[ScanItem]
+  }
+  class ScanImage <<domain>> {
+    id : UUID
+    ordinal : int {1..2}
+    shelf_group : int
+    storage_key : str
+    width : int
+    height : int
+    contributed : bool
+    purged_at : datetime | None
+  }
+  class Detection <<domain>> {
+    id : int
+    vision_class_id : int
+    box : tuple[float, float, float, float]
+    confidence : float
+    freshness : FreshnessProbs | None
+  }
+  class ScanItem <<domain>> {
+    id : UUID
+    ingredient_id : UUID
+    origin : ItemOrigin
+    model_count : int | None
+    final_count : int | None
+    qty_level : QtyLevel | None
+    user_action : UserAction
+    original_ingredient_id : UUID | None
+    user_freshness : FreshnessClass | None
+  }
+  class ScanAccepted <<DTO>> {
+    id : UUID
+    location : str
+    retry_after_s : int = 1
+  }
+  class ScanOut <<DTO>>
+  class ItemCreate <<DTO>> {
+    ingredient_id : UUID
+    count : int | None
+    qty_level : QtyLevel | None
+  }
+  class ItemPatch <<DTO>> {
+    ingredient_id : UUID | None
+    final_count : int | None
+    qty_level : QtyLevel | None
+    user_freshness : FreshnessClass | None
+  }
+  class ConfirmOut <<DTO>> {
+    lot_ids : list[UUID]
+    not_seen_count : int
+  }
+  enum ScanStatus {
+    queued
+    processing
+    done
+    failed
+    expired
+    confirmed
+    discarded
+  }
+  enum ScanMode {
+    fridge
+    haul
+  }
+}
+
+package "Giao diện module khác (service.py)" as PDeps {
+  interface "core" as ICore <<service>> {
+    + UnitOfWork
+    + IdempotencyStore.run(user_id, key, request_hash, fn)
+    + FileStorage.put(key, data) / delete(key) / accel_path(key)
+  }
+  interface "catalog" as ICatalog <<service>> {
+    + get_vision_class_map(class_ids) : ClassMap
+    + ingredient_exists(ingredient_id) : bool
+  }
+  interface "pantry" as IPantry <<service>> {
+    + convert_quantity(ingredient_id, count, level) : GramRange
+    + add_lots_from_scan(uow, user_id, items, scan_id) : list[UUID]
+    + mark_not_seen(uow, user_id, seen_ingredient_ids) : int
+  }
+  interface "mlops" as IMlops <<service>> {
+    + get_active(name) : ActiveModel
+    + class_map(model_version_id) : dict[int, int]
+  }
+  interface "privacy" as IPrivacy <<service>> {
+    + has_consent(user_id, purpose) : bool
+  }
+}
+
+class "rq.Queue (Valkey)" as Queue <<library>>
+
+ScanRouter ..> ScanService : gọi
+ScanRouter ..> ScanAccepted
+ScanRouter ..> ItemCreate
+ScanRouter ..> ItemPatch
+ScanRouter ..> ConfirmOut
+ScanRouter ..> ScanOut
+ScanService --> ScanRepository
+ScanService --> ImageSanitizer
+ScanService ..> Queue : enqueue(InferenceJob.run, scan_id)
+Queue ..> InferenceJob : giao job
+InferenceJob --> ScanRepository
+InferenceJob --> DetectionMerger
+InferenceJob --> ChipBuilder
+ScanRepository ..> Scan
+Scan "1" *-- "1..2" ScanImage
+Scan "1" *-- "0..*" ScanItem
+ScanImage "1" *-- "0..*" Detection
+Detection "0..*" --> "0..1" ScanItem : gộp vào
+Scan --> ScanStatus
+Scan --> ScanMode
+
+ScanService ..> ICore : <<use>>
+ScanService ..> ICatalog : <<use>>
+ScanService ..> IPantry : <<use>>
+ScanService ..> IPrivacy : <<use>>
+InferenceJob ..> IMlops : <<use>>
+InferenceJob ..> ICore : <<use>>
+ChipBuilder ..> ICatalog : <<use>>
+ChipBuilder ..> IPantry : <<use>>
+
+note bottom of ScanService
+  confirm(): chỉ từ trạng thái done (lũy đẳng nếu đã confirmed);
+  một Unit of Work: pantry.add_lots_from_scan + (mode = fridge) pantry.mark_not_seen
+  + scans.status = confirmed.
+  create_scan(): privacy.has_consent(photo_contribution) quyết định scan_images.contributed
+  và việc chép ảnh sang contrib/ ngay lúc tạo (SD01).
+  sweep_stuck_scans(): enqueue bù khi enqueued_at rỗng, còn lại kẹt quá 60 s → expired (ST01).
+end note
+
+@enduml

@@ -1,0 +1,449 @@
+@startchen
+title ERD00 — Mô hình khái niệm Tastoria (ký pháp Chen: 1/N/M là tỉ số lực lượng, nét đôi là tham gia toàn phần)
+
+' ===================== Thực thể =====================
+entity "Người dùng" as NGUOIDUNG {
+  Mã người dùng <<key>>
+  Email
+  Vai trò
+  Trạng thái
+}
+
+entity "Hồ sơ" as HOSO <<weak>> {
+  Chỉ số cơ thể {
+    Giới tính
+    Năm sinh
+    Chiều cao
+    Cân nặng
+  }
+  Mức vận động
+  Mục tiêu
+  Kcal mục tiêu
+}
+
+entity "Nhóm dị ứng" as DIUNG {
+  Mã nhóm dị ứng <<key>>
+  Tên
+  Căn cứ
+}
+
+entity "Chế độ ăn" as CHEDO {
+  Mã chế độ ăn <<key>>
+  Tên
+}
+
+entity "Nhóm thực phẩm" as NHOMTP {
+  Mã nhóm <<key>>
+  Tên
+}
+
+entity "Nguyên liệu" as NGUYENLIEU {
+  Mã nguyên liệu <<key>>
+  Tên tiếng Việt
+  Tên đồng nghĩa <<multi>>
+  Thời hạn bảo quản
+  Đếm được
+  Gia vị luôn có
+}
+
+entity "Thực phẩm (bảng thành phần)" as THUCPHAM {
+  Nguồn dữ liệu <<key>>
+  Mã trong nguồn <<key>>
+  Tên
+  Tỉ lệ thải bỏ
+}
+
+entity "Chất dinh dưỡng" as CHATDD {
+  Mã chất <<key>>
+  Đơn vị
+}
+
+entity "Món" as MON {
+  Mã món <<key>>
+  Tên món
+  Vị trí trong mâm
+  Số khẩu phần
+  Trạng thái
+  Tổng thời gian <<derived>>
+}
+
+entity "Bước nấu" as BUOCNAU <<weak>> {
+  Số bước <<key>>
+  Nội dung
+  Loại bước
+  Số phút
+  Chiếm bếp
+}
+
+entity "Lô kho" as LOKHO {
+  Mã lô <<key>>
+  Lượng ban đầu {
+    g_min
+    g_max
+  }
+  Ngày nhập
+  Trạng thái
+  Xác suất độ tươi gần nhất
+  Lượng hiện tại <<derived>>
+  Độ gấp u <<derived>>
+}
+
+entity "Giao dịch kho" as GIAODICH {
+  Mã giao dịch <<key>>
+  Lượng thay đổi
+  Lý do
+  Thời điểm
+}
+
+entity "Lần quét" as LANQUET {
+  Mã lần quét <<key>>
+  Chế độ quét
+  Trạng thái
+  Số lần thử
+}
+
+entity "Ảnh quét" as ANHQUET <<weak>> {
+  Thứ tự ảnh <<key>>
+  Ngăn tủ
+  Khoá lưu trữ
+  Thời điểm xoá ảnh
+}
+
+entity "Chip nguyên liệu" as CHIP {
+  Mã chip <<key>>
+  Nguồn gốc
+  Số đếm của mô hình
+  Số đếm cuối
+  Mức lượng
+  Thao tác người dùng
+}
+
+entity "Khung phát hiện" as KHUNG {
+  Mã khung <<key>>
+  Toạ độ {
+    x1
+    y1
+    x2
+    y2
+  }
+  Độ tin cậy
+  Xác suất độ tươi
+}
+
+entity "Lớp thị giác" as LOPTG {
+  Mã lớp <<key>>
+  Tên lớp
+  Cách đếm cá thể
+}
+
+entity "Mâm cơm" as MAM {
+  Mã mâm <<key>>
+  Bữa
+  Số người
+  Thời gian tối đa
+  Trạng thái
+  Mục tiêu kcal lúc tạo
+  Dòng lý do
+}
+
+entity "Món trong mâm" as MONMAM {
+  Mã mục <<key>>
+  Vị trí trong mâm
+  Trạng thái
+  Điểm xếp hạng
+  Hệ số khẩu phần
+  Kcal mỗi người lúc tạo
+}
+
+entity "Phiên nấu" as PHIENNAU {
+  Mã phiên <<key>>
+  Giờ dọn
+  Số họng bếp lúc tạo
+  Trạng thái
+}
+
+entity "Tương tác" as TUONGTAC {
+  Mã sự kiện <<key>>
+  Loại
+  Vị trí hiển thị
+  Thời điểm xảy ra
+}
+
+entity "Phiên bản mô hình" as MOHINH {
+  Mã phiên bản <<key>>
+  Tên mô hình
+  Số phiên bản
+  Trạng thái
+  Chỉ số đánh giá
+}
+
+entity "Mục đích đồng ý" as MUCDICH {
+  Mã mục đích <<key>>
+  Tên
+  Nhạy cảm
+}
+
+entity "Phiên bản điều khoản" as DIEUKHOAN {
+  Mã phiên bản điều khoản <<key>>
+  Số phiên bản
+  Hiệu lực từ
+  Băm nội dung
+}
+
+entity "Phiếu khảo sát" as PHIEUKS {
+  Mã phiếu <<key>>
+  Phiên bản phiếu
+  Số món neo
+  Số món ngẫu nhiên
+}
+
+entity "Người tham gia khảo sát" as NGUOIKS {
+  Mã người tham gia <<key>>
+  Kênh
+  Thời điểm đồng ý
+  Thời điểm hoàn tất
+}
+
+entity "Sự kiện đồng ý" as SUKIENDY {
+  Mã sự kiện <<key>>
+  Hành động
+  Kênh
+  Thời điểm
+  Phiên bản app
+}
+
+entity "Phân công khảo sát" as PHANCONG <<weak>> {
+  Thứ tự hiển thị
+  Là món neo
+}
+
+entity "Điểm khảo sát" as DIEMKS <<weak>> {
+  Điểm
+  Chưa từng ăn
+  Thời điểm trả lời
+}
+
+' ===================== Quan hệ =====================
+relationship "có hồ sơ" as R_COHOSO <<identifying>> {
+}
+relationship "dị ứng với" as R_DIUNG {
+}
+relationship "theo" as R_THEO {
+}
+relationship "loại trừ" as R_LOAITRU {
+}
+relationship "thuộc nhóm" as R_THUOCNHOM {
+}
+relationship "chứa chất gây dị ứng" as R_CHUADU {
+}
+relationship "tra thành phần" as R_TRATP {
+}
+relationship "có hàm lượng" as R_HAMLUONG {
+  Lượng trên 100 g
+}
+relationship "dùng" as R_DUNG {
+  Số gam
+  Vai trò
+  Tuỳ chọn
+}
+relationship "gồm bước" as R_GOMBUOC <<identifying>> {
+}
+relationship "sở hữu" as R_SOHUU {
+}
+relationship "là nguyên liệu" as R_LANL {
+}
+relationship "phát sinh" as R_PHATSINH {
+}
+relationship "thực hiện" as R_THUCHIEN {
+}
+relationship "chụp" as R_CHUP <<identifying>> {
+}
+relationship "đề xuất" as R_DEXUAT {
+}
+relationship "nhận diện là" as R_NHANDIEN {
+}
+relationship "chứa khung" as R_CHUAKHUNG {
+}
+relationship "thuộc lớp" as R_THUOCLOP {
+}
+relationship "gộp vào" as R_GOPVAO {
+}
+relationship "ánh xạ tới" as R_ANHXA {
+  Mặc định
+}
+relationship "tạo lô" as R_TAOLO {
+}
+relationship "nhận mâm" as R_NHANMAM {
+}
+relationship "gồm món" as R_GOMMON {
+}
+relationship "chọn món" as R_CHONMON {
+}
+relationship "ghim" as R_GHIM {
+}
+relationship "được nấu trong" as R_DUOCNAU {
+}
+relationship "xếp lịch" as R_XEPLICH {
+  Giây bắt đầu
+  Giây kết thúc
+}
+relationship "ghi nhận" as R_GHINHAN {
+}
+relationship "về món" as R_VEMON {
+}
+relationship "xảy ra trong" as R_TRONGMAM {
+}
+relationship "xếp hạng bởi" as R_XEPHANG {
+}
+relationship "có lớp đầu ra" as R_LOPDAURA {
+  Chỉ số lớp
+}
+relationship "có phiên bản" as R_COPHIENBAN {
+}
+relationship "ghi" as R_GHIDY {
+}
+relationship "theo điều khoản" as R_THEODK {
+}
+relationship "điền" as R_DIEN {
+}
+relationship "chấp nhận" as R_CHAPNHAN {
+}
+relationship "được giao" as R_DUOCGIAO <<identifying>> {
+}
+relationship "giao món" as R_GIAOMON <<identifying>> {
+}
+relationship "trả lời" as R_TRALOI <<identifying>> {
+}
+
+' ===================== Liên kết =====================
+NGUOIDUNG -1- R_COHOSO
+R_COHOSO =1= HOSO
+
+NGUOIDUNG -M- R_DIUNG
+R_DIUNG -N- DIUNG
+
+HOSO -N- R_THEO
+R_THEO -1- CHEDO
+
+CHEDO -M- R_LOAITRU
+R_LOAITRU -N- NHOMTP
+
+NGUYENLIEU =N= R_THUOCNHOM
+R_THUOCNHOM -1- NHOMTP
+
+NGUYENLIEU -M- R_CHUADU
+R_CHUADU -N- DIUNG
+
+NGUYENLIEU -N- R_TRATP
+R_TRATP -1- THUCPHAM
+
+THUCPHAM -M- R_HAMLUONG
+R_HAMLUONG -N- CHATDD
+
+MON =M= R_DUNG
+R_DUNG -N- NGUYENLIEU
+
+MON =1= R_GOMBUOC
+R_GOMBUOC =N= BUOCNAU
+
+NGUOIDUNG -1- R_SOHUU
+R_SOHUU =N= LOKHO
+
+LOKHO =N= R_LANL
+R_LANL -1- NGUYENLIEU
+
+LOKHO -1- R_PHATSINH
+R_PHATSINH =N= GIAODICH
+
+NGUOIDUNG -1- R_THUCHIEN
+R_THUCHIEN =N= LANQUET
+
+LANQUET =1= R_CHUP
+R_CHUP =N= ANHQUET
+
+LANQUET -1- R_DEXUAT
+R_DEXUAT =N= CHIP
+
+CHIP =N= R_NHANDIEN
+R_NHANDIEN -1- NGUYENLIEU
+
+ANHQUET -1- R_CHUAKHUNG
+R_CHUAKHUNG =N= KHUNG
+
+KHUNG =N= R_THUOCLOP
+R_THUOCLOP -1- LOPTG
+
+KHUNG -N- R_GOPVAO
+R_GOPVAO -1- CHIP
+
+LOPTG -M- R_ANHXA
+R_ANHXA -N- NGUYENLIEU
+
+CHIP -1- R_TAOLO
+R_TAOLO -N- LOKHO
+
+NGUOIDUNG -1- R_NHANMAM
+R_NHANMAM =N= MAM
+
+MAM =1= R_GOMMON
+R_GOMMON =N= MONMAM
+
+MONMAM =N= R_CHONMON
+R_CHONMON -1- MON
+
+MAM -M- R_GHIM
+R_GHIM -N- LOKHO
+
+MAM -1- R_DUOCNAU
+R_DUOCNAU =N= PHIENNAU
+
+PHIENNAU -M- R_XEPLICH
+R_XEPLICH -N- BUOCNAU
+
+NGUOIDUNG -1- R_GHINHAN
+R_GHINHAN =N= TUONGTAC
+
+TUONGTAC =N= R_VEMON
+R_VEMON -1- MON
+
+TUONGTAC -N- R_TRONGMAM
+R_TRONGMAM -1- MAM
+
+MAM -N- R_XEPHANG
+R_XEPHANG -1- MOHINH
+
+MOHINH -M- R_LOPDAURA
+R_LOPDAURA -N- LOPTG
+
+MUCDICH -1- R_COPHIENBAN
+R_COPHIENBAN =N= DIEUKHOAN
+
+NGUOIDUNG -1- R_GHIDY
+R_GHIDY =N= SUKIENDY
+
+SUKIENDY =N= R_THEODK
+R_THEODK -1- DIEUKHOAN
+
+NGUOIKS =N= R_DIEN
+R_DIEN -1- PHIEUKS
+
+NGUOIKS =N= R_CHAPNHAN
+R_CHAPNHAN -1- DIEUKHOAN
+
+NGUOIKS =1= R_DUOCGIAO
+R_DUOCGIAO =N= PHANCONG
+
+PHANCONG =N= R_GIAOMON
+R_GIAOMON -1- MON
+
+PHANCONG -1- R_TRALOI
+R_TRALOI =1= DIEMKS
+
+legend right
+  Chen (Elmasri–Navathe): chữ nhật = thực thể, viền đôi = thực thể yếu; thoi = quan hệ, viền đôi = quan hệ định danh.
+  1/N/M = tỉ số lực lượng; cạnh nét đôi = tham gia toàn phần theo luật nghiệp vụ (BR), nét đơn = tham gia bộ phận.
+  <<key>> ở thực thể thường là khoá; ở thực thể yếu (Bước nấu: Số bước, Ảnh quét: Thứ tự ảnh) là khoá bộ phận,
+  theo chuẩn gạch chân nét đứt (PlantUML chỉ vẽ nét liền). Hồ sơ, Phân công, Điểm khảo sát định danh hoàn toàn qua chủ.
+  Sơ đồ khái niệm thể hiện ràng buộc nghiệp vụ (ví dụ mâm 2–3 món, BR-TRAY-01); ERD01–07 thể hiện đúng những gì DDL ép được.
+endlegend
+@endchen

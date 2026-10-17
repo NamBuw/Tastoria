@@ -1,0 +1,44 @@
+@startuml
+title ST03 — Máy trạng thái CookSession (bảng cook_sessions; UC19–UC21)
+hide empty description
+
+state "in_progress" as in_progress : entry / started_at := now();\nlập lịch CP-SAT → cook_schedule_entries (BR-COOK-01)
+state "completed" as completed {
+  state "undoable" as undoable
+  state "sealed" as sealed
+  [*] --> undoable
+  undoable --> sealed : after(10 phút) kể từ completed_at
+  sealed : POST /cook-sessions/{id}/undo / từ chối 409 undo_window_closed
+}
+completed : entry / completed_at := now()
+completed : POST /cook-sessions/{id}/complete / trả kết quả đã có, không trừ kho lần hai
+state "reverted" as reverted : entry / reverted_at := now()
+state "abandoned" as abandoned
+
+[*] --> in_progress : / tạo bởi POST /cook-sessions (Idempotency-Key):\nghi serve_at, burners (ảnh chụp từ user_settings\nqua meal.get_plan_for_cooking)
+in_progress --> completed : POST /cook-sessions/{id}/complete (Idempotency-Key)\n/ Unit of Work (BR-COOK-02): trừ kho theo lô có u cao nhất trước\n(pantry_transactions reason = cook_deduct), interactions type = cooked\n(nếu có đồng ý personalization), meal_plans.status := 'cooked'
+undoable --> reverted : POST /cook-sessions/{id}/undo\n/ ghi giao dịch đảo reason = undo, reverses_id;\ninteractions type = undone; meal_plans.status := 'accepted'
+in_progress --> abandoned : POST /cook-sessions/{id}/abandon
+sealed --> [*] : xoá tài khoản (CASCADE qua meal_plans)
+reverted --> [*] : xoá tài khoản (CASCADE qua meal_plans)
+abandoned --> [*] : xoá tài khoản (CASCADE qua meal_plans)
+
+note as Npre
+  <b>Tiền điều kiện của POST /cook-sessions</b> (không phải guard
+  của initial transition): meal_plans.status = 'accepted' và mâm
+  chưa có phiên in_progress; nếu không → 409 conflict_state (SD06).
+end note
+
+note as Nmap
+  <b>Trạng thái ↔ cột lưu trữ</b>
+  in_progress: status = 'in_progress', completed_at NULL
+  completed: status = 'completed', completed_at NOT NULL
+    undoable: derived, now() − completed_at ≤ 10 phút
+    sealed: derived, now() − completed_at > 10 phút
+  reverted: status = 'reverted', reverted_at NOT NULL
+  abandoned: status = 'abandoned' (không có cột thời điểm riêng)
+  Cửa sổ hoàn tác 10 phút theo BR-PANTRY-02.
+  Phiên reverted hoặc abandoned không chặn tạo phiên mới
+  cho cùng mâm (meal_plans 1 — 0..* cook_sessions).
+end note
+@enduml

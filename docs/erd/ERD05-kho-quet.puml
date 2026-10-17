@@ -1,0 +1,143 @@
+@startuml
+title ERD05 — Kho (pantry) và quét ảnh (scan)
+hide circle
+
+entity "pantry_lots" as pantry_lots {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * ingredient_id : uuid <<FK>>
+  * initial_g_min : numeric
+  * initial_g_max : numeric
+  * acquired_at : timestamptz
+  * acquired_basis : acquired_basis_t
+  * status : lot_status_t
+    p_tuoi : real
+    p_dung_som : real
+    p_dung_ngay : real
+    p_kiem_tra : real
+    freshness_observed_at : timestamptz
+    freshness_model_version_id : uuid <<FK>>
+    user_checked_at : timestamptz
+    source_scan_item_id : uuid <<FK>>
+  * created_at : timestamptz
+  * updated_at : timestamptz
+}
+entity "pantry_transactions" as pantry_transactions {
+  * id : bigint <<PK>>
+  --
+  * lot_id : uuid <<FK>>
+  * delta_g_min : numeric
+  * delta_g_max : numeric
+  * reason : pantry_tx_reason_t
+    ref_type : pantry_ref_type_t
+    ref_id : uuid
+    reverses_id : bigint <<FK, UQ>>
+    urgency_at_event : real
+  * created_at : timestamptz
+}
+entity "scans" as scans {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * mode : scan_mode_t
+  * status : scan_status_t
+    error_code : text
+  * attempts : smallint
+    detector_version_id : uuid <<FK>>
+    classifier_version_id : uuid <<FK>>
+    preprocess_version : text
+    enqueued_at : timestamptz
+    started_at : timestamptz
+    finished_at : timestamptz
+    confirmed_at : timestamptz
+  * created_at : timestamptz
+}
+entity "scan_images" as scan_images {
+  * id : uuid <<PK>>
+  --
+  * scan_id : uuid <<FK>>
+  * ordinal : smallint
+  * shelf_group : smallint
+  * storage_key : text <<UQ>>
+  * width : integer
+  * height : integer
+  * contributed : boolean
+    purged_at : timestamptz
+  .. UNIQUE(scan_id, ordinal) ..
+}
+entity "scan_items" as scan_items {
+  * id : uuid <<PK>>
+  --
+  * scan_id : uuid <<FK>>
+  * ingredient_id : uuid <<FK>>
+  * origin : scan_item_origin_t
+    model_count : smallint
+    final_count : smallint
+    qty_level : qty_level_t
+  * user_action : scan_user_action_t
+    original_ingredient_id : uuid <<FK>>
+    user_freshness : freshness_t
+  * created_at : timestamptz
+  * updated_at : timestamptz
+}
+entity "detections" as detections {
+  * id : bigint <<PK>>
+  --
+  * scan_image_id : uuid <<FK>>
+    scan_item_id : uuid <<FK>>
+  * vision_class_id : smallint <<FK>>
+  * x1 : real
+  * y1 : real
+  * x2 : real
+  * y2 : real
+  * confidence : real
+    p_tuoi : real
+    p_dung_som : real
+    p_dung_ngay : real
+    p_kiem_tra : real
+}
+entity "users" as users #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01 ..
+}
+entity "ingredients" as ingredients #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD03 ..
+}
+entity "model_versions" as model_versions #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD07 ..
+}
+entity "vision_classes" as vision_classes #EEEEEE {
+  * id : smallint <<PK>>
+  .. chi tiết ở ERD03 ..
+}
+
+users ||--o{ pantry_lots : user_id (cascade)
+ingredients ||--o{ pantry_lots : ingredient_id
+model_versions |o--o{ pantry_lots : freshness_model_version_id
+scan_items |o--o{ pantry_lots : source_scan_item_id (set_null)
+pantry_lots ||--o{ pantry_transactions : lot_id (cascade)
+pantry_transactions |o--o| pantry_transactions : reverses_id
+users ||--o{ scans : user_id (cascade)
+model_versions |o--o{ scans : detector_version_id
+model_versions |o--o{ scans : classifier_version_id
+scans ||--o{ scan_images : scan_id (cascade)
+scans ||--o{ scan_items : scan_id (cascade)
+ingredients ||--o{ scan_items : ingredient_id
+ingredients |o--o{ scan_items : original_ingredient_id
+scan_images ||--o{ detections : scan_image_id (cascade)
+scan_items |o--o{ detections : scan_item_id (set_null)
+vision_classes ||--o{ detections : vision_class_id
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  UNIQUE(...) WHERE ...: chỉ mục duy nhất một phần (không phải khoá của cả bảng)
+  ||  đúng một; |o  không hoặc một
+  o{  không hoặc nhiều; o|  không hoặc một
+  (cascade), (set_null): hành vi ON DELETE; không ghi = NO ACTION
+  Thực thể nền xám: bảng thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+
+@enduml

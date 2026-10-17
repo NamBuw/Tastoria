@@ -1,0 +1,88 @@
+@startuml
+title SD05 — Xem và chọn thay thế nguyên liệu thiếu "Thiếu gì?" (UC17, UC18; BR-ALG-01, BR-DIET-01)
+autonumber
+hide footbox
+
+actor "Người dùng (A02)" as U
+participant "App" as APP
+participant "nginx" as NGX
+participant "api:meal" as MEAL
+participant "api:substitute" as SUB
+participant "api:profile" as PRO
+participant "api:pantry" as PAN
+participant "api:mlops" as ML
+database "PostgreSQL" as DB
+
+note over APP, NGX : Mọi phản hồi đi qua nginx; chiều trả về\nvẽ gộp thành một mũi tên tới App.
+
+== Lấy gợi ý ==
+U -> APP : mở "Thiếu gì?" của một món trong mâm
+APP -> NGX : GET /api/v1/meal-plans/<id>/items/<itemId>/substitutes
+NGX -> MEAL : chuyển tiếp
+activate MEAL
+MEAL -> DB : SELECT meal_plans, meal_plan_items, recipes, recipe_ingredients\nWHERE meal_plans.id = ? AND user_id = ? AND item.status = 'active'
+DB --> MEAL : mâm + món hoặc rỗng
+alt không thấy
+  MEAL --> APP : 404 problem+json (code = not_found)
+else
+  MEAL -> PRO : get_meal_constraints(user_id, meal)
+  PRO --> MEAL : MealConstraints {allergen_codes, diet_code, ...}
+  MEAL -> PAN : list_available_lots(user_id, at = now())
+  PAN --> MEAL : list[LotView] (lượng khả dụng theo nguyên liệu)
+  MEAL -> MEAL : nguyên liệu thiếu = need (BR-TRAY-02) > cận dưới khả dụng,\ntrừ gia vị luôn có
+  MEAL -> DB : SELECT meal_plan_coeater_allergens WHERE meal_plan_id = ?
+  DB --> MEAL : dị ứng người ăn cùng
+  MEAL -> MEAL : c = MealConstraints đã gộp dị ứng người ăn cùng (BR-ALG-01)
+  loop mỗi nguyên liệu thiếu
+    MEAL -> SUB : suggest(user_id, recipe_id, missing_id, c)
+    activate SUB
+    SUB -> DB : SELECT substitution_pairs WHERE ingredient_id = ?\nAND (context_slot = ? OR NULL) AND (context_method_code = ? OR NULL)\nORDER BY curated DESC, score DESC
+    SUB -> ML : get_active('substitution')
+    ML --> SUB : model_version_id
+    SUB -> DB : SELECT ingredient_embeddings WHERE model_version_id = ?\nORDER BY vector <=> (vector của nguyên liệu thiếu) LIMIT n
+    SUB -> DB : lọc cứng theo c: cùng food_group_code; không thuộc ingredient_allergens\ncủa người dùng + người ăn cùng; không bị diet_exclusions loại
+    SUB -> PAN : list_available_lots(user_id, at = now())
+    PAN --> SUB : list[LotView]
+    SUB -> SUB : xếp: bảng tra trước, embedding xếp lại trong nhóm;\nđánh dấu ứng viên đang có trong kho
+    SUB --> MEAL : list[SubstituteOption] ≤ 3 {substitute_id, ratio, origin = lookup | embedding, in_pantry}
+    deactivate SUB
+  end
+  MEAL --> APP : 200 {missing[{ingredient_id, need_g, suggestions[≤3]}]}
+end
+deactivate MEAL
+
+== Chọn một thay thế ==
+U -> APP : chọn gợi ý (hoặc tự chọn nguyên liệu khác)
+APP -> NGX : POST /api/v1/meal-plans/<id>/items/<itemId>/substitutions\n{original_ingredient_id, substitute_ingredient_id, origin}
+NGX -> MEAL : chuyển tiếp
+activate MEAL
+MEAL -> DB : SELECT meal_plans, meal_plan_items, meal_plan_coeater_allergens\nWHERE meal_plans.id = ? AND user_id = ? AND item.status = 'active'
+DB --> MEAL : mâm + món hoặc rỗng (không thấy → 404 not_found)
+MEAL -> PRO : get_meal_constraints(user_id, meal)
+PRO --> MEAL : MealConstraints
+MEAL -> SUB : check_allowed(original_ingredient_id, substitute_ingredient_id, c)
+SUB --> MEAL : true / false
+note right of SUB : Kiểm lại toàn bộ lọc cứng ở server,\nkhông tin danh sách gợi ý do app gửi lên.\nLựa chọn tự nhập (origin = 'user') cũng qua bước này.
+alt vi phạm dị ứng / chế độ ăn / khác nhóm thực phẩm
+  MEAL --> APP : 422 problem+json (code = validation_failed, errors[{pointer:\n/substitute_ingredient_id, code: substitute_not_allowed}])
+else hợp lệ
+  critical Giao dịch DB
+    MEAL -> DB : INSERT meal_plan_item_substitutions (item_id, original_ingredient_id,\nsubstitute_ingredient_id, grams = need × ratio, origin)\nON CONFLICT (item_id, original_ingredient_id) DO UPDATE
+    MEAL -> MEAL : tính lại dinh dưỡng món theo đồ thay (BR-NUT-05)
+    MEAL -> DB : UPDATE meal_plan_items SET kcal_per_person = ?;\nUPDATE meal_plans SET kcal_low, kcal_high, rice_bowls_per_person
+    MEAL -> DB : COMMIT
+  end
+  MEAL --> APP : 200 MealPlanItemOut {item, kcal_range, rice_bowls_per_person}
+end
+deactivate MEAL
+note over APP, MEAL : Endpoint lũy đẳng: chọn lại cùng cặp cho cùng nguyên liệu gốc\nchỉ ghi đè một hàng (PK item_id, original_ingredient_id).
+
+== Đưa đồ thiếu vào danh sách đi chợ (UC18 mở rộng UC17) ==
+opt người dùng chọn "Mua thêm" thay vì thay thế
+  APP -> NGX : POST /api/v1/shopping-items {ingredient_id, qty_g, source_meal_plan_item_id}
+  NGX -> SUB : chuyển tiếp
+  SUB -> DB : INSERT shopping_items (status = 'open')
+  DB --> SUB : id
+  SUB --> APP : 201 Created, Location: /api/v1/shopping-items/<id>
+end
+@enduml

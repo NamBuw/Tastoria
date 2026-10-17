@@ -1,0 +1,103 @@
+@startuml
+title AD02 — Ghép mâm cơm trong module meal (UC15, POST /meal-plans)
+' Làn là module của modular monolith (model.yaml modules). meal gọi profile, pantry, events qua service.py.
+' Lịch nấu CP-SAT (BR-COOK-01) thuộc cooking và chỉ lập khi POST /cook-sessions (SD06); meal chỉ ước lượng cận dưới.
+
+|meal|
+start
+:Nhận yêu cầu: bữa (lunch/dinner), số người n,
+thời gian tối đa, lô ghim, dị ứng người ăn cùng;
+|profile|
+:get_meal_constraints(): dị ứng, chế độ ăn,
+E_mâm = E × s (BR-NUT-04), số họng bếp;
+note right
+  Không đồng ý health_profile:
+  chưa có mục tiêu, β = 0 (BR-CONSENT-02).
+end note
+|pantry|
+:Đọc lô in_stock và lượng khả dụng [g_min, g_max],
+qua v_pantry_lot_balance;
+:Tính độ gấp u của từng lô lúc đọc
+(BR-FRESH-01 đến BR-FRESH-05);
+:Loại lô mức "kiểm tra trước khi dùng"
+khỏi kho khả dụng (BR-FRESH-04);
+|meal|
+:Kiểm lô ghim: tối đa 2 lô, phải thuộc kho khả dụng
+(BR-TRAY-08);
+:Lọc cứng từng món trong kho món;
+note right
+  Loại món nếu:
+  - có nguyên liệu, kể cả gia vị is_staple, thuộc nhóm
+    dị ứng của người dùng hoặc người ăn cùng (BR-ALG-01)
+  - trái chế độ ăn qua diet_exclusions (BR-DIET-01)
+  - nguyên liệu không phải gia vị luôn có thiếu so với
+    cận dưới g_min khả dụng (BR-TRAY-04)
+  - thời gian món vượt thời gian tối đa
+  Lô ghim: ghi nhận ràng buộc dùng ≥ 50% g_min,
+  kiểm ở mức tổ hợp (BR-TRAY-08).
+end note
+:Tính ŝ' = phân vị gu theo người trong từng slot;
+note right
+  Không đồng ý personalization: trung bình món
+  + content-based từ 5 món hay ăn (BR-CONSENT-03).
+end note
+:Xác định cấu trúc mâm theo n (BR-TRAY-01):
+n = 1: mặn + (rau hoặc canh), n ≥ 2: mặn + rau + canh;
+:K = 20;
+repeat
+  :Điểm cấp món = ŝ' + α·U_r − β·lệch calo_r,
+  giữ top-K mỗi slot;
+  repeat
+    :Lấy tổ hợp kế tiếp (một món mỗi slot);
+    if (Khả thi gộp? Σ need ≤ g_min khả dụng,
+    nguyên liệu chia chung giữa các món, mỗi lô ghim
+    dùng ≥ 50% g_min) then (có)
+      :Ước lượng makespan từ recipe_steps
+      và số họng bếp (MakespanEstimator);
+      if (Cận dưới makespan ≤ thời gian tối đa? (BR-TRAY-05)) then (có)
+        :Tính hàm mục tiêu
+        Σ ŝ' + α·U(m) − β·|E(m) − E_mâm|/E_mâm − γ·D(m);
+        :Giữ vào danh sách mâm khả thi;
+      else (không)
+      endif
+    else (không)
+    endif
+  repeat while (Còn tổ hợp?) is (có) not (không)
+  if (Chưa có mâm khả thi và còn bước nới?) then (có)
+    :Nới một bước: lần 1 K = toàn bộ món qua lọc cứng,
+    lần 2 (n ≥ 2) mâm 2 món (BR-TRAY-06);
+  else (không)
+  endif
+repeat while (Vừa nới thêm một bước?) is (có) not (không)
+if (Có mâm khả thi?) then (có)
+  :Chọn mâm có hàm mục tiêu lớn nhất;
+  :Dòng lý do: thành phần đóng góp chuẩn hoá lớn nhất
+  so với mâm tốt nhì;
+  :Gợi ý số bát cơm (BR-TRAY-03),
+  khoảng calo (BR-NUT-06);
+  :Lưu meal_plans (proposed, ảnh chụp e_target_kcal),
+  meal_plan_items, meal_plan_pins,
+  meal_plan_coeater_allergens;
+  |events|
+  if (Có đồng ý personalization?) then (có)
+    :Ghi interactions type served
+    cho từng món (BR-CONSENT-03);
+  else (không)
+    :Không ghi tương tác;
+  endif
+  |meal|
+  :Trả mâm cơm;
+else (không)
+  :Lập danh sách nguyên liệu còn thiếu
+  của 3 mâm tốt nhất (BR-TRAY-06);
+  if (Không mâm nào thoả do lô ghim?) then (có)
+    :Báo và gợi ý bỏ ghim (BR-TRAY-08);
+  else (không)
+  endif
+  :Lưu phản hồi vào idempotency_keys (422),
+  không lưu meal_plans;
+  :Trả 422 problem+json code = infeasible_tray
+  (shortfalls ≤ 3 mâm, unmet_pinned_lot_ids);
+endif
+stop
+@enduml

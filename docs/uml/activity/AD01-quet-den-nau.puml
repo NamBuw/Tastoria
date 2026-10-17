@@ -1,0 +1,172 @@
+@startuml
+title AD01 — Từ quét tủ lạnh đến nấu xong (UC12, UC13, UC15–UC17, UC19–UC21)
+' Luồng chính đầu–cuối. Chi tiết ghép mâm ở AD02, chi tiết xác nhận quét ở AD03.
+
+|Người dùng|
+start
+:Mở app;
+|App|
+:Hiện trang chủ;
+|Người dùng|
+:Chọn chế độ quét
+(toàn tủ hoặc đồ vừa mua);
+:Chụp hoặc chọn 1–2 ảnh;
+|App|
+:Nén ảnh 1.280 px JPEG;
+:POST /scans
+(mode, ảnh, Idempotency-Key);
+|api|
+:Kiểm tệp: ≤ 2 ảnh × 3 MB, magic bytes,
+giới hạn điểm ảnh, exif_transpose,
+mã hoá lại JPEG không metadata;
+:Tạo scans (queued), scan_images,
+đưa job suy luận vào hàng đợi;
+:Trả 202 + Location + Retry-After: 1;
+fork
+  |worker|
+  :Nhận job, scans → processing;
+  :Phát hiện nguyên liệu (detector ONNX)
+  và phân loại độ tươi (freshness);
+  :Gộp ảnh: cùng ngăn lấy max số đếm,
+  khác ngăn thì cộng (BR-SCAN-01);
+  if (Suy luận thành công?) then (có)
+    :Ghi detections, scan_items (chip),
+    scans → done;
+  else (không, sau tối đa 2 lần thử lại)
+    :scans → failed (error_code);
+  endif
+fork again
+  |App|
+  repeat
+    :GET /scans/{id}?wait=10 (long-poll);
+  repeat while (Trạng thái queued hoặc processing?) is (có) not (không)
+end fork
+|App|
+if (scans ở trạng thái done?) then (không: failed hoặc expired)
+  :Báo lỗi, mời quét lại;
+  stop
+else (có)
+endif
+:Hiện chip nguyên liệu: tên, số lượng hoặc mức,
+nhãn độ tươi bằng chữ kèm chấm màu;
+note right
+  Chip mức "kiểm tra trước khi dùng"
+  buộc người dùng xác nhận (BR-FRESH-04).
+end note
+|Người dùng|
+repeat
+  :Sửa chip (đổi nhãn, số lượng/mức,
+  độ tươi, xoá, thêm nguyên liệu);
+  |App|
+  :POST /scans/{id}/items,
+  PATCH hoặc DELETE /scans/{id}/items/{itemId},
+  (qua hàng đợi outbox khi mất mạng);
+  |api|
+  :Cập nhật scan_items; không ghi kho (BR-SCAN-02);
+  |Người dùng|
+repeat while (Còn chip cần sửa?) is (có) not (không)
+:Bấm Xác nhận;
+|App|
+:POST /scans/{id}/confirm;
+|api|
+:Unit of Work xác nhận vào kho (AD03):
+tạo lô, giao dịch scan_add,
+toàn tủ: lô không thấy → not_seen;
+|App|
+:Hiện kho đã cập nhật,
+hỏi về các lô not_seen;
+|Người dùng|
+:Chọn bữa, số người, thời gian tối đa,
+tuỳ chọn: ghim ≤ 2 lô, dị ứng người ăn cùng;
+|App|
+:POST /meal-plans (Idempotency-Key);
+|api|
+:Ghép mâm (AD02);
+if (Có mâm khả thi?) then (không)
+  :Trả 422 problem+json code = infeasible_tray
+  (3 mâm tốt nhất + nguyên liệu thiếu);
+  |App|
+  :Hiện danh sách nguyên liệu còn thiếu
+  của 3 mâm tốt nhất (BR-TRAY-06)
+  hoặc gợi ý bỏ ghim (BR-TRAY-08);
+  |Người dùng|
+  :Thêm vào danh sách đi chợ (UC18);
+  stop
+else (có)
+endif
+|App|
+:Hiện mâm cơm hôm nay: món, dòng lý do,
+khoảng calo, gợi ý số bát cơm;
+|Người dùng|
+while (Muốn điều chỉnh mâm?) is (có)
+  if (Loại điều chỉnh?) then (đổi món)
+    :Chọn món cần đổi và một lý do
+    (không hợp gu / mới ăn / thiếu thời gian / khác);
+    |App|
+    :POST /meal-plans/{id}/items/{itemId}/swap
+    (Idempotency-Key);
+    |api|
+    :Giải lại slot đó, giữ các slot còn lại,
+    loại món đã bị đổi ra (BR-SWAP-01);
+  else (thay thế nguyên liệu)
+    |App|
+    :GET /meal-plans/{id}/items/{itemId}/substitutes;
+    |api|
+    :Trả 3 gợi ý đã lọc dị ứng, chế độ ăn;
+    |Người dùng|
+    :Chọn một gợi ý;
+    |App|
+    :POST /meal-plans/{id}/items/{itemId}/substitutions;
+    |api|
+    :Ghi meal_plan_item_substitutions,
+    tính lại dinh dưỡng;
+  endif
+  |App|
+  :Hiện mâm đã cập nhật;
+  |Người dùng|
+endwhile (không)
+:Nhận mâm;
+|App|
+:POST /meal-plans/{id}/accept;
+|api|
+:meal_plans → accepted;
+|Người dùng|
+:Bấm Nấu cả mâm;
+|App|
+:POST /cook-sessions (Idempotency-Key);
+|api|
+:Kiểm mâm ở accepted (nếu không: 409 conflict_state);
+:Lập lịch nấu CP-SAT (BR-COOK-01),
+tạo cook_sessions (in_progress);
+|App|
+:Hiện lịch nấu theo bước,
+giữ màn hình sáng;
+|Người dùng|
+:Nấu theo lịch;
+:Bấm Nấu xong, đánh giá thích/không thích
+từng món;
+|App|
+:POST /cook-sessions/{id}/complete
+(Idempotency-Key, qua outbox);
+|api|
+:Unit of Work: trừ kho theo lô gấp nhất trước
+(cook_deduct), ghi interactions nếu có đồng ý
+personalization, cook_sessions → completed,
+meal_plans → cooked (BR-COOK-02);
+|App|
+:Hiện kết quả trừ kho và nút Hoàn tác
+trong 10 phút;
+|Người dùng|
+if (Bấm Hoàn tác trong 10 phút?) then (có)
+  |App|
+  :POST /cook-sessions/{id}/undo;
+  |api|
+  :Ghi giao dịch đảo (undo, reverses_id),
+  cook_sessions → reverted, meal_plans → accepted
+  (BR-PANTRY-02);
+else (không hoặc quá 10 phút)
+endif
+|App|
+:Cập nhật kho và nhật ký;
+stop
+@enduml

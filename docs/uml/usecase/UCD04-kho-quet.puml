@@ -1,0 +1,27 @@
+@startuml
+title UCD04 — Gói PK4 Kho & quét
+' Sinh từ docs/sad/model.yaml (actors, use_cases, rels). Không sửa tay mã định danh.
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle stick
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Người dùng\n(A02)" as A02
+
+rectangle "Tastoria" {
+  package "PK4 Kho & quét" as PK4 {
+    usecase "UC12 Quét nguyên liệu (toàn tủ\nhoặc đồ vừa mua)" as UC12
+    usecase "UC13 Xác nhận và sửa kết quả\nquét" as UC13
+    usecase "UC14 Quản lý kho (sửa lượng,\nngày mua, bỏ đồ, xác nhận đồ\ncần kiểm tra)" as UC14
+  }
+}
+
+A02 -- UC12
+A02 -- UC13
+A02 -- UC14
+
+UC12 ..> UC13 : <<include>>
+@enduml

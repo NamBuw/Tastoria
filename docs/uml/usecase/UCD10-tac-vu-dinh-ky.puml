@@ -1,0 +1,26 @@
+@startuml
+title UCD10 — Gói PK10 Tác vụ định kỳ
+' Sinh từ docs/sad/model.yaml (actors, use_cases, rels). Không sửa tay mã định danh.
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle stick
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Bộ lập lịch\n(A08)" as A08 <<time>>
+
+rectangle "Tastoria" {
+  package "PK10 Tác vụ định kỳ" as PK10 {
+    usecase "UC32 Xoá ảnh quét quá hạn" as UC32
+    usecase "UC33 Sao lưu cơ sở dữ liệu" as UC33
+    usecase "UC34 Dọn job quét kẹt, token\nvà khoá lũy đẳng hết hạn" as UC34
+  }
+}
+
+A08 -- UC32
+A08 -- UC33
+A08 -- UC34
+
+@enduml

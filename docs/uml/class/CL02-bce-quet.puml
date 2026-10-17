@@ -1,0 +1,154 @@
+@startuml CL02-bce-quet
+title CL02 — Lớp phân tích BCE: UC12 Quét nguyên liệu và UC13 Xác nhận, sửa kết quả quét
+
+' Quy tắc sơ đồ robustness: actor chỉ nối boundary; boundary chỉ nối control;
+' entity chỉ nối control; control nối control khi một bước gọi bước khác.
+
+left to right direction
+hide empty members
+skinparam classAttributeIconSize 0
+
+class "A02 Người dùng" as A02 <<actor>>
+
+package "Boundary" {
+  class "Màn hình Quét" as B_Quet <<boundary>> {
+    {field} chọn chế độ: toàn tủ | đồ vừa mua
+    {field} chụp/chọn 1–2 ảnh (nén 1.280 px)
+    {field} đánh dấu "ngăn khác"
+  }
+  class "Màn hình Xác nhận nguyên liệu" as B_XacNhan <<boundary>> {
+    {field} danh sách chip + ảnh có khung
+    {field} sửa nhãn, số đếm, mức lượng
+    {field} thêm / xoá chip
+    {field} nút Xác nhận, nút Bỏ lần quét
+  }
+  class "Hàng đợi job (Valkey + RQ)" as B_HangDoi <<boundary>>
+  class "Kho tệp ảnh" as B_KhoTep <<boundary>>
+}
+
+package "Control" {
+  class "Tạo lần quét" as C_Tao <<control>> {
+    {field} POST /scans (Idempotency-Key)
+    {field} kiểm magic bytes, ≤ 2 ảnh × 3 MB
+    {field} xoá EXIF, mã hoá lại JPEG
+    {field} đặt scan_images.contributed theo đồng ý
+  }
+  class "Theo dõi trạng thái quét" as C_TheoDoi <<control>> {
+    {field} GET /scans/{id}?wait=10
+    {field} GET /scans/{id}/images/{ordinal}
+  }
+  class "Suy luận ảnh (worker)" as C_SuyLuan <<control>> {
+    {field} nạp mô hình theo con trỏ triển khai
+    {field} phát hiện + phân loại độ tươi
+    {field} timeout 30 s, thử lại ≤ 2 lần
+  }
+  class "Gộp phát hiện thành chip" as C_Gop <<control>> {
+    {field} BR-SCAN-01: cùng ngăn lấy max,
+    {field} khác ngăn thì cộng
+  }
+  class "Sửa chip" as C_SuaChip <<control>> {
+    {field} POST /scans/{id}/items
+    {field} PATCH /scans/{id}/items/{itemId}
+    {field} DELETE /scans/{id}/items/{itemId}
+    {field} BR-SCAN-02: không ghi kho
+  }
+  class "Tra danh mục nguyên liệu" as C_TraNL <<control>> {
+    {field} GET /ingredients
+  }
+  class "Xác nhận vào kho" as C_XacNhan <<control>> {
+    {field} POST /scans/{id}/confirm (lũy đẳng, từ done)
+    {field} BR-PANTRY-01: mỗi chip một lô mới
+    {field} BR-QTY-02: quy đổi số đếm, mức lượng ra gam
+    {field} BR-PANTRY-03: toàn tủ -> lô không thấy thành not_seen
+    {field} BR-FRESH-04: chip "kiểm tra" buộc xác nhận
+  }
+  class "Bỏ lần quét" as C_Bo <<control>> {
+    {field} POST /scans/{id}/discard
+  }
+  class "Tính độ gấp lô" as C_DoGap <<control>> {
+    {field} BR-FRESH-01..03: u = f(u_time, u_img)
+    {field} BR-FRESH-04: nhãn 4 mức
+  }
+  class "Kiểm đồng ý góp ảnh" as C_DongY <<control>> {
+    {field} mục đích photo_contribution
+  }
+}
+
+package "Entity" {
+  class "Lần quét (scans)" as E_LanQuet <<entity>>
+  class "Ảnh quét (scan_images)" as E_Anh <<entity>>
+  class "Phát hiện (detections)" as E_PhatHien <<entity>>
+  class "Chip nguyên liệu (scan_items)" as E_Chip <<entity>>
+  class "Khoá lũy đẳng (idempotency_keys)" as E_Idem <<entity>>
+  class "Phiên bản mô hình (model_versions)" as E_PBMH <<entity>>
+  class "Triển khai mô hình (model_deployments)" as E_TKMH <<entity>>
+  class "Lớp thị giác (vision_classes)" as E_Lop <<entity>>
+  class "Ánh xạ lớp – nguyên liệu (vision_class_ingredients)" as E_AnhXa <<entity>>
+  class "Nguyên liệu (ingredients)" as E_NL <<entity>>
+  class "Quy đổi đơn vị (ingredient_units)" as E_QuyDoi <<entity>>
+  class "Mức lượng (qty_levels)" as E_MucLuong <<entity>>
+  class "Lô kho (pantry_lots)" as E_Lo <<entity>>
+  class "Giao dịch kho (pantry_transactions)" as E_GD <<entity>>
+  class "Đồng ý hiện hành (v_current_consents)" as E_DongY <<entity>>
+}
+
+' actor - boundary
+A02 -- B_Quet
+A02 -- B_XacNhan
+
+' boundary - control
+B_Quet -- C_Tao
+B_Quet -- C_TheoDoi
+B_XacNhan -- C_TheoDoi
+B_XacNhan -- C_SuaChip
+B_XacNhan -- C_TraNL
+B_XacNhan -- C_XacNhan
+B_XacNhan -- C_Bo
+C_Tao -- B_HangDoi : đưa job
+B_HangDoi -- C_SuyLuan : giao job
+C_Tao -- B_KhoTep : ghi ảnh tmp/ (+ contrib/ khi đồng ý)
+C_SuyLuan -- B_KhoTep : đọc ảnh
+C_TheoDoi -- B_KhoTep : X-Accel-Redirect
+
+' control - control
+C_SuyLuan --> C_Gop
+C_XacNhan --> C_DoGap
+C_Tao --> C_DongY
+
+' control - entity
+C_Tao -- E_LanQuet : tạo (queued)
+C_Tao -- E_Anh : tạo (contributed)
+C_Tao -- E_Idem : lưu phản hồi
+C_TheoDoi -- E_LanQuet : đọc
+C_TheoDoi -- E_Chip : đọc
+C_SuyLuan -- E_LanQuet : processing -> done | failed;\nghi detector_version_id, classifier_version_id
+C_SuyLuan -- E_TKMH : đọc bản đang chạy
+C_SuyLuan -- E_PBMH : đọc (artifact_key, sha256)
+C_SuyLuan -- E_PhatHien : tạo
+C_Gop -- E_Lop : đọc
+C_Gop -- E_AnhXa : chọn nguyên liệu mặc định
+C_Gop -- E_Chip : tạo (origin = model)
+C_SuaChip -- E_Chip : tạo, sửa, đánh dấu xoá
+C_TraNL -- E_NL : đọc
+C_XacNhan -- E_LanQuet : done -> confirmed
+C_XacNhan -- E_Chip : đọc
+C_XacNhan -- E_Lo : tạo lô / đánh dấu not_seen
+C_XacNhan -- E_GD : ghi scan_add
+C_XacNhan -- E_QuyDoi : đọc
+C_XacNhan -- E_MucLuong : đọc
+C_DoGap -- E_Lo : đọc acquired_at, p_*
+C_DoGap -- E_NL : đọc shelf_life_days
+C_DongY -- E_DongY : đọc
+C_Bo -- E_LanQuet : -> discarded
+
+note bottom of C_Tao
+  contributed đặt ngay khi tạo lần quét (SD01): ảnh nằm đúng chỗ
+  (tmp/, và contrib/ khi có đồng ý photo_contribution) từ đầu.
+end note
+
+note bottom of C_XacNhan
+  Chạy trong một Unit of Work:
+  đổi trạng thái lần quét + tạo lô + ghi giao dịch.
+end note
+
+@enduml

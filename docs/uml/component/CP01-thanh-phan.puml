@@ -1,0 +1,177 @@
+@startuml CP01-thanh-phan
+title CP01 — Sơ đồ thành phần: 16 module backend, giao diện và phụ thuộc được phép
+
+' Mỗi module cung cấp đúng một giao diện công khai <name>.service (service.py).
+' Mũi tên nét đứt (phụ thuộc «use», nhãn lược bỏ cho dễ đọc) từ module A tới giao diện B.service = A được phép gọi B (model.yaml modules[].deps).
+' Tập mũi tên module -> module trùng khớp đúng modules[].deps: không thêm, không thiếu; cưỡng chế bằng import-linter.
+' Mũi tên từ module tới hạ tầng (PostgreSQL, Valkey, Kho tệp, SMTP) không phải phụ thuộc module.
+
+skinparam componentStyle uml2
+left to right direction
+
+component "App Tastoria (Expo: Android + web)" as App <<client>>
+component "Landing (HTML/CSS tĩnh)" as Landing <<static>>
+
+component "nginx" as Nginx <<reverse proxy>>
+interface "HTTPS (qua Cloudflare Tunnel)" as I_https
+Nginx - I_https
+
+component "Backend Tastoria (modular monolith, FastAPI)" as Backend {
+  portin "REST /api/v1" as P_rest
+  component "M01\ncore" as M01
+  interface "core.service" as I_core
+  component "M02\nidentity" as M02
+  interface "identity.service" as I_identity
+  component "M03\nprivacy" as M03
+  interface "privacy.service" as I_privacy
+  component "M04\ncatalog" as M04
+  interface "catalog.service" as I_catalog
+  component "M05\nprofile" as M05
+  interface "profile.service" as I_profile
+  component "M06\npantry" as M06
+  interface "pantry.service" as I_pantry
+  component "M07\nmlops" as M07
+  interface "mlops.service" as I_mlops
+  component "M08\nscan" as M08
+  interface "scan.service" as I_scan
+  component "M09\nevents" as M09
+  interface "events.service" as I_events
+  component "M10\nsubstitute" as M10
+  interface "substitute.service" as I_substitute
+  component "M11\nmeal" as M11
+  interface "meal.service" as I_meal
+  component "M12\ncooking" as M12
+  interface "cooking.service" as I_cooking
+  component "M13\njournal" as M13
+  interface "journal.service" as I_journal
+  component "M14\nsurvey" as M14
+  interface "survey.service" as I_survey
+  component "M15\nadmin" as M15
+  interface "admin.service" as I_admin
+  component "M16\njobs" as M16
+  interface "jobs.service" as I_jobs
+  M01 -- I_core
+  M02 -- I_identity
+  M03 -- I_privacy
+  M04 -- I_catalog
+  M05 -- I_profile
+  M06 -- I_pantry
+  M07 -- I_mlops
+  M08 -- I_scan
+  M09 -- I_events
+  M10 -- I_substitute
+  M11 -- I_meal
+  M12 -- I_cooking
+  M13 -- I_journal
+  M14 -- I_survey
+  M15 -- I_admin
+  M16 -- I_jobs
+}
+
+component "Worker (RQ)" as Worker <<process>>
+component "Scheduler (cron)" as Scheduler <<process>>
+
+database "PostgreSQL 18 + pgvector" as PG
+interface "SQL :5432" as I_sql
+PG - I_sql
+database "Valkey 9" as VK
+interface "RESP :6379" as I_resp
+VK - I_resp
+folder "Kho tệp (volume files: tmp/, contrib/, models/)" as Files
+component "Dịch vụ email (SMTP)" as SMTP <<external>>
+interface "SMTP" as I_smtp
+SMTP - I_smtp
+component "Công cụ gán nhãn (Label Studio, A10)" as LabelStudio <<external>>
+interface "HTTPS REST (Label Studio API)" as I_ls
+LabelStudio - I_ls
+
+' ---- phụ thuộc module (sinh từ model.yaml modules[].deps)
+M02 ..> I_core
+M03 ..> I_core
+M03 ..> I_identity
+M04 ..> I_core
+M05 ..> I_core
+M05 ..> I_identity
+M05 ..> I_privacy
+M05 ..> I_catalog
+M06 ..> I_core
+M06 ..> I_catalog
+M07 ..> I_core
+M07 ..> I_catalog
+M08 ..> I_core
+M08 ..> I_catalog
+M08 ..> I_pantry
+M08 ..> I_mlops
+M08 ..> I_privacy
+M09 ..> I_core
+M09 ..> I_privacy
+M10 ..> I_core
+M10 ..> I_catalog
+M10 ..> I_profile
+M10 ..> I_pantry
+M10 ..> I_mlops
+M11 ..> I_core
+M11 ..> I_catalog
+M11 ..> I_profile
+M11 ..> I_pantry
+M11 ..> I_substitute
+M11 ..> I_events
+M11 ..> I_mlops
+M11 ..> I_privacy
+M12 ..> I_core
+M12 ..> I_catalog
+M12 ..> I_meal
+M12 ..> I_pantry
+M12 ..> I_events
+M13 ..> I_core
+M13 ..> I_cooking
+M13 ..> I_meal
+M13 ..> I_pantry
+M13 ..> I_profile
+M14 ..> I_core
+M14 ..> I_catalog
+M14 ..> I_privacy
+M15 ..> I_core
+M15 ..> I_identity
+M15 ..> I_privacy
+M15 ..> I_catalog
+M15 ..> I_mlops
+M15 ..> I_survey
+M15 ..> I_substitute
+M16 ..> I_core
+M16 ..> I_scan
+M16 ..> I_identity
+M16 ..> I_privacy
+
+' ---- client, proxy, tiến trình
+App ..> I_https : REST JSON
+Nginx ..> P_rest : proxy_pass
+Nginx ..> Landing : phục vụ tệp tĩnh
+Nginx ..> App : phục vụ bản web
+Nginx ..> Files : X-Accel-Redirect (internal)
+Worker ..> I_scan : InferenceJob.run
+Worker ..> I_privacy : xuất dữ liệu, xoá tài khoản
+Worker ..> I_resp : nhận job
+Scheduler ..> I_jobs : python -m tastoria.jobs.<tên>
+Scheduler ..> I_resp : sweeper (scan.sweep_stuck_scans):\nenqueue bù, PUBLISH scan:<id>
+
+' ---- hạ tầng
+M01 ..> I_sql : DB session, Unit of Work
+M01 ..> Files : lưu tệp
+M02 ..> I_resp : khoá đăng nhập
+M02 ..> I_smtp : thư đặt lại mật khẩu
+M08 ..> I_resp : đưa job suy luận, PUBLISH scan:<id>
+M15 ..> I_ls : tastoria labeling push|pull (UC31)
+
+note bottom of Backend
+  Cổng REST /api/v1 nối tới router của các module có endpoint
+  (identity, privacy, profile, catalog, pantry, scan, meal, substitute,
+  cooking, journal, events, survey, admin; core cho /healthz, /readyz).
+  Mũi tên nét đứt module -> X.service: phụ thuộc «use» theo model.yaml modules[].deps.
+  Đảo phụ thuộc không thêm mũi tên module: core giữ sổ core.dsr_registry (module nào
+  cũng đăng ký handler xuất/xoá dữ liệu theo mục đích, privacy duyệt sổ; SD07, SD09)
+  và cổng TokenVersionPort (identity cài đặt, lớp bảo mật của core gọi; SD07).
+  Khoá đăng nhập sai 5 lần đếm theo (email, IP) trong Valkey (M02 -> RESP, ST06).
+end note
+
+@enduml

@@ -1,0 +1,83 @@
+@startuml
+title SD09 — Tải về dữ liệu cá nhân (UC06; BR-DSR-01, NFR-PRIV-01)
+autonumber
+hide footbox
+
+actor "Người dùng (A02)" as U
+participant "App" as APP
+participant "nginx" as NGX
+participant "api:privacy" as PRIV
+database "PostgreSQL" as DB
+queue "Valkey" as VK
+participant "worker:privacy" as WK
+participant "core.dsr_registry" as REG
+collections "Kho tệp" as FS
+
+note over APP, NGX : Mọi phản hồi đi qua nginx; chiều trả về vẽ gộp\nthành một mũi tên tới App (trừ tệp, do nginx tự đọc).
+
+== Gửi yêu cầu ==
+U -> APP : Cài đặt → "Tải dữ liệu của tôi"
+APP -> NGX : POST /api/v1/me/data-requests {type: "export"}
+NGX -> PRIV : chuyển tiếp
+activate PRIV
+PRIV -> DB : SELECT dsr_requests WHERE user_id = ? AND type = 'export'\nAND status IN ('received','in_progress')
+DB --> PRIV : yêu cầu đang mở hoặc rỗng
+alt đã có yêu cầu export đang mở (gửi lại)
+  PRIV --> APP : 200 {id, status} + Location: /api/v1/me/data-requests/<id> (lũy đẳng)
+else
+  critical Giao dịch DB
+    PRIV -> DB : INSERT dsr_requests (type = 'export', status = 'received',\nsubject_ref = HMAC-SHA256(user_id), received_at = now(), acknowledged_at = now())
+    PRIV -> DB : COMMIT
+  end
+  PRIV -> VK : enqueue job "privacy.export" (dsr_request_id)
+  PRIV --> APP : 202 Accepted, Location: /api/v1/me/data-requests/<id>, Retry-After: 5
+end
+deactivate PRIV
+
+== Worker tạo tệp ==
+VK -> WK : giao job privacy.export
+activate WK
+WK -> DB : UPDATE dsr_requests SET status = 'in_progress' WHERE id = ? AND status = 'received'
+WK -> REG : export_handlers()
+REG --> WK : handler do identity, privacy, profile, pantry, scan,\nmeal, cooking, events, substitute đăng ký lúc khởi động
+note right of REG : Sổ đăng ký nằm trong core: module nào cũng phụ thuộc core\nnên đăng ký được mà không import privacy (giữ deps của\npantry, cooking, substitute theo model.yaml). Cần ghi vào ADR-0001.
+WK -> DB : mỗi handler SELECT dữ liệu của user_id ở mọi bảng có chủ sở hữu\n(users trừ password_hash, consent_events, profiles, user_allergens,\npantry_lots, pantry_transactions, scans, scan_items, meal_plans,\ncook_sessions, interactions, shopping_items, ...)
+opt có cột sức khoẻ mã hoá
+  WK -> WK : [handler của profile] giải mã *_enc
+  WK -> DB : INSERT audit_log (action = 'decrypt_health', purpose = 'dsr_export')
+end
+WK -> FS : đọc ảnh quét chưa purged_at (scan_images.storage_key)
+WK -> FS : ghi tmp/exports/<dsr_id>.zip (JSON theo bảng + ảnh)
+alt thành công
+  WK -> DB : UPDATE dsr_requests SET status = 'completed', completed_at = now(),\nresult_key = 'tmp/exports/<dsr_id>.zip'
+else lỗi (sau số lần thử lại của RQ)
+  WK -> DB : UPDATE dsr_requests SET note = mã lỗi (giữ 'in_progress' để nhân sự xử lý, UC27)
+end
+deactivate WK
+note right of WK : Hoàn tất ≤ 24 giờ (NFR-PRIV-01),\nthường vài giây với dữ liệu một người.
+
+== Theo dõi và tải về ==
+loop đến khi status = completed
+  APP -> NGX : GET /api/v1/me/data-requests/<id>
+  NGX -> PRIV : chuyển tiếp
+  PRIV -> DB : SELECT dsr_requests WHERE id = ? AND user_id = ?
+  DB --> PRIV : yêu cầu
+  PRIV --> APP : 200 {id, type, status, received_at, completed_at?}
+end
+U -> APP : bấm "Tải về"
+APP -> NGX : GET /api/v1/me/data-requests/<id>/download
+NGX -> PRIV : chuyển tiếp
+activate PRIV
+PRIV -> DB : SELECT dsr_requests WHERE id = ? AND user_id = ? (chống BOLA)
+DB --> PRIV : yêu cầu hoặc rỗng
+alt không thấy
+  PRIV --> APP : 404 problem+json (code = not_found)
+else status ≠ 'completed' hoặc result_key IS NULL
+  PRIV --> APP : 409 problem+json (code = conflict_state; detail: tệp chưa sẵn sàng)
+else sẵn sàng
+  PRIV --> NGX : 200, X-Accel-Redirect: /_files/<result_key>\nContent-Disposition: attachment; filename="tastoria-du-lieu.zip"
+  NGX -> FS : đọc tệp qua location internal (không truy cập trực tiếp từ ngoài)
+  NGX --> APP : 200 application/zip (luồng tệp)
+end
+deactivate PRIV
+@enduml

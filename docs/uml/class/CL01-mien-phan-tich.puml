@@ -1,0 +1,631 @@
+@startuml CL01-mien-phan-tich
+title CL01 — Sơ đồ lớp miền (mức phân tích) của Tastoria
+
+' Lớp khái niệm tiếng Việt; ghi chú «bảng» chỉ ra bảng tương ứng trong docs/sad/model.yaml.
+' Bội số lấy từ khoá ngoại: cột FK NOT NULL -> 1, cột FK NULL -> 0..1, phía nhiều -> 0..*.
+' Ràng buộc chỉ kiểm ở tầng service ghi trong ghi chú.
+' Bỏ khỏi mô hình miền (là chi tiết kỹ thuật, có ở sơ đồ thiết kế/ERD): refresh_tokens, password_resets,
+' idempotency_keys, ingredient_embeddings, model_version_classes, nutrient_sources.
+
+hide empty methods
+skinparam classAttributeIconSize 0
+
+package "Tài khoản, hồ sơ, quyền riêng tư" as P_TK {
+  class "Tài khoản" as TaiKhoan <<users>> {
+    email : Chuỗi {duy nhất, không phân biệt hoa thường}
+    vaiTro : VaiTro
+    trangThai : TrangThaiTaiKhoan
+    phienBanToken : Số nguyên
+    soLanSai : Số nguyên
+    khoaDen : Thời điểm [0..1]
+  }
+  class "Hồ sơ" as HoSo <<profiles>> {
+    gioiTinh : Chuỗi [0..1] {mã hoá}
+    namSinh : Số nguyên [0..1] {mã hoá}
+    chieuCao : Số thực (cm) [0..1] {mã hoá}
+    canNang : Số thực (kg) [0..1] {mã hoá}
+    mucVanDong : MucVanDong [0..1]
+    mucTieu : MucTieu [0..1]
+    kcalMucTieu : Số nguyên (kcal/ngày) [0..1] {800..5000}
+    nguonKcal : NguonKcal [0..1]
+  }
+  class "Cài đặt bếp" as CaiDat <<user_settings>> {
+    soHongBep : Số nguyên {1..4, mặc định 2}
+    soNguoiMacDinh : Số nguyên {1..6, mặc định 2}
+    muiGio : Chuỗi {mặc định Asia/Ho_Chi_Minh}
+  }
+  class "Mục đích đồng ý" as MucDich <<consent_purposes>> {
+    ma : Chuỗi {health_profile | personalization | photo_contribution | survey}
+    ten : Chuỗi
+    loaiDuLieu : Chuỗi
+    nhayCam : Logic
+    batBuoc : Logic
+  }
+  class "Phiên bản điều khoản" as DieuKhoan <<policy_versions>> {
+    phienBan : Chuỗi
+    bamVanBan : Băm SHA-256
+    hieuLucTu : Thời điểm
+  }
+  class "Sự kiện đồng ý" as SuKienDongY <<consent_events>> {
+    hanhDong : HanhDongDongY
+    kenh : KenhDongY
+    phienBanApp : Chuỗi [0..1]
+    thoiDiem : Thời điểm
+  }
+  class "Yêu cầu chủ thể dữ liệu" as YeuCauDSR <<dsr_requests>> {
+    loai : LoaiYeuCauDSR
+    trangThai : TrangThaiDSR
+    thamChieuChuThe : Băm HMAC-SHA256
+    nhanLuc : Thời điểm
+    hoanTatLuc : Thời điểm [0..1]
+  }
+  class "Nhật ký kiểm toán" as KiemToan <<audit_log>> {
+    vaiTroNguoiLam : Chuỗi
+    hanhDong : Chuỗi
+    doiTuong : Chuỗi
+    mucDich : Chuỗi [0..1]
+    thoiDiem : Thời điểm
+  }
+}
+
+package "Danh mục món và nguyên liệu" as P_DM {
+  class "Nhóm thực phẩm" as NhomTP <<food_groups>> {
+    ma : Chuỗi
+    ten : Chuỗi
+  }
+  class "Thực phẩm tham chiếu" as ThucPham <<food_items>> {
+    nguon : Chuỗi {fct2007 | usda_sr_legacy | usda_foundation}
+    maTrongNguon : Chuỗi
+    ten : Chuỗi
+    tyLeThaiBo : Số thực (%) [0..1] {0..100}
+  }
+  class "Chất dinh dưỡng" as ChatDD <<nutrients>> {
+    ma : Chuỗi
+    ten : Chuỗi
+    donVi : Chuỗi
+  }
+  class "Giá trị dinh dưỡng" as GiaTriDD <<food_nutrients>> {
+    tren100g : Số thực
+  }
+  class "Nguyên liệu" as NguyenLieu <<ingredients>> {
+    ten : Chuỗi {duy nhất}
+    giaViLuonCo : Logic
+    demDuoc : Logic
+    hanNganMat : Số thực (ngày) [0..1]
+    canCuHan : Chuỗi [0..1]
+    dangDung : Logic
+  }
+  class "Tên đồng nghĩa" as DongNghia <<ingredient_synonyms>> {
+    tuDongNghia : Chuỗi
+    ngonNgu : NgonNgu
+  }
+  class "Quy đổi đơn vị" as QuyDoi <<ingredient_units>> {
+    donVi : Chuỗi {qua | bo | cu | nhanh | mieng | goi | hop}
+    gamMoiDonVi : Số thực (g) {> 0}
+    nguon : Chuỗi
+  }
+  class "Mức lượng" as MucLuong <<qty_levels>> {
+    muc : MucLuongEnum
+    gMin : Số thực (g)
+    gMax : Số thực (g)
+  }
+  class "Nhóm dị ứng" as NhomDiUng <<allergen_groups>> {
+    ma : Chuỗi
+    ten : Chuỗi
+    canCu : CanCuDiUng
+  }
+  class "Chế độ ăn" as CheDoAn <<diets>> {
+    ma : Chuỗi
+    ten : Chuỗi
+  }
+  class "Món" as Mon <<recipes>> {
+    ten : Chuỗi {duy nhất}
+    slot : SlotMon
+    soKhauPhan : Số nguyên {> 0}
+    trangThai : TrangThaiMon
+    /tongThoiGian : Số nguyên (phút)
+  }
+  class "Thành phần món" as ThanhPhan <<recipe_ingredients>> {
+    khoiLuong : Số thực (g, lúc mua, cho soKhauPhan) {> 0}
+    vaiTro : VaiTroNguyenLieu
+    tuyChon : Logic
+  }
+  class "Bước nấu" as BuocNau <<recipe_steps>> {
+    soThuTu : Số nguyên
+    noiDung : Chuỗi
+    loai : LoaiBuoc
+    thoiLuong : Số nguyên (phút) {> 0}
+    chiemBep : Logic
+  }
+  class "Cách nấu" as CachNau <<cooking_methods>> {
+    ma : Chuỗi
+    ten : Chuỗi
+  }
+  class "Thẻ" as The <<tags>> {
+    ma : Chuỗi
+    loai : LoaiThe
+    ten : Chuỗi
+  }
+  class "Nguồn tham khảo món" as NguonMon <<recipe_sources>> {
+    url : Chuỗi
+    tieuDe : Chuỗi
+    ngayTruyCap : Ngày
+  }
+  class "Dinh dưỡng món" as DinhDuongMon <<recipe_nutrition>> {
+    /moiKhauPhan : Số thực
+    tinhLuc : Thời điểm
+    phienBanDuLieu : Chuỗi
+  }
+  class "Lớp thị giác" as LopTG <<vision_classes>> {
+    ma : Chuỗi
+    tenVi : Chuỗi
+    demDuoc : Logic
+    dinhNghiaTheHien : DinhNghiaTheHien
+    coMoHinhDoTuoi : Logic
+  }
+  class "Ánh xạ lớp – nguyên liệu" as AnhXaLop <<vision_class_ingredients>> {
+    macDinh : Logic
+  }
+}
+
+package "Kho và quét" as P_KHO {
+  class "Lô kho" as LoKho <<pantry_lots>> {
+    luongBanDau : Khoảng gam [gMin, gMax] (g)
+    ngayCo : Thời điểm
+    canCuNgay : CanCuNgay
+    trangThai : TrangThaiLo
+    xacSuatDoTuoi : P(tươi, dùng sớm, dùng ngay, kiểm tra) [0..1]
+    nguoiDungDaKiem : Thời điểm [0..1]
+    /luongHienTai : Khoảng gam (g)
+    /doGap : Số thực (u, tính lúc đọc)
+    /nhanDoTuoi : MucTuoi
+  }
+  class "Giao dịch kho" as GiaoDich <<pantry_transactions>> {
+    bienDong : Khoảng gam [dMin, dMax] (g)
+    lyDo : LyDoGiaoDich
+    doGapLucGhi : Số thực [0..1]
+    thoiDiem : Thời điểm
+  }
+  class "Lần quét" as LanQuet <<scans>> {
+    cheDo : CheDoQuet
+    trangThai : TrangThaiQuet
+    soLanThu : Số nguyên
+    maLoi : Chuỗi [0..1]
+    xacNhanLuc : Thời điểm [0..1]
+  }
+  class "Ảnh quét" as AnhQuet <<scan_images>> {
+    thuTu : Số nguyên {1..2}
+    nhomNgan : Số nguyên
+    rong : Số nguyên (px)
+    cao : Số nguyên (px)
+    daGop : Logic
+    daXoaLuc : Thời điểm [0..1]
+  }
+  class "Phát hiện" as PhatHien <<detections>> {
+    khung : Hộp chuẩn hoá (x1, y1, x2, y2) {0..1}
+    doTinCay : Số thực {0..1}
+    xacSuatDoTuoi : P(tươi, dùng sớm, dùng ngay, kiểm tra) [0..1]
+  }
+  class "Chip nguyên liệu" as Chip <<scan_items>> {
+    nguonGoc : NguonChip
+    soDemMoHinh : Số nguyên [0..1]
+    soDemCuoi : Số nguyên [0..1]
+    mucLuong : MucLuongEnum [0..1]
+    thaoTac : ThaoTacChip
+    doTuoiNguoiDung : MucTuoi [0..1]
+  }
+  class "Mục đi chợ" as MucDiCho <<shopping_items>> {
+    luong : Số thực (g) [0..1]
+    ghiChu : Chuỗi [0..1]
+    trangThai : TrangThaiMucDiCho
+  }
+  class "Cặp thay thế" as CapThayThe <<substitution_pairs>> {
+    slotNguCanh : SlotMon [0..1]
+    tyLe : Số thực
+    diem : Số thực
+    nguon : Chuỗi
+    doNguoiSoan : Logic
+  }
+}
+
+package "Mâm cơm, nấu, tương tác" as P_MAM {
+  class "Mâm cơm" as Mam <<meal_plans>> {
+    bua : Bua
+    soNguoi : Số nguyên {1..6}
+    thoiGianToiDa : Số nguyên (phút) {10..180}
+    trangThai : TrangThaiMam
+    eMucTieu : Số thực (kcal) [0..1] {ảnh chụp}
+    khoangKcal : [kcalLow, kcalHigh] (kcal) [0..1]
+    batComMoiNguoi : Số thực (bát) [0..1]
+    dongLyDo : Chuỗi
+    phienBanThamSo : Chuỗi
+  }
+  class "Món trong mâm" as MonTrongMam <<meal_plan_items>> {
+    slot : SlotMon
+    trangThai : TrangThaiMonTrongMam
+    lyDoDoi : LyDoDoiMon [0..1]
+    diemXepHang : Số thực
+    heSoKhauPhan : Số thực
+    kcalMoiNguoi : Số thực (kcal) [0..1] {ảnh chụp}
+  }
+  class "Thay thế đã chọn" as ThayTheDaChon <<meal_plan_item_substitutions>> {
+    khoiLuong : Số thực (g)
+    nguonGoc : NguonThayThe
+  }
+  class "Phiên nấu" as PhienNau <<cook_sessions>> {
+    trangThai : TrangThaiPhienNau
+    gioDon : Thời điểm
+    soHongBep : Số nguyên {ảnh chụp}
+    batDau : Thời điểm
+    hoanTatLuc : Thời điểm [0..1]
+    hoanTacLuc : Thời điểm [0..1]
+  }
+  class "Mục lịch nấu" as MucLich <<cook_schedule_entries>> {
+    batDauSau : Số nguyên (giây)
+    ketThucSau : Số nguyên (giây)
+  }
+  class "Tương tác" as TuongTac <<interactions>> {
+    maSuKien : UUID {do app sinh, chống trùng}
+    loai : LoaiTuongTac
+    viTri : Số nguyên [0..1]
+    lyDoDoi : LyDoDoiMon [0..1]
+    xacSuatHienThi : Số thực [0..1]
+    xayRaLuc : Thời điểm
+  }
+}
+
+package "Mô hình" as P_MH {
+  class "Phiên bản mô hình" as PhienBanMH <<model_versions>> {
+    ten : TenMoHinh
+    phienBan : Chuỗi
+    bamTep : Băm SHA-256
+    phienBanTienXuLy : Chuỗi [0..1]
+    chiSo : Báo cáo JSON
+    trangThai : TrangThaiPhienBanMH
+  }
+  class "Triển khai mô hình" as TrienKhaiMH <<model_deployments>> {
+    ten : TenMoHinh {khoá}
+    doiLuc : Thời điểm
+  }
+}
+
+package "Khảo sát gu" as P_KS {
+  class "Phiếu khảo sát" as Phieu <<survey_forms>> {
+    phienBan : Chuỗi {duy nhất}
+    soMonNeo : Số nguyên
+    soMonNgauNhien : Số nguyên
+    dangMo : Logic
+  }
+  class "Người tham gia khảo sát" as NguoiKS <<survey_respondents>> {
+    dongYLuc : Thời điểm
+    hoanTatLuc : Thời điểm [0..1]
+    kenh : KenhKhaoSat
+  }
+  class "Phân công món" as PhanCong <<survey_assignments>> {
+    thuTuHienThi : Số nguyên
+    laMonNeo : Logic
+  }
+  class "Điểm khảo sát" as DiemKS <<survey_ratings>> {
+    diem : Số nguyên [0..1] {1..5}
+    chuaAnBaoGio : Logic
+    traLoiLuc : Thời điểm
+  }
+}
+
+package "Kiểu liệt kê" as P_ENUM {
+  enum VaiTro {
+    user
+    admin
+    curator
+    ml_operator
+  }
+  enum SlotMon {
+    man
+    rau
+    canh
+  }
+  enum MucTuoi {
+    tuoi
+    dung_som
+    dung_ngay
+    kiem_tra
+  }
+  enum TrangThaiLo {
+    in_stock
+    not_seen
+    used_up
+    discarded
+  }
+  enum LyDoGiaoDich {
+    scan_add
+    cook_deduct
+    manual_edit
+    discard
+    undo
+  }
+  enum TrangThaiQuet {
+    queued
+    processing
+    done
+    failed
+    expired
+    confirmed
+    discarded
+  }
+  enum TrangThaiMam {
+    proposed
+    accepted
+    cooked
+    abandoned
+    expired
+  }
+  enum TrangThaiPhienNau {
+    in_progress
+    completed
+    reverted
+    abandoned
+  }
+  enum LyDoDoiMon {
+    khong_hop_gu
+    moi_an
+    thieu_thoi_gian
+    khac
+  }
+  enum Bua {
+    lunch
+    dinner
+  }
+  enum MucLuongEnum {
+    it
+    vua
+    nhieu
+  }
+  enum LoaiTuongTac {
+    served
+    viewed
+    swapped
+    cooked
+    liked
+    disliked
+    undone
+  }
+  enum TrangThaiTaiKhoan {
+    active
+    deletion_requested
+  }
+  enum MucVanDong {
+    light
+    moderate
+    heavy
+  }
+  enum MucTieu {
+    maintain
+    lose
+    expert
+  }
+  enum NguonKcal {
+    suggested
+    user
+    expert
+  }
+  enum HanhDongDongY {
+    grant
+    withdraw
+  }
+  enum KenhDongY {
+    onboarding
+    settings
+  }
+  enum LoaiYeuCauDSR {
+    access
+    export
+    correct
+    delete
+    withdraw
+    restrict
+    object
+  }
+  enum TrangThaiDSR {
+    received
+    in_progress
+    completed
+    rejected
+  }
+  enum NgonNgu {
+    vi
+    en
+  }
+  enum CanCuDiUng {
+    codex_2024
+    tastoria_extra
+  }
+  enum TrangThaiMon {
+    draft
+    published
+    retired
+  }
+  enum VaiTroNguyenLieu {
+    main
+    side
+    seasoning
+  }
+  enum LoaiBuoc {
+    active
+    passive
+  }
+  enum LoaiThe {
+    flavor
+    texture
+    occasion
+  }
+  enum DinhNghiaTheHien {
+    item
+    group_of
+    package
+  }
+  enum CanCuNgay {
+    purchase_date_entered
+    first_seen
+  }
+  enum CheDoQuet {
+    fridge
+    haul
+  }
+  enum NguonChip {
+    model
+    user_added
+  }
+  enum ThaoTacChip {
+    kept
+    relabeled
+    deleted
+    edited
+  }
+  enum TrangThaiMucDiCho {
+    open
+    bought
+    dropped
+  }
+  enum TrangThaiMonTrongMam {
+    active
+    swapped_out
+  }
+  enum NguonThayThe {
+    lookup
+    embedding
+    user
+  }
+  enum TrangThaiPhienBanMH {
+    candidate
+    validated
+    rejected
+    retired
+  }
+  enum KenhKhaoSat {
+    link
+    qr
+  }
+  enum TenMoHinh {
+    detector
+    freshness
+    ranker
+    substitution
+  }
+}
+
+' ---------- Tài khoản, hồ sơ, quyền riêng tư
+TaiKhoan "1" -- "0..1" HoSo : có >
+TaiKhoan "1" -- "0..1" CaiDat : có >
+TaiKhoan "0..*" -- "0..*" NhomDiUng : khai dị ứng >
+TaiKhoan "0..*" -- "0..5" Mon : món hay ăn >
+HoSo "0..*" -- "0..1" CheDoAn : theo >
+MucDich "1" -- "0..*" DieuKhoan : có phiên bản >
+TaiKhoan "1" -- "0..*" SuKienDongY : ghi >
+SuKienDongY "0..*" -- "1" DieuKhoan : theo >
+TaiKhoan "0..1" -- "0..*" YeuCauDSR : gửi >
+TaiKhoan "0..1" -- "0..*" KiemToan : người làm >
+
+' ---------- Danh mục
+ThucPham "0..*" -- "0..*" ChatDD
+(ThucPham, ChatDD) .. GiaTriDD
+NguyenLieu "0..*" -- "1" NhomTP : thuộc >
+NguyenLieu "0..*" -- "0..1" ThucPham : thành phần lấy từ >
+NguyenLieu "1" -- "0..*" DongNghia : có >
+NguyenLieu "1" -- "0..*" QuyDoi : có >
+NhomTP "1" -- "0..3" MucLuong : có >
+NguyenLieu "0..*" -- "0..*" NhomDiUng : chứa >
+CheDoAn "0..*" -- "0..*" NhomTP : loại trừ >
+Mon "0..*" -- "0..*" NguyenLieu
+(Mon, NguyenLieu) .. ThanhPhan
+Mon "1" -- "0..*" BuocNau : gồm >
+Mon "0..*" -- "1" CachNau : nấu bằng >
+Mon "0..*" -- "0..*" The : gắn >
+Mon "1" -- "0..*" NguonMon : trích từ >
+Mon "0..*" -- "0..*" ChatDD
+(Mon, ChatDD) .. DinhDuongMon
+LopTG "0..*" -- "0..*" NguyenLieu
+(LopTG, NguyenLieu) .. AnhXaLop
+
+' ---------- Kho và quét
+TaiKhoan "1" -- "0..*" LoKho : sở hữu >
+LoKho "0..*" -- "1" NguyenLieu : là >
+LoKho "1" *-- "0..*" GiaoDich
+GiaoDich "0..1" -- "0..1" GiaoDich : đảo giao dịch >
+LoKho "0..*" -- "0..1" PhienBanMH : độ tươi theo >
+TaiKhoan "1" -- "0..*" LanQuet : thực hiện >
+LanQuet "1" *-- "1..2" AnhQuet
+LanQuet "1" *-- "0..*" Chip
+AnhQuet "1" *-- "0..*" PhatHien
+PhatHien "0..*" -- "0..1" Chip : gộp vào >
+PhatHien "0..*" -- "1" LopTG : thuộc lớp >
+Chip "0..*" -- "1" NguyenLieu : là >
+Chip "0..*" -- "0..1" NguyenLieu : nhãn gốc trước khi sửa >
+LoKho "0..1" -- "0..1" Chip : sinh từ >
+LanQuet "0..*" -- "0..1" PhienBanMH : bộ phát hiện >
+LanQuet "0..*" -- "0..1" PhienBanMH : bộ phân loại >
+CapThayThe "0..*" -- "1" NguyenLieu : nguyên liệu gốc >
+CapThayThe "0..*" -- "1" NguyenLieu : đồ thay thế >
+CapThayThe "0..*" -- "0..1" CachNau : ngữ cảnh >
+TaiKhoan "1" -- "0..*" MucDiCho : có >
+MucDiCho "0..*" -- "1" NguyenLieu : cần mua >
+MucDiCho "0..*" -- "0..1" MonTrongMam : phát sinh từ >
+
+' ---------- Mâm cơm, nấu
+TaiKhoan "1" -- "0..*" Mam : nhận >
+Mam "1" *-- "1..*" MonTrongMam
+MonTrongMam "0..*" -- "1" Mon : là >
+MonTrongMam "0..1" -- "0..1" MonTrongMam : thay cho >
+Mam "0..*" -- "0..*" NhomDiUng : dị ứng người ăn cùng >
+Mam "0..*" -- "0..2" LoKho : ghim phải dùng >
+Mam "0..*" -- "0..1" PhienBanMH : bộ xếp hạng >
+MonTrongMam "0..*" -- "0..*" NguyenLieu
+(MonTrongMam, NguyenLieu) .. ThayTheDaChon
+ThayTheDaChon "0..*" -- "1" NguyenLieu : thay bằng >
+Mam "1" -- "0..*" PhienNau : được nấu trong >
+PhienNau "1" *-- "0..*" MucLich
+MucLich "0..*" -- "1" BuocNau : xếp lịch cho >
+TaiKhoan "1" -- "0..*" TuongTac : phát sinh >
+TuongTac "0..*" -- "1" Mon : về >
+TuongTac "0..*" -- "0..1" Mam : trong >
+TuongTac "0..*" -- "0..1" MonTrongMam : trên >
+TuongTac "0..*" -- "0..1" PhienBanMH : bộ xếp hạng >
+
+' ---------- Mô hình
+TrienKhaiMH "0..1" -- "1" PhienBanMH : bản đang chạy >
+TrienKhaiMH "0..1" -- "0..1" PhienBanMH : bản trước >
+TrienKhaiMH "0..*" -- "0..1" TaiKhoan : đổi bởi >
+
+' ---------- Khảo sát
+Phieu "0..*" -- "0..*" Mon : món neo >
+Phieu "1" -- "0..*" NguoiKS : có >
+NguoiKS "0..*" -- "1" DieuKhoan : đồng ý theo >
+NguoiKS "0..*" -- "0..*" Mon
+(NguoiKS, Mon) .. PhanCong
+PhanCong "1" -- "0..1" DiemKS : có điểm >
+NguoiKS "0..*" -- "0..*" Mon : món hay ăn (khảo sát) >
+
+note as N1
+  Ràng buộc kiểm ở service (không thể hiện bằng FK):
+  - Món hay ăn của tài khoản tối đa 5 (user_favorite_recipes).
+  - Mâm ghim tối đa 2 lô (BR-TRAY-08).
+  - Lần quét có 1..2 ảnh (scan_images.ordinal CK 1..2, UNIQUE(scan_id, ordinal)).
+  - Mỗi slot của mâm có tối đa 1 "Món trong mâm" ở trạng thái active.
+  - Món trong mâm phải cùng slot với Món (FK ghép (recipe_id, slot)).
+  - Tương tác chỉ ghi khi có đồng ý personalization (BR-CONSENT-03).
+  - Ba bội số 0..1 sau là quy tắc nghiệp vụ do service bảo đảm; DDL hiện chỉ
+    có FK không UNIQUE nên về vật lý là 0..*:
+    Lô kho 0..1 — Chip (mỗi chip một lô mới, BR-PANTRY-01; pantry_lots.source_scan_item_id),
+    Món trong mâm "thay cho" 0..1 (meal_plan_items.replaced_item_id),
+    Giao dịch "đảo" 0..1 (pantry_transactions.reverses_id).
+    Đã đề xuất UNIQUE một phần (WHERE cột IS NOT NULL) cho ba cột này.
+  Dùng liên kết thường, không composition, cho Đồng nghĩa, Quy đổi, Mức lượng,
+  Bước nấu, Nguồn món: FK của các bảng này không ON DELETE CASCADE và món,
+  nguyên liệu không bị xoá cứng (BR-CATALOG-01: sửa = bản mới, retire bản cũ).
+  Composition chỉ dùng nơi DDL có ON DELETE CASCADE (giao dịch kho, ảnh quét,
+  chip, phát hiện, món trong mâm, mục lịch nấu).
+  Thuộc tính có dấu "/" là dẫn xuất: lượng hiện tại = ban đầu + Σ giao dịch;
+  độ gấp u tính lúc đọc (BR-FRESH-01..05); Dinh dưỡng món tính lại từ
+  Thành phần món × Giá trị dinh dưỡng × tỷ lệ thải bỏ (BR-NUT-05).
+end note
+
+@enduml

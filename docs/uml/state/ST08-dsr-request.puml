@@ -1,0 +1,41 @@
+@startuml
+title ST08 — Máy trạng thái DsrRequest (bảng dsr_requests; UC05–UC08, UC27)
+hide empty description
+
+state "received" as received : entry / received_at := now(); acknowledged_at := now();\nsubject_ref := HMAC-SHA256(user_id)
+state "in_progress" as in_progress : entry / worker nhận job
+state "completed" as completed : entry / completed_at := now()
+state "rejected" as rejected : entry / completed_at := now(); note := lý do
+
+completed : GET /me/data-requests/{id}/download [type = export] / trả tệp theo result_key
+received : GET /me/data-requests/{id} / trả trạng thái
+in_progress : GET /me/data-requests/{id} / trả trạng thái
+in_progress : job lỗi sau khi RQ hết lượt thử lại / note := mã lỗi; chờ nhân sự (UC27)
+
+[*] --> received : / tạo bởi POST /me/data-requests, hoặc type = withdraw\ntạo từ POST /me/consents/{purpose}/withdraw (SD07, SD09)
+received --> in_progress : worker nhận job [type ∈ {access, export, delete, withdraw}]
+in_progress --> completed : job xong [type ∈ {access, export}]\n/ result_key := khoá tệp xuất
+in_progress --> completed : job xong [type ∈ {delete, withdraw}]\n/ xoá dữ liệu (xem ST06, ST04)
+in_progress --> completed : POST /admin/data-requests/{id}/resolve\n[nhân sự đã xử lý tay phần job làm dở]\n/ note := kết quả xử lý; result_key nếu có (UC27)
+in_progress --> rejected : POST /admin/data-requests/{id}/resolve [từ chối]\n/ note := lý do (UC27)
+received --> completed : POST /admin/data-requests/{id}/resolve\n[type ∈ {correct, restrict, object}, chấp nhận]\n/ note := kết quả xử lý (UC08, UC27)
+received --> rejected : POST /admin/data-requests/{id}/resolve [từ chối]\n/ note := lý do
+completed --> [*]
+rejected --> [*]
+
+note as Nmap
+  <b>Trạng thái ↔ cột lưu trữ</b> (dsr_requests.status lưu trực tiếp)
+  received: status = 'received', acknowledged_at NOT NULL, completed_at NULL
+  in_progress: status = 'in_progress', completed_at NULL
+    (note khác NULL khi job lỗi và đang chờ nhân sự)
+  completed: status = 'completed', completed_at NOT NULL
+    (result_key NOT NULL khi type ∈ {access, export})
+  rejected: status = 'rejected', completed_at NOT NULL, note NOT NULL
+  acknowledged_at được ghi ngay khi tạo (AD05, SD07, SD09).
+  Ràng buộc thời gian: completed_at − received_at ≤ 24 giờ
+  (BR-DSR-01, NFR-PRIV-01; luôn trong hạn NĐ 356/2025 Điều 5).
+  Dòng được giữ làm bằng chứng; khi tài khoản bị xoá,
+  user_id := NULL (ON DELETE SET NULL), subject_ref còn lại.
+  Trạng thái cuối = vòng đời xử lý kết thúc, dòng không bị xoá.
+end note
+@enduml

@@ -1,0 +1,45 @@
+@startuml
+title CTX01 — Sơ đồ ngữ cảnh hệ thống Tastoria
+' Mức 0: hệ thống là hộp đen; mọi tác nhân lấy từ docs/sad/model.yaml (actors).
+' Luồng ghi trên mũi tên là dữ liệu trao đổi qua ranh giới hệ thống.
+left to right direction
+skinparam actorStyle stick
+skinparam rectangle {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Khách\n(A01)" as A01
+actor "Người dùng\n(A02)" as A02
+actor "Người tham gia\nkhảo sát\n(A03)" as A03
+actor "Quản trị viên\n(A04)" as A04
+actor "Người biên soạn\ncông thức\n(A05)" as A05
+actor "Người vận hành\nmô hình\n(A06)" as A06
+actor "Người gán nhãn\n(A07)" as A07
+actor "Bộ lập lịch\n(A08)" as A08 <<time>>
+actor "Dịch vụ email\n(A09)" as A09 <<system>>
+actor "Công cụ gán nhãn\nLabel Studio\n(A10)" as A10 <<system>>
+rectangle "Kho sao lưu ngoài\n(Google Drive qua rclone)\nchưa có mã actor" as EXTB <<system>>
+
+
+rectangle "Hệ thống Tastoria\n(app Android + web, API /api/v1,\nworker suy luận, scheduler, PostgreSQL, ổ tệp)" as SYS
+
+A01 --> SYS : email, mật khẩu,\nyêu cầu đặt lại mật khẩu
+SYS --> A01 : landing, phiên đăng nhập\n(access + refresh token)
+A02 --> SYS : ảnh tủ lạnh / đồ vừa mua,\nsửa chip, hồ sơ, đồng ý,\nchọn mâm, đổi món, nấu xong,\nyêu cầu dữ liệu
+SYS --> A02 : chip nguyên liệu, kho,\nmâm cơm + lý do, lịch nấu,\nnhật ký tuần, tệp dữ liệu cá nhân
+A03 --> SYS : đồng ý survey,\nđiểm 1–5, 5 món hay ăn
+SYS --> A03 : phiếu khảo sát\n(món neo + món ngẫu nhiên)
+A04 --> SYS : xử lý yêu cầu dữ liệu,\ntra nhật ký kiểm toán
+SYS --> A04 : hàng đợi yêu cầu,\nbản ghi audit_log
+A05 --> SYS : bundle món, nguyên liệu,\ncặp thay thế (CLI)
+SYS --> A05 : báo cáo kiểm tra bundle
+A06 --> SYS : đăng ký, kiểm định,\ntriển khai, quay lui mô hình;\ntạo / xuất phiếu khảo sát
+SYS --> A06 : bản xuất huấn luyện\nđã bí danh hoá, báo cáo cổng
+A08 --> SYS : kích hoạt định kỳ\n(xoá ảnh, sao lưu, sweeper)
+SYS --> A09 : thư đặt lại mật khẩu (SMTP)
+SYS --> A10 : ảnh góp đã đồng ý\n(photo_contribution)
+A10 --> SYS : nhãn khung, nhãn độ tươi
+A07 --> A10 : gán nhãn
+SYS --> EXTB : bản pg_dump mã hoá\n(giữ ≤ 14 ngày)
+@enduml

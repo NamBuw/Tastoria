@@ -1,0 +1,96 @@
+@startuml
+title AD03 — Xác nhận kết quả quét vào kho trong một Unit of Work (UC13, POST /scans/{id}/confirm)
+' Làn là module. Toàn bộ phần giữa "Bắt đầu Unit of Work" và "Commit"/"Rollback" là một giao dịch DB.
+' Thứ tự kiểm khớp SD02: khoá hàng trước, rồi mới kiểm trạng thái.
+
+|App|
+start
+:POST /scans/{id}/confirm;
+|scan|
+:Bắt đầu Unit of Work (một giao dịch);
+:SELECT scans WHERE id = ? AND user_id = ? FOR UPDATE
+(khoá hàng, chống BOLA);
+if (Tìm thấy?) then (không)
+  :Rollback;
+  :Trả 404 problem+json code = not_found;
+  |App|
+  stop
+else (có)
+endif
+|scan|
+if (scans.status = confirmed?) then (có)
+  :Rollback;
+  :Trả lại kết quả xác nhận trước đó
+  (lũy đẳng, không ghi thêm);
+  |App|
+  stop
+else (không)
+endif
+|scan|
+if (scans.status = done?) then (không)
+  :Rollback;
+  :Trả 409 problem+json code = scan_not_ready
+  (chỉ xác nhận từ trạng thái done, BR-SCAN-02);
+  |App|
+  stop
+else (có)
+endif
+|scan|
+if (Còn chip mức "kiểm tra" chưa được người dùng xác nhận?) then (có)
+  :Rollback;
+  :Trả 422 problem+json code = validation_failed,
+  errors[] {code: freshness_check_required} (BR-FRESH-04);
+  |App|
+  stop
+else (không)
+endif
+|scan|
+:Lấy scan_items có user_action khác deleted;
+while (Còn chip chưa quy đổi?) is (có)
+  |pantry|
+  :convert_quantity(ingredient_id, final_count, qty_level);
+  |catalog|
+  if (Nguyên liệu đếm được?) then (có)
+    :Trả gam mỗi đơn vị (ingredient_units);
+  else (không)
+    :Trả khoảng gam của mức ít/vừa/nhiều
+    (qty_levels theo nhóm thực phẩm);
+  endif
+  |pantry|
+  :Khoảng gam [g_min, g_max] (BR-QTY-02);
+  |scan|
+endwhile (không)
+|pantry|
+:add_lots_from_scan: mỗi chip một lô mới (BR-PANTRY-01);
+if (Chế độ quét?) then (haul: đồ vừa mua)
+  :acquired_basis = purchase_date_entered,
+  acquired_at = hôm nay;
+else (fridge: toàn tủ)
+  :acquired_basis = first_seen,
+  acquired_at = thời điểm quét;
+endif
+:Tạo pantry_lots (in_stock, initial_g_min, initial_g_max,
+p_* độ tươi, source_scan_item_id);
+:Ghi pantry_transactions reason = scan_add,
+ref_type = scan, ref_id = scans.id;
+|scan|
+if (scans.mode = fridge?) then (có)
+  |pantry|
+  :mark_not_seen: lô in_stock của người dùng không xuất hiện
+  trong lần quét → status not_seen
+  (không xoá, app hỏi người dùng, BR-PANTRY-03);
+else (không)
+endif
+|scan|
+:scans.status = confirmed, ghi confirmed_at;
+:Commit;
+note right
+  Lỗi ở bất kỳ bước nào: rollback toàn bộ,
+  kho và trạng thái quét giữ nguyên.
+  Hai yêu cầu confirm đồng thời xếp hàng ở FOR UPDATE;
+  yêu cầu sau thấy confirmed và nhận lại kết quả cũ.
+end note
+|App|
+:Nhận danh sách lô mới và số lô not_seen;
+stop
+@enduml

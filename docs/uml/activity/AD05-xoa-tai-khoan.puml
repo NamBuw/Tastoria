@@ -1,0 +1,48 @@
+@startuml
+title AD05 — Xoá tài khoản và toàn bộ dữ liệu (UC07, BR-DSR-01, BR-RETAIN-01)
+
+|Người dùng|
+start
+:Chọn Xoá tài khoản trong Cài đặt;
+|App|
+:Hiện hậu quả (không hoàn tác được)
+và yêu cầu xác nhận;
+|Người dùng|
+if (Xác nhận xoá?) then (không)
+  stop
+else (có)
+endif
+|App|
+:POST /me/data-requests (type = delete);
+|api|
+:Ghi dsr_requests (received, received_at,
+subject_ref = HMAC-SHA256 của user_id);
+:users.status = deletion_requested,
+tăng token_version, thu hồi refresh_tokens;
+:Ghi acknowledged_at, đưa job xoá vào hàng đợi;
+:Trả mã yêu cầu cho app;
+|worker|
+:dsr_requests → in_progress;
+:Xoá tệp của người dùng: ảnh quét trong thư mục tmp/,
+contrib/ và tệp xuất dữ liệu cá nhân;
+:Xoá dây chuyền trong DB: xoá users,
+các bảng FK ON DELETE CASCADE xoá theo;
+note right
+  FK ON DELETE SET NULL: dsr_requests.user_id,
+  audit_log.actor_user_id, model_deployments.switched_by.
+end note
+:Giữ dsr_requests với subject_ref
+làm bằng chứng đã xử lý;
+:dsr_requests → completed, ghi completed_at
+(≤ 24 giờ từ received_at, NFR-PRIV-01);
+fork
+  |api|
+  :Lần xuất dữ liệu huấn luyện kế tiếp (UC28)
+  không còn dữ liệu của tài khoản;
+fork again
+  |scheduler|
+  :Bản sao lưu cũ còn chứa dữ liệu tự hết hạn
+  và bị xoá sau ≤ 14 ngày (UC33, BR-RETAIN-01);
+end fork
+stop
+@enduml

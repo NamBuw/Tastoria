@@ -1,0 +1,97 @@
+@startuml DP01-trien-khai
+title DP01 — Sơ đồ triển khai Tastoria (môi trường chạy thật trên máy chủ lab)
+
+' Docker Compose trên máy chủ lab (đóng vai VPS). Chỉ nginx công bố cổng, bind 127.0.0.1;
+' postgres, valkey, api, worker chỉ nằm trong mạng nội bộ Docker. Ra Internet qua Cloudflare Tunnel.
+
+left to right direction
+skinparam nodesep 40
+skinparam ranksep 60
+
+node "Điện thoại Android" as Phone <<device>> {
+  artifact "App Tastoria (Expo, APK)" as ApkApp
+}
+
+node "Máy người dùng" as UserPc <<device>> {
+  node "Trình duyệt" as Browser <<execution environment>> {
+    artifact "Web app (Expo web, single)" as WebApp
+    artifact "Landing (HTML/CSS)" as LandingPage
+  }
+}
+
+cloud "Cloudflare Tunnel (edge Cloudflare)" as CF
+
+node "Máy chủ lab" as LabServer <<device>> {
+  artifact "cloudflared (tunnel sẵn có, dịch vụ hệ điều hành)" as Cloudflared
+  node "Docker host (Docker Compose)" as Docker <<execution environment>> {
+    node "nginx" as Nginx <<container>> {
+      artifact "tệp tĩnh: landing, web app" as StaticFiles
+      artifact "location internal cho tệp (X-Accel-Redirect)" as AccelLoc
+    }
+    node "api" as Api <<container>> {
+      artifact "tastoria (FastAPI, uvicorn)" as ApiApp
+      artifact "CLI tastoria (catalog, survey, mlops, labeling)" as Cli
+    }
+    node "worker" as Worker <<container>> {
+      artifact "RQ worker + ONNX Runtime (intra_op 2)" as WorkerApp
+    }
+    node "scheduler" as Scheduler <<container>> {
+      artifact "crontab: python -m tastoria.jobs.*" as Cron
+      artifact "tastoria (mã nguồn, module jobs gọi scan, identity, privacy, core)" as JobsApp
+      artifact "rclone" as Rclone
+    }
+    node "migrate" as Migrate <<container, chạy một lần>> {
+      artifact "pg_dump trước, rồi alembic upgrade" as MigrateApp
+    }
+    node "postgres" as Pg <<container>> {
+      artifact "PostgreSQL 18 + pgvector 0.8" as PgApp
+    }
+    node "valkey" as Vk <<container>> {
+      artifact "Valkey 9 (hàng đợi RQ, khoá đăng nhập)" as VkApp
+    }
+    storage "volume pgdata" as VolPg
+    storage "volume files (tmp/, contrib/, models/)" as VolFiles
+  }
+}
+
+node "Máy GPU lab (L40S)" as GpuServer <<device>> {
+  artifact "huấn luyện: ultralytics, PyTorch, LightGBM" as Train
+  artifact "MLflow (SQLite + thư mục artifact)" as Mlflow
+}
+
+cloud "Google Drive" as Drive
+node "Dịch vụ email (SMTP)" as Smtp <<external system>>
+node "Label Studio (tự host)" as LabelStudio <<external system>>
+
+' ---- đường truyền
+Phone -- CF : HTTPS (TLS), REST JSON /api/v1
+Browser -- CF : HTTPS (TLS)
+CF -- Cloudflared : tunnel ra ngoài (QUIC hoặc HTTP/2 trên TLS)
+Cloudflared -- Nginx : HTTP, 127.0.0.1:<cổng nginx>
+Nginx -- Api : HTTP, mạng nội bộ Docker
+Nginx -- VolFiles : mount chỉ đọc
+Api -- Pg : TCP 5432 (giao thức PostgreSQL)
+Api -- Vk : TCP 6379 (RESP)
+Api -- VolFiles : mount đọc/ghi
+Worker -- Vk : TCP 6379 (RESP), nhận job
+Worker -- Pg : TCP 5432
+Worker -- VolFiles : mount đọc/ghi
+Scheduler -- Pg : TCP 5432 (pg_dump -Fc, dọn hết hạn)
+Scheduler -- Vk : TCP 6379 (RESP): sweeper enqueue bù, PUBLISH scan:<id>
+Scheduler -- VolFiles : mount đọc/ghi (xoá ảnh quá hạn)
+Scheduler -- Drive : HTTPS (rclone, Google Drive API), bản sao lưu mã hoá
+Migrate -- Pg : TCP 5432
+Pg -- VolPg : mount
+Api -- Smtp : SMTP + STARTTLS
+Api -- LabelStudio : HTTPS REST (labeling push/pull)
+GpuServer -- LabServer : SSH (rsync) tệp mô hình ONNX vào files/models
+GpuServer -- LabelStudio : HTTPS REST (xuất nhãn)
+
+note bottom of Docker
+  Chỉ nginx công bố cổng, bind 127.0.0.1; các container khác không công bố cổng.
+  Môi trường dev: Mailpit thay SMTP thật.
+  Sao lưu: giữ ≤ 14 ngày (BR-RETAIN-01); RPO ≤ 24 h, RTO ≤ 2 h (NFR-REL-01).
+  Healthcheck: /healthz, /readyz.
+end note
+
+@enduml

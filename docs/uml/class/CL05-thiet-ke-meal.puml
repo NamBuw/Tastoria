@@ -1,0 +1,245 @@
+@startuml CL05-thiet-ke-meal
+title CL05 — Sơ đồ lớp thiết kế: module meal (M11)
+
+' Tầng: router (HTTP) -> service (giao diện công khai) -> repository (SQL) -> bảng của module meal.
+' Module meal chỉ gọi service của: core, catalog, profile, pantry, substitute, events, mlops, privacy (model.yaml).
+' Kiểu chữ ký theo Python; tiền tố đường dẫn /api/v1 được lược bỏ.
+
+left to right direction
+hide empty members
+skinparam classAttributeIconSize 0
+
+package "tastoria.modules.meal" as PMeal {
+  class MealRouter <<router>> {
+    + create_plan(req: MealPlanRequest, idempotency_key: str) : MealPlanOut [POST /meal-plans]
+    + list_plans(cursor: str | None, limit: int) : Page[MealPlanSummary] [GET /meal-plans]
+    + get_latest() : MealPlanOut [GET /meal-plans/latest]
+    + get_plan(id: UUID) : MealPlanOut [GET /meal-plans/{id}]
+    + accept(id: UUID) : MealPlanOut [POST /meal-plans/{id}/accept]
+    + swap(id: UUID, itemId: UUID, req: SwapRequest, idempotency_key: str) : MealPlanOut [POST /meal-plans/{id}/items/{itemId}/swap]
+    + list_substitutes(id: UUID, itemId: UUID) : list[SubstituteOption] [GET /meal-plans/{id}/items/{itemId}/substitutes]
+    + choose_substitution(id: UUID, itemId: UUID, req: SubstitutionRequest) : MealPlanItemOut [POST /meal-plans/{id}/items/{itemId}/substitutions]
+  }
+
+  class MealService <<service>> {
+    + create_plan(uow: UnitOfWork, user_id: UUID, req: MealPlanRequest) : MealPlanOut
+    -- ném ProblemError(infeasible_tray, 422, InfeasibleTrayDetail) khi không khả thi --
+    + list_plans(user_id: UUID, cursor: Cursor | None, limit: int) : Page[MealPlanSummary]
+    + get_latest(user_id: UUID) : MealPlanOut | None
+    + get_plan(user_id: UUID, plan_id: UUID) : MealPlanOut
+    + accept(user_id: UUID, plan_id: UUID) : MealPlanOut
+    + swap_item(uow: UnitOfWork, user_id: UUID, plan_id: UUID, item_id: UUID, reason: SwapReason) : MealPlanOut
+    + list_substitutes(user_id: UUID, plan_id: UUID, item_id: UUID) : list[SubstituteOption]
+    + choose_substitution(user_id: UUID, plan_id: UUID, item_id: UUID, req: SubstitutionRequest) : MealPlanItemOut
+    .. dùng bởi module cooking, journal ..
+    + get_plan_for_cooking(user_id: UUID, plan_id: UUID) : PlanForCooking
+    + mark_cooked(uow: UnitOfWork, plan_id: UUID) : None
+    + revert_cooked(uow: UnitOfWork, plan_id: UUID) : None
+  }
+
+  class HardFilter <<domain service>> {
+    + filter(recipes: list[RecipeView], c: MealConstraints, coeater_allergens: set[str]) : list[RecipeView]
+    -- BR-ALG-01, BR-DIET-01 --
+  }
+  class TasteRanker <<domain service>> {
+    + score(user_id: UUID, recipes: list[RecipeView], personalized: bool) : dict[UUID, float]
+    -- ŝ' = phân vị theo người trong slot; BR-CONSENT-03 --
+  }
+  class TrayComposer <<domain service>> {
+    - top_k: int = 20
+    + compose(cands: dict[Slot, list[Candidate]], stock: StockView, req: MealPlanRequest, e_tray: float | None) : TrayResult
+    + resolve_swap(plan: MealPlan, slot: Slot, excluded: set[UUID]) : TrayResult
+    -- BR-TRAY-01, 02, 04, 05, 06, 08; BR-SWAP-01 --
+  }
+  class MakespanEstimator <<domain service>> {
+    + estimate(steps: list[StepView], burners: int) : int
+    -- phút; cận dưới cho BR-TRAY-05 --
+  }
+  class RiceCalculator <<domain service>> {
+    + bowls_per_person(e_tray: float, e_dishes: float) : float
+    + kcal_range(kcal: float) : tuple[float, float] | None
+    -- BR-TRAY-03, BR-NUT-06 --
+  }
+  class ReasonBuilder <<domain service>> {
+    + build(best: TrayScore, runner_up: TrayScore | None) : str
+  }
+
+  class MealRepository <<repository>> {
+    + add_plan(plan: MealPlan) : None
+    + get_plan(user_id: UUID, plan_id: UUID) : MealPlan | None
+    + get_latest(user_id: UUID) : MealPlan | None
+    + list_plans(user_id: UUID, after: Cursor | None, limit: int) : list[MealPlan]
+    + set_status(plan_id: UUID, status: PlanStatus) : None
+    + swap_out(item_id: UUID, new_item: MealPlanItem, reason: SwapReason) : None
+    + add_substitution(sub: ItemSubstitution) : None
+  }
+
+  class MealPlan <<domain>> {
+    id : UUID
+    user_id : UUID
+    meal : Meal
+    persons : int
+    max_minutes : int
+    status : PlanStatus
+    e_target_kcal : float | None
+    kcal_low : float | None
+    kcal_high : float | None
+    rice_bowls_per_person : float | None
+    reason_vi : str
+    ranker_version_id : UUID | None
+    params_version : str
+    coeater_allergens : set[str]
+    pinned_lot_ids : list[UUID]
+    items : list[MealPlanItem]
+  }
+  class MealPlanItem <<domain>> {
+    id : UUID
+    slot : Slot
+    recipe_id : UUID
+    status : ItemStatus
+    replaced_item_id : UUID | None
+    swap_reason : SwapReason | None
+    rank_score : float
+    servings_scale : float
+    kcal_per_person : float | None
+  }
+  class ItemSubstitution <<domain>> {
+    original_ingredient_id : UUID
+    substitute_ingredient_id : UUID
+    grams : float
+    origin : SubOrigin
+  }
+  class MealPlanRequest <<DTO>> {
+    meal : Meal
+    persons : int {1..6}
+    max_minutes : int {10..180}
+    coeater_allergens : list[str]
+    pinned_lot_ids : list[UUID] {≤ 2}
+  }
+  class SwapRequest <<DTO>> {
+    reason : SwapReason
+  }
+  class SubstitutionRequest <<DTO>> {
+    original_ingredient_id : UUID
+    substitute_ingredient_id : UUID
+  }
+  class MealPlanOut <<DTO>>
+  class InfeasibleTrayDetail <<DTO>> {
+    shortfalls : list[TrayShortfall] {≤ 3}
+    unmet_pinned_lot_ids : list[UUID]
+  }
+  class PlanForCooking <<DTO>> {
+    plan_id : UUID
+    status : PlanStatus
+    persons : int
+    burners : int
+    items : list[CookItem]
+  }
+  enum Slot {
+    man
+    rau
+    canh
+  }
+  enum PlanStatus {
+    proposed
+    accepted
+    cooked
+    abandoned
+    expired
+  }
+  enum SwapReason {
+    khong_hop_gu
+    moi_an
+    thieu_thoi_gian
+    khac
+  }
+}
+
+package "Giao diện module khác (service.py)" as PDeps {
+  interface "core" as ICore <<service>> {
+    + UnitOfWork
+    + IdempotencyStore.run(user_id, key, request_hash, fn)
+    + ProblemError(code, status)
+  }
+  interface "catalog" as ICatalog <<service>> {
+    + list_published_recipes() : list[RecipeView]
+    + get_recipe(recipe_id) : RecipeDetail
+    + get_ingredient_allergens(ids) : dict[UUID, set[str]]
+    + get_diet_exclusions(diet_code) : set[str]
+  }
+  interface "profile" as IProfile <<service>> {
+    + get_meal_constraints(user_id, meal) : MealConstraints
+  }
+  interface "pantry" as IPantry <<service>> {
+    + list_available_lots(user_id, at) : list[LotView]
+  }
+  interface "substitute" as ISubstitute <<service>> {
+    + suggest(user_id, recipe_id, missing_id, c: MealConstraints) : list[SubstituteOption]
+    + lookup_pairs(ingredient_ids, slot, method) : list[PairView]
+    + check_allowed(original_id, substitute_id, c: MealConstraints) : bool
+  }
+  interface "events" as IEvents <<service>> {
+    + record(uow, user_id, events: list[InteractionIn]) : None
+  }
+  interface "mlops" as IMlops <<service>> {
+    + get_active(name) : ActiveModel
+  }
+  interface "privacy" as IPrivacy <<service>> {
+    + has_consent(user_id, purpose) : bool
+  }
+}
+
+MealRouter ..> MealService : gọi
+MealRouter ..> MealPlanRequest
+MealRouter ..> MealPlanOut
+MealService --> MealRepository
+MealService --> HardFilter
+MealService --> TasteRanker
+MealService --> TrayComposer
+TrayComposer --> MakespanEstimator
+MealService --> RiceCalculator
+MealService --> ReasonBuilder
+MealService ..> InfeasibleTrayDetail
+MealService ..> PlanForCooking
+MealService ..> SwapRequest
+MealService ..> SubstitutionRequest
+MealRepository ..> MealPlan
+MealPlan "1" *-- "1..*" MealPlanItem
+MealPlanItem "1" *-- "0..*" ItemSubstitution
+MealPlan --> PlanStatus
+MealPlanItem --> Slot
+MealPlanItem --> SwapReason
+
+MealService ..> ICore : <<use>>
+MealService ..> ICatalog : <<use>>
+MealService ..> IProfile : <<use>>
+MealService ..> IPantry : <<use>>
+MealService ..> ISubstitute : <<use>>
+MealService ..> IEvents : <<use>>
+TasteRanker ..> IMlops : <<use>>
+TasteRanker ..> IPrivacy : <<use>>
+
+note right of InfeasibleTrayDetail
+  Phần mở rộng của InfeasibleTrayProblem (OpenAPI),
+  trả kèm 422 code = infeasible_tray.
+  unmet_pinned_lot_ids khác rỗng ⇔ lý do BR-TRAY-08;
+  rỗng ⇔ BR-TRAY-06.
+end note
+
+note right of PlanForCooking
+  burners lấy từ MealConstraints (profile, user_settings).
+  CookItem = {meal_plan_item_id, recipe_id, servings_scale,
+  substitutions: list[ItemSubstitution]}.
+  Kiểm chủ sở hữu (user_id) trước khi trả; không thấy → not_found.
+  cooking dùng status để chặn mâm chưa accepted (UC19),
+  lấy bước nấu qua catalog.get_recipe và tính nhu cầu
+  nguyên liệu bằng NeedCalculator của chính nó.
+end note
+
+note bottom of MealRepository
+  Bảng: meal_plans, meal_plan_items, meal_plan_coeater_allergens,
+  meal_plan_pins, meal_plan_item_substitutions.
+  Mọi truy vấn lọc theo user_id (chống BOLA).
+end note
+
+@enduml

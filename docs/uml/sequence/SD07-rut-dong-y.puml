@@ -1,0 +1,94 @@
+@startuml
+title SD07 — Rút đồng ý theo mục đích (UC05; BR-CONSENT-04, BR-DSR-01, NFR-PRIV-01)
+autonumber
+hide footbox
+
+actor "Người dùng (A02)" as U
+participant "App" as APP
+participant "nginx" as NGX
+participant "api:privacy" as PRIV
+participant "api:identity" as IDN
+participant "api:core.security" as SEC
+participant "api:meal" as MEAL
+database "PostgreSQL" as DB
+queue "Valkey" as VK
+participant "worker:privacy" as WK
+participant "core.dsr_registry" as REG
+collections "Kho tệp" as FS
+
+note over APP, NGX : Mọi phản hồi đi qua nginx; chiều trả về\nvẽ gộp thành một mũi tên tới App.
+
+U -> APP : Cài đặt → Đồng ý → tắt mục đích (ví dụ personalization)
+APP -> U : nêu hệ quả (dữ liệu của mục đích bị xoá ≤ 24 giờ), hỏi xác nhận
+U -> APP : xác nhận
+APP -> NGX : POST /api/v1/me/consents/<purpose>/withdraw\nAuthorization: Bearer <access cũ>
+NGX -> PRIV : chuyển tiếp
+activate PRIV
+PRIV -> DB : SELECT FROM v_current_consents WHERE user_id = ? AND purpose_code = ?
+DB --> PRIV : sự kiện đồng ý mới nhất hoặc rỗng
+alt mục đích không có trong consent_purposes
+  PRIV --> APP : 404 problem+json (code = not_found)
+else mục đích bắt buộc (is_required = true)
+  PRIV --> APP : 422 problem+json (code = validation_failed)
+else hiện tại không ở trạng thái đồng ý (gửi lại hoặc chưa từng đồng ý)
+  PRIV --> APP : 200 {purpose, status: "withdrawn"} (lũy đẳng, không ghi thêm)
+else đang đồng ý
+  critical Giao dịch DB
+    PRIV -> DB : INSERT consent_events (action = 'withdraw', channel = 'settings',\npolicy_version_id hiện hành, app_version)
+    PRIV -> IDN : bump_token_version(user_id)
+    IDN -> DB : UPDATE users SET token_version = token_version + 1
+    IDN --> PRIV : token_version mới
+    PRIV -> DB : INSERT dsr_requests (type = 'withdraw', status = 'received',\nsubject_ref = HMAC-SHA256(user_id), received_at, acknowledged_at = now())
+    PRIV -> DB : INSERT audit_log (action = 'consent_withdraw', entity = 'consent_events')
+    PRIV -> DB : COMMIT
+  end
+  PRIV -> VK : enqueue job "privacy.purge_purpose" (dsr_request_id, purpose)
+  PRIV --> APP : 200 {purpose, status: "withdrawn", dsr_request_id}
+end
+deactivate PRIV
+note right of PRIV : Hiệu lực ngay: access token cũ mang token_version cũ\nbị từ chối ở yêu cầu kế tiếp. Refresh token không bị\nthu hồi, người dùng không phải đăng nhập lại.
+
+== Access token cũ bị từ chối, làm mới phiên ==
+APP -> NGX : GET /api/v1/meal-plans/latest\nAuthorization: Bearer <access cũ, tv = n>
+NGX -> SEC : chuyển tiếp (dependency xác thực chạy trước router của meal)
+activate SEC
+SEC -> SEC : kiểm chữ ký, kid, hạn của JWT
+SEC -> IDN : TokenVersionPort.current(sub)
+note right of SEC : Đảo phụ thuộc: core khai báo cổng TokenVersionPort,\nidentity cung cấp bản cài đặt và đăng ký lúc khởi động.\ncore và meal không import identity; chỉ identity đọc bảng users.
+IDN -> DB : SELECT token_version FROM users WHERE id = ?
+DB --> IDN : n + 1
+IDN --> SEC : n + 1
+SEC --> APP : 401 problem+json (code = unauthenticated; tv trong JWT = n < n + 1)\nWWW-Authenticate: Bearer error="invalid_token"
+deactivate SEC
+APP -> NGX : POST /api/v1/auth/refresh {refresh_token}
+NGX -> IDN : chuyển tiếp
+IDN -> IDN : xoay vòng refresh token (SD08)
+IDN --> APP : 200 {access_token (tv = n + 1), refresh_token mới}
+APP -> NGX : GET /api/v1/meal-plans/latest (gửi lại với access mới)
+NGX -> SEC : chuyển tiếp
+SEC -> SEC : JWT hợp lệ, tv = token_version
+SEC -> MEAL : gọi router meal với user_id = sub
+MEAL --> APP : 200 MealPlanOut
+
+== Xoá dữ liệu của mục đích (≤ 24 giờ) ==
+VK -> WK : giao job privacy.purge_purpose
+activate WK
+WK -> DB : UPDATE dsr_requests SET status = 'in_progress' WHERE id = ? AND status = 'received'
+critical Giao dịch DB
+  WK -> REG : handlers_for_purpose(purpose)
+  REG --> WK : danh sách handler do profile, events, scan đăng ký
+  alt purpose = 'health_profile' (BR-CONSENT-02)
+    WK -> DB : [handler của profile] UPDATE profiles SET sex_enc, birth_year_enc,\nheight_cm_enc, weight_kg_enc, enc_key_id = NULL;\nkcal_target = NULL khi kcal_source = 'suggested'
+  else purpose = 'personalization' (BR-CONSENT-03)
+    WK -> DB : [handler của events] DELETE FROM interactions WHERE user_id = ?
+  else purpose = 'photo_contribution'
+    WK -> DB : [handler của scan] UPDATE scan_images SET contributed = false\nWHERE scan_id IN (scans của user_id)
+    WK -> FS : [handler của scan] xoá bản sao trong contrib/ của người dùng
+  end
+  WK -> DB : UPDATE dsr_requests SET status = 'completed', completed_at = now()
+  WK -> DB : INSERT audit_log (action = 'purpose_data_purged', purpose)
+  WK -> DB : COMMIT
+end
+deactivate WK
+note right of WK : Sổ đăng ký handler nằm trong core (core.dsr_registry):\nmọi module đã phụ thuộc core nên tự đăng ký handler xoá/xuất\ndữ liệu theo mục đích lúc khởi động mà không import privacy;\nprivacy chỉ duyệt sổ. Cách này cần ghi vào ADR-0001.\nJob lỗi thì RQ thử lại; dsr_requests còn 'in_progress'\nquá hạn được nhân sự đóng qua UC27\n(POST /admin/data-requests/{id}/resolve, xem ST08).\nBản sao lưu cũ hết hạn sau ≤ 14 ngày (BR-RETAIN-01).
+@enduml

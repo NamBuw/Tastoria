@@ -1,0 +1,38 @@
+@startuml
+title ST06 — Máy trạng thái Account (bảng users + khoá đăng nhập trong Valkey; UC01–UC04, UC07)
+hide empty description
+
+state "active" as active
+state "locked" as locked : entry / SET Valkey login_lock:<email>:<ip> EX 900 (NFR-SEC-02)
+state "deletion_requested" as deletion_requested : entry / users.token_version += 1; thu hồi mọi refresh_tokens;\nenqueue job xoá
+state "deleted" as deleted : entry / DELETE users (CASCADE dữ liệu cá nhân);\ndsr_requests giữ subject_ref, user_id := NULL
+
+active : POST /auth/login [mật khẩu đúng] / DEL login_fail:<email>:<ip>, cấp token
+active : POST /auth/login [mật khẩu sai, đếm < 4] / INCR login_fail:<email>:<ip> (EX 900)
+active : POST /auth/logout-all / token_version += 1
+active : POST /auth/password-reset/confirm [token hợp lệ] / đổi password_hash, token_version += 1
+locked : POST /auth/login từ cùng (email, IP) / 429 account_locked + Retry-After, không kiểm mật khẩu
+
+[*] --> active : / tạo bởi POST /auth/register: status = active, role = user
+active --> locked : POST /auth/login [mật khẩu sai, đếm = 4]\n/ INCR → 5; đặt login_lock
+locked --> active : after(15 phút) — khoá Valkey tự hết hạn (TTL)
+active --> deletion_requested : POST /me/data-requests [type = delete]\n/ status := deletion_requested; tạo dsr_requests (ST08)
+locked --> deletion_requested : POST /me/data-requests [type = delete]\n(access token còn hạn) / như trên
+deletion_requested --> deleted : job xoá hoàn tất [≤ 24 giờ kể từ received_at]\n(BR-DSR-01, NFR-PRIV-01)
+deleted --> [*]
+
+note as Nmap
+  <b>Trạng thái ↔ dữ liệu lưu trữ</b>
+  active: users.status = 'active' và không có khoá login_lock cho (email, IP) đang xét
+  locked: derived, users.status = 'active' và tồn tại login_lock:<email>:<ip>
+    trong Valkey; khoá theo cặp (email, IP) như spec §8 và OpenAPI account_locked,
+    nên cùng tài khoản từ IP khác vẫn đăng nhập được
+  deletion_requested: users.status = 'deletion_requested'
+  deleted: dòng users không còn tồn tại (xoá cứng);
+    bằng chứng còn ở dsr_requests.subject_ref (HMAC-SHA256 của user_id)
+  Mọi chuyển ghi DB cập nhật users.updated_at.
+  Cột users.failed_logins và users.locked_until (model.yaml) không dùng
+  trong thiết kế này; đã đề xuất bỏ khỏi model.yaml để còn một nguồn sự thật.
+  Valkey mất dữ liệu thì bộ đếm về 0 (ADR-0003 chấp nhận).
+end note
+@enduml

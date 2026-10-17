@@ -1,0 +1,131 @@
+@startuml
+title SD02 — Xác nhận và sửa kết quả quét (UC13; BR-SCAN-02, BR-PANTRY-01, BR-PANTRY-03, BR-QTY-02, BR-FRESH-04)
+autonumber
+hide footbox
+
+actor "Người dùng (A02)" as U
+participant "App" as APP
+participant "nginx" as NGX
+participant "api:scan" as SCAN
+participant "api:catalog" as CAT
+participant "api:pantry" as PAN
+database "PostgreSQL" as DB
+collections "Kho tệp" as FS
+
+note over APP, NGX : Mọi phản hồi đi qua nginx; chiều trả về vẽ gộp\nthành một mũi tên tới App (trừ ảnh, do nginx tự đọc tệp).
+
+== Xem chip và ảnh ==
+APP -> NGX : GET /api/v1/scans/<id>
+NGX -> SCAN : chuyển tiếp
+SCAN -> DB : SELECT scans, scan_items, detections\nWHERE scans.id = ? AND scans.user_id = ?
+DB --> SCAN : lần quét + chip + khung
+SCAN --> APP : 200 {status: "done", items[], detections[]}
+APP -> NGX : GET /api/v1/scans/<id>/images/<ordinal>
+NGX -> SCAN : chuyển tiếp
+SCAN -> DB : SELECT scan_images JOIN scans WHERE scans.user_id = ?\nAND scan_id = ? AND ordinal = ?
+DB --> SCAN : storage_key, purged_at
+alt không thấy, hoặc ảnh đã bị xoá theo hạn (purged_at khác NULL, BR-RETAIN-01)
+  SCAN --> APP : 404 problem+json (code = not_found)
+else
+  SCAN --> NGX : 200, X-Accel-Redirect: /_files/tmp/scans/<id>/<ordinal>.jpg
+  NGX -> FS : đọc tệp (location internal)
+  NGX --> APP : 200 image/jpeg
+end
+APP -> U : ảnh + khung + chip (nhãn độ tươi có chữ kèm chấm màu)
+
+== Sửa chip (không ghi kho) ==
+loop người dùng sửa từng chip
+  alt đổi nhãn / sửa số đếm, mức lượng, độ tươi
+    APP -> NGX : PATCH /api/v1/scans/<id>/items/<itemId>\n{ingredient_id?, final_count?, qty_level?, user_freshness?}
+    NGX -> SCAN : chuyển tiếp
+    SCAN -> DB : UPDATE scan_items SET ..., user_action = 'relabeled' | 'edited',\noriginal_ingredient_id = (nhãn mô hình, khi đổi nhãn)\nWHERE id = ? AND scan_id = ? (scan của chính người dùng, status = 'done')
+    DB --> SCAN : số hàng
+    alt 1 hàng
+      SCAN --> APP : 200 ScanItemOut
+    else lần quét không ở 'done'
+      SCAN --> APP : 409 problem+json (code = scan_not_ready)
+    end
+  else xoá chip
+    APP -> NGX : DELETE /api/v1/scans/<id>/items/<itemId>
+    NGX -> SCAN : chuyển tiếp
+    SCAN -> DB : UPDATE scan_items SET user_action = 'deleted'
+    SCAN --> APP : 204 No Content (gọi lại vẫn 204)
+  else thêm đồ mô hình bỏ sót
+    APP -> NGX : POST /api/v1/scans/<id>/items {ingredient_id, final_count | qty_level}
+    NGX -> SCAN : chuyển tiếp
+    SCAN -> CAT : ingredient_exists(ingredient_id) (is_active)
+    CAT --> SCAN : true / false
+    SCAN -> DB : INSERT scan_items (origin = 'user_added')
+    SCAN --> APP : 201 Created, Location: /api/v1/scans/<id>/items/<itemId>
+    note right of SCAN : Mọi thao tác sửa chip chỉ chạy khi\nscans.status = 'done'; khác đi thì\n409 scan_not_ready.
+  end
+end
+note over APP, SCAN : Lỗi mạng: app giữ thao tác sửa chip trong outbox và gửi lại;\nPATCH và DELETE lũy đẳng, POST items không lũy đẳng nên app chỉ gửi lại\nkhi chưa nhận 201 và kiểm danh sách chip trước khi gửi lại.
+
+== Xác nhận vào kho ==
+U -> APP : bấm "Xác nhận"
+APP -> NGX : POST /api/v1/scans/<id>/confirm
+NGX -> SCAN : chuyển tiếp
+activate SCAN
+critical Unit of Work (một giao dịch DB)
+  SCAN -> DB : SELECT scans WHERE id = ? AND user_id = ? FOR UPDATE
+  DB --> SCAN : dòng (đã khoá) hoặc rỗng
+  alt không thấy
+    SCAN -> DB : ROLLBACK
+    SCAN --> APP : 404 problem+json (code = not_found)
+  else status = 'confirmed' (gửi lại)
+    SCAN -> DB : ROLLBACK
+    SCAN --> APP : 200 kết quả xác nhận đã có (lũy đẳng)
+  else status ≠ 'done'
+    SCAN -> DB : ROLLBACK
+    SCAN --> APP : 409 problem+json (code = scan_not_ready)
+  else còn chip "kiểm tra trước khi dùng" chưa có user_freshness
+    SCAN -> DB : ROLLBACK
+    SCAN --> APP : 422 problem+json (code = validation_failed, errors[{pointer:\n/items/<itemId>/user_freshness, code: freshness_check_required}]) (BR-FRESH-04)
+  else hợp lệ
+    SCAN -> DB : SELECT scan_items (user_action ≠ 'deleted') + detections.p_*
+    DB --> SCAN : chip còn lại
+    loop mỗi chip
+      SCAN -> PAN : convert_quantity(ingredient_id, final_count, qty_level)
+      PAN -> CAT : get_unit_grams(ingredient_id, unit_code) hoặc\nget_qty_level(food_group_code, level)
+      CAT --> PAN : grams_per_unit hoặc [g_min, g_max] của mức
+      PAN --> SCAN : GramRange [g_min, g_max] (BR-QTY-02)
+    end
+    SCAN -> PAN : add_lots_from_scan(uow, user_id, items[{ingredient_id, [g_min, g_max],\nacquired_basis, p_*, source_scan_item_id}], scan_id)
+    loop mỗi item (một chip → một lô mới, BR-PANTRY-01)
+      PAN -> DB : INSERT pantry_lots (status = 'in_stock', acquired_basis = 'first_seen'\n(toàn tủ) | 'purchase_date_entered' với ngày hôm nay (đồ vừa mua),\nfreshness_observed_at, freshness_model_version_id)
+      PAN -> DB : INSERT pantry_transactions (reason = 'scan_add', ref_type = 'scan', ref_id = scan_id)
+    end
+    PAN --> SCAN : list[lot_id]
+    opt mode = 'fridge' (BR-PANTRY-03)
+      SCAN -> PAN : mark_not_seen(uow, user_id, seen_ingredient_ids)
+      PAN -> DB : UPDATE pantry_lots SET status = 'not_seen'\nWHERE user_id = ? AND status = 'in_stock'\nAND ingredient_id NOT IN (đã thấy) AND không phải gia vị luôn có
+      PAN --> SCAN : số lô chuyển not_seen
+    end
+    SCAN -> DB : UPDATE scans SET status = 'confirmed', confirmed_at = now()
+    SCAN -> DB : COMMIT
+    SCAN --> APP : 200 ConfirmOut {lot_ids[], not_seen_count}
+  end
+end
+deactivate SCAN
+note right of SCAN : Chỉ bước này ghi vào kho (BR-SCAN-02).\nLũy đẳng nhờ khoá hàng FOR UPDATE và chuyển trạng thái\ndone → confirmed một lần; không cần Idempotency-Key.
+
+opt có lô vừa chuyển 'not_seen'
+  APP -> U : hỏi từng lô: còn hay đã hết (xử lý ở UC14, không tự xoá)
+end
+
+== Bỏ lần quét ==
+opt người dùng bỏ kết quả
+  APP -> NGX : POST /api/v1/scans/<id>/discard
+  NGX -> SCAN : chuyển tiếp
+  SCAN -> DB : UPDATE scans SET status = 'discarded'\nWHERE id = ? AND user_id = ? AND status = 'done'
+  DB --> SCAN : số hàng
+  alt 1 hàng, hoặc 0 hàng mà lần quét đã 'discarded' (gửi lại)
+    SCAN --> APP : 200 ScanOut {status: "discarded"}
+  else không thấy
+    SCAN --> APP : 404 problem+json (code = not_found)
+  else đã confirmed, hoặc chưa tới done (queued / processing / failed / expired)
+    SCAN --> APP : 409 problem+json (code = conflict_state)
+  end
+end
+@enduml
