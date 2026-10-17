@@ -15,20 +15,21 @@ from tastoria.core.health import router as health_router
 from tastoria.core.kv import make_valkey
 from tastoria.core.logging import configure_logging
 from tastoria.core.middleware import RequestContextMiddleware
+from tastoria.modules.identity.dsr import IdentitySubjectData
 from tastoria.modules.identity.mailer import make_mailer
 from tastoria.modules.identity.router import router as identity_router
 from tastoria.modules.identity.throttle import MemoryLoginThrottle, ValkeyLoginThrottle
 from tastoria.modules.privacy.router import router as privacy_router
-from tastoria.modules.privacy.service import PrivacyDeps
+from tastoria.modules.privacy.service import PrivacyDeps, SubjectDataHandler
+from tastoria.modules.profile.router import router as profile_router
+from tastoria.modules.profile.service import ProfileDeps, ProfileSubjectData, make_cipher
 
 API_PREFIX = "/api/v1"
 
 
-def build_subject_handlers(settings: Settings) -> list:
+def build_subject_handlers(profile: ProfileDeps) -> list[SubjectDataHandler]:
     """Per-module exporters/erasers for data-subject requests (privacy calls them; ADR 0001 inversion)."""
-    from tastoria.modules.identity.dsr import IdentitySubjectData
-
-    return [IdentitySubjectData()]
+    return [IdentitySubjectData(), ProfileSubjectData(profile)]
 
 
 def create_app(settings: Settings | None = None, *, configure_logs: bool = True) -> FastAPI:
@@ -69,11 +70,15 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
             max_failures=settings.login_max_failures, lock_s=settings.login_lock_s
         )
     app.state.mailer = make_mailer(settings)
-    app.state.privacy = PrivacyDeps(settings, app.state.sessionmaker, handlers=build_subject_handlers(settings))
+    app.state.profile = ProfileDeps(settings, make_cipher(settings))
+    app.state.privacy = PrivacyDeps(
+        settings, app.state.sessionmaker, handlers=build_subject_handlers(app.state.profile)
+    )
 
     install_error_handlers(app)
     app.add_middleware(RequestContextMiddleware, min_app_version=settings.min_app_version)
     app.include_router(health_router)
     app.include_router(identity_router, prefix=API_PREFIX)
     app.include_router(privacy_router, prefix=API_PREFIX)
+    app.include_router(profile_router, prefix=API_PREFIX)
     return app

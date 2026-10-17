@@ -92,9 +92,13 @@ def begin(session: Session, user_id: uuid.UUID, idem: IdempotencyRequest) -> JSO
 
 
 def finish(
-    session: Session, user_id: uuid.UUID, idem: IdempotencyRequest, status_code: int, payload: Any,
+    session: Session,
+    user_id: uuid.UUID,
+    idem: IdempotencyRequest,
+    status_code: int,
+    payload: Any,
     headers: dict[str, str] | None = None,
-) -> JSONResponse:  # fmt: skip
+) -> JSONResponse:
     body = jsonable_encoder(payload)
     session.add(
         IdempotencyKey(
