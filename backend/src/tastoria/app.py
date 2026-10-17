@@ -15,6 +15,9 @@ from tastoria.core.health import router as health_router
 from tastoria.core.kv import make_valkey
 from tastoria.core.logging import configure_logging
 from tastoria.core.middleware import RequestContextMiddleware
+from tastoria.modules.identity.mailer import make_mailer
+from tastoria.modules.identity.router import router as identity_router
+from tastoria.modules.identity.throttle import MemoryLoginThrottle, ValkeyLoginThrottle
 
 API_PREFIX = "/api/v1"
 
@@ -48,7 +51,18 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
 
     app.state.readiness_checks = {"database": check_database, "valkey": check_valkey}
 
+    if settings.login_throttle_backend == "valkey":
+        app.state.login_throttle = ValkeyLoginThrottle(
+            kv, max_failures=settings.login_max_failures, lock_s=settings.login_lock_s
+        )
+    else:
+        app.state.login_throttle = MemoryLoginThrottle(
+            max_failures=settings.login_max_failures, lock_s=settings.login_lock_s
+        )
+    app.state.mailer = make_mailer(settings)
+
     install_error_handlers(app)
     app.add_middleware(RequestContextMiddleware, min_app_version=settings.min_app_version)
     app.include_router(health_router)
+    app.include_router(identity_router, prefix=API_PREFIX)
     return app
