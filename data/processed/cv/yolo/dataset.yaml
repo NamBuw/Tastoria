@@ -1,0 +1,18 @@
+path: /home/namnx/NamBuw/Tastoria/data/processed/cv/yolo
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: ca
+  1: tom
+  2: trung
+  3: ca_chua
+  4: ca_rot
+  5: khoai_tay
+  6: bap_cai
+  7: sup_lo
+  8: bi_do
+  9: bi_dao
+  10: muop_dang
+  11: dau_que
+  12: nam

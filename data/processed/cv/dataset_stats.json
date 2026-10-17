@@ -1,0 +1,142 @@
+{
+  "classes_trained": [
+    "ca",
+    "tom",
+    "trung",
+    "ca_chua",
+    "ca_rot",
+    "khoai_tay",
+    "bap_cai",
+    "sup_lo",
+    "bi_do",
+    "bi_dao",
+    "muop_dang",
+    "dau_que",
+    "nam"
+  ],
+  "classes_without_public_data": [
+    "thit_lon",
+    "thit_bo",
+    "thit_ga",
+    "dau_phu",
+    "su_su",
+    "muop",
+    "rau_cai",
+    "rau_muong",
+    "gia_do"
+  ],
+  "images_per_split": {
+    "test": 2035,
+    "val": 897,
+    "train": 11091
+  },
+  "boxes_per_split_class": {
+    "test": {
+      "bap_cai": 236,
+      "bi_dao": 149,
+      "bi_do": 411,
+      "ca": 410,
+      "ca_chua": 2870,
+      "ca_rot": 329,
+      "dau_que": 787,
+      "khoai_tay": 378,
+      "muop_dang": 273,
+      "nam": 467,
+      "sup_lo": 628,
+      "tom": 364,
+      "trung": 644
+    },
+    "val": {
+      "bap_cai": 89,
+      "bi_dao": 185,
+      "bi_do": 533,
+      "ca": 468,
+      "ca_chua": 801,
+      "ca_rot": 330,
+      "dau_que": 99,
+      "khoai_tay": 386,
+      "muop_dang": 166,
+      "nam": 137,
+      "sup_lo": 217,
+      "tom": 135,
+      "trung": 179
+    },
+    "train": {
+      "bap_cai": 1764,
+      "bi_dao": 2249,
+      "bi_do": 7817,
+      "ca": 6717,
+      "ca_chua": 14619,
+      "ca_rot": 3727,
+      "dau_que": 5966,
+      "khoai_tay": 2896,
+      "muop_dang": 2539,
+      "nam": 3561,
+      "sup_lo": 3328,
+      "tom": 1771,
+      "trung": 1704
+    }
+  },
+  "images_per_split_class": {
+    "test": {
+      "bap_cai": 154,
+      "bi_dao": 78,
+      "bi_do": 270,
+      "ca": 248,
+      "ca_chua": 554,
+      "ca_rot": 179,
+      "dau_que": 232,
+      "khoai_tay": 179,
+      "muop_dang": 94,
+      "nam": 220,
+      "sup_lo": 244,
+      "tom": 201,
+      "trung": 228
+    },
+    "val": {
+      "bap_cai": 64,
+      "bi_dao": 95,
+      "bi_do": 210,
+      "ca": 248,
+      "ca_chua": 165,
+      "ca_rot": 134,
+      "dau_que": 74,
+      "khoai_tay": 83,
+      "muop_dang": 74,
+      "nam": 63,
+      "sup_lo": 78,
+      "tom": 75,
+      "trung": 68
+    },
+    "train": {
+      "bap_cai": 813,
+      "bi_dao": 730,
+      "bi_do": 2625,
+      "ca": 1477,
+      "ca_chua": 2744,
+      "ca_rot": 1396,
+      "dau_que": 1268,
+      "khoai_tay": 900,
+      "muop_dang": 977,
+      "nam": 1488,
+      "sup_lo": 1028,
+      "tom": 588,
+      "trung": 873
+    }
+  },
+  "candidates_per_source_split": {
+    "mendeley_bd/test": 405,
+    "openimages_v7/test": 1630,
+    "mendeley_bd/val": 213,
+    "openimages_v7/val": 685,
+    "mendeley_bd/train": 2916,
+    "openimages_v7/train": 8560
+  },
+  "dropped_near_duplicates": {
+    "mendeley_bd/train": 383,
+    "mendeley_bd/val": 1,
+    "openimages_v7/train": 2
+  },
+  "dropped_no_box_train": 0,
+  "phash_threshold": 4
+}

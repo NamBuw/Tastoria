@@ -1,0 +1,65 @@
+{
+  "data": "PUBLIC ONLY: Local Spinach Leaf v3 + AgriFreshNET v1 originals; team-collected lots still required",
+  "n_images": 9182,
+  "n_lots": 4318,
+  "images_per_label": {
+    "tuoi": 3809,
+    "dung_ngay": 3730,
+    "dung_som": 1643
+  },
+  "mean_foreground_fraction": 0.2470803555627081,
+  "svm": {
+    "accuracy": {
+      "mean": 0.8561315617512525,
+      "sd": 0.0025119935950056135
+    },
+    "macro_f1": {
+      "mean": 0.8185657110194096,
+      "sd": 0.003482602617742788
+    },
+    "qwk": {
+      "mean": 0.8784462395760272,
+      "sd": 0.002371024044341408
+    },
+    "mae_level": {
+      "mean": 0.16227401437595293,
+      "sd": 0.0029646389868909213
+    }
+  },
+  "cnn": {
+    "accuracy": {
+      "mean": 0.88793291221956,
+      "sd": null
+    },
+    "macro_f1": {
+      "mean": 0.8554546611655521,
+      "sd": null
+    },
+    "qwk": {
+      "mean": 0.9192621317552839,
+      "sd": null
+    },
+    "mae_level": {
+      "mean": 0.11871052058375081,
+      "sd": null
+    }
+  },
+  "paired_bootstrap_repeat0": {
+    "n_lots": 4318,
+    "delta_macro_f1_cnn_minus_svm": {
+      "point": 0.03344649682843248,
+      "ci95": [
+        0.012192169448747592,
+        0.05363027695323962
+      ]
+    },
+    "delta_qwk_cnn_minus_svm": {
+      "point": 0.038078543682607435,
+      "ci95": [
+        0.025816833094348558,
+        0.050509932753109506
+      ]
+    },
+    "n_boot": 2000
+  }
+}

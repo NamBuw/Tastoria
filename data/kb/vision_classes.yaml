@@ -1,0 +1,385 @@
+# Bảng lớp thị giác của bộ phát hiện nguyên liệu Tastoria (thiết kế v2 §7, review:cv#4).
+#
+# Tiêu chí chọn lớp (thiết kế v2 §7):
+#   (a) là nguyên liệu chính (trường `main`) của món mặn / rau / canh trong data/kb/dish_list.yaml;
+#       gia vị và rau thơm bị loại;
+#   (b) thường để ở ngăn mát tủ lạnh (không phải ngăn đá, không phải tủ bếp);
+#   (c) tách được bằng mắt trên ảnh chụp tủ lạnh. Điểm (c) mới là giả thuyết: phải kiểm bằng vòng gán thử
+#       100–150 ảnh (F1 giữa hai người, κ tên lớp ≥ 0,81). Lớp nào không đạt thì gộp vào nhãn cha
+#       (ghi ở `fallback_parent`) hoặc bỏ.
+#   Mục tiêu dữ liệu: mỗi lớp ≥ 300 vật thể train, ≥ 30–50 vật thể test (ảnh tủ lạnh của nhóm).
+#
+# Trường của mỗi lớp:
+#   id                  mã lớp (ASCII, cố định; thứ tự trong danh sách = chỉ số lớp YOLO).
+#   name_vi, name_en    tên hiển thị trên chip.
+#   ingredients         tên name_vi trong data/kb/ingredients.yaml (nhiều–nhiều: một lớp ứng với nhiều
+#                       nguyên liệu, người dùng chọn loại cụ thể trên chip; một nguyên liệu có thể nằm ở
+#                       nhiều lớp khi trông giống nhau). Test kiểm mọi tên đều có trong ingredients.yaml.
+#   dish_main_count     số món trong dish_list.yaml có ít nhất một nguyên liệu của lớp trong `main`
+#                       (đếm tự động, test kiểm lại).
+#   countable           true khi số khung có nghĩa là số lượng (từng quả, từng bìa). false với bó, túi, khay.
+#   instance_def        item (một vật: một quả, một củ, một bắp) | group_of (một bó / một túi / một chùm,
+#                       kiểu IsGroupOf của Open Images) | package (một khay, hộp, túi kín có nhãn).
+#   instance_note       mô tả một thể hiện để người gán nhãn làm giống nhau.
+#   has_freshness_model true khi nằm trong kế hoạch mô hình độ tươi (6–8 loại có thời hạn ngắn, review:cv#1).
+#   fridge              ngăn mát | ngăn mát hoặc ngoài: điều kiện (b) và ghi chú khi không chắc.
+#   public_data         nguồn công khai đã ánh xạ được vào lớp (khoá nguồn → nhãn gốc). Rỗng nghĩa là lớp
+#                       chỉ có thể học từ ảnh nhóm tự chụp (hoặc bộ Roboflow cần API key, chưa tải).
+#   pending_public      bộ Roboflow Universe có nhãn phù hợp nhưng cần API key (chưa tải, chưa kiểm ảnh).
+#   fallback_parent     nhãn cha để gộp nếu vòng gán thử cho thấy không tách được.
+#   reason              lý do chọn.
+#
+# Nguồn dữ liệu công khai (chi tiết giấy phép ở data/raw/images/<nguồn>/SOURCE.md):
+#   openimages_v7       Open Images V7, tập boxable (nhãn CC BY 4.0, ảnh CC BY 2.0 theo từng ảnh).
+#   mendeley_bd         Jahan et al. 2025, Vegetable Object Detection Dataset from Bangladesh, Mendeley
+#                       gnc4s3z2mf v3 (CC BY 4.0). 3.534 khung hình cắt từ 10 video quầy rau.
+# Bộ Roboflow (cần API key, xem docs/reports/xu-ly-anh/ket-qua-so-bo.md): viet_hoang (Viet Hoang Food
+#   food-ingredient-detection-mnc5n), robo1 (INGREDIENTS ingredients-b5dkh), smartpantry
+#   (ingredients-yot0w), nhan_dien_rau (khai-pha-du-lieu/nhan-dien-rau-p2y8s), water_spinach
+#   (fishdetect-q6amf/water-spinach-disease-7a5pr), phcs (phcs-workspace-kultf/vegetables-ckjsc),
+#   aicook (aicook-lcv4d, MIT).
+version: 1
+classes:
+- id: thit_lon
+  name_vi: thịt lợn
+  name_en: pork (raw)
+  ingredients: [thịt ba chỉ, thịt nạc vai, thịt băm, sườn non, chân giò, xương ống lợn]
+  dish_main_count: 47
+  countable: false
+  instance_def: package
+  instance_note: Một khay, túi hoặc hộp thịt; thịt để trần trên đĩa thì một đĩa là một thể hiện.
+  has_freshness_model: false
+  fridge: ngăn mát
+  public_data: {}
+  pending_public: [viet_hoang (pork belly, pork rib), smartpantry (pork), robo1 (pork)]
+  fallback_parent: thit_dong_goi
+  reason: Nhóm nguyên liệu chính phổ biến nhất của món mặn và canh. Open Images, LVIS không có thịt lợn sống.
+- id: thit_bo
+  name_vi: thịt bò
+  name_en: beef (raw)
+  ingredients: [thịt bò, bắp bò, thịt bò xay]
+  dish_main_count: 10
+  countable: false
+  instance_def: package
+  instance_note: Như thit_lon.
+  has_freshness_model: false
+  fridge: ngăn mát
+  public_data: {}
+  pending_public: [aicook (beef), viet_hoang]
+  fallback_parent: thit_dong_goi
+  reason: Món xào/mặn phổ biến. Màu đỏ sẫm khác thịt lợn nhưng trong túi có thể lẫn; nếu κ thấp thì gộp nhãn cha.
+- id: thit_ga
+  name_vi: thịt gà
+  name_en: chicken (raw)
+  ingredients: [thịt gà, cánh gà, đùi gà, ức gà]
+  dish_main_count: 9
+  countable: false
+  instance_def: package
+  instance_note: Một khay/túi; gà nguyên con hoặc nửa con để trần thì một con là một thể hiện.
+  has_freshness_model: false
+  fridge: ngăn mát
+  public_data: {}
+  pending_public: [aicook (chicken, chicken_breast), viet_hoang]
+  fallback_parent: thit_dong_goi
+  reason: Món mặn và canh. Lớp "Chicken" của Open Images là con gà sống, không dùng được.
+- id: ca
+  name_vi: cá
+  name_en: fish (raw)
+  ingredients: [cá lóc, cá basa, cá thu, cá nục, cá rô phi, cá diêu hồng, cá chép, cá trắm, cá bống, cá ngừ,
+    cá cơm, cá rô đồng, cá hồi, cá trê]
+  dish_main_count: 14
+  countable: false
+  instance_def: package
+  instance_note: Một con cá nguyên, hoặc một khay/túi khúc cá. Cá đơn lẻ để trần vẫn gán một khung một con.
+  has_freshness_model: false
+  fridge: ngăn mát hoặc ngăn đá (cá mua về nấu trong 1–2 ngày để ngăn mát)
+  public_data:
+    openimages_v7: [Fish]
+  pending_public: [viet_hoang (fish)]
+  fallback_parent: null
+  reason: 14 món mặn/canh. Lớp Fish của Open Images chủ yếu là cá sống dưới nước hoặc cá cảnh, lệch miền rất xa
+    ảnh tủ lạnh; chỉ dùng cho baseline.
+- id: tom
+  name_vi: tôm
+  name_en: shrimp
+  ingredients: [tôm, tép]
+  dish_main_count: 15
+  countable: false
+  instance_def: group_of
+  instance_note: Cả túi/khay tôm là một khung group_of; tôm rời ≤ 5 con mới gán từng con.
+  has_freshness_model: false
+  fridge: ngăn mát
+  public_data:
+    openimages_v7: [Shrimp]
+  pending_public: [viet_hoang (shrimp), aicook (shrimp)]
+  fallback_parent: null
+  reason: 14 món, đủ cả ba slot. Open Images có, phần lớn là tôm đã nấu trên đĩa.
+- id: trung
+  name_vi: trứng
+  name_en: egg
+  ingredients: [trứng gà, trứng vịt, trứng cút]
+  dish_main_count: 12
+  countable: true
+  instance_def: item
+  instance_note: Từng quả. Vỉ trứng đóng kín không nhìn rõ từng quả thì một vỉ là một khung (ghi chú group_of).
+  has_freshness_model: false
+  fridge: ngăn mát (cửa tủ)
+  public_data:
+    openimages_v7: [Egg]
+  pending_public: [aicook (eggs), viet_hoang (egg)]
+  fallback_parent: null
+  reason: Món mặn hằng ngày, đếm được, dễ tách. Lớp Egg của Open Images có cả trứng Phục sinh tô màu và trứng đã
+    nấu.
+- id: dau_phu
+  name_vi: đậu phụ
+  name_en: tofu
+  ingredients: [đậu phụ, đậu phụ non]
+  dish_main_count: 16
+  countable: true
+  instance_def: item
+  instance_note: Từng bìa đậu; hộp đậu non một hộp là một khung.
+  has_freshness_model: false
+  fridge: ngăn mát
+  public_data: {}
+  pending_public: [smartpantry (tofu), phcs (tofu)]
+  fallback_parent: null
+  reason: 16 món (thứ ba theo tần suất). Open Images không có; LVIS có bean_curd nhưng LVIS cần tải ảnh COCO 20 GB.
+- id: ca_chua
+  name_vi: cà chua
+  name_en: tomato
+  ingredients: [cà chua]
+  dish_main_count: 20
+  countable: true
+  instance_def: item
+  instance_note: Từng quả.
+  has_freshness_model: true
+  fridge: ngăn mát
+  public_data:
+    openimages_v7: [Tomato]
+    mendeley_bd: [Tomato]
+  pending_public: []
+  fallback_parent: null
+  reason: 20 món, thời hạn ngắn (5 ngày), có dữ liệu độ tươi AgriFreshNET.
+- id: ca_rot
+  name_vi: cà rốt
+  name_en: carrot
+  ingredients: [cà rốt]
+  dish_main_count: 23
+  countable: true
+  instance_def: item
+  instance_note: Từng củ.
+  has_freshness_model: false
+  fridge: ngăn mát
+  public_data:
+    openimages_v7: [Carrot]
+    mendeley_bd: [Carrots]
+  pending_public: []
+  fallback_parent: null
+  reason: Nhiều món nhất (23). Thời hạn dài (21 ngày) nên không làm mô hình độ tươi.
+- id: khoai_tay
+  name_vi: khoai tây
+  name_en: potato
+  ingredients: [khoai tây]
+  dish_main_count: 4
+  countable: true
+  instance_def: item
+  instance_note: Từng củ; túi lưới nhiều củ không thấy rõ thì một túi group_of.
+  has_freshness_model: false
+  fridge: ngăn mát hoặc ngoài (nhiều hộ để ngoài; điều kiện (b) cần kiểm lại khi chụp 12 hộ)
+  public_data:
+    openimages_v7: [Potato]
+    mendeley_bd: [Potato]
+  pending_public: []
+  fallback_parent: null
+  reason: 4 món canh/rau, dễ tách, nhiều dữ liệu công khai. Giữ có điều kiện vì (b) không chắc.
+- id: bap_cai
+  name_vi: bắp cải
+  name_en: cabbage
+  ingredients: [bắp cải]
+  dish_main_count: 5
+  countable: true
+  instance_def: item
+  instance_note: Từng bắp (nguyên hay đã cắt nửa).
+  has_freshness_model: false
+  fridge: ngăn mát
+  public_data:
+    openimages_v7: [Cabbage]
+    mendeley_bd: [Cabbage]
+  pending_public: []
+  fallback_parent: null
+  reason: 5 món rau/canh. Cải thảo không ánh xạ vào đây vì hình dáng khác; nó vào rau_cai.
+- id: sup_lo
+  name_vi: súp lơ
+  name_en: broccoli / cauliflower
+  ingredients: [súp lơ xanh, súp lơ trắng]
+  dish_main_count: 4
+  countable: true
+  instance_def: item
+  instance_note: Từng cây/bông lớn; túi bông nhỏ đã cắt thì một túi group_of.
+  has_freshness_model: true
+  fridge: ngăn mát
+  public_data:
+    openimages_v7: [Broccoli]
+    mendeley_bd: [Cauliflower]
+  pending_public: []
+  fallback_parent: null
+  reason: 4 món rau. Gộp xanh và trắng thành một lớp, người dùng chọn trên chip; vàng nhanh (5 ngày).
+- id: bi_do
+  name_vi: bí đỏ
+  name_en: pumpkin
+  ingredients: [bí đỏ]
+  dish_main_count: 3
+  countable: true
+  instance_def: item
+  instance_note: Từng quả hoặc từng miếng đã cắt.
+  has_freshness_model: false
+  fridge: ngăn mát (miếng đã cắt) hoặc ngoài (quả nguyên)
+  public_data:
+    openimages_v7: [Pumpkin]
+    mendeley_bd: [Pumpkin]
+  pending_public: []
+  fallback_parent: null
+  reason: 3 món canh/rau. Open Images Pumpkin phần lớn là bí Halloween khắc mặt, lệch miền.
+- id: bi_dao
+  name_vi: bí đao
+  name_en: winter melon
+  ingredients: [bí đao, bầu]
+  dish_main_count: 6
+  countable: true
+  instance_def: item
+  instance_note: Từng quả hoặc từng khúc.
+  has_freshness_model: false
+  fridge: ngăn mát
+  public_data:
+    openimages_v7: [Winter melon]
+    mendeley_bd: [Bottle gourd]
+  pending_public: [phcs (winter_melon), robo1 (gourd)]
+  fallback_parent: qua_bau_bi
+  reason: Bí đao 4 món + bầu 2 món (canh). Gộp bầu vào cùng lớp vì vỏ xanh nhạt, dáng thuôn giống nhau trên ảnh
+    tủ; nhãn cha qua_bau_bi nếu gán thử không tách được với mướp, su su.
+- id: su_su
+  name_vi: su su
+  name_en: chayote
+  ingredients: [su su]
+  dish_main_count: 5
+  countable: true
+  instance_def: item
+  instance_note: Từng quả.
+  has_freshness_model: false
+  fridge: ngăn mát
+  public_data: {}
+  pending_public: [robo1 (chayote)]
+  fallback_parent: qua_bau_bi
+  reason: 5 món rau/canh; không có bộ công khai tải được không cần khoá.
+- id: muop
+  name_vi: mướp
+  name_en: luffa
+  ingredients: [mướp]
+  dish_main_count: 4
+  countable: true
+  instance_def: item
+  instance_note: Từng quả.
+  has_freshness_model: true
+  fridge: ngăn mát
+  public_data: {}
+  pending_public: []
+  fallback_parent: qua_bau_bi
+  reason: 4 món canh/rau; không có bộ công khai nào (kể cả Roboflow). "Snake gourd" của bộ Bangladesh là loài khác
+    (Trichosanthes), không ánh xạ.
+- id: muop_dang
+  name_vi: mướp đắng
+  name_en: bitter gourd
+  ingredients: [mướp đắng]
+  dish_main_count: 3
+  countable: true
+  instance_def: item
+  instance_note: Từng quả.
+  has_freshness_model: true
+  fridge: ngăn mát
+  public_data:
+    mendeley_bd: [Bitter Gourd]
+  pending_public: [robo1 (bitter_melon)]
+  fallback_parent: null
+  reason: 3 món canh/rau; vỏ sần rất dễ tách; có dữ liệu độ tươi AgriFreshNET (bittermelon).
+- id: dau_que
+  name_vi: đậu que
+  name_en: green beans
+  ingredients: [đậu que, đậu đũa]
+  dish_main_count: 3
+  countable: false
+  instance_def: group_of
+  instance_note: Một nắm/túi là một khung group_of.
+  has_freshness_model: true
+  fridge: ngăn mát
+  public_data:
+    mendeley_bd: [Green Beans]
+  pending_public: []
+  fallback_parent: null
+  reason: 3 món rau (đậu que, đậu đũa); bộ Bangladesh có 7.468 khung. Thời hạn 5 ngày.
+- id: rau_cai
+  name_vi: rau cải
+  name_en: leafy brassica greens
+  ingredients: [cải ngọt, cải thìa, cải bẹ xanh, cải làn, cải thảo, cải cúc]
+  dish_main_count: 11
+  countable: false
+  instance_def: group_of
+  instance_note: Một bó hoặc một túi là một khung group_of. Người dùng chọn loại cải trên chip.
+  has_freshness_model: true
+  fridge: ngăn mát
+  public_data: {}
+  pending_public: [robo1 (bok_choy, napa_cabbage), viet_hoang (bok choy)]
+  fallback_parent: rau_la
+  reason: 11 món. Nhãn cha theo đúng gợi ý của thiết kế (các loại cải khó tách bằng mắt). Héo nhanh (3–5 ngày).
+- id: rau_muong
+  name_vi: rau muống
+  name_en: water spinach
+  ingredients: [rau muống]
+  dish_main_count: 2
+  countable: false
+  instance_def: group_of
+  instance_note: Một bó hoặc một túi.
+  has_freshness_model: true
+  fridge: ngăn mát
+  public_data: {}
+  pending_public: [nhan_dien_rau (rau_muong), water_spinach (Water Spinach Fresh/NonFresh)]
+  fallback_parent: rau_la
+  reason: Rau phổ biến nhất bữa cơm nhà (kho món mới ghi 2 món); có dữ liệu độ tươi Local Spinach Leaf.
+- id: gia_do
+  name_vi: giá đỗ
+  name_en: mung bean sprouts
+  ingredients: [giá đỗ]
+  dish_main_count: 5
+  countable: false
+  instance_def: group_of
+  instance_note: Một túi hoặc một nắm.
+  has_freshness_model: false
+  fridge: ngăn mát
+  public_data: {}
+  pending_public: [robo1 (mung_bean_sprout), viet_hoang (bean sprout)]
+  fallback_parent: null
+  reason: 5 món rau/canh, trông khác hẳn các lớp còn lại.
+- id: nam
+  name_vi: nấm
+  name_en: mushroom
+  ingredients: [nấm rơm, nấm hương tươi, nấm kim châm, nấm đùi gà, nấm sò, nấm mỡ]
+  dish_main_count: 14
+  countable: false
+  instance_def: group_of
+  instance_note: Một túi/khay/chùm là một khung group_of; cây nấm rời ≤ 5 cây mới gán từng cây.
+  has_freshness_model: false
+  fridge: ngăn mát
+  public_data:
+    openimages_v7: [Mushroom]
+  pending_public: [aicook (mushrooms)]
+  fallback_parent: null
+  reason: 14 món ở cả ba slot. Open Images Mushroom có nhiều nấm mọc ngoài rừng.
+# Ứng viên đã cân nhắc nhưng chưa đưa vào (có thể thêm khi đủ ảnh tự chụp).
+rejected:
+- {name_vi: mực, reason: "3 món; thường để ngăn đá, vi phạm điều kiện (b)."}
+- {name_vi: cà tím, reason: "2 món; giữ dự phòng, bộ Bangladesh có 6.274 khung nếu cần thêm lớp."}
+- {name_vi: đậu bắp, reason: "4 món nhưng chưa có bộ công khai tải được không cần khoá."}
+- {name_vi: hành tây, reason: "7 món nhưng thường để ngoài tủ và là phụ liệu; không có trong Open Images."}
+- {name_vi: dưa chuột, reason: "Không phải nguyên liệu chính của món nào trong dish_list.yaml (vi phạm (a))."}
+- {name_vi: mồng tơi / rau ngót / rau dền / rau đay, reason: "Rau canh khó tách với nhau bằng mắt; khi có ảnh tự
+    chụp có thể thêm nhãn cha rau_la."}
+- {name_vi: hành lá, reason: "Rau thơm/gia vị, loại theo (a)."}
