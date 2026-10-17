@@ -266,3 +266,24 @@ def test_safety_check_failure_rolls_back_everything(fresh_database, bundle_copy:
     assert not res.ok and any("Ba chỉ chiên nước mắm" in e for e in res.errors)
     assert _catalog_rows(url) == 0
     assert _one(url, "SELECT count(*) FROM audit_log WHERE purpose = 'failed: safety check'") == 1
+
+
+def test_cli_prints_a_json_report_and_exit_code(fresh_database, monkeypatch, capsys, bundle_copy: Path) -> None:
+    import json
+
+    from tastoria.cli import main
+    from tastoria.core.config import get_settings
+
+    url = fresh_database()
+    monkeypatch.setenv("TASTORIA_DATABASE_URL", url)
+    get_settings.cache_clear()
+    try:
+        assert main(["catalog", "import", str(KB_DIR), "--processed", str(PROCESSED_DIR)]) == 0
+        out = json.loads(capsys.readouterr().out)
+        assert out["ok"] is True and out["changes"] > 0 and out["data_version"]
+        _edit_yaml(bundle_copy / "recipes/rau/dau-dua-xao-toi.yaml", lambda d: d.update(servings=0))
+        assert main(["catalog", "import", str(bundle_copy), "--processed", str(PROCESSED_DIR)]) == 1
+        captured = capsys.readouterr()
+        assert "recipes/rau/dau-dua-xao-toi.yaml:" in captured.err and json.loads(captured.out)["ok"] is False
+    finally:
+        get_settings.cache_clear()
