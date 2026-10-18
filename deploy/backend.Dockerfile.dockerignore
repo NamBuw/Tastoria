@@ -10,5 +10,6 @@
 !data/processed/fct2007/**
 !data/processed/usda/**
 !deploy/scripts/scheduler.sh
+!deploy/scripts/models-bootstrap.sh
 **/__pycache__
 **/*.pyc

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# Tastoria backend image: api, migrate and scheduler run from it (ADR 0001, ADR 0003).
+# Tastoria backend image: api, worker, migrate and scheduler run from it (ADR 0001, ADR 0003).
 # Build context: repository root (see backend.Dockerfile.dockerignore).
 
 FROM ghcr.io/astral-sh/uv:0.9.28 AS uv
@@ -37,6 +37,7 @@ COPY data/kb /app/data/kb
 COPY data/processed/fct2007 /app/data/processed/fct2007
 COPY data/processed/usda /app/data/processed/usda
 COPY deploy/scripts/scheduler.sh /app/scheduler.sh
+COPY deploy/scripts/models-bootstrap.sh /app/models-bootstrap.sh
 WORKDIR /app
 USER tastoria
 EXPOSE 8000

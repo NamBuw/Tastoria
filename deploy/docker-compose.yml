@@ -29,6 +29,8 @@ services:
       - "127.0.0.1:6880:80"
     volumes:
       - files:/var/lib/tastoria/storage:ro
+      # APK downloads under /tai-ve/ (repo dist/, gitignored)
+      - ../dist:/srv/tastoria/dist:ro
     depends_on:
       api:
         condition: service_healthy
@@ -82,12 +84,42 @@ services:
         tastoria db upgrade
         tastoria catalog import data/kb
         tastoria catalog substitutes import data/kb/substitution_pairs.yaml
+        sh /app/models-bootstrap.sh
+    volumes:
+      - files:/var/lib/tastoria/storage
+      # model files staged by scripts/deploy.sh (ml/runs/… is gitignored, so they are not in the image)
+      - ./models:/import:ro
     depends_on:
       postgres:
         condition: service_healthy
     restart: "no"
 
-  # No RQ worker yet: the backend runs its jobs in-process (TASTORIA_JOBS_BACKEND=sync); the scan slice adds one.
+  # Scan inference (spec v2 §8): RQ SimpleWorker on queue `scan`, loads the deployed detector once (sha256 checked,
+  # onnxruntime 2 intra-op threads). Limits = the NFR-PERF-01 measurement condition (--cpus=2 --memory=4g).
+  # Photos and model artifacts are read from the file volume, mounted read-only.
+  worker:
+    <<: *backend
+    command: ["tastoria", "worker"]
+    volumes:
+      - files:/var/lib/tastoria/storage:ro
+    cpus: 2
+    mem_limit: 4g
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    restart: unless-stopped
+    stop_grace_period: 40s
+    healthcheck:
+      test: ["CMD", "tastoria", "worker", "--check"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
   # scheduler = the cron container of ADR 0003, as a plain loop (no cron daemon in a non-root image).
   scheduler:
     <<: *backend
@@ -128,7 +160,8 @@ services:
 
   valkey:
     image: valkey/valkey:9
-    # Not a source of truth (ADR 0003): login-lock counters only. Snapshot so a restart keeps active locks.
+    # Not a source of truth (ADR 0003): login-lock counters, the RQ scan queue, long-poll channels.
+    # Snapshot so a restart keeps active locks (a lost scan job is re-enqueued by the sweeper).
     command: ["valkey-server", "--save", "300", "1", "--appendonly", "no", "--maxmemory", "128mb", "--maxmemory-policy", "volatile-ttl"]
     volumes:
       - valkeydata:/data

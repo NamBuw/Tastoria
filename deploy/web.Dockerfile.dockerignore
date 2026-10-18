@@ -5,3 +5,5 @@ app/dist
 app/.expo
 app/docs
 !deploy/nginx/**
+!landing/**
+landing/docs

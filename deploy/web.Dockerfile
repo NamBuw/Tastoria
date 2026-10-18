@@ -17,3 +17,7 @@ RUN rm -f /etc/nginx/conf.d/default.conf
 COPY deploy/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY deploy/nginx/tastoria.conf /etc/nginx/conf.d/tastoria.conf
 COPY --from=web /app/dist /usr/share/nginx/tastoria
+# Landing page /gioi-thieu/ (static, landing/nginx-snippet.conf is inlined in tastoria.conf)
+COPY landing/index.html landing/style.css /usr/share/nginx/landing/
+COPY landing/fonts /usr/share/nginx/landing/fonts
+COPY landing/img /usr/share/nginx/landing/img
