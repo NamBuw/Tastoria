@@ -249,6 +249,44 @@ Journal (UC22): kcal per person = Σ dish snapshots + Σ rice bowls × E_bát; d
 Privacy: pantry, meal, cooking, events and substitute export their tables in data-subject exports; withdrawing
 `personalization` deletes the user's interactions (BR-CONSENT-04).
 
+## Taste survey (UC23, UC24)
+
+Respondents (A03) need no account. `POST /survey/respondents` checks the `consent` flag (422 `consent_required`),
+the current `survey` policy version (409 `policy_outdated`) and the open form (409 `survey_closed`), then assigns
+every anchor of the form plus `n_random` published non-anchor dishes:
+- split over man / rau / canh in proportion to the published dishes per slot, largest remainder with random
+  tie-break (FR-23-06: every share within 1 of the exact proportion);
+- within a slot, the dishes shown least often in this form first, random among equals, so every dish collects about
+  the same number of ratings (within 1 per slot). The form row is locked while assigning, so concurrent starts keep
+  that balance;
+- `display_order` is a random permutation of all assigned dishes (anchors included).
+
+`respondent_token` (header `X-Respondent-Token`) is an HS256 JWT signed with the active JWT key, audience
+`tastoria-survey`, `sub` = respondent id, valid 30 days, not stored. A missing, forged or expired token, a user access
+token, or a token of another respondent answers 401 `respondent_token_invalid` (the contract and UC23 8b; TC-SEC-07
+says 404). Answering is allowed on anchors too, "Chưa ăn bao giờ" included (UC23 open question 4). Writes on a closed
+form answer 409 `survey_closed`, after completion 409 `survey_already_completed`; `complete` lists what is missing in
+`missing_recipe_ids` (422 `survey_incomplete`).
+
+Staff commands (inside the `api` container; container access is the `ml_operator` check, as for `catalog import`;
+every run, refused ones included, writes one `audit_log` row with `actor_role = ml_operator`):
+
+```bash
+tastoria survey create-form --anchors 10 --random 35 [--seed S] [--yes]  # version YYYYMMDD-n, closes the open form
+tastoria survey close [VERSION]       # stop answers (default: the open form)
+tastoria survey open VERSION          # accept answers again (closes any other open form)
+tastoria survey list                  # forms with respondent / completed counts
+tastoria survey export VERSION [--out DIR]   # default DIR: $TASTORIA_STORAGE_DIR/survey-exports
+```
+
+Anchors are drawn by slot with `random.Random(seed)` over the published dishes ordered by id; the seed is printed
+and stored in `audit_log.purpose` (`seed=…`), so the same seed on the same published catalog gives the same anchors.
+`--yes` is required (or an interactive confirmation) when the open form already has respondents. `export` writes
+`respondents.csv`, `assignments.csv`, `ratings.csv`, `favorites.csv`, `anchors.csv`, `recipes.csv` and
+`manifest.json` (sha256 and row count per file) for completed respondents only, with `respondent_id` as the only
+identifier, into a new directory `<VERSION>-<UTC stamp>` (written through a temporary directory, never overwriting).
+`GET /admin/surveys` (JWT role `ml_operator`, else 403) lists the forms with counts and is audited.
+
 ## Contract changes made in slice 2 (`docs/api/openapi-v1.yaml`)
 
 - Declared fields slice 1 already sent: `Profile.target_stale`, `Profile.suggested_kcal`; `EnergySuggestion.goal`,

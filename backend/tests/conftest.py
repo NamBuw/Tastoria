@@ -136,7 +136,7 @@ def client(app, clean_db: None) -> Iterator[object]:
 _TRUNCATE = """
 BEGIN;
 SET LOCAL tastoria.erasure = 'on';
-TRUNCATE users, dsr_requests, audit_log, idempotency_keys, recipes, cooking_methods RESTART IDENTITY CASCADE;
+TRUNCATE users, dsr_requests, audit_log, idempotency_keys, recipes, cooking_methods, survey_forms RESTART IDENTITY CASCADE;
 DELETE FROM policy_versions WHERE version LIKE 'test-%';
 COMMIT;
 """
@@ -263,7 +263,8 @@ def kb_app(kb_database_url: str, valkey: ds.Container, storage_dir: Path):
 _KB_TRUNCATE = """
 BEGIN;
 SET LOCAL tastoria.erasure = 'on';
-TRUNCATE users, dsr_requests, audit_log, idempotency_keys, substitution_pairs RESTART IDENTITY CASCADE;
+TRUNCATE users, dsr_requests, audit_log, idempotency_keys, substitution_pairs, survey_forms RESTART IDENTITY CASCADE;
+DELETE FROM policy_versions WHERE version LIKE 'test-%';
 COMMIT;
 """
 

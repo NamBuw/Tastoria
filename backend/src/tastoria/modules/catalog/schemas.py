@@ -208,6 +208,16 @@ class StepView:
 
 
 @dataclass(frozen=True)
+class RecipeRef:
+    """Id, name, slot and status of a recipe, without lines or steps (survey forms, exports)."""
+
+    id: uuid.UUID
+    name_vi: str
+    slot: str
+    status: str
+
+
+@dataclass(frozen=True)
 class MakeAheadView:
     item: IngredientView
     through_step_no: int

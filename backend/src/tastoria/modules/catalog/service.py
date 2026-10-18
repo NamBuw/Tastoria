@@ -70,6 +70,7 @@ from tastoria.modules.catalog.schemas import (
     RecipeLine,
     RecipeNutrientOut,
     RecipeOut,
+    RecipeRef,
     RecipeSourceOut,
     RecipeStepOut,
     RecipeSummary,
@@ -121,6 +122,25 @@ def not_published_recipe_ids(session: Session, recipe_ids: Iterable[uuid.UUID]) 
         return []
     ok = set(session.scalars(select(Recipe.id).where(Recipe.id.in_(wanted), Recipe.status == "published")).all())
     return [r for r in wanted if r not in ok]
+
+
+def published_recipe_refs(session: Session) -> list[RecipeRef]:
+    """Every `published` recipe as (id, name, slot, status), ordered by id (stable input for seeded sampling)."""
+    rows = session.execute(
+        select(Recipe.id, Recipe.name_vi, Recipe.slot, Recipe.status)
+        .where(Recipe.status == "published")
+        .order_by(Recipe.id)
+    )
+    return [RecipeRef(*r) for r in rows]
+
+
+def recipe_refs(session: Session, ids: Iterable[uuid.UUID]) -> dict[uuid.UUID, RecipeRef]:
+    """Any status: a survey keeps showing and exporting the recipe it assigned, even once retired (BR-CATALOG-01)."""
+    wanted = list(set(ids))
+    if not wanted:
+        return {}
+    rows = session.execute(select(Recipe.id, Recipe.name_vi, Recipe.slot, Recipe.status).where(Recipe.id.in_(wanted)))
+    return {r[0]: RecipeRef(*r) for r in rows}
 
 
 def excluded_food_groups(session: Session, diet_code: str | None) -> frozenset[str]:

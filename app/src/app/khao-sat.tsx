@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
@@ -36,7 +37,7 @@ export default function Survey() {
         <BrandHeader subtitle="Khảo sát gu món ăn" />
         <Notice tone="warn">
           <T v="title">Khảo sát chưa mở</T>
-          <T>Máy chủ này chưa mở đợt khảo sát nào. Cảm ơn bạn đã ghé; hãy quay lại khi nhóm gửi đường dẫn mới.</T>
+          <T>Hiện không có đợt khảo sát nào đang nhận trả lời. Cảm ơn bạn đã ghé; hãy quay lại khi nhóm gửi đường dẫn mới.</T>
         </Notice>
       </Screen>
     );
@@ -53,7 +54,12 @@ export default function Survey() {
     );
   }
   return saved ? (
-    <Form saved={saved} onReset={() => store(null)} onDone={async () => { await store(null); setThanks(true); }} />
+    <Form
+      saved={saved}
+      onReset={() => store(null)}
+      onDone={async () => { await store(null); setThanks(true); }}
+      onClosed={async () => { await store(null); setNotOpen(true); }}
+    />
   ) : (
     <Start onStarted={store} onNotOpen={() => setNotOpen(true)} />
   );
@@ -62,17 +68,20 @@ export default function Survey() {
 function Start({ onStarted, onNotOpen }: { onStarted: (s: Saved) => void; onNotOpen: () => void }) {
   const [agree, setAgree] = useState(false);
   const [open, setOpen] = useState(false);
+  // ?kenh=qr on the link printed as a QR code; anything else counts as a shared link (survey_respondents.channel)
+  const { kenh } = useLocalSearchParams<{ kenh?: string }>();
+  const channel = kenh === 'qr' ? 'qr' : 'link';
   const policy = useQuery({
     queryKey: ['policy', 'survey'],
     queryFn: () => call(api.GET('/policies/{purpose}/current', { params: { path: { purpose: 'survey' } } })),
   });
   const start = useMutation({
     mutationFn: () =>
-      call(api.POST('/survey/respondents', { body: { policy_version_id: policy.data!.id, consent: true, channel: 'link' } })),
+      call(api.POST('/survey/respondents', { body: { policy_version_id: policy.data!.id, consent: true, channel } })),
     onSuccess: (r) => onStarted({ id: r.respondent.id, token: r.respondent_token }),
     onError: (e) => {
-      // POST /survey/respondents has no 404 in the contract: 404 = survey module not deployed here
-      if (isCode(e, 'not_found')) onNotOpen();
+      // 409 survey_closed = no open form; 404 is not in the contract for this call = survey module not deployed here
+      if (isCode(e, 'survey_closed') || isCode(e, 'not_found')) onNotOpen();
       if (isCode(e, 'policy_outdated')) policy.refetch();
     },
   });
@@ -98,12 +107,14 @@ function Start({ onStarted, onNotOpen }: { onStarted: (s: Saved) => void; onNotO
           <Checkbox testID="survey-consent" checked={agree} onChange={setAgree} label="Tôi đồng ý tham gia và cho dùng câu trả lời theo điều khoản trên" />
         </Card>
       ) : null}
-      {start.error && !isCode(start.error, 'not_found') ? <ErrorBox message={errorText(start.error)} /> : null}
+      {start.error && !isCode(start.error, 'not_found') && !isCode(start.error, 'survey_closed') ? (
+        <ErrorBox message={errorText(start.error)} />
+      ) : null}
     </Screen>
   );
 }
 
-function Form({ saved, onReset, onDone }: { saved: Saved; onReset: () => void; onDone: () => void }) {
+function Form({ saved, onReset, onDone, onClosed }: { saved: Saved; onReset: () => void; onDone: () => void; onClosed: () => void }) {
   const qc = useQueryClient();
   const headers = { 'X-Respondent-Token': saved.token };
   const r = useQuery({
@@ -115,6 +126,9 @@ function Form({ saved, onReset, onDone }: { saved: Saved; onReset: () => void; o
   useEffect(() => {
     if (r.data && favs === null) setFavs(r.data.favorite_recipe_ids);
   }, [r.data, favs]);
+  useEffect(() => {
+    if (r.data?.completed_at) onDone(); // already sent from this browser earlier
+  }, [r.data, onDone]);
   const rate = useMutation({
     mutationFn: ({ recipeId, body }: { recipeId: string; body: Schemas['SurveyRatingPut'] }) =>
       call(api.PUT('/survey/respondents/{id}/ratings/{recipeId}', { params: { path: { id: saved.id, recipeId } }, headers, body })),
@@ -129,6 +143,10 @@ function Form({ saved, onReset, onDone }: { saved: Saved; onReset: () => void; o
             }
           : cur,
       ),
+    onError: (e) => {
+      if (isCode(e, 'survey_closed')) onClosed();
+      if (isCode(e, 'survey_already_completed')) onDone();
+    },
   });
   const submit = useMutation({
     mutationFn: async () => {
@@ -136,6 +154,10 @@ function Form({ saved, onReset, onDone }: { saved: Saved; onReset: () => void; o
       return call(api.POST('/survey/respondents/{id}/complete', { params: { path: { id: saved.id } }, headers }));
     },
     onSuccess: onDone,
+    onError: (e) => {
+      if (isCode(e, 'survey_closed')) onClosed();
+      if (isCode(e, 'survey_already_completed')) onDone();
+    },
   });
 
   if (r.isLoading) return <Screen><Loading /></Screen>;

@@ -15,6 +15,7 @@ import tastoria.modules.pantry.models  # noqa: F401
 import tastoria.modules.privacy.models  # noqa: F401
 import tastoria.modules.profile.models  # noqa: F401
 import tastoria.modules.substitute.models  # noqa: F401
+import tastoria.modules.survey.models  # noqa: F401
 from tastoria.core.db import Base
 
 target_metadata = Base.metadata

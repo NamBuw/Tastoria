@@ -14,7 +14,7 @@ import logging
 import os
 import uuid
 import zipfile
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from datetime import timedelta
 from pathlib import Path
@@ -147,6 +147,15 @@ def current_policy(session: Session, purpose: str) -> PolicyVersion | None:
         .order_by(PolicyVersion.effective_from.desc())
         .limit(1)
     ).first()
+
+
+def policy_version_labels(session: Session, ids: Iterable[uuid.UUID]) -> dict[uuid.UUID, str]:
+    """policy_versions.id -> version label (survey export, UC24)."""
+    wanted = list(set(ids))
+    if not wanted:
+        return {}
+    rows = session.execute(select(PolicyVersion.id, PolicyVersion.version).where(PolicyVersion.id.in_(wanted)))
+    return {pid: version for pid, version in rows}
 
 
 def _policy_text(pv: PolicyVersion) -> str:

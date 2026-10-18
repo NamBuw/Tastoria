@@ -16,6 +16,7 @@ from tastoria.core.health import router as health_router
 from tastoria.core.kv import make_valkey
 from tastoria.core.logging import configure_logging
 from tastoria.core.middleware import RequestContextMiddleware
+from tastoria.modules.admin.surveys_router import router as admin_surveys_router
 from tastoria.modules.catalog.router import router as catalog_router
 from tastoria.modules.catalog.service import CatalogDeps
 from tastoria.modules.cooking.router import router as cooking_router
@@ -38,6 +39,7 @@ from tastoria.modules.profile.router import router as profile_router
 from tastoria.modules.profile.service import ProfileDeps, ProfileSubjectData, make_cipher
 from tastoria.modules.substitute.router import router as shopping_router
 from tastoria.modules.substitute.service import SubstituteDeps, SubstituteSubjectData
+from tastoria.modules.survey.router import router as survey_router
 
 API_PREFIX = "/api/v1"
 
@@ -117,4 +119,6 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
     app.include_router(cooking_router, prefix=API_PREFIX)
     app.include_router(journal_router, prefix=API_PREFIX)
     app.include_router(events_router, prefix=API_PREFIX)
+    app.include_router(survey_router, prefix=API_PREFIX)
+    app.include_router(admin_surveys_router, prefix=API_PREFIX)
     return app
