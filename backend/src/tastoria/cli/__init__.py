@@ -257,8 +257,16 @@ def _mlops(args: argparse.Namespace) -> int:
     return 0
 
 
+def load_all_models() -> None:
+    """Map every table before a process flushes (FKs such as scan_items → ingredients, scans → users resolve only when
+    the target table is in the metadata). The API gets this from tastoria.app; the worker process from here."""
+    import tastoria.models_registry  # noqa: F401
+
+
 def _worker(args: argparse.Namespace) -> int:
     from tastoria.modules.scan import runner
+
+    load_all_models()
 
     return runner.check(get_settings()) if args.check else runner.run(get_settings(), burst=args.burst)
 
