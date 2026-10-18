@@ -50,7 +50,7 @@ def main() -> int:
     rng = random.Random(a.seed)
     picks = rng.sample(files, min(a.runs, len(files)))
     c = httpx.Client(timeout=30)
-    email = f"e2e+{int(time.time())}@example.com"
+    email = f"e2e+{int(time.time())}-{uuid.uuid4().hex[:6]}@example.com"
     r = c.post(f"{api}/auth/register", json={"email": email, "password": "e2e-mat-khau-dai-123"})
     r.raise_for_status()
     h = {"Authorization": f"Bearer {r.json()['access_token']}"}

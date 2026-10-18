@@ -293,3 +293,53 @@ Quy tắc GPU dùng chung đã được cài trong `train_detector.GpuGuard` và
 chỉ khởi chạy khi còn ≥ 10 GB trống, `set_per_process_memory_fraction(0.15)`, batch cố định, một job một lúc
 (khoá tệp), watchdog dừng job ngay khi bộ nhớ trống < 3 GB. Trong các lần chạy, bộ nhớ trống thấp nhất watchdog
 ghi được là 9.371 MB (lần chạy baseline), chưa lần nào chạm ngưỡng dừng.
+
+## 11. Bộ phát hiện chạy thật trong backend (18/10/2026)
+
+Bản `yolo26n_640_none` (mục 4, ONNX mục 6) được đăng ký vào backend bằng `tastoria mlops register` (sha256
+`c7d67aff2d0a…`, bản đồ lớp lấy từ metadata `names` của ONNX, 13 lớp), qua `gate`, rồi `deploy`. Worker (RQ,
+`cpus: 2`, `mem_limit: 4g`, onnxruntime 1.31.0 với 2 luồng intra-op) nạp phiên ONNX một lần khi khởi động. Không có
+mô hình độ tươi nào được triển khai: bản MobileNetV3 ở mục 7 chỉ lưu dự đoán out-of-fold, không có trọng số cuối để
+xuất ONNX, chỉ có 3 mức (không có mức "kiểm tra") và chưa hiệu chỉnh nhiệt độ. Vì vậy chip quét không có xác suất
+độ tươi (`p_*` NULL).
+
+### 11.1 Hậu xử lý
+
+- Đầu ra `output0` [1, 17, 8400] là đầu one-to-many (metadata `end2end: False`): 15 anchor điểm cao nhất của một ảnh
+  val chỉ là 2 vật thể. Backend áp NMS theo từng lớp, IoU > 0,7, như `non_max_suppression` của ultralytics.
+- Kiểm thử đơn vị so hậu xử lý của backend với kết quả `predict` của chính ultralytics 8.4.173 trên 2 ảnh val (một
+  ảnh Open Images, một ảnh Bangladesh): cùng số khung (5 và 5), cùng lớp, IoU từng cặp > 0,9, độ tin cậy lệch < 0,05.
+  Chênh lệch nhỏ đến từ letterbox (Pillow so với cv2).
+- **Ngưỡng conf 0,18**, chọn trên tập val (897 ảnh) theo macro-F1 lớn nhất (ghép tham lam IoU ≥ 0,5, lưới 0,05–0,95),
+  bằng đúng mã hậu xử lý của worker (`backend/scripts/choose_conf_threshold.py`). Macro-F1 tại 0,18 là 0,499; đường
+  F1 khá phẳng (0,20: 0,494; 0,25: 0,489; 0,30: 0,474). Tập test không được đọc khi chọn. Nhãn Open Images không đầy
+  đủ nên precision ở đây là cận dưới. Kết quả: `data/processed/cv/detector/yolo26n_640_none_serving.json`; ngưỡng
+  lưu trong `model_versions.metrics.serving` của phiên bản, không nằm trong mã.
+
+### 11.2 Độ trễ quét phía server
+
+Đo qua địa chỉ công khai `https://safework.ctslab.net/api/v1` (Cloudflare Tunnel → nginx → api → Valkey → worker),
+mỗi lần quét một ảnh thật lấy ngẫu nhiên từ tập test công khai (`data/processed/cv/yolo/images/test`), bằng
+`backend/scripts/scan_e2e.py`. Mốc thời gian lấy từ chính lần quét trong CSDL:
+`hàng đợi → xong` = `finished_at − enqueued_at` (cách đo của NFR-PERF-01), `tạo → xong` = `finished_at − created_at`,
+`chạy job` = `finished_at − started_at` (worker nhận job, đọc ảnh, phát hiện, ghi chip).
+
+| Điều kiện | Số lần | hàng đợi → xong p50 / p95 (ms) | tạo → xong p50 / p95 (ms) | chạy job p50 / p95 (ms) | phía client p50 / p95 (ms) |
+|---|---:|---:|---:|---:|---:|
+| 1 người, tuần tự | 40 | 58,9 / 98,4 | 63,9 / 104,7 | 55,8 / 91,0 | 286,8 / 352,5 |
+| 5 người đồng thời | 300 | 65,5 / 170,3 | 72,3 / 178,3 | 53,5 / 66,7 | 312,7 / 413,6 |
+
+Tệp số liệu: `data/processed/cv/detector/scan_latency_live_c1.json`, `scan_latency_live_c5.json`. Phía client gồm cả
+tải ảnh lên và long-poll qua Cloudflare từ chính máy chủ, không phải từ điện thoại (NFR-PERF-03 chưa đo).
+
+Đọc kết quả và giới hạn:
+- p95 hàng đợi → xong là 0,17 s với 5 người đồng thời, thấp hơn nhiều mục tiêu 3 s. Thời gian chạy job gần như không
+  đổi khi tăng tải; phần tăng ở p95 là thời gian chờ trong hàng đợi của một worker duy nhất.
+- Máy đo là máy chủ lab dùng chung (Intel Xeon Gold 6542Y, 32 luồng) với worker giới hạn 2 CPU / 4 GB bằng Docker,
+  chưa phải VPS đích 2 vCPU.
+- Ảnh test công khai rộng 640–1.024 px (trung bình 717 px), nhỏ hơn ảnh 1.280 px app gửi; giải mã và letterbox ảnh
+  1.280 px sẽ tốn hơn một chút.
+- Ảnh không phải ảnh tủ lạnh; số khung mỗi ảnh (trung bình 3,5 ở lượt tuần tự, 4,9 ở lượt đồng thời) có thể khác ảnh thật.
+- Đầu–cuối kiểm tra một lần quét `haul`: ảnh `openimages_v7__test__d3478f79ed79141c.jpg` (nhãn thật: 1 khung tôm kiểu
+  group_of) cho một chip "tôm" từ 8 khung; chọn mức "vừa" rồi xác nhận tạo một lô tôm 250–500 g, `acquired_basis =
+  purchase_date_entered`; xác nhận lần hai trả đúng kết quả cũ, không tạo lô mới.
