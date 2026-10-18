@@ -10,6 +10,7 @@
     "backgroundColor": "#F6F0E2",
     "android": {
       "package": "net.ctslab.tastoria",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#F6F0E2",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -41,9 +42,13 @@
           "backgroundColor": "#F6F0E2",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 96,
-          "dark": { "backgroundColor": "#1A1612", "image": "./assets/images/splash-icon.png" }
+          "dark": {
+            "backgroundColor": "#1A1612",
+            "image": "./assets/images/splash-icon.png"
+          }
         }
-      ]
+      ],
+      "./plugins/with-android-release"
     ],
     "experiments": {
       "typedRoutes": true,

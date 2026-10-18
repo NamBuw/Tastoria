@@ -19,6 +19,21 @@ so `expo start --web` on another port cannot call it; use the export + `serve:we
 
 Backend and catalog: see `backend/README.md` (`tastoria db upgrade`, `tastoria catalog import data/kb`).
 
+## Android release APK (local, no EAS)
+
+`plugins/with-android-release.js` wires release signing from `TASTORIA_UPLOAD_*` (Gradle property or env; falls back
+to the debug keystore when unset), limits ABIs to arm64-v8a + armeabi-v7a and sets Gradle to `-Xmx6g`, 8 workers.
+The keystore and its password live outside the repo in `~/.config/tastoria/` (release.keystore, keystore.env).
+`EXPO_PUBLIC_API_URL` is inlined into the JS bundle at build time, so it must be set when Gradle runs.
+
+```bash
+export ANDROID_HOME=$HOME/Android/Sdk JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export EXPO_PUBLIC_API_URL=https://safework.ctslab.net/api/v1
+set -a; . ~/.config/tastoria/keystore.env; set +a
+npx expo prebuild --platform android --clean --no-install
+(cd android && ./gradlew assembleRelease)    # → android/app/build/outputs/apk/release/app-release.apk
+```
+
 ## Layout
 
 ```
