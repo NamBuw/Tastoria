@@ -1,0 +1,154 @@
+# Tastoria production-like stack (spec v2 §10). Only nginx publishes a port, on loopback:
+# cloudflared on the host forwards the public domain to 127.0.0.1:6880.
+#   cd deploy && ./scripts/deploy.sh
+name: tastoria
+
+x-backend: &backend
+  image: tastoria-backend:${TASTORIA_IMAGE_TAG:-latest}
+  env_file: .env
+  environment:
+    TASTORIA_ENV: production
+    TASTORIA_DATABASE_URL: postgresql+psycopg://tastoria:${POSTGRES_PASSWORD:?set in .env}@postgres:5432/tastoria
+    TASTORIA_VALKEY_URL: redis://valkey:6379/0
+    TASTORIA_STORAGE_DIR: /var/lib/tastoria/storage
+    TASTORIA_ACCEL_REDIRECT_PREFIX: /_protected/
+  volumes:
+    - files:/var/lib/tastoria/storage
+  networks: [backend]
+  logging: &logging
+    driver: json-file
+    options: { max-size: "20m", max-file: "5" }
+
+services:
+  nginx:
+    image: tastoria-web:${TASTORIA_IMAGE_TAG:-latest}
+    build:
+      context: ..
+      dockerfile: deploy/web.Dockerfile
+    ports:
+      - "127.0.0.1:6880:80"
+    volumes:
+      - files:/var/lib/tastoria/storage:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks: [backend]
+    logging: *logging
+
+  api:
+    <<: *backend
+    build:
+      context: ..
+      dockerfile: deploy/backend.Dockerfile
+    command:
+      - uvicorn
+      - tastoria.app:create_app
+      - --factory
+      - --host=0.0.0.0
+      - --port=8000
+      - --workers=${TASTORIA_API_WORKERS:-2}
+      - --proxy-headers
+      # only nginx (same private network) can reach the api; it sets X-Forwarded-For to the real client
+      - --forwarded-allow-ips=*
+      - --timeout-graceful-shutdown=20
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=4).status == 200 else 1)"]
+      interval: 15s
+      timeout: 6s
+      retries: 3
+      start_period: 20s
+
+  migrate:
+    <<: *backend
+    command:
+      - sh
+      - -ec
+      - |
+        tastoria db upgrade
+        tastoria catalog import data/kb
+        tastoria catalog substitutes import data/kb/substitution_pairs.yaml
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  # No RQ worker yet: the backend runs its jobs in-process (TASTORIA_JOBS_BACKEND=sync); the scan slice adds one.
+  # scheduler = the cron container of ADR 0003, as a plain loop (no cron daemon in a non-root image).
+  scheduler:
+    <<: *backend
+    command: ["sh", "/app/scheduler.sh"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "test $$(( $$(date +%s) - $$(cat /tmp/scheduler.beat 2>/dev/null || echo 0) )) -lt 300"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+  postgres:
+    image: pgvector/pgvector:pg18
+    environment:
+      POSTGRES_USER: tastoria
+      POSTGRES_DB: tastoria
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+    volumes:
+      # PostgreSQL 18 images keep data under /var/lib/postgresql/<major>/; mount the parent.
+      - pgdata:/var/lib/postgresql
+    restart: unless-stopped
+    shm_size: 256m
+    stop_grace_period: 60s
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tastoria -d tastoria"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    networks: [backend]
+    logging: *logging
+
+  valkey:
+    image: valkey/valkey:9
+    # Not a source of truth (ADR 0003): login-lock counters only. Snapshot so a restart keeps active locks.
+    command: ["valkey-server", "--save", "300", "1", "--appendonly", "no", "--maxmemory", "128mb", "--maxmemory-policy", "volatile-ttl"]
+    volumes:
+      - valkeydata:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: [backend]
+    logging: *logging
+
+volumes:
+  pgdata:
+    name: tastoria_pgdata
+  files:
+    name: tastoria_files
+  valkeydata:
+    name: tastoria_valkeydata
+
+networks:
+  backend:
+    name: tastoria_backend

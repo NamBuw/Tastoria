@@ -1,0 +1,14 @@
+# Allow-list: only what backend.Dockerfile copies.
+*
+!pyproject.toml
+!uv.lock
+!backend/pyproject.toml
+!backend/src/**
+!ml/pyproject.toml
+!ml/src/**
+!data/kb/**
+!data/processed/fct2007/**
+!data/processed/usda/**
+!deploy/scripts/scheduler.sh
+**/__pycache__
+**/*.pyc
