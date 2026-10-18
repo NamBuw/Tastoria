@@ -55,7 +55,8 @@ def _canonical_body(raw: bytes) -> bytes:
         return raw
 
 
-async def idempotency_key(request: Request) -> IdempotencyRequest:
+def header_key(request: Request) -> str:
+    """The validated Idempotency-Key header, for endpoints that hash their own canonical request (multipart)."""
     key = request.headers.get("idempotency-key")
     if key is None:
         raise ApiError(400, ProblemCode.idempotency_key_required)
@@ -65,6 +66,11 @@ async def idempotency_key(request: Request) -> IdempotencyRequest:
             ProblemCode.validation_error,
             errors=[{"pointer": "#/header/Idempotency-Key", "code": "pattern", "message": "16–64 ký tự [A-Za-z0-9_-]"}],
         )
+    return key
+
+
+async def idempotency_key(request: Request) -> IdempotencyRequest:
+    key = header_key(request)
     raw = await request.body()
     digest = hashlib.sha256(
         request.method.encode() + b"\n" + request.url.path.encode() + b"\n" + _canonical_body(raw)

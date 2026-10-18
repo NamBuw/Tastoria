@@ -6,6 +6,7 @@ The bundle is the curated knowledge base:
     ingredients.yaml (+ ingredients_proposed*.yaml)       ingredients, synonyms, allergens, units, shelf life
     recipes/<slot>/<slug>.yaml                           one recipe per file
     make_ahead.yaml                                      make-ahead recipes and their made-ahead item
+    vision_classes.yaml                                  detector classes → ingredients (design v2 §7; optional)
 
 plus the processed composition tables `<processed>/fct2007/{foods,nutrients_long}.csv` and
 `<processed>/usda/foods.csv` (D0). Every problem is collected (no stop at the first) as `file:line: code: message`.
@@ -236,6 +237,21 @@ class MakeAheadFile(_Strict):
     ingredients: list[IngredientIn] = []
 
 
+class VisionClassIn(BaseModel):
+    """One class of data/kb/vision_classes.yaml. Only the fields the database stores are read; the file also carries
+    documentation fields (sources, reasons, counts) for the CV team."""
+
+    model_config = ConfigDict(extra="ignore", frozen=True)
+
+    id: Code
+    name_vi: Text
+    name_en: Text
+    ingredients: list[Text] = Field(min_length=1)  # first = default ingredient of the chip (FR-12-12)
+    countable: bool
+    instance_def: Literal["item", "group_of", "package"]
+    has_freshness_model: bool = False
+
+
 # ---------------------------------------------------------------- loaded bundle
 
 
@@ -275,6 +291,7 @@ class Bundle:
     publishable: dict[str, bool] = field(default_factory=dict)  # slug -> FR-25-08
     vegetarian: dict[str, bool] = field(default_factory=dict)  # slug -> dish_list.yaml `vegetarian` (post-check)
     calorie_check: dict[str, Any] | None = None  # summary of validation/nin_dishes.yaml (BR-NUT-06), if present
+    vision_classes: list[VisionClassIn] = field(default_factory=list)  # file order; empty without the file
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     file_sha: dict[str, str] = field(default_factory=dict)
@@ -598,6 +615,25 @@ def load_bundle(root: Path, processed: Path | None = None) -> Bundle:
             b.warnings.append(f"validation/nin_dishes.yaml:1: yaml_error: {exc}")
         if isinstance(summary, dict):
             b.calorie_check = summary
+
+    vd = r.doc(root / "vision_classes.yaml") if (root / "vision_classes.yaml").exists() else None
+    if vd is not None and isinstance(vd.data, dict):
+        seen_codes: set[str] = set()
+        for i, raw in enumerate(vd.data.get("classes") or []):
+            vc = r.model(vd, VisionClassIn, raw, "classes", i)
+            if vc is None:
+                continue
+            if vc.id in seen_codes:
+                r.err(vd.rel, vd.line("classes", i), "duplicate", f"lớp thị giác {vc.id} lặp")
+                continue
+            seen_codes.add(vc.id)
+            for j, name in enumerate(vc.ingredients):
+                if name not in b.ingredients:
+                    line = vd.line("classes", i, "ingredients", j)
+                    r.err(vd.rel, line, "unknown_ref", f"{vc.id}: nguyên liệu {name!r} không có")
+            if len(set(vc.ingredients)) != len(vc.ingredients):
+                r.err(vd.rel, vd.line("classes", i), "duplicate", f"{vc.id}: nguyên liệu lặp")
+            b.vision_classes.append(vc)
 
     # make-ahead (passive step > threshold)
     threshold = ma_file.passive_threshold_minutes if ma_file else 120

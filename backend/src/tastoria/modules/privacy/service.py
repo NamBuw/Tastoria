@@ -524,6 +524,9 @@ _DESCRIPTIONS = {
     "cook_sessions": "Các phiên nấu: giờ dọn mâm, lúc bắt đầu, nấu xong, hoàn tác.",
     "interactions": "Tương tác với món (được gợi ý, xem, đổi, nấu, thích, không thích) khi bạn đồng ý cá nhân hoá.",
     "shopping_items": "Danh sách đi chợ.",
+    "scans": "Các lần quét tủ lạnh / đồ vừa mua: chế độ, trạng thái, thời điểm.",
+    "scan_images": "Ảnh của từng lần quét: kích thước, có góp ảnh không, đã xoá theo hạn 30 ngày chưa (không kèm tệp).",
+    "scan_items": "Nguyên liệu nhận được trong mỗi lần quét và chỉnh sửa của bạn (số lượng, mức, đổi nhãn, xoá).",
 }
 
 

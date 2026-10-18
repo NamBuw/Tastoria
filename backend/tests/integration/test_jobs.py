@@ -27,7 +27,8 @@ def test_sweep_removes_only_expired_rows(client: TestClient, db, app) -> None:
           "VALUES (:u, 'old-0123456789abcdef', '\\x01', 201, '{}', now() - interval '49 hours'), "
           "(:u, 'new-0123456789abcdef', '\\x01', 201, '{}', now() - interval '47 hours')", u=uid)  # fmt: skip
     counts = sweep(app.state.sessionmaker)
-    assert counts == {"refresh_tokens": 2, "password_resets": 1, "idempotency_keys": 1}
+    assert counts == {"refresh_tokens": 2, "password_resets": 1, "idempotency_keys": 1, "scans_requeued": 0,
+                      "scans_expired": 0}
     assert q(db, "SELECT count(*) FROM refresh_tokens").scalar() == 1  # the live session from register
     assert q(db, "SELECT key FROM idempotency_keys").scalar() == "new-0123456789abcdef"
 

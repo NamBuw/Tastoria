@@ -33,7 +33,7 @@ class Interaction(Base):
     type: Mapped[str] = mapped_column(ITYPE, nullable=False)
     position: Mapped[int | None] = mapped_column(SmallInteger)
     swap_reason: Mapped[str | None] = mapped_column(SWAP_REASON)
-    ranker_version_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))  # FK model_versions
+    ranker_version_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("model_versions.id"))
     propensity: Mapped[float | None] = mapped_column(REAL)
     occurred_at: Mapped[datetime] = mapped_column(TZ, nullable=False)
     received_at: Mapped[datetime] = mapped_column(TZ, nullable=False)

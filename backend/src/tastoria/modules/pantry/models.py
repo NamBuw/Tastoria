@@ -1,7 +1,6 @@
 """Tables owned by pantry: pantry_lots and the append-only pantry_transactions (view v_pantry_lot_balance).
 
-FKs to tables of modules that have no code yet (model_versions of mlops, scan_items of scan) exist in the database
-and are left out of the mapping until those modules map their tables.
+FKs to model_versions (mlops) and scan_items (scan) are declared by table name: pantry never imports those modules.
 """
 
 from __future__ import annotations
@@ -45,9 +44,13 @@ class PantryLot(Base):
     p_dung_ngay: Mapped[float | None] = mapped_column(REAL)
     p_kiem_tra: Mapped[float | None] = mapped_column(REAL)
     freshness_observed_at: Mapped[datetime | None] = mapped_column(TZ)
-    freshness_model_version_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))  # FK model_versions
+    freshness_model_version_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("model_versions.id")
+    )
     user_checked_at: Mapped[datetime | None] = mapped_column(TZ)
-    source_scan_item_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))  # FK scan_items
+    source_scan_item_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("scan_items.id", ondelete="SET NULL")
+    )
     created_at: Mapped[datetime] = mapped_column(TZ, nullable=False, server_default=text("now()"))
     updated_at: Mapped[datetime] = mapped_column(TZ, nullable=False, server_default=text("now()"))
 

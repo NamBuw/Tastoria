@@ -50,6 +50,8 @@ from tastoria.modules.catalog.models import (
     RecipeStep,
     RecipeTag,
     Tag,
+    VisionClass,
+    VisionClassIngredient,
 )
 from tastoria.modules.catalog.schemas import (
     AllergenGroupOut,
@@ -79,6 +81,7 @@ from tastoria.modules.catalog.schemas import (
     ReferenceData,
     StepView,
     TagOut,
+    VisionClassView,
 )
 
 RICE_FCT_CODE = nut.RICE_FCT_CODE
@@ -629,3 +632,28 @@ def check_catalog_safety(session: Session, bundle: Bundle | None = None) -> list
                 bad = sorted(ln.ingredient.name_vi for ln in v.lines if ln.ingredient.food_group_code in excl)
                 problems.append(f"{v.name_vi}: dish_list ghi chay nhưng có {bad}")
     return problems
+
+
+# ---------------------------------------------------------------- vision classes (scan, mlops)
+
+
+def vision_classes(session: Session) -> dict[int, VisionClassView]:
+    """Every detector class by id, with its default ingredient (is_default, FR-12-12); None when it has none."""
+    rows = session.execute(
+        select(
+            VisionClass.id,
+            VisionClass.code,
+            VisionClass.name_vi,
+            VisionClass.countable,
+            VisionClass.has_freshness_model,
+            VisionClassIngredient.ingredient_id,
+        ).outerjoin(
+            VisionClassIngredient,
+            (VisionClassIngredient.vision_class_id == VisionClass.id) & VisionClassIngredient.is_default,
+        )
+    )
+    return {r[0]: VisionClassView(*r) for r in rows}
+
+
+def vision_class_ids_by_code(session: Session) -> dict[str, int]:
+    return {code: vid for vid, code in session.execute(select(VisionClass.id, VisionClass.code))}

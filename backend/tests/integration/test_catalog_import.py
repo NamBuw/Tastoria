@@ -287,3 +287,51 @@ def test_cli_prints_a_json_report_and_exit_code(fresh_database, monkeypatch, cap
         assert "recipes/rau/dau-dua-xao-toi.yaml:" in captured.err and json.loads(captured.out)["ok"] is False
     finally:
         get_settings.cache_clear()
+
+
+# ---------------------------------------------------------------- vision classes (design v2 §7, FR-12-12)
+
+
+def test_kb_import_loads_vision_classes_with_one_default_ingredient(kb_database_url: str) -> None:
+    url = kb_database_url
+    classes = yaml.safe_load((KB_DIR / "vision_classes.yaml").read_text(encoding="utf-8"))["classes"]
+    assert _one(url, "SELECT count(*) FROM vision_classes") == len(classes) == 22
+    # ids follow the file order on the first import; every class has exactly one default = first listed ingredient
+    rows = _rows(url, "SELECT v.id, v.code, v.countable, i.name_vi FROM vision_classes v "
+                      "JOIN vision_class_ingredients vi ON vi.vision_class_id = v.id AND vi.is_default "
+                      "JOIN ingredients i ON i.id = vi.ingredient_id ORDER BY v.id")  # fmt: skip
+    assert [(r.id, r.code, r.countable, r.name_vi) for r in rows] == [
+        (i + 1, c["id"], c["countable"], c["ingredients"][0]) for i, c in enumerate(classes)
+    ]
+    assert _one(url, "SELECT count(*) FROM vision_class_ingredients") == sum(len(c["ingredients"]) for c in classes)
+
+
+def test_vision_class_ids_are_stable_and_default_can_move(fresh_database, bundle_copy: Path) -> None:
+    url = fresh_database()
+    assert _run(url, bundle_copy).ok
+    trung = _one(url, "SELECT id FROM vision_classes WHERE code = 'trung'")
+
+    def edit(d):
+        cls = d["classes"]
+        egg = next(c for c in cls if c["id"] == "trung")
+        egg["ingredients"] = ["trứng vịt", "trứng gà"]  # new default
+        cls.remove(egg)
+        cls.append(egg)  # reordering the file keeps the id
+
+    _edit_yaml(bundle_copy / "vision_classes.yaml", edit)
+    res = _run(url, bundle_copy)
+    assert res.ok, res.errors
+    assert _one(url, "SELECT id FROM vision_classes WHERE code = 'trung'") == trung
+    assert _one(url, "SELECT i.name_vi FROM vision_class_ingredients vi JOIN ingredients i ON i.id = vi.ingredient_id "
+                     "WHERE vi.vision_class_id = :v AND vi.is_default", v=trung) == "trứng vịt"  # fmt: skip
+    again = _run(url, bundle_copy)
+    assert again.report["tables"].get("vision_classes") is None
+    assert again.report["tables"].get("vision_class_ingredients") is None
+
+
+def test_vision_class_with_unknown_ingredient_blocks_the_import(fresh_database, bundle_copy: Path) -> None:
+    url = fresh_database()
+    _edit_yaml(bundle_copy / "vision_classes.yaml", lambda d: d["classes"][0]["ingredients"].append("thịt rồng"))
+    res = _run(url, bundle_copy)
+    assert not res.ok
+    assert any("vision_classes.yaml" in e and "unknown_ref" in e and "thịt rồng" in e for e in res.errors)

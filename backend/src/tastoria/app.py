@@ -5,6 +5,8 @@ This is the only place that knows every module (ADR 0001); business modules neve
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from sqlalchemy import text
 
@@ -31,12 +33,16 @@ from tastoria.modules.identity.throttle import MemoryLoginThrottle, ValkeyLoginT
 from tastoria.modules.journal.router import router as journal_router
 from tastoria.modules.meal.router import router as meal_router
 from tastoria.modules.meal.service import MealDeps, MealSubjectData, item_owned
+from tastoria.modules.mlops import service as mlops
 from tastoria.modules.pantry.router import router as pantry_router
 from tastoria.modules.pantry.service import PantrySubjectData
 from tastoria.modules.privacy.router import router as privacy_router
 from tastoria.modules.privacy.service import PrivacyDeps, SubjectDataHandler, list_purposes
 from tastoria.modules.profile.router import router as profile_router
 from tastoria.modules.profile.service import ProfileDeps, ProfileSubjectData, make_cipher
+from tastoria.modules.scan.queue import ScanQueue
+from tastoria.modules.scan.router import router as scan_router
+from tastoria.modules.scan.service import ScanDeps, ScanSubjectData
 from tastoria.modules.substitute.router import router as shopping_router
 from tastoria.modules.substitute.service import SubstituteDeps, SubstituteSubjectData
 from tastoria.modules.survey.router import router as survey_router
@@ -54,6 +60,7 @@ def build_subject_handlers(profile: ProfileDeps) -> list[SubjectDataHandler]:
         CookingSubjectData(),
         EventsSubjectData(),
         SubstituteSubjectData(),
+        ScanSubjectData(Path(profile.settings.storage_dir)),
     ]
 
 
@@ -84,7 +91,21 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
     def check_valkey() -> None:
         kv.ping()
 
-    app.state.readiness_checks = {"database": check_database, "valkey": check_valkey}
+    verified: dict[object, int] = {}  # version id -> artifact size once its SHA-256 matched (hash once per process)
+
+    def check_models() -> None:
+        """SD10: a deployed model whose artifact is missing or has another SHA-256 makes the API not ready. No
+        deployment at all is not an error here: POST /scans then answers 503 model_unavailable."""
+        with app.state.sessionmaker() as s:
+            views = [v for n in ("detector", "freshness") if (v := mlops.active_version(s, n)) is not None]
+        for v in views:
+            path = Path(settings.storage_dir) / v.artifact_key
+            if verified.get(v.id) == (path.stat().st_size if path.exists() else -1):
+                continue
+            mlops.artifact_path(Path(settings.storage_dir), v, verify=True)
+            verified[v.id] = path.stat().st_size
+
+    app.state.readiness_checks = {"database": check_database, "valkey": check_valkey, "models": check_models}
 
     if settings.login_throttle_backend == "valkey":
         app.state.login_throttle = ValkeyLoginThrottle(
@@ -105,6 +126,7 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
     # Dependency inversions (ADR 0001): meal may not import cooking, substitute may not import meal.
     app.state.meal = MealDeps(has_live_cook_session=has_live_cook_session)
     app.state.substitute = SubstituteDeps(item_owned=item_owned)
+    app.state.scan = ScanDeps(settings, app.state.sessionmaker, ScanQueue(settings.valkey_url))
 
     install_error_handlers(app)
     app.add_middleware(RequestContextMiddleware, min_app_version=settings.min_app_version)
@@ -121,4 +143,5 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
     app.include_router(events_router, prefix=API_PREFIX)
     app.include_router(survey_router, prefix=API_PREFIX)
     app.include_router(admin_surveys_router, prefix=API_PREFIX)
+    app.include_router(scan_router, prefix=API_PREFIX)
     return app

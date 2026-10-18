@@ -48,7 +48,7 @@ class MealPlan(Base):
     kcal_high: Mapped[Decimal | None] = mapped_column(Numeric)
     rice_bowls_per_person: Mapped[Decimal | None] = mapped_column(Numeric)
     reason_vi: Mapped[str] = mapped_column(Text, nullable=False)
-    ranker_version_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))  # FK model_versions
+    ranker_version_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("model_versions.id"))
     params_version: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(TZ, nullable=False, server_default=text("now()"))
     updated_at: Mapped[datetime] = mapped_column(TZ, nullable=False, server_default=text("now()"))

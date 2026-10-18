@@ -11,9 +11,11 @@ import tastoria.modules.cooking.models  # noqa: F401
 import tastoria.modules.events.models  # noqa: F401
 import tastoria.modules.identity.models  # noqa: F401
 import tastoria.modules.meal.models  # noqa: F401
+import tastoria.modules.mlops.models  # noqa: F401
 import tastoria.modules.pantry.models  # noqa: F401
 import tastoria.modules.privacy.models  # noqa: F401
 import tastoria.modules.profile.models  # noqa: F401
+import tastoria.modules.scan.models  # noqa: F401
 import tastoria.modules.substitute.models  # noqa: F401
 import tastoria.modules.survey.models  # noqa: F401
 from tastoria.core.db import Base

@@ -1700,7 +1700,8 @@ paths:
       tags:
       - scan
       summary: Xoá chip nhận nhầm
-      description: Đặt user_action = deleted (giữ lại làm tín hiệu chọn ảnh cho học chủ động). Lũy đẳng.
+      description: Chip của mô hình được giữ với user_action = deleted (tín hiệu chọn ảnh cho học chủ động); chip người
+        dùng thêm bị xoá hẳn. Lũy đẳng; gọi lại (kể cả với chip người dùng đã xoá) trả 204.
       x-use-cases:
       - UC13
       x-module: M08
@@ -1734,8 +1735,11 @@ paths:
       tags:
       - scan
       summary: Xác nhận kết quả quét vào kho
-      description: 'Một Unit of Work: tạo pantry_lots + giao dịch scan_add cho mỗi chip còn lại, đánh dấu lô not_seen (fridge),
-        status = confirmed (BR-SCAN-02, BR-PANTRY-01, BR-PANTRY-03). Còn chip needs_check = true chưa xác nhận → 409 freshness_check_required
+      description: 'Một Unit of Work: haul tạo một pantry_lots mới cho mỗi chip còn lại; fridge cập nhật quan sát độ tươi
+        của lô in_stock/not_seen mới nhất cùng nguyên liệu (không tạo lô) hoặc tạo lô mới, rồi đánh dấu lô not_seen;
+        status = confirmed (BR-SCAN-02, BR-PANTRY-01, BR-PANTRY-03). Lô mới mang lượng ở initial_g_min/max và không có
+        giao dịch (như POST /pantry/lots: initial + Σ giao dịch là số dư, thêm scan_add sẽ đếm hai lần); source_scan_item_id
+        trỏ về chip. Chip đếm được có số 0 không tạo lô. Còn chip needs_check = true chưa xác nhận → 409 freshness_check_required
         (BR-FRESH-04); chip không đếm được chưa có mức → 422 qty_level_required. Lũy đẳng: gọi lại khi đã confirmed trả kết
         quả cũ.'
       x-use-cases:
@@ -5801,6 +5805,26 @@ components:
           items:
             $ref: '#/components/schemas/ScanItem'
           description: Rỗng khi status ∈ {queued, processing, failed, expired}; không gồm chip user_action = deleted
+        unseen_lots:
+          type: array
+          description: 'Chỉ có khi mode = fridge và status = done (FR-12-18): lô in_stock của người dùng có nguyên liệu không
+            xuất hiện ở chip nào (trừ gia vị luôn có); xác nhận quét sẽ chuyển chúng sang not_seen. Không có trường này ở
+            chế độ haul hay trạng thái khác.'
+          items:
+            type: object
+            properties:
+              lot_id:
+                type: string
+                format: uuid
+              ingredient_id:
+                type: string
+                format: uuid
+              ingredient_name_vi:
+                type: string
+            required:
+            - lot_id
+            - ingredient_id
+            - ingredient_name_vi
       required:
       - id
       - mode

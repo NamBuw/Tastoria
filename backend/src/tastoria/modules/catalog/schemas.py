@@ -269,3 +269,15 @@ class FoodNutrition:
 
     ingredient_id: uuid.UUID
     per_100g_purchased: dict[str, float] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class VisionClassView:
+    """A detector class (vision_classes) with the default ingredient of its chip (vision_class_ingredients)."""
+
+    id: int
+    code: str
+    name_vi: str
+    countable: bool
+    has_freshness_model: bool
+    default_ingredient_id: uuid.UUID | None

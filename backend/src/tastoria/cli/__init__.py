@@ -18,6 +18,16 @@ tastoria survey list               forms with respondent counts
 tastoria survey export VERSION [--out DIR]
                                    CSV files + manifest.json of the completed respondents, into a new directory
                                    under DIR (default: STORAGE_DIR/survey-exports)
+tastoria jobs purge-images         UC32: delete scan photos older than 30 days (not contributed)
+tastoria mlops register NAME ARTIFACT --version V [--metrics JSON|FILE] [--serving FILE]
+                       [--preprocess-version P] [--class-map FILE]
+                                   copy the artifact into the file volume, record sha256 / class map (UC29, SD10)
+tastoria mlops gate NAME VERSION   check the stored artifact can serve → validated | rejected
+tastoria mlops deploy NAME VERSION [--if-none]
+                                   point model_deployments(NAME) at VERSION; then restart api + worker (UC30)
+tastoria mlops rollback NAME       swap active and previous version; then restart api + worker
+tastoria mlops list [NAME]
+tastoria worker [--check]          scan inference worker: load the deployed detector, then serve the RQ queue
 """
 
 from __future__ import annotations
@@ -55,7 +65,15 @@ def _jobs(args: argparse.Namespace) -> int:
     sm = make_sessionmaker(engine)
     try:
         if args.job == "sweep":
-            print(json.dumps(sweep(sm)))
+            from tastoria.modules.scan.queue import ScanQueue
+
+            print(json.dumps(sweep(sm, ScanQueue(settings.valkey_url))))
+        elif args.job == "purge-images":
+            from pathlib import Path
+
+            from tastoria.jobs.purge_images import purge
+
+            print(json.dumps(purge(sm, Path(settings.storage_dir))))
         else:
             deps = PrivacyDeps(
                 settings, sm, handlers=build_subject_handlers(ProfileDeps(settings, make_cipher(settings)))
@@ -174,6 +192,77 @@ def _survey(args: argparse.Namespace) -> int:
     return 0 if res.ok else 1
 
 
+def _class_map(path: str | None) -> list[str] | None:
+    """--class-map: YAML/JSON with `names` ({index: code} or [code, ...]) like ultralytics' dataset.yaml."""
+    if not path:
+        return None
+    from pathlib import Path
+
+    import yaml
+
+    data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    names = data.get("names", data) if isinstance(data, dict) else data
+    if isinstance(names, dict):
+        return [str(names[k]) for k in sorted(names, key=int)]
+    return [str(n) for n in names]
+
+
+def _mlops(args: argparse.Namespace) -> int:
+    from pathlib import Path
+
+    from tastoria.core.db import make_engine, make_sessionmaker
+    from tastoria.modules.admin import mlops as ops
+    from tastoria.modules.mlops.schemas import MlopsError
+
+    settings = get_settings()
+    engine = make_engine(settings.database_url, pool_size=1)
+    sm = make_sessionmaker(engine)
+    storage = Path(settings.storage_dir)
+    try:
+        if args.mlops_cmd == "register":
+            metrics = ops.load_json_arg(args.metrics, "--metrics")
+            if args.serving:
+                metrics["serving"] = ops.load_json_arg(args.serving, "--serving")
+            view, created = ops.register(
+                sm,
+                storage,
+                name=args.name,
+                version=args.version,
+                artifact=Path(args.artifact),
+                metrics=metrics,
+                preprocess_version=args.preprocess_version,
+                class_codes=_class_map(args.class_map),
+                mlflow_run_id=args.mlflow_run_id,
+            )
+            print(json.dumps({"created": created, **ops.view_dict(view)}, ensure_ascii=False, indent=2))
+        elif args.mlops_cmd == "gate":
+            ok, reasons = ops.gate(sm, storage, name=args.name, version=args.version)
+            print(json.dumps({"passed": ok, "reasons": reasons}, ensure_ascii=False))
+            return 0 if ok else 1
+        elif args.mlops_cmd == "deploy":
+            res = ops.deploy(sm, name=args.name, version=args.version, only_if_none=args.if_none)
+            print(json.dumps(res))
+            if res["changed"]:
+                print("restart api + worker to load it: docker compose restart api worker", file=sys.stderr)
+        elif args.mlops_cmd == "rollback":
+            print(json.dumps(ops.rollback(sm, name=args.name)))
+            print("restart api + worker to load it: docker compose restart api worker", file=sys.stderr)
+        else:
+            print(json.dumps(ops.list_versions(sm, args.name), ensure_ascii=False, indent=2))
+    except MlopsError as exc:
+        print(f"mlops: {exc}", file=sys.stderr)
+        return 1
+    finally:
+        engine.dispose()
+    return 0
+
+
+def _worker(args: argparse.Namespace) -> int:
+    from tastoria.modules.scan import runner
+
+    return runner.check(get_settings()) if args.check else runner.run(get_settings(), burst=args.burst)
+
+
 def main(argv: list[str] | None = None) -> int:
     configure_logging(get_settings().log_level)
     p = argparse.ArgumentParser(prog="tastoria")
@@ -183,7 +272,7 @@ def main(argv: list[str] | None = None) -> int:
     db.add_argument("revision", nargs="?", default="head")
     db.set_defaults(func=_db)
     jobs = sub.add_parser("jobs", help="background jobs")
-    jobs.add_argument("job", choices=["process-dsr", "sweep"])
+    jobs.add_argument("job", choices=["process-dsr", "sweep", "purge-images"])
     jobs.set_defaults(func=_jobs)
     cat = sub.add_parser("catalog", help="catalog bundle (UC25)")
     cat_sub = cat.add_subparsers(dest="catalog_cmd", required=True)
@@ -214,6 +303,33 @@ def main(argv: list[str] | None = None) -> int:
     ex.add_argument("version")
     ex.add_argument("--out", default=None, help="base directory (default: STORAGE_DIR/survey-exports)")
     sv.set_defaults(func=_survey)
+    ml = sub.add_parser("mlops", help="model versions (UC29, UC30)")
+    ml_sub = ml.add_subparsers(dest="mlops_cmd", required=True)
+    reg = ml_sub.add_parser("register", help="register an artifact as a candidate version")
+    reg.add_argument("name", choices=["detector", "freshness", "ranker", "substitution"])
+    reg.add_argument("artifact")
+    reg.add_argument("--version", required=True)
+    reg.add_argument("--metrics", default=None, help="JSON object or file (training / evaluation report)")
+    reg.add_argument("--serving", default=None, help="JSON file stored as metrics.serving (conf, iou, imgsz)")
+    reg.add_argument("--preprocess-version", default=None)
+    reg.add_argument("--class-map", default=None, help="YAML/JSON with names; default: ONNX metadata names")
+    reg.add_argument("--mlflow-run-id", default=None)
+    g = ml_sub.add_parser("gate", help="check a candidate → validated | rejected")
+    g.add_argument("name")
+    g.add_argument("version")
+    dep = ml_sub.add_parser("deploy", help="point the deployment at a validated version")
+    dep.add_argument("name")
+    dep.add_argument("version")
+    dep.add_argument("--if-none", action="store_true", help="only when NAME has no deployment yet (bootstrap)")
+    rb = ml_sub.add_parser("rollback", help="swap active and previous version")
+    rb.add_argument("name")
+    ls = ml_sub.add_parser("list", help="model versions")
+    ls.add_argument("name", nargs="?", default=None)
+    ml.set_defaults(func=_mlops)
+    wk = sub.add_parser("worker", help="scan inference worker (RQ)")
+    wk.add_argument("--check", action="store_true", help="healthcheck: exit 0 when this host's worker is registered")
+    wk.add_argument("--burst", action="store_true", help="stop when the queue is empty (tests)")
+    wk.set_defaults(func=_worker)
     args = p.parse_args(argv)
     return int(args.func(args))
 

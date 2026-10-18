@@ -43,6 +43,8 @@ from tastoria.modules.pantry.schemas import (
     PantryLotOut,
     PantryLotPage,
     PantryLotPatch,
+    ScanApplyResult,
+    ScanLotInput,
     Shortfall,
 )
 
@@ -503,6 +505,167 @@ def round_up_to_unit(grams: float, unit_g: float | None) -> float:
     if not unit_g or grams <= 0:
         return grams
     return math.ceil(grams / unit_g - 1e-9) * unit_g
+
+
+# ---------------------------------------------------------------- scan confirmation (UC13, BR-SCAN-02, BR-PANTRY-03)
+
+
+def image_freshness(probs: tuple[float, float, float, float] | None) -> tuple[float, str] | None:
+    """(u_img, label) of a detection's calibrated probabilities (BR-FRESH-02, FR-13-01); None without them."""
+    if probs is None:
+        return None
+    p = dict(zip(("tuoi", "dung_som", "dung_ngay", "kiem_tra"), probs, strict=True))
+    u = sum(p[c] * fresh.M[c] for c in fresh.M)
+    if u > fresh.U_CHECK or p["kiem_tra"] >= max(p.values()):
+        return u, "kiem_tra"
+    if u < fresh.U_SOON:
+        return u, "tuoi"
+    if u < fresh.U_NOW:
+        return u, "dung_som"
+    return u, "dung_ngay"
+
+
+def chip_grams(session: Session, ing: IngredientView, *, count: int | None, level: str | None) -> tuple[float, float]:
+    """[g_min, g_max] of a confirmed chip (FR-13-10, FR-13-11): a count × grams of the ingredient's unit (the
+    smallest one when there are several), or the qty_levels range of its food group."""
+    if count is not None:
+        if not ing.units:
+            raise ApiError(422, ProblemCode.unit_conversion_missing, extra={"ingredient_id": str(ing.id)})
+        g = count * min(ing.units.values())
+        return g, g
+    if level is None:
+        raise ApiError(422, ProblemCode.qty_level_required, extra={"ingredient_id": str(ing.id)})
+    rng = catalog.qty_level_grams(session, ing.food_group_code, level)
+    if rng is None:
+        raise ApiError(422, ProblemCode.unit_conversion_missing, extra={"ingredient_id": str(ing.id), "level": level})
+    return rng
+
+
+def apply_scan(
+    session: Session,
+    user_id: uuid.UUID,
+    *,
+    mode: str,
+    items: list[ScanLotInput],
+    acquired_at: datetime,
+    acquired_basis: str,
+    observed_at: datetime | None,
+    model_version_id: uuid.UUID | None,
+    now: datetime,
+) -> ScanApplyResult:
+    """Write a confirmed scan into the pantry, inside the caller's transaction (the scan's Unit of Work).
+
+    haul (BR-PANTRY-03): one new lot per chip, nothing else changes.
+    fridge: a chip whose ingredient already has an in_stock / not_seen lot updates the freshness observation of the
+    newest such lot and brings it back to in_stock (FR-13-15, no new lot, amount unchanged); other chips create a lot
+    (FR-13-14). Then every in_stock lot of an ingredient no chip shows becomes not_seen — no transaction, never
+    deleted (FR-13-16); staples are left alone (they are not counted, BR-TRAY-04).
+    New lots carry their amount as the initial interval and no transaction, like POST /pantry/lots (slice 2):
+    initial + Σ delta is the balance, a scan_add row would count the amount twice. `source_scan_item_id` links the
+    lot to its chip.
+    """
+    created: list[uuid.UUID] = []
+    updated: list[uuid.UUID] = []
+    open_lots: dict[uuid.UUID, PantryLot] = {}
+    if mode == "fridge":
+        rows = session.scalars(
+            select(PantryLot)
+            .where(PantryLot.user_id == user_id, PantryLot.status.in_(OPEN_STATUSES))
+            .order_by(PantryLot.acquired_at, PantryLot.created_at)
+            .with_for_update()
+        )
+        for r in rows:
+            open_lots[r.ingredient_id] = r  # last = newest acquired_at
+    for it in items:
+        probs = it.probs
+        existing = open_lots.get(it.ingredient_id) if mode == "fridge" else None
+        if existing is not None:
+            if probs is not None:
+                existing.p_tuoi, existing.p_dung_som, existing.p_dung_ngay, existing.p_kiem_tra = probs
+                existing.freshness_observed_at = observed_at
+                existing.freshness_model_version_id = model_version_id
+            if it.user_checked:
+                existing.user_checked_at = now
+            existing.status = "in_stock"
+            existing.updated_at = now
+            updated.append(existing.id)
+            continue
+        lot = PantryLot(
+            id=uuid.uuid4(),
+            user_id=user_id,
+            ingredient_id=it.ingredient_id,
+            initial_g_min=Decimal(str(round(it.g_min, 3))),
+            initial_g_max=Decimal(str(round(it.g_max, 3))),
+            acquired_at=acquired_at,
+            acquired_basis=acquired_basis,
+            status="in_stock",
+            p_tuoi=probs[0] if probs else None,
+            p_dung_som=probs[1] if probs else None,
+            p_dung_ngay=probs[2] if probs else None,
+            p_kiem_tra=probs[3] if probs else None,
+            freshness_observed_at=observed_at if probs else None,
+            freshness_model_version_id=model_version_id if probs else None,
+            user_checked_at=now if it.user_checked else None,
+            source_scan_item_id=it.scan_item_id,
+            created_at=now,
+            updated_at=now,
+        )
+        session.add(lot)
+        created.append(lot.id)
+    not_seen: list[uuid.UUID] = []
+    if mode == "fridge":
+        seen = {it.ingredient_id for it in items}
+        unseen = [
+            r
+            for r in session.scalars(
+                select(PantryLot)
+                .where(PantryLot.user_id == user_id, PantryLot.status == "in_stock")
+                .order_by(PantryLot.created_at, PantryLot.id)
+            )
+            if r.ingredient_id not in seen
+        ]
+        ings = catalog.ingredients_by_ids(session, [r.ingredient_id for r in unseen])
+        for r in unseen:
+            if ings[r.ingredient_id].is_staple:
+                continue
+            r.status = "not_seen"
+            r.updated_at = now
+            not_seen.append(r.id)
+    session.flush()
+    return ScanApplyResult(created, updated, not_seen)
+
+
+def scan_lot_ids(session: Session, user_id: uuid.UUID, scan_item_ids: Iterable[uuid.UUID]) -> list[uuid.UUID]:
+    """Lots created from these chips (replay of an idempotent confirm, FR-13-17)."""
+    ids = list(scan_item_ids)
+    if not ids:
+        return []
+    return list(
+        session.scalars(
+            select(PantryLot.id)
+            .where(PantryLot.user_id == user_id, PantryLot.source_scan_item_id.in_(ids))
+            .order_by(PantryLot.id)
+        )
+    )
+
+
+def lots_marked_at(session: Session, user_id: uuid.UUID, at: datetime) -> list[uuid.UUID]:
+    """not_seen lots whose last change is exactly `at` (the confirm of one scan; replay of FR-13-17)."""
+    return list(
+        session.scalars(
+            select(PantryLot.id)
+            .where(PantryLot.user_id == user_id, PantryLot.status == "not_seen", PantryLot.updated_at == at)
+            .order_by(PantryLot.id)
+        )
+    )
+
+
+def open_lots_without(session: Session, user_id: uuid.UUID, ingredient_ids: Iterable[uuid.UUID]) -> list[LotView]:
+    """in_stock lots of ingredients outside `ingredient_ids` (FR-12-18: "lần này không thấy"), staples excluded."""
+    seen = set(ingredient_ids)
+    views = [v for v in lot_views(session, user_id, statuses=("in_stock",)) if v.ingredient_id not in seen]
+    ings = catalog.ingredients_by_ids(session, [v.ingredient_id for v in views])
+    return [v for v in views if not ings[v.ingredient_id].is_staple]
 
 
 # ---------------------------------------------------------------- data-subject requests

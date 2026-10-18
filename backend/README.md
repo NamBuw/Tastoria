@@ -1,6 +1,6 @@
 # Tastoria backend
 
-FastAPI modular monolith (ADR 0001). Slice 1: `core`, `identity`, `privacy`, `profile`. Slice 2: `catalog` (import of
+FastAPI modular monolith (ADR 0001). Slice 3: `mlops`, `scan` (UC12, UC13, UC29, UC30, UC32) and the RQ worker. Slice 1: `core`, `identity`, `privacy`, `profile`. Slice 2: `catalog` (import of
 `data/kb`), `pantry`, `meal`, `substitute` (shopping list), `events`, `cooking`, `journal`, and `admin` (CLI side of
 the import). Contract: `docs/api/openapi-v1.yaml`; schema: `db/schema.sql` + later migrations; modules and their
 allowed dependencies: `docs/sad/model.yaml`.
@@ -110,7 +110,7 @@ All prefixed `TASTORIA_`. JSON values for the key maps.
 | `ENV` | `development` | `production` refuses the development secrets below |
 | `DATABASE_URL` | `postgresql+psycopg://tastoria:tastoria@127.0.0.1:5432/tastoria` | SQLAlchemy URL |
 | `DB_POOL_SIZE` | `5` | connection pool (overflow = same) |
-| `VALKEY_URL` | `redis://127.0.0.1:6379/0` | Valkey (login lock counters; RQ later) |
+| `VALKEY_URL` | `redis://127.0.0.1:6379/0` | Valkey (login lock counters, RQ queue `scan`, long-poll channel `scan:<id>`) |
 | `LOGIN_THROTTLE_BACKEND` | `valkey` | `memory` = one process only, for local dev without Valkey |
 | `JWT_KEYS` | dev key | `{"kid": "secret", ...}` HS256 keys by `kid` |
 | `JWT_ACTIVE_KID` | `dev-1` | key used to sign new access tokens |
@@ -128,9 +128,9 @@ All prefixed `TASTORIA_`. JSON values for the key maps.
 | `HEALTH_ENC_KEYS` | dev key (zeros) | `{"key_id": "<base64 of 32 bytes>"}` AES-256-GCM keys for `profiles.*_enc` |
 | `HEALTH_ENC_ACTIVE_KEY_ID` | `dev-1` | key for new writes; old key ids stay readable while listed |
 | `DSR_HMAC_KEY` | dev key | HMAC-SHA256 key for `dsr_requests.subject_ref` |
-| `STORAGE_DIR` | `./var/storage` | volume root; exports go to `exports/<id>.zip` |
+| `STORAGE_DIR` | `./var/storage` | volume root: `exports/<id>.zip`, `tmp/scans/`, `contrib/`, `models/` |
 | `ACCEL_REDIRECT_PREFIX` | `/_protected/` | nginx internal location for `X-Accel-Redirect` |
-| `JOBS_BACKEND` | `sync` | only `sync` in this slice (job runs after the request commits) |
+| `JOBS_BACKEND` | `sync` | DSR jobs run after the request commits; scan inference always goes through RQ (`tastoria worker`) |
 | `MIN_APP_VERSION` | `0.0.0` | lower `X-App-Version` → 412 `app_too_old` |
 | `LOG_LEVEL` | `INFO` | |
 | `TIMEZONE` | `Asia/Ho_Chi_Minh` | "current year" for the age gate |
@@ -301,11 +301,101 @@ identifier, into a new directory `<VERSION>-<UTC stamp>` (written through a temp
 - `CookSessionCreate.confirm_over_time`; 409 `conflict_state` for an over-long schedule; `CookCompletion.shortfalls`.
 - Descriptions: `GET /meal-plans` newest first; `GET /recipes/{id}` 404 for drafts.
 
+## Slice 3: model versions and scans
+
+Commands:
+
+```bash
+# register → gate → deploy (UC29, UC30, SD10); the artifact is copied into STORAGE_DIR/models/<name>/<version>/
+uv run --package tastoria-backend tastoria mlops register detector ml/runs/detect/yolo26n_640_none/weights/best.onnx \
+    --version yolo26n_640_none --preprocess-version none \
+    --metrics data/processed/cv/detector/yolo26n_640_none.json \
+    --serving data/processed/cv/detector/yolo26n_640_none_serving.json   # class map: ONNX metadata `names`
+uv run --package tastoria-backend tastoria mlops gate detector yolo26n_640_none
+uv run --package tastoria-backend tastoria mlops deploy detector yolo26n_640_none     # then restart api + worker
+uv run --package tastoria-backend tastoria mlops rollback detector
+uv run --package tastoria-backend tastoria worker                  # RQ SimpleWorker on queue `scan`
+uv run --package tastoria-backend tastoria jobs purge-images       # UC32, hourly from the scheduler
+# serving threshold, on the validation split only (CPU):
+uv run --package tastoria-backend python backend/scripts/choose_conf_threshold.py --onnx <best.onnx> \
+    --images data/processed/cv/yolo/images/val --out data/processed/cv/detector/yolo26n_640_none_serving.json
+```
+
+mlops (`modules/mlops`, CLI side with audit in `modules/admin/mlops.py`):
+- `register` is idempotent for identical bytes (same name + version + sha256 → no-op, exit 0) and refuses other bytes
+  under an existing version. Detector class map = output index → `vision_classes.id` by code; by default read from the
+  `names` metadata ultralytics writes into the ONNX.
+- `gate` checks that a version can serve, not that it is good enough: stored file + sha256, onnxruntime loads it,
+  output width = 4 + number of classes, class map 0..n-1, `metrics.serving.conf/iou` present. No metric threshold:
+  there is no team-collected test set to set one on (CV report §8). Report at `models/<name>/<version>/gate.json`.
+- `deploy` / `rollback` only move `model_deployments` (ST07); `deploy --if-none` bootstraps a pointer without
+  overriding an operator's choice (deploy.sh uses it). Each command writes one audit_log row (`ml_operator`).
+- `load_onnx` re-hashes the artifact before creating the session (intra-op 2, inter-op 1, sequential, no spinning) and
+  caches it per process. The API's `/readyz` `models` check fails when a deployed artifact is missing or its sha256
+  differs (hashed once per process, then size-checked); no deployment at all is not a readiness failure — POST /scans
+  answers 503 `model_unavailable` instead.
+
+vision classes: the catalog import now loads `data/kb/vision_classes.yaml` into `vision_classes` (ids assigned once per
+code, never reused or deleted) and `vision_class_ingredients` (the first listed ingredient is the chip default, the
+others are the alternatives).
+
+scan (`modules/scan`):
+- Upload: ≤ 2 photos, each ≤ 3 145 728 bytes (413), magic bytes JPEG/PNG/WebP (415), pixel count from the header
+  before decoding > 4096² (422), Pillow's decompression-bomb warning raised as an error, `exif_transpose`, re-encoded
+  as JPEG q90 from a fresh RGB buffer (no EXIF/GPS/ICC/XMP). Stored once: `tmp/scans/<user>/<scan>/<n>.jpg`, or
+  `contrib/<user>/<scan>/<n>.jpg` when contributed.
+- Idempotency-Key: the hash is over (mode, shelf_groups, contribute, sha256 of each photo), not the raw multipart
+  body, because two sends of the same photos have different boundaries. A replay gets Location + Retry-After again.
+- `contribute` (contract field) and FR-12-17 together: absent → contributed iff `photo_contribution` is granted;
+  `true` without consent → 403 `consent_required`; `false` opts the scan out.
+- Enqueue after COMMIT, then `enqueued_at`; a lost enqueue is picked up by the sweeper after 60 s. The worker also
+  stamps `enqueued_at` when it wins the race against the API's stamp.
+- Worker (`scan/worker.py`, `scan/runner.py`): RQ **SimpleWorker** (no fork per job: the ONNX session and DB pool are
+  reused, ORT threads are never forked), RQ's SIGALRM timeout of 30 s per job. Retries are DB-driven: every failure
+  (including the RQ timeout) with attempts < 3 puts the scan back to `queued` and enqueues a new job
+  `scan-<id>-<attempt>`; attempts = 3 → `failed` + error_code (`timeout` or `inference_error:<Exception>`). A job
+  whose claim (`UPDATE … WHERE status = 'queued'`) finds nothing does nothing, so duplicate jobs are harmless.
+- Detector post-processing (`scan/detector.py`): the exported YOLO26n is `end2end: False`, output [1, 17, 8400] =
+  one-to-many head with sigmoid scores; class-aware NMS at IoU 0.7 is required (duplicates measured), as ultralytics
+  does. Unit-tested against ultralytics' own `predict` boxes on two validation images (fixtures/*.npz).
+- Confidence threshold 0.18 = argmax macro-F1 on the validation split (897 images, IoU ≥ 0.5 matching, grid
+  0.05–0.95, macro-F1 0.499; 0.20–0.25 are within 0.01). Stored in `model_versions.metrics.serving`, so it changes
+  with the version, never in code.
+- Chips: class → default ingredient; one chip per ingredient; count of a countable class = Σ over shelf groups of the
+  max over that group's photos, chip count = Σ over its countable classes (BR-SCAN-01). A chip is "counted" when its
+  ingredient is countable and has a unit (final_count starts at the model count), otherwise the user picks a level
+  (qty_level NULL until then; confirm answers 422 `qty_level_required`). Counted chips convert with the smallest
+  unit of the ingredient.
+- Freshness: **no freshness model is deployed.** The MobileNetV3 run of the CV report kept only out-of-fold
+  predictions (no final weights to export), is 3-level (no `kiem_tra`), uncalibrated, and trained on public produce
+  that does not match the `has_freshness_model` classes; so `classifier_version_id` and every `p_*` stay NULL,
+  `predicted_freshness` is null and lots use u = u_time (UC12 8a). The aggregation, labels (FR-13-01),
+  `freshness_check_required` and the copy into lots are implemented and tested with probabilities.
+- Long-poll: the request transaction is committed before waiting (no pooled connection held), the wait subscribes to
+  `scan:<id>` and re-reads the status at least every second (a lost PUBLISH costs ≤ 1 s).
+- Confirm (one UoW, scan row `FOR UPDATE`): haul → one new lot per chip (`purchase_date_entered`, now or the given
+  date at noon in TASTORIA_TIMEZONE); fridge → a chip whose ingredient has an in_stock/not_seen lot updates the newest
+  such lot (freshness observation, back to in_stock, amount unchanged — UC13 open question 2), other chips create a
+  `first_seen` lot at `scans.created_at`; then in_stock lots of unseen non-staple ingredients → `not_seen`. New lots
+  carry the amount as their initial interval and **no** `scan_add` transaction (same rule as POST /pantry/lots; the
+  openapi text is updated). A chip counted 0 makes no lot. A replay recomputes the result: created lots by
+  `source_scan_item_id`, not_seen lots by `updated_at = confirmed_at` (still not_seen).
+- DELETE of a chip id that is not (or no longer) in the caller's editable scan answers 204: a removed user chip
+  leaves no row, and the scan is owner-checked first.
+- GET /scans/{id} adds `unseen_lots` (fridge + done only, FR-12-18; added to the contract).
+- Retention: `tastoria jobs purge-images` deletes non-contributed photos 30 days after the scan (sets `purged_at`,
+  GET image → 410) and removes upload directories of transactions that rolled back. Withdrawing
+  `photo_contribution` moves contributed photos back under `tmp/` (30-day rule). Account deletion removes the user's
+  photo directories. Data-subject exports list scans, images (metadata only, not the JPEG files) and chips.
+- Sweeper (`jobs sweep`, every minute): enqueues queued scans without `enqueued_at` older than 60 s; expires queued
+  > 60 s after enqueue, processing > 60 s after start, and anything pending 5 minutes after creation.
+
 ## Next steps
 
 - `tastoria catalog substitutes import` (UC26) and a curated `data/kb/substitutions.yaml`; then UC17 has candidates.
-- mlops module (model_versions / model_deployments mapping) to serve a trained ranker through the `Ranker` protocol
-  and to record `ranker_version_id`; scan module (UC12/UC13) writing lots and freshness probabilities.
+- Serve a trained ranker through the `Ranker` protocol via mlops and record `ranker_version_id`.
+- A freshness classifier trained on the team's lots (4 levels, temperature-calibrated), exported to ONNX and run on
+  crops in the worker; `/admin/models` (read-only endpoint).
 - Calibrate: objective weights (§6.2 rule), qty_levels, made-ahead yields, shelf lives of the made-ahead products.
 - Refresh the derived documents for migration 0003 (`docs/sad/05-tu-dien-du-lieu.md`, `db/schema_vp.sql`, ERD).
 - A role for the CLI actor in `audit_log` (UC25 open question 1); `Idempotency-Key` on `POST /pantry/lots` (UC14 open

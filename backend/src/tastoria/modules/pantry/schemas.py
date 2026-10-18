@@ -142,3 +142,22 @@ class Shortfall:
     need_g: float
     available_g_min: float
     short_g: float
+
+
+@dataclass(frozen=True)
+class ScanLotInput:
+    """One confirmed scan chip as the pantry receives it (UC13 step 13)."""
+
+    scan_item_id: uuid.UUID
+    ingredient_id: uuid.UUID
+    g_min: float
+    g_max: float
+    probs: tuple[float, float, float, float] | None  # p_tuoi, p_dung_som, p_dung_ngay, p_kiem_tra of the chip
+    user_checked: bool  # a "kiểm tra" chip the user confirmed as still usable (FR-13-20)
+
+
+@dataclass(frozen=True)
+class ScanApplyResult:
+    created_lot_ids: list[uuid.UUID]
+    updated_lot_ids: list[uuid.UUID]
+    not_seen_lot_ids: list[uuid.UUID]

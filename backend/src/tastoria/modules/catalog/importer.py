@@ -45,6 +45,8 @@ from tastoria.modules.catalog.models import (
     RecipeStep,
     RecipeTag,
     Tag,
+    VisionClass,
+    VisionClassIngredient,
 )
 from tastoria.modules.catalog.nutrition import RICE_FCT_CODE, NutritionResult
 
@@ -368,6 +370,68 @@ def _ingredients(
     return ids
 
 
+# ---------------------------------------------------------------- vision classes
+
+
+def _vision(session: Session, b: Bundle, ing_ids: dict[str, uuid.UUID], report: ImportReport) -> None:
+    """vision_classes by `code` (ids assigned once, never reused, never deleted: detections and model class maps
+    point at them) and their ingredients; the first listed ingredient is the default of the chip (FR-12-12)."""
+    if not b.vision_classes:
+        return
+    ids = {code: vid for vid, code in session.execute(select(VisionClass.id, VisionClass.code))}
+    nxt = max(ids.values(), default=0) + 1
+    for vc in b.vision_classes:
+        if vc.id not in ids:
+            ids[vc.id] = nxt
+            nxt += 1
+    _sync(
+        session,
+        VisionClass,
+        ("code",),
+        [
+            {
+                "id": ids[vc.id],
+                "code": vc.id,
+                "name_vi": vc.name_vi,
+                "name_en": vc.name_en,
+                "countable": vc.countable,
+                "instance_def": vc.instance_def,
+                "has_freshness_model": vc.has_freshness_model,
+            }
+            for vc in b.vision_classes
+        ],
+        report,
+    )
+    for vc in b.vision_classes:
+        vid = ids[vc.id]
+        default = ing_ids[vc.ingredients[0]]
+        # ux_vision_class_ingredients_default: clear a moved default before setting the new one
+        moved = session.execute(
+            update(VisionClassIngredient)
+            .where(
+                VisionClassIngredient.vision_class_id == vid,
+                VisionClassIngredient.is_default,
+                VisionClassIngredient.ingredient_id != default,
+            )
+            .values(is_default=False)
+        ).rowcount
+        if moved:
+            session.expire_all()
+            report.count("vision_class_ingredients", "updated", moved)
+        _sync(
+            session,
+            VisionClassIngredient,
+            ("vision_class_id", "ingredient_id"),
+            [
+                {"vision_class_id": vid, "ingredient_id": ing_ids[name], "is_default": j == 0}
+                for j, name in enumerate(vc.ingredients)
+            ],
+            report,
+            delete_missing=True,
+            scope={"vision_class_id": vid},
+        )
+
+
 # ---------------------------------------------------------------- recipes
 
 
@@ -599,6 +663,7 @@ def apply(session: Session, b: Bundle, nut: NutritionResult, now: datetime) -> I
     _reference(session, b, report)
     comp_ids = _composition(session, b, report)
     ing_ids = _ingredients(session, b, comp_ids, now, report)
+    _vision(session, b, ing_ids, report)
     recipe_ids = _recipes(session, b, ing_ids, now, report)
     _nutrition(session, recipe_ids, nut, now, report)
     _set_db_param(session, "rice_bowl_kcal", nut.rice_bowl_kcal, report)

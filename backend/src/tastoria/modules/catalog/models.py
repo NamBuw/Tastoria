@@ -39,6 +39,7 @@ QTY_LEVEL = ENUM("it", "vua", "nhieu", name="qty_level_t", create_type=False)
 TAG_KIND = ENUM("flavor", "texture", "occasion", name="tag_kind_t", create_type=False)
 ROLE = ENUM("main", "side", "seasoning", name="ingredient_role_t", create_type=False)
 STEP_KIND = ENUM("active", "passive", name="step_kind_t", create_type=False)
+INSTANCE_DEF = ENUM("item", "group_of", "package", name="instance_def_t", create_type=False)
 
 
 def _uuid_pk() -> Mapped[uuid.UUID]:
@@ -200,6 +201,38 @@ class IngredientUnit(Base):
     unit_code: Mapped[str] = mapped_column(Text, primary_key=True)
     grams_per_unit: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     source: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+# ---------------------------------------------------------------- vision classes (design v2 §7)
+
+
+class VisionClass(Base):
+    """Classes of the ingredient detector (data/kb/vision_classes.yaml). `id` is assigned once per `code` and never
+    reused: model_version_classes and detections point at it."""
+
+    __tablename__ = "vision_classes"
+
+    id: Mapped[int] = mapped_column(SmallInteger, primary_key=True, autoincrement=False)
+    code: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    name_vi: Mapped[str] = mapped_column(Text, nullable=False)
+    name_en: Mapped[str] = mapped_column(Text, nullable=False)
+    countable: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    instance_def: Mapped[str] = mapped_column(INSTANCE_DEF, nullable=False)
+    has_freshness_model: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+
+
+class VisionClassIngredient(Base):
+    __tablename__ = "vision_class_ingredients"
+
+    vision_class_id: Mapped[int] = mapped_column(SmallInteger, ForeignKey("vision_classes.id"), primary_key=True)
+    ingredient_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("ingredients.id"), primary_key=True)
+    is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+
+    __table_args__ = (
+        Index(
+            "ux_vision_class_ingredients_default", "vision_class_id", unique=True, postgresql_where=text("is_default")
+        ),
+    )
 
 
 # ---------------------------------------------------------------- recipes
