@@ -1,0 +1,54 @@
+{
+  "criterion": "val COCO AP@[.5:.95] after 20 epochs, YOLO26n 640, seed 0 (test not looked at)",
+  "rows": [
+    {
+      "run": "grid20_clahe_c1.0_t16",
+      "clip": 1.0,
+      "tile": 16,
+      "val_map50_95_ultralytics": 0.34554177457720747,
+      "val_map50_ultralytics": 0.5163933102927581,
+      "val_AP_coco": 0.3438056324414892,
+      "val_AP50_coco": 0.5103079672050704
+    },
+    {
+      "run": "grid20_clahe_c1.0_t4",
+      "clip": 1.0,
+      "tile": 4,
+      "val_map50_95_ultralytics": 0.3386073943197972,
+      "val_map50_ultralytics": 0.5040313172774259,
+      "val_AP_coco": 0.33551168312124335,
+      "val_AP50_coco": 0.4990526154934265
+    },
+    {
+      "run": "grid20_clahe_c1.0_t8",
+      "clip": 1.0,
+      "tile": 8,
+      "val_map50_95_ultralytics": 0.33867295897789046,
+      "val_map50_ultralytics": 0.5030970151468213,
+      "val_AP_coco": 0.3364701891702266,
+      "val_AP50_coco": 0.4970404248611813
+    },
+    {
+      "run": "grid20_clahe_c2.0_t8",
+      "clip": 2.0,
+      "tile": 8,
+      "val_map50_95_ultralytics": 0.32464890327545837,
+      "val_map50_ultralytics": 0.4898783592298127,
+      "val_AP_coco": 0.3223903001348394,
+      "val_AP50_coco": 0.4823103920116173
+    },
+    {
+      "run": "grid20_clahe_c3.0_t8",
+      "clip": 3.0,
+      "tile": 8,
+      "val_map50_95_ultralytics": 0.3252601221056933,
+      "val_map50_ultralytics": 0.4880704933071762,
+      "val_AP_coco": 0.3225631522298982,
+      "val_AP50_coco": 0.47819516606859275
+    }
+  ],
+  "chosen": {
+    "clip": 1.0,
+    "tile": 16
+  }
+}
