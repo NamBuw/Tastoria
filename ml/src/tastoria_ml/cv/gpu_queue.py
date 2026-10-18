@@ -29,7 +29,9 @@ from tastoria_ml.cv.train_detector import (
     MAX_JOBS,
     MIN_DISK_GB,
     MIN_FREE_START_MB,
+    EX_TEMPFAIL,
     disk_free_gb,
+    free_slots,
     gpu_free_mb,
     mem_available_gb,
 )
@@ -46,11 +48,26 @@ def log(msg: str) -> None:
     print(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {msg}", flush=True)
 
 
+def _alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    return Path(f"/proc/{pid}/status").exists() and "zombie" not in Path(f"/proc/{pid}/status").read_text()
+
+
 def main(jobs_file: str) -> None:
     QDIR.mkdir(parents=True, exist_ok=True)
     state_f = QDIR / "state.json"
     state: dict[str, dict] = json.loads(state_f.read_text()) if state_f.exists() else {}
     procs: dict[str, subprocess.Popen] = {}
+    adopted: dict[str, int] = {}  # jobs left running by a previous queue process: name -> pid
+    for name, st in state.items():
+        if st.get("status") == "running" and st.get("pid") and _alive(st["pid"]):
+            adopted[name] = st["pid"]
+            log(f"adopted running {name} (pid {st['pid']})")
+        elif st.get("status") == "running":
+            st["status"] = "pending"
     last_launch = 0.0
     py = sys.executable
     env = dict(os.environ, PYTHONPATH=str(REPO / "ml" / "src"), MLFLOW_DISABLE_AGENT_HINT="1")
@@ -66,18 +83,25 @@ def main(jobs_file: str) -> None:
                 st["status"] = "done"
             elif rc == -9:
                 st["status"], st["kills"] = "pending", st.get("kills", 0) + 1
+            elif rc == EX_TEMPFAIL:
+                st["status"] = "pending"
             else:
                 st["tries"] = st.get("tries", 0) + 1
                 st["status"] = "pending" if st["tries"] < 2 else "failed"
             log(f"{name} exited rc={rc} -> {st['status']}")
             del procs[name]
-        n_gpu = sum(1 for n in procs if state[n].get("gpu", True))
+        for name, pid in list(adopted.items()):
+            if not _alive(pid):
+                state[name].update(status="done", end=time.time(), rc="adopted (exit code unknown)")
+                log(f"adopted {name} finished (check its outputs)")
+                del adopted[name]
+        n_gpu = sum(1 for n in procs if state[n].get("gpu", True)) + len(adopted)
         n_ram = sum(1 for n in procs if state[n].get("ram", False))
         for j in jobs:
             st = state.setdefault(j["name"], {"status": "pending"})
             st["gpu"] = j.get("gpu", True)
             st["ram"] = j.get("ram", False)
-            if st["status"] != "pending" or j["name"] in procs:
+            if st["status"] != "pending" or j["name"] in procs or j["name"] in adopted:
                 continue
             if any(state.get(a, {}).get("status") == "failed" for a in j.get("after", [])):
                 st["status"] = "failed"
@@ -86,7 +110,7 @@ def main(jobs_file: str) -> None:
             if any(state.get(a, {}).get("status") != "done" for a in j.get("after", [])):
                 continue
             if st["gpu"]:
-                if n_gpu >= MAX_JOBS or time.time() - last_launch < RAMP_S:
+                if n_gpu >= MAX_JOBS or time.time() - last_launch < RAMP_S or free_slots() == 0:
                     continue
                 if st["ram"] and (n_ram >= MAX_RAM_JOBS or mem_available_gb() < MIN_RAM_START_GB):
                     continue
@@ -97,14 +121,14 @@ def main(jobs_file: str) -> None:
             mod = j.get("module", "train_detector")
             procs[j["name"]] = subprocess.Popen([py, "-u", "-m", f"tastoria_ml.cv.{mod}", *j["cmd"]], cwd=REPO,
                                                 env=env, stdout=out, stderr=subprocess.STDOUT)
-            st.update(status="running", start=time.time())
+            st.update(status="running", start=time.time(), pid=procs[j["name"]].pid)
             log(f"launched {j['name']} (gpu={st['gpu']})")
             if st["gpu"]:
                 n_gpu += 1
                 n_ram += int(st["ram"])
                 last_launch = time.time()
         state_f.write_text(json.dumps(state, indent=1))
-        if not procs and all(state.get(j["name"], {}).get("status") in ("done", "failed") for j in jobs):
+        if not procs and not adopted and all(state.get(j["name"], {}).get("status") in ("done", "failed") for j in jobs):
             log("queue empty")
             (QDIR / "queue.done").write_text(time.strftime("%Y-%m-%d %H:%M:%S"))
             return
