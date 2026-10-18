@@ -1,0 +1,705 @@
+{
+ "note": "first sweep, lr 0.05, 100 epochs, checkpoint every 10; superseded by tuning.json",
+ "rows": [
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 10
+   },
+   "hr@10": 0.07267160812117306,
+   "recall@10": 0.021896272262063914,
+   "ndcg@10": 0.016730508180879945,
+   "n_users": 6206,
+   "fit_eval_seconds": 118.3
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 20
+   },
+   "hr@10": 0.06558169513374154,
+   "recall@10": 0.019998885013278383,
+   "ndcg@10": 0.014721513120321484,
+   "n_users": 6206,
+   "fit_eval_seconds": 118.3
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 30
+   },
+   "hr@10": 0.06397035127296165,
+   "recall@10": 0.019144950866188813,
+   "ndcg@10": 0.013839134528332703,
+   "n_users": 6206,
+   "fit_eval_seconds": 118.3
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 40
+   },
+   "hr@10": 0.06090879793747986,
+   "recall@10": 0.017430413215066054,
+   "ndcg@10": 0.013236149926877525,
+   "n_users": 6206,
+   "fit_eval_seconds": 118.3
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 50
+   },
+   "hr@10": 0.05720270705768611,
+   "recall@10": 0.014898129273239632,
+   "ndcg@10": 0.010863498358397462,
+   "n_users": 6206,
+   "fit_eval_seconds": 118.3
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 60
+   },
+   "hr@10": 0.04979052529809862,
+   "recall@10": 0.013314478106248464,
+   "ndcg@10": 0.010085748813589965,
+   "n_users": 6206,
+   "fit_eval_seconds": 118.3
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 70
+   },
+   "hr@10": 0.047695778279084756,
+   "recall@10": 0.012955990908901652,
+   "ndcg@10": 0.009932678914296736,
+   "n_users": 6206,
+   "fit_eval_seconds": 118.3
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 80
+   },
+   "hr@10": 0.05494682565259426,
+   "recall@10": 0.015865736860254283,
+   "ndcg@10": 0.012253353232292659,
+   "n_users": 6206,
+   "fit_eval_seconds": 118.3
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 90
+   },
+   "hr@10": 0.04689010634869481,
+   "recall@10": 0.013392591181167708,
+   "ndcg@10": 0.010350550957177539,
+   "n_users": 6206,
+   "fit_eval_seconds": 118.3
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 100
+   },
+   "hr@10": 0.04721237512085079,
+   "recall@10": 0.01281920556783905,
+   "ndcg@10": 0.009500228015431364,
+   "n_users": 6206,
+   "fit_eval_seconds": 118.3
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.0001,
+    "lr": 0.05,
+    "epochs": 10
+   },
+   "hr@10": 0.0720270705768611,
+   "recall@10": 0.02139624922966729,
+   "ndcg@10": 0.016508088711588955,
+   "n_users": 6206,
+   "fit_eval_seconds": 184.2
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.0001,
+    "lr": 0.05,
+    "epochs": 20
+   },
+   "hr@10": 0.06542056074766354,
+   "recall@10": 0.020074081060114775,
+   "ndcg@10": 0.014638674137842811,
+   "n_users": 6206,
+   "fit_eval_seconds": 184.2
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.0001,
+    "lr": 0.05,
+    "epochs": 30
+   },
+   "hr@10": 0.0647760232033516,
+   "recall@10": 0.01928266964521915,
+   "ndcg@10": 0.013859666082612977,
+   "n_users": 6206,
+   "fit_eval_seconds": 184.2
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.0001,
+    "lr": 0.05,
+    "epochs": 40
+   },
+   "hr@10": 0.06090879793747986,
+   "recall@10": 0.017468286601827122,
+   "ndcg@10": 0.013173852244144446,
+   "n_users": 6206,
+   "fit_eval_seconds": 184.2
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.0001,
+    "lr": 0.05,
+    "epochs": 50
+   },
+   "hr@10": 0.056558169513374154,
+   "recall@10": 0.014854021922235608,
+   "ndcg@10": 0.010809575747310177,
+   "n_users": 6206,
+   "fit_eval_seconds": 184.2
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.0001,
+    "lr": 0.05,
+    "epochs": 60
+   },
+   "hr@10": 0.04866258459555269,
+   "recall@10": 0.012888228448503417,
+   "ndcg@10": 0.009774994335308568,
+   "n_users": 6206,
+   "fit_eval_seconds": 184.2
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.0001,
+    "lr": 0.05,
+    "epochs": 70
+   },
+   "hr@10": 0.04640670319046084,
+   "recall@10": 0.012599356008286922,
+   "ndcg@10": 0.009672779716927565,
+   "n_users": 6206,
+   "fit_eval_seconds": 184.2
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.0001,
+    "lr": 0.05,
+    "epochs": 80
+   },
+   "hr@10": 0.05269094424750242,
+   "recall@10": 0.01496680870978118,
+   "ndcg@10": 0.011737900151966138,
+   "n_users": 6206,
+   "fit_eval_seconds": 184.2
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.0001,
+    "lr": 0.05,
+    "epochs": 90
+   },
+   "hr@10": 0.045923300032226874,
+   "recall@10": 0.01307732815264616,
+   "ndcg@10": 0.01006369530857953,
+   "n_users": 6206,
+   "fit_eval_seconds": 184.2
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.0001,
+    "lr": 0.05,
+    "epochs": 100
+   },
+   "hr@10": 0.044956493715758945,
+   "recall@10": 0.011688841118378389,
+   "ndcg@10": 0.009029599845572568,
+   "n_users": 6206,
+   "fit_eval_seconds": 184.2
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.001,
+    "lr": 0.05,
+    "epochs": 10
+   },
+   "hr@10": 0.06944892039961328,
+   "recall@10": 0.02000739031917464,
+   "ndcg@10": 0.015536163105542164,
+   "n_users": 6206,
+   "fit_eval_seconds": 131.7
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.001,
+    "lr": 0.05,
+    "epochs": 20
+   },
+   "hr@10": 0.06074766355140187,
+   "recall@10": 0.017956757781069147,
+   "ndcg@10": 0.013447143979763007,
+   "n_users": 6206,
+   "fit_eval_seconds": 131.7
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.001,
+    "lr": 0.05,
+    "epochs": 30
+   },
+   "hr@10": 0.06010312600708991,
+   "recall@10": 0.017278115691234434,
+   "ndcg@10": 0.013107044808309907,
+   "n_users": 6206,
+   "fit_eval_seconds": 131.7
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.001,
+    "lr": 0.05,
+    "epochs": 40
+   },
+   "hr@10": 0.05478569126651627,
+   "recall@10": 0.015185323955924151,
+   "ndcg@10": 0.011419465066771592,
+   "n_users": 6206,
+   "fit_eval_seconds": 131.7
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.001,
+    "lr": 0.05,
+    "epochs": 50
+   },
+   "hr@10": 0.0485014502094747,
+   "recall@10": 0.012717032662929546,
+   "ndcg@10": 0.009388703127803077,
+   "n_users": 6206,
+   "fit_eval_seconds": 131.7
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.001,
+    "lr": 0.05,
+    "epochs": 60
+   },
+   "hr@10": 0.04398968739929101,
+   "recall@10": 0.011239402284452188,
+   "ndcg@10": 0.008318502330991117,
+   "n_users": 6206,
+   "fit_eval_seconds": 131.7
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.001,
+    "lr": 0.05,
+    "epochs": 70
+   },
+   "hr@10": 0.04205607476635514,
+   "recall@10": 0.0110250163536946,
+   "ndcg@10": 0.008397864592615262,
+   "n_users": 6206,
+   "fit_eval_seconds": 131.7
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.001,
+    "lr": 0.05,
+    "epochs": 80
+   },
+   "hr@10": 0.045923300032226874,
+   "recall@10": 0.013239472185046506,
+   "ndcg@10": 0.010111899955494373,
+   "n_users": 6206,
+   "fit_eval_seconds": 131.7
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.001,
+    "lr": 0.05,
+    "epochs": 90
+   },
+   "hr@10": 0.04221720915243313,
+   "recall@10": 0.011985626689712888,
+   "ndcg@10": 0.008717032613167714,
+   "n_users": 6206,
+   "fit_eval_seconds": 131.7
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.001,
+    "lr": 0.05,
+    "epochs": 100
+   },
+   "hr@10": 0.039800193361263295,
+   "recall@10": 0.010366975796281574,
+   "ndcg@10": 0.008362133204520866,
+   "n_users": 6206,
+   "fit_eval_seconds": 131.7
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.01,
+    "lr": 0.05,
+    "epochs": 10
+   },
+   "hr@10": 0.06735417338059942,
+   "recall@10": 0.01905575007390317,
+   "ndcg@10": 0.014444241344050469,
+   "n_users": 6206,
+   "fit_eval_seconds": 119.1
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.01,
+    "lr": 0.05,
+    "epochs": 20
+   },
+   "hr@10": 0.053174347405736386,
+   "recall@10": 0.014359786956806817,
+   "ndcg@10": 0.01100436489274319,
+   "n_users": 6206,
+   "fit_eval_seconds": 119.1
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.01,
+    "lr": 0.05,
+    "epochs": 30
+   },
+   "hr@10": 0.05784724460199807,
+   "recall@10": 0.017231441661696528,
+   "ndcg@10": 0.012311528226096585,
+   "n_users": 6206,
+   "fit_eval_seconds": 119.1
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.01,
+    "lr": 0.05,
+    "epochs": 40
+   },
+   "hr@10": 0.05027392845633258,
+   "recall@10": 0.013738040107803306,
+   "ndcg@10": 0.010131288172326228,
+   "n_users": 6206,
+   "fit_eval_seconds": 119.1
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.01,
+    "lr": 0.05,
+    "epochs": 50
+   },
+   "hr@10": 0.04431195617144699,
+   "recall@10": 0.011863743283645995,
+   "ndcg@10": 0.008202147724850983,
+   "n_users": 6206,
+   "fit_eval_seconds": 119.1
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.01,
+    "lr": 0.05,
+    "epochs": 60
+   },
+   "hr@10": 0.039800193361263295,
+   "recall@10": 0.0103280649562998,
+   "ndcg@10": 0.00757632745191133,
+   "n_users": 6206,
+   "fit_eval_seconds": 119.1
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.01,
+    "lr": 0.05,
+    "epochs": 70
+   },
+   "hr@10": 0.03883338704479536,
+   "recall@10": 0.010152379767926736,
+   "ndcg@10": 0.0076138072773723,
+   "n_users": 6206,
+   "fit_eval_seconds": 119.1
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.01,
+    "lr": 0.05,
+    "epochs": 80
+   },
+   "hr@10": 0.044795359329680956,
+   "recall@10": 0.012230459191863484,
+   "ndcg@10": 0.009474595075584968,
+   "n_users": 6206,
+   "fit_eval_seconds": 119.1
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.01,
+    "lr": 0.05,
+    "epochs": 90
+   },
+   "hr@10": 0.042378343538511117,
+   "recall@10": 0.011610586821143833,
+   "ndcg@10": 0.008583171730544261,
+   "n_users": 6206,
+   "fit_eval_seconds": 119.1
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 16,
+    "lam": 0.01,
+    "lr": 0.05,
+    "epochs": 100
+   },
+   "hr@10": 0.04012246213341927,
+   "recall@10": 0.009368375755028763,
+   "ndcg@10": 0.007483530385986269,
+   "n_users": 6206,
+   "fit_eval_seconds": 119.1
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 32,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 10
+   },
+   "hr@10": 0.0704157267160812,
+   "recall@10": 0.021538745311909944,
+   "ndcg@10": 0.015359082938296338,
+   "n_users": 6206,
+   "fit_eval_seconds": 500.0
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 32,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 20
+   },
+   "hr@10": 0.06670963583628746,
+   "recall@10": 0.019910160673463462,
+   "ndcg@10": 0.013843341835040905,
+   "n_users": 6206,
+   "fit_eval_seconds": 500.0
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 32,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 30
+   },
+   "hr@10": 0.05704157267160812,
+   "recall@10": 0.01702077244253851,
+   "ndcg@10": 0.012942504905829351,
+   "n_users": 6206,
+   "fit_eval_seconds": 500.0
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 32,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 40
+   },
+   "hr@10": 0.05188527231711247,
+   "recall@10": 0.015148719202524849,
+   "ndcg@10": 0.011175466865940925,
+   "n_users": 6206,
+   "fit_eval_seconds": 500.0
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 32,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 50
+   },
+   "hr@10": 0.04721237512085079,
+   "recall@10": 0.013737470927581185,
+   "ndcg@10": 0.009993145679488554,
+   "n_users": 6206,
+   "fit_eval_seconds": 500.0
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 32,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 60
+   },
+   "hr@10": 0.04914598775378666,
+   "recall@10": 0.014219873693904192,
+   "ndcg@10": 0.010418298773448888,
+   "n_users": 6206,
+   "fit_eval_seconds": 500.0
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 32,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 70
+   },
+   "hr@10": 0.04447309055752498,
+   "recall@10": 0.0128914408298877,
+   "ndcg@10": 0.009073741863410568,
+   "n_users": 6206,
+   "fit_eval_seconds": 500.0
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 32,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 80
+   },
+   "hr@10": 0.047695778279084756,
+   "recall@10": 0.013635073635809443,
+   "ndcg@10": 0.010446762047960042,
+   "n_users": 6206,
+   "fit_eval_seconds": 500.0
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 32,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 90
+   },
+   "hr@10": 0.04366741862713503,
+   "recall@10": 0.01234934972236228,
+   "ndcg@10": 0.009043396447179186,
+   "n_users": 6206,
+   "fit_eval_seconds": 500.0
+  },
+  {
+   "model": "BPR-MF (NumPy)",
+   "params": {
+    "dim": 32,
+    "lam": 1e-05,
+    "lr": 0.05,
+    "epochs": 100
+   },
+   "hr@10": 0.04205607476635514,
+   "recall@10": 0.012061183323888327,
+   "ndcg@10": 0.008795312373751973,
+   "n_users": 6206,
+   "fit_eval_seconds": 500.0
+  }
+ ]
+}

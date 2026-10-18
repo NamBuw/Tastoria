@@ -1,0 +1,46 @@
+{
+ "commit_at_run": "f6e64dc78fd4ab3bcb2be855716b55b1014746ce",
+ "python": "3.12.12",
+ "platform": "Linux-5.15.0-194-generic-x86_64-with-glibc2.35",
+ "threads": 12,
+ "gpu": "none (CUDA_VISIBLE_DEVICES empty)",
+ "seeds_test": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "seed_tuning": 0,
+ "dataset": {
+  "raw_interactions": 1132367,
+  "raw_positives": 1003724,
+  "raw_rating0": 60847,
+  "core_k": 5,
+  "core_users": 16043,
+  "core_items": 37851,
+  "core_positives": 498607,
+  "core_interactions_all_ratings": 529087,
+  "core_rating0_interactions": 10058,
+  "density": 0.0008210988238454745,
+  "d_val": "2010-06-24",
+  "d_test": "2012-04-01",
+  "share_train": 0.7998202993540002,
+  "share_val": 0.1000788195913816,
+  "share_test": 0.10010088105461816,
+  "interactions_sha256": "b1bb6cee1e08a248a805f127ffb404ce35d10923388dfe82ce89365a1fd76974"
+ },
+ "item_features": {
+  "n_features_excl_identity": 1882,
+  "min_count": 20
+ },
+ "libraries": {
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "pandas": "3.0.6",
+  "implicit": "0.7.3",
+  "lightfm-next": "1.19.0",
+  "threadpoolctl": "3.7.0"
+ },
+ "test_targets_file": "data/processed/recsys/test_targets.csv.gz"
+}
