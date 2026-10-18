@@ -44,6 +44,10 @@ ULTRALYTICS_VERSION = "8.4.173"
 MIN_FREE_START_MB = 10 * 1024
 MIN_FREE_RUN_MB = 3 * 1024
 MEM_FRACTION = 0.15
+MAX_JOBS = 3  # coordinator allows ≤ 3 concurrent jobs while ≥ 6 GB stays free
+SLOT_MIN_FREE_MB = {0: 3 * 1024, 1: 6 * 1024, 2: 6 * 1024 + 512}
+MIN_DISK_GB = 30
+BATCH_FOR_IMGSZ = {640: 16, 960: 8}
 
 
 # ------------------------------------------------------------------ GPU safety
@@ -63,47 +67,85 @@ def gpu_apps() -> str:
     ).strip()
 
 
-def _watchdog(stop: threading.Event, log: Path) -> None:
+def disk_free_gb(path: Path = REPO) -> float:
+    st = os.statvfs(path)
+    return st.f_bavail * st.f_frsize / 2**30
+
+
+def mem_available_gb() -> float:
+    for line in Path("/proc/meminfo").read_text().splitlines():
+        if line.startswith("MemAvailable:"):
+            return int(line.split()[1]) / 2**20
+    return 1e9
+
+
+def _watchdog(stop: threading.Event, log: Path, min_free_mb: int, min_ram_gb: float = 4.0) -> None:
+    """Kill this process when GPU free memory < ``min_free_mb``, disk free < MIN_DISK_GB or host
+    MemAvailable < ``min_ram_gb`` (the RAM image cache must never push other users into OOM)."""
+    n = 0
     with log.open("a") as f:
         while not stop.is_set():
+            total = 0
             try:
                 free, total = gpu_free_mb()
             except Exception as e:  # noqa: BLE001
                 f.write(f"{time.strftime('%H:%M:%S')} nvidia-smi failed: {e}\n")
-                free = MIN_FREE_RUN_MB + 1
-            f.write(f"{time.strftime('%H:%M:%S')} free {free} MB of {total} MB\n")
+                free = min_free_mb + 1
+            disk = disk_free_gb()
+            ram = mem_available_gb()
+            f.write(f"{time.strftime('%H:%M:%S')} free {free} MB of {total} MB, disk {disk:.1f} GB, "
+                    f"ram avail {ram:.1f} GB\n")
             f.flush()
-            if free < MIN_FREE_RUN_MB:
-                f.write("free memory below 3 GB: stopping this job now\n")
+            if free < min_free_mb or disk < MIN_DISK_GB or ram < min_ram_gb:
+                f.write(f"limit hit (gpu free < {min_free_mb} MB, disk < {MIN_DISK_GB} GB or "
+                        f"ram < {min_ram_gb} GB): killing job\n")
                 f.flush()
                 os.kill(os.getpid(), signal.SIGKILL)
+            n += 1
             stop.wait(5)
 
 
 class GpuGuard:
-    """Checks free memory, takes the one-job lock, caps memory and starts the watchdog."""
+    """Checks free memory and disk, takes one of MAX_JOBS slot locks, caps memory, starts the watchdog.
+
+    Slot 0 (first job) is killed when GPU free memory < 3 GB. A job holding slot k ≥ 1 runs alongside
+    others, so it is killed earlier (free < SLOT_MIN_FREE_MB[k], ≥ 6 GB): concurrent jobs only while the
+    GPU keeps ≥ 6 GB free, and the most recent job goes first.
+    """
 
     def __init__(self, name: str):
         self.name = name
 
     def __enter__(self):
         free, total = gpu_free_mb()
-        print(f"[gpu] free {free} MB / {total} MB\n{gpu_apps()}", flush=True)
+        print(f"[gpu] free {free} MB / {total} MB, disk {disk_free_gb():.1f} GB\n{gpu_apps()}", flush=True)
         if free < MIN_FREE_START_MB:
             raise SystemExit(f"[gpu] only {free} MB free (< 10 GB): not starting")
+        if disk_free_gb() < MIN_DISK_GB:
+            raise SystemExit(f"[disk] < {MIN_DISK_GB} GB free: not starting")
         LOCK.parent.mkdir(parents=True, exist_ok=True)
-        self._lock = LOCK.open("w")
-        try:
-            fcntl.flock(self._lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
-            raise SystemExit("[gpu] another Tastoria GPU job holds ml/runs/gpu.lock") from None
+        self.slot = None
+        for k in range(MAX_JOBS):
+            fh = (LOCK.parent / f"gpu.lock.{k}").open("w")
+            try:
+                fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                fh.close()
+                continue
+            self.slot, self._lock = k, fh
+            break
+        if self.slot is None:
+            raise SystemExit(f"[gpu] {MAX_JOBS} Tastoria GPU jobs already running")
         import torch
 
         torch.cuda.set_per_process_memory_fraction(MEM_FRACTION)
         self._stop = threading.Event()
         log = RUNS / f"{self.name}.gpu.log"
         log.parent.mkdir(parents=True, exist_ok=True)
-        self._t = threading.Thread(target=_watchdog, args=(self._stop, log), daemon=True)
+        min_free = SLOT_MIN_FREE_MB[self.slot]
+        print(f"[gpu] slot {self.slot}, watchdog kill threshold {min_free} MB", flush=True)
+        min_ram = 4.0 + 1.0 * self.slot  # newest job is killed first
+        self._t = threading.Thread(target=_watchdog, args=(self._stop, log, min_free, min_ram), daemon=True)
         self._t.start()
         return self
 
@@ -124,16 +166,35 @@ def _prep_one(args) -> None:
     src, dst, arm = args
     if dst.exists():
         return
+    base, clip, grid = parse_arm(arm)
     with Image.open(src) as im:
         a = np.asarray(im.convert("RGB"))
-    Image.fromarray(apply_arm(a, arm)).save(dst, "JPEG", quality=95)
+    Image.fromarray(apply_arm(a, base, clip, grid)).save(dst, "JPEG", quality=95)
+
+
+def parse_arm(arm: str) -> tuple[str, float, tuple[int, int]]:
+    """``clahe@3.0x8`` -> ("clahe", 3.0, (8, 8)); plain ``clahe`` / ``gw_clahe`` use clip 2.0, tile 8."""
+    base, _, par = arm.partition("@")
+    clip, tile = (float(par.split("x")[0]), int(par.split("x")[1])) if par else (2.0, 8)
+    return base, clip, (tile, tile)
+
+
+def arm_data(arm: str) -> Path:
+    """dataset.yaml for an arm. ``none`` and ``aug`` read the raw images (``aug`` changes training only)."""
+    if arm in ("none", "aug"):
+        return YOLO_DIR / "dataset.yaml"
+    return ABL_DIR / arm / "dataset.yaml"
+
+
+def arm_images(arm: str, split: str) -> Path:
+    return arm_data(arm).parent / "images" / split
 
 
 def prep_arm(arm: str, workers: int = 12) -> Path:
     """Copy of the YOLO dataset with ``arm`` applied to every whole image (train, val and test alike)."""
     import yaml
 
-    if arm == "none":
+    if arm in ("none", "aug"):
         return YOLO_DIR / "dataset.yaml"
     root = ABL_DIR / arm
     jobs = []
@@ -185,28 +246,120 @@ def _counts(split: str, names: dict[int, str]) -> dict:
     return {"images": n_img, "boxes": n_box}
 
 
+def _patch_illuminant_aug() -> None:
+    """``aug`` arm: insert RandomIlluminant before ultralytics' RandomHSV in the *training* pipeline."""
+    import ultralytics.data.augment as ua
+    import ultralytics.data.dataset as ud
+
+    from tastoria_ml.cv.colorcast import RandomIlluminant
+
+    orig = ua.v8_transforms
+
+    def v8_with_cast(dataset, imgsz, hyp):
+        comp = orig(dataset, imgsz, hyp)
+        k = next(i for i, t in enumerate(comp.transforms) if type(t).__name__ == "RandomHSV")
+        comp.transforms.insert(k, RandomIlluminant(p=0.5))
+        return comp
+
+    ud.v8_transforms = v8_with_cast
+
+
+def _patch_imread_arm(arm: str) -> None:
+    """Apply the preprocessing arm inside ultralytics' image reader (whole image, before resize).
+
+    Used with ``cache="ram"``: every image of train / val / test is read and preprocessed once into the
+    shared RAM cache, so no preprocessed copy of the dataset is written to disk.
+    """
+    import ultralytics.data.base as ub
+
+    from tastoria_ml.cv.preprocess import apply_arm
+
+    base, clip, grid = parse_arm(arm)
+    orig = ub.imread
+
+    def imread_arm(filename, flags=None, **kw):
+        im = orig(filename, flags) if flags is not None else orig(filename, **kw)
+        if im is None or im.ndim != 3:
+            return im
+        return np.ascontiguousarray(apply_arm(im[..., ::-1], base, clip, grid)[..., ::-1])
+
+    ub.imread = imread_arm
+    ub.ThreadPool = _ForkPool  # caching is CPU-bound numpy: processes instead of GIL-bound threads
+
+
+_FCN = None
+
+
+def _fork_call(i):
+    return _FCN(i)
+
+
+class _ForkPool:
+    """Drop-in for the ``ThreadPool`` used by ultralytics' ``cache_images``: forked worker processes that
+    inherit the dataset (only indices and finished images cross the process boundary)."""
+
+    def __init__(self, n: int):
+        self.n = max(1, min(int(n), 8))
+        self.pool = None
+
+    def __enter__(self):
+        return self
+
+    def imap(self, fcn, it):
+        import multiprocessing as mp
+
+        global _FCN
+        _FCN = fcn
+        self.pool = mp.get_context("fork").Pool(self.n)
+        return self.pool.imap(_fork_call, it, chunksize=16)
+
+    def __exit__(self, *exc):
+        if self.pool is not None:
+            self.pool.close()
+            self.pool.join()
+
+
 def train(name: str, epochs: int, arm: str = "none", model: str = "yolo26n.pt", imgsz: int = 640,
-          batch: int = 16, patience: int = 15, seed: int = 0, workers: int = 8) -> dict:
+          batch: int | None = None, patience: int = 15, seed: int = 0, workers: int = 8,
+          cache: str | None = None) -> dict:
+    """``cache="ram"``: on-the-fly arm (no disk copy). Without it, non-trivial arms use a prep-arm copy."""
+    batch = batch or BATCH_FOR_IMGSZ[imgsz]
     assert batch > 0, "fixed batch only"
     import ultralytics
     from ultralytics import YOLO
 
+    from tastoria_ml.cv import predict_dump
+
     assert ultralytics.__version__ == ULTRALYTICS_VERSION, ultralytics.__version__
-    data = prep_arm(arm) if arm != "none" else YOLO_DIR / "dataset.yaml"
+    if cache == "ram":
+        data = YOLO_DIR / "dataset.yaml"
+        if arm not in ("none", "aug"):
+            _patch_imread_arm(arm)
+    else:
+        data = prep_arm(arm) if arm not in ("none", "aug") else YOLO_DIR / "dataset.yaml"
+    if arm == "aug":
+        _patch_illuminant_aug()
     _disable_builtin_mlflow()
+    run_dir = RUNS / name
     with GpuGuard(name):
         t0 = time.time()
-        m = YOLO(str(REPO / "ml" / "runs" / "weights" / model))
-        m.train(data=str(data), epochs=epochs, imgsz=imgsz, batch=batch, patience=patience, seed=seed,
-                deterministic=True, workers=workers, project=str(RUNS), name=name, exist_ok=True, device=0,
-                plots=True, verbose=False, amp=True)
+        last = run_dir / "weights" / "last.pt"
+        if last.exists() and not (run_dir / "train.done").exists():
+            print(f"[train] resuming {last}", flush=True)
+            YOLO(str(last)).train(resume=True, device=0, workers=workers)
+        elif not (run_dir / "train.done").exists():
+            m = YOLO(str(REPO / "ml" / "runs" / "weights" / model))
+            m.train(data=str(data), epochs=epochs, imgsz=imgsz, batch=batch, patience=patience, seed=seed,
+                    deterministic=True, workers=workers, project=str(RUNS), name=name, exist_ok=True, device=0,
+                    plots=True, verbose=False, amp=True, cache=cache or False)
+        (run_dir / "train.done").write_text("ok")
         train_s = time.time() - t0
-        best = RUNS / name / "weights" / "best.pt"
+        best = run_dir / "weights" / "best.pt"
         bm = YOLO(str(best))
         names = bm.names
         res = {}
         for split in ("val", "test"):
-            mt = bm.val(data=str(data), split=split, imgsz=imgsz, batch=batch, device=0, plots=False,
+            mt = bm.val(data=str(data), split=split, imgsz=imgsz, batch=batch, device=0, plots=True,
                         verbose=False, project=str(RUNS), name=f"{name}_eval_{split}", exist_ok=True)
             res[split] = {
                 "map50": float(mt.box.map50),
@@ -216,6 +369,20 @@ def train(name: str, epochs: int, arm: str = "none", model: str = "yolo26n.pt", 
                 "per_class": _per_class(mt, names),
                 "counts": _counts(split, names),
             }
+        modes = ["nms", "e2e"] if "26" in model else ["nms"]
+        for split in ("val", "test"):
+            todo = [m for m in modes if not predict_dump.pred_path(name, split, m).exists()]
+            if not todo:
+                continue
+            if cache == "ram":  # raw files, arm applied in memory exactly as during training
+                img_dir, dump_arm = YOLO_DIR / "images" / split, arm
+            else:
+                img_dir, dump_arm = arm_images(arm, split), "none"
+            loaded = predict_dump.load_split(img_dir, dump_arm)
+            for mode in todo:
+                predict_dump.dump(best, img_dir, predict_dump.pred_path(name, split, mode), imgsz, mode,
+                                  batch=batch, loaded=loaded)
+            del loaded
         import torch
 
         peak = torch.cuda.max_memory_reserved() / 2**30
@@ -224,6 +391,8 @@ def train(name: str, epochs: int, arm: str = "none", model: str = "yolo26n.pt", 
     hist = pd.read_csv(RUNS / name / "results.csv")
     hist.columns = [c.strip() for c in hist.columns]
     best_epoch = int(hist.loc[hist["metrics/mAP50-95(B)"].idxmax(), "epoch"])
+    if "time" in hist:  # ultralytics' cumulative wall time per epoch survives a resume
+        train_s = float(hist["time"].iloc[-1])
     summary = {
         "name": name,
         "data": "PUBLIC ONLY (Open Images V7 subset + Mendeley Bangladesh vegetables); not fridge photos",
@@ -237,6 +406,7 @@ def train(name: str, epochs: int, arm: str = "none", model: str = "yolo26n.pt", 
         "patience": patience,
         "seed": seed,
         "preprocess_arm": arm,
+        "cache": cache,
         "train_seconds": round(train_s, 1),
         "peak_cuda_reserved_gib": round(peak, 2),
         "memory_fraction": MEM_FRACTION,
@@ -353,13 +523,16 @@ def main() -> None:
     ap.add_argument("--patience", type=int, default=15)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--model", default="yolo26n.pt")
+    ap.add_argument("--imgsz", type=int, default=640)
+    ap.add_argument("--cache", default=None, choices=[None, "ram"])
     a = ap.parse_args()
     if a.cmd == "gpu-check":
         print(gpu_free_mb(), gpu_apps())
     elif a.cmd == "prep-arm":
         print(prep_arm(a.arm))
     elif a.cmd == "train":
-        print(json.dumps(train(a.name, a.epochs, a.arm, a.model, patience=a.patience, seed=a.seed), indent=2))
+        print(json.dumps(train(a.name, a.epochs, a.arm, a.model, imgsz=a.imgsz, patience=a.patience, seed=a.seed,
+                                    cache=a.cache), indent=2))
     elif a.cmd == "latency":
         print(json.dumps(latency(a.name), indent=2))
 
