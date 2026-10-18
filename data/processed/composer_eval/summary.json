@@ -1,6 +1,6 @@
 {
  "n_scenarios": 150,
- "seconds": 115.1,
+ "seconds": 23.9,
  "scenario_seed": 20261018,
  "split_sizes": {
   "tuning": 75,
@@ -7499,5 +7499,18 @@
   "taste": 0.724933391441328,
   "kcal_dev": 0.03183493681228462,
   "diversity": 0.057777777777777775
+ },
+ "sensitivity_95pct_gain": {
+  "alpha": 16.0,
+  "beta": 0.0,
+  "gamma": 0.5,
+  "n": 71,
+  "urgency": 0.32307138063776664,
+  "taste": 0.5742370592303524,
+  "taste_loss": 0.1642719537588753,
+  "kcal_dev": 0.06328770602455383,
+  "diversity": 0.09859154929577464,
+  "share_kcal_ok": 0.9014084507042254,
+  "share_uses_urgent": 1.0
  }
 }

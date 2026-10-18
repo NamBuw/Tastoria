@@ -12,5 +12,6 @@
   "kcal_dev": 0.06324909126869602,
   "diversity": 0.09389671361502347
  },
+ "caveat": "U(m) saturates in α: α = 16 (same β, γ) already gets 95 % of the urgency gain over taste-only with taste loss 0.164 instead of 0.196; the rule as pre-registered picks the largest gain, so it sits at the taste-loss limit",
  "how_to_apply": "backend/src/tastoria/app.py builds MealDeps(...) with the default composer.Params(); pass MealDeps(params=Params(version='tray-p1-synthetic-20261018', alpha=…, beta=…, gamma=…)) there, or change the defaults of Params in backend/src/tastoria/modules/meal/composer.py. meal_plans.params_version records the version on every plan."
 }

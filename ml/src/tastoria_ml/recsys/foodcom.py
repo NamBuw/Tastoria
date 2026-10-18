@@ -40,7 +40,8 @@ K = 10
 
 GRIDS: dict[str, list[dict]] = {
     "ItemKNN": [{"k": k, "shrink": h} for k in (10, 20, 50, 100, 200, 500, 1000) for h in (0.0, 20.0)]
-    + [{"k": k, "shrink": h} for k in (1000, 2000) for h in (100.0,)] + [{"k": 2000, "shrink": 20.0}],
+    + [{"k": k, "shrink": h} for k in (1000, 2000) for h in (100.0,)] + [{"k": 2000, "shrink": 20.0}]
+    + [{"k": 2000, "shrink": h} for h in (300.0, 1000.0)],
     "EASE": [{"lam": lam, "max_items": 20000} for lam in (100.0, 300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0)],
     # validation NDCG peaks within the first epochs on the time split (checked in a first 100-epoch sweep,
     # data/processed/recsys/tuning_bpr_first_sweep.json), so 30 epochs with a checkpoint every 2

@@ -406,12 +406,22 @@ def main(argv: list[str] | None = None) -> int:
         summary["test_provisional"] = {m: _mean([r["provisional"] for r in results if r["split"] == "test"], m) for m in ("urgency", "taste", "kcal_dev", "diversity")}
     (OUT / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1, default=float) + "\n", encoding="utf-8")
     if pick:
+        u0 = next(t["urgency"] for t in tune_tab if t["alpha"] == 0 and t["beta"] == 0 and t["gamma"] == 0)
+        same = sorted((t for t in tune_tab if t["beta"] == pick["beta"] and t["gamma"] == pick["gamma"]), key=lambda t: t["alpha"])
+        near = next(t for t in same if t["urgency"] >= u0 + 0.95 * (pick["urgency"] - u0))
+        summary["sensitivity_95pct_gain"] = near
+        (OUT / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1, default=float) + "\n", encoding="utf-8")
         weights = {
             "version": "tray-p1-synthetic-20261018",
             "alpha": pick["alpha"], "beta": pick["beta"], "gamma": pick["gamma"], "top_k": 20,
             "chosen_by": "pre-registered rule on 75 synthetic tuning scenarios (data/processed/composer_eval/summary.json)",
             "taste_signal": "PROXY: BaselineRanker content cosine to 5 random favourites; re-run with survey ratings as the taste oracle before treating these as final",
             "tuning_means": {k: pick[k] for k in ("urgency", "taste_loss", "kcal_dev", "diversity")},
+            "caveat": (
+                f"U(m) saturates in α: α = {near['alpha']:g} (same β, γ) already gets 95 % of the urgency gain over "
+                f"taste-only with taste loss {near['taste_loss']:.3f} instead of {pick['taste_loss']:.3f}; the rule as "
+                "pre-registered picks the largest gain, so it sits at the taste-loss limit"
+            ),
             "how_to_apply": (
                 "backend/src/tastoria/app.py builds MealDeps(...) with the default composer.Params(); pass "
                 "MealDeps(params=Params(version='tray-p1-synthetic-20261018', alpha=…, beta=…, gamma=…)) there, or "
