@@ -1,0 +1,16 @@
+{
+ "version": "tray-p1-synthetic-20261018",
+ "alpha": 64.0,
+ "beta": 0.0,
+ "gamma": 0.5,
+ "top_k": 20,
+ "chosen_by": "pre-registered rule on 75 synthetic tuning scenarios (data/processed/composer_eval/summary.json)",
+ "taste_signal": "PROXY: BaselineRanker content cosine to 5 random favourites; re-run with survey ratings as the taste oracle before treating these as final",
+ "tuning_means": {
+  "urgency": 0.32563586142153284,
+  "taste_loss": 0.19624003854386152,
+  "kcal_dev": 0.06324909126869602,
+  "diversity": 0.09389671361502347
+ },
+ "how_to_apply": "backend/src/tastoria/app.py builds MealDeps(...) with the default composer.Params(); pass MealDeps(params=Params(version='tray-p1-synthetic-20261018', alpha=…, beta=…, gamma=…)) there, or change the defaults of Params in backend/src/tastoria/modules/meal/composer.py. meal_plans.params_version records the version on every plan."
+}

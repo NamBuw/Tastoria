@@ -1,0 +1,4739 @@
+{
+ "corpus": {
+  "foodcom_recipes": 231637,
+  "kb_dishes": 180,
+  "longest_list": 43,
+  "foodcom_distinct_ingredient_strings": 14942
+ },
+ "split": {
+  "seed": 20261018,
+  "dev": [
+   "bầu",
+   "bắp bò",
+   "chân giò",
+   "cá chép",
+   "cá lóc",
+   "cá nục",
+   "cá trê",
+   "cải thìa",
+   "ghẹ",
+   "hành lá",
+   "hẹ",
+   "hến",
+   "khoai mỡ",
+   "lạc",
+   "mật ong",
+   "mồng tơi",
+   "ngọn su su",
+   "nấm kim châm",
+   "nấm mỡ",
+   "nấm rơm",
+   "nấm đùi gà",
+   "rau lang",
+   "rau muống",
+   "rau ngót",
+   "súp lơ xanh",
+   "thịt băm",
+   "thịt nạc vai",
+   "tôm",
+   "đu đủ xanh",
+   "đậu phụ",
+   "ớt bột",
+   "ức gà"
+  ],
+  "test": [
+   "bí ngòi",
+   "bí đao",
+   "bông bí",
+   "bắp cải",
+   "bột chiên giòn",
+   "cua biển",
+   "cá basa",
+   "cá bống",
+   "cá diêu hồng",
+   "cá ngừ",
+   "cá rô phi",
+   "cá rô đồng",
+   "cá thu",
+   "cá trắm",
+   "cánh gà",
+   "cải bó xôi",
+   "cải bẹ xanh",
+   "cải làn",
+   "cải ngọt",
+   "cải thảo",
+   "cải xoong",
+   "cần tây",
+   "củ cải trắng",
+   "củ đậu",
+   "dầu lạc",
+   "hoa hồi",
+   "hoa thiên lý",
+   "húng lủi",
+   "hạt nêm chay",
+   "khoai môn",
+   "khoai sọ",
+   "khế",
+   "me chua",
+   "mì căn",
+   "măng khô",
+   "mướp",
+   "mắm ruốc",
+   "mắm tép",
+   "mắm tôm",
+   "mộc nhĩ",
+   "mực",
+   "nghêu",
+   "ngò gai",
+   "nấm hương khô",
+   "nấm hương tươi",
+   "nấm sò",
+   "quế",
+   "rau bí",
+   "rau cần",
+   "rau dền",
+   "rau mùi",
+   "rau răm",
+   "rau đay",
+   "su hào",
+   "su su",
+   "sò",
+   "súp lơ trắng",
+   "sườn non",
+   "sấu",
+   "thịt ba chỉ",
+   "thịt bò",
+   "thịt bò xay",
+   "thịt gà",
+   "trứng gà",
+   "trứng vịt",
+   "tép",
+   "tôm khô",
+   "tỏi tây",
+   "xương ống lợn",
+   "đùi gà",
+   "đậu Hà Lan",
+   "đậu phụ non",
+   "đậu que",
+   "đậu đũa",
+   "ớt chuông"
+  ]
+ },
+ "label": "agreement with the curated table on held-out ingredients — NOT accuracy (no human gold yet)",
+ "mapping": {
+  "kb_ingredients": 225,
+  "with_en_synonym_in_foodcom": 176,
+  "with_en_synonym_ge50": 124,
+  "occurrence_share_mapped": 0.9433060109289617,
+  "occurrence_share_ge50": 0.8715846994535519,
+  "non_staple_mapped_share": 0.7741935483870968,
+  "unmapped_examples": [
+   "chao",
+   "chuối xanh",
+   "cua đồng",
+   "cà pháo",
+   "cà pháo muối",
+   "cá bống",
+   "cá diêu hồng",
+   "cá lóc",
+   "cá nục",
+   "cá rô phi",
+   "cá rô đồng",
+   "cá trắm",
+   "cải cúc",
+   "củ sen",
+   "diếp cá",
+   "dưa giá",
+   "dọc mùng",
+   "hoa thiên lý",
+   "hạt nêm chay",
+   "khoai môn",
+   "khoai mỡ",
+   "khoai sọ",
+   "lá giang",
+   "lá lốt",
+   "măng khô",
+   "mướp",
+   "mắm nêm",
+   "mắm tép",
+   "mẻ",
+   "mồng tơi",
+   "ngó sen",
+   "ngũ vị hương",
+   "ngải cứu",
+   "ngọn su su",
+   "rau bí",
+   "rau lang",
+   "rau muống",
+   "rau má",
+   "rau ngót",
+   "rau răm"
+  ],
+  "n_unmapped": 49
+ },
+ "w2v_tuning": [
+  {
+   "params": {
+    "dim": 50,
+    "min_count": 5,
+    "kb_repeat": 1,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.4015625,
+   "dev_agreement@3": 0.4375,
+   "dev_answered": 0.65625,
+   "vocab": 8017,
+   "seconds": 185.7
+  },
+  {
+   "params": {
+    "dim": 50,
+    "min_count": 5,
+    "kb_repeat": 10,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.5759920634920634,
+   "dev_agreement@3": 0.71875,
+   "dev_answered": 1.0,
+   "vocab": 8061,
+   "seconds": 165.0
+  },
+  {
+   "params": {
+    "dim": 50,
+    "min_count": 20,
+    "kb_repeat": 1,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.37760416666666663,
+   "dev_agreement@3": 0.4375,
+   "dev_answered": 0.53125,
+   "vocab": 4419,
+   "seconds": 104.6
+  },
+  {
+   "params": {
+    "dim": 50,
+    "min_count": 20,
+    "kb_repeat": 10,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.5361979166666666,
+   "dev_agreement@3": 0.59375,
+   "dev_answered": 0.78125,
+   "vocab": 4451,
+   "seconds": 69.2
+  },
+  {
+   "params": {
+    "dim": 100,
+    "min_count": 5,
+    "kb_repeat": 1,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.4081597222222222,
+   "dev_agreement@3": 0.40625,
+   "dev_answered": 0.65625,
+   "vocab": 8017,
+   "seconds": 80.8
+  },
+  {
+   "params": {
+    "dim": 100,
+    "min_count": 5,
+    "kb_repeat": 10,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.546391369047619,
+   "dev_agreement@3": 0.65625,
+   "dev_answered": 1.0,
+   "vocab": 8061,
+   "seconds": 74.8
+  },
+  {
+   "params": {
+    "dim": 100,
+    "min_count": 20,
+    "kb_repeat": 1,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.37760416666666663,
+   "dev_agreement@3": 0.4375,
+   "dev_answered": 0.53125,
+   "vocab": 4419,
+   "seconds": 77.7
+  },
+  {
+   "params": {
+    "dim": 100,
+    "min_count": 20,
+    "kb_repeat": 10,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.521875,
+   "dev_agreement@3": 0.59375,
+   "dev_answered": 0.78125,
+   "vocab": 4451,
+   "seconds": 59.3
+  },
+  {
+   "params": {
+    "dim": 200,
+    "min_count": 5,
+    "kb_repeat": 1,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.4107638888888889,
+   "dev_agreement@3": 0.4375,
+   "dev_answered": 0.65625,
+   "vocab": 8017,
+   "seconds": 97.5
+  },
+  {
+   "params": {
+    "dim": 200,
+    "min_count": 5,
+    "kb_repeat": 10,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.6008184523809524,
+   "dev_agreement@3": 0.65625,
+   "dev_answered": 1.0,
+   "vocab": 8061,
+   "seconds": 95.7
+  },
+  {
+   "params": {
+    "dim": 200,
+    "min_count": 20,
+    "kb_repeat": 1,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.4140625,
+   "dev_agreement@3": 0.4375,
+   "dev_answered": 0.53125,
+   "vocab": 4419,
+   "seconds": 99.8
+  },
+  {
+   "params": {
+    "dim": 200,
+    "min_count": 20,
+    "kb_repeat": 10,
+    "epochs": 10,
+    "negative": 10
+   },
+   "window": 43,
+   "dev_mrr": 0.5489583333333333,
+   "dev_agreement@3": 0.59375,
+   "dev_answered": 0.78125,
+   "vocab": 4451,
+   "seconds": 105.5
+  }
+ ],
+ "w2v_best": {
+  "params": {
+   "dim": 200,
+   "min_count": 5,
+   "kb_repeat": 10,
+   "epochs": 10,
+   "negative": 10
+  },
+  "window": 43,
+  "dev_mrr": 0.6008184523809524,
+  "dev_agreement@3": 0.65625,
+  "dev_answered": 1.0,
+  "vocab": 8061,
+  "seconds": 95.7
+ },
+ "test": {
+  "Word2Vec": {
+   "agreement@1": {
+    "mean": 0.38933333333333336,
+    "sd": 0.025647178748895126
+   },
+   "agreement@3": {
+    "mean": 0.5466666666666666,
+    "sd": 0.009428090415820656
+   },
+   "mrr": {
+    "mean": 0.5223507138575891,
+    "sd": 0.013094887136170987
+   },
+   "answered": {
+    "mean": 1.0,
+    "sd": 0.0
+   },
+   "seeds": 5,
+   "rows_seed0": [
+    {
+     "ingredient": "bí ngòi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.047619047619047616,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "cà tím",
+      "bí đỏ",
+      "đậu Hà Lan"
+     ]
+    },
+    {
+     "ingredient": "bí đao",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "bầu",
+      "mướp",
+      "măng khô"
+     ]
+    },
+    {
+     "ingredient": "bông bí",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "rau bí",
+      "rau lang",
+      "ngọn su su"
+     ]
+    },
+    {
+     "ingredient": "bắp cải",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cải thảo",
+      "cải cúc",
+      "cải ngọt"
+     ]
+    },
+    {
+     "ingredient": "bột chiên giòn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.125,
+     "n_cands": 11,
+     "n_ref": 1,
+     "top3": [
+      "gạo nếp",
+      "miến",
+      "bánh phở"
+     ]
+    },
+    {
+     "ingredient": "cua biển",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "ghẹ",
+      "tôm",
+      "nghêu"
+     ]
+    },
+    {
+     "ingredient": "cá basa",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá trê",
+      "cá thu",
+      "cá bống"
+     ]
+    },
+    {
+     "ingredient": "cá bống",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.125,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": [
+      "cá trắm",
+      "cá nục",
+      "lươn"
+     ]
+    },
+    {
+     "ingredient": "cá diêu hồng",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá nục",
+      "lươn",
+      "cá trắm"
+     ]
+    },
+    {
+     "ingredient": "cá ngừ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá hồi",
+      "chả cá thác lác",
+      "lươn"
+     ]
+    },
+    {
+     "ingredient": "cá rô phi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": [
+      "cá trắm",
+      "cá nục",
+      "lươn"
+     ]
+    },
+    {
+     "ingredient": "cá rô đồng",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": [
+      "cá nục",
+      "cá trắm",
+      "cá diêu hồng"
+     ]
+    },
+    {
+     "ingredient": "cá thu",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá nục",
+      "cá chép",
+      "cá lóc"
+     ]
+    },
+    {
+     "ingredient": "cá trắm",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.14285714285714285,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá nục",
+      "cá bống",
+      "cá rô đồng"
+     ]
+    },
+    {
+     "ingredient": "cánh gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "đùi gà",
+      "thịt gà",
+      "chim cút"
+     ]
+    },
+    {
+     "ingredient": "cải bó xôi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.08333333333333333,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "rau cần",
+      "rong biển khô",
+      "bông bí"
+     ]
+    },
+    {
+     "ingredient": "cải bẹ xanh",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.05555555555555555,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cải cúc",
+      "rau ngót",
+      "mồng tơi"
+     ]
+    },
+    {
+     "ingredient": "cải làn",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cải thìa",
+      "cải ngọt",
+      "rau cần"
+     ]
+    },
+    {
+     "ingredient": "cải ngọt",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "cải thìa",
+      "cải làn",
+      "rau cần"
+     ]
+    },
+    {
+     "ingredient": "cải thảo",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.06666666666666667,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cải thìa",
+      "cải ngọt",
+      "giá đỗ"
+     ]
+    },
+    {
+     "ingredient": "cải xoong",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.06666666666666667,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "xà lách",
+      "cải thảo",
+      "rau sam"
+     ]
+    },
+    {
+     "ingredient": "cần tây",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.1,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "bắp cải",
+      "rong biển khô",
+      "rau má"
+     ]
+    },
+    {
+     "ingredient": "củ cải trắng",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.09090909090909091,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "măng khô",
+      "mướp",
+      "đu đủ xanh"
+     ]
+    },
+    {
+     "ingredient": "củ đậu",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "củ cải trắng",
+      "su hào",
+      "đu đủ xanh"
+     ]
+    },
+    {
+     "ingredient": "dầu lạc",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 3,
+     "n_ref": 1,
+     "top3": [
+      "dầu ăn",
+      "dầu vừng",
+      "dầu ô liu"
+     ]
+    },
+    {
+     "ingredient": "hoa hồi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": [
+      "đường thốt nốt",
+      "ngũ vị hương",
+      "quế"
+     ]
+    },
+    {
+     "ingredient": "hoa thiên lý",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.05555555555555555,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "ngọn su su",
+      "rau lang",
+      "rau bí"
+     ]
+    },
+    {
+     "ingredient": "húng lủi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "nghệ",
+      "húng quế",
+      "rau mùi"
+     ]
+    },
+    {
+     "ingredient": "hạt nêm chay",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": [
+      "ngũ vị hương",
+      "mẻ",
+      "hoa hồi"
+     ]
+    },
+    {
+     "ingredient": "khoai môn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 5,
+     "n_ref": 2,
+     "top3": [
+      "củ sen",
+      "khoai mỡ",
+      "khoai sọ"
+     ]
+    },
+    {
+     "ingredient": "khoai sọ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 5,
+     "n_ref": 1,
+     "top3": [
+      "củ sen",
+      "khoai mỡ",
+      "khoai môn"
+     ]
+    },
+    {
+     "ingredient": "khế",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "sấu",
+      "nước dừa",
+      "dứa"
+     ]
+    },
+    {
+     "ingredient": "me chua",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 3,
+     "top3": [
+      "sấu",
+      "nước cốt dừa",
+      "khế"
+     ]
+    },
+    {
+     "ingredient": "mì căn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 8,
+     "n_ref": 1,
+     "top3": [
+      "đậu phụ non",
+      "đậu phụ",
+      "đậu nành"
+     ]
+    },
+    {
+     "ingredient": "măng khô",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0625,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "mướp",
+      "đu đủ xanh",
+      "mướp đắng"
+     ]
+    },
+    {
+     "ingredient": "mướp",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "măng khô",
+      "bầu",
+      "bí đao"
+     ]
+    },
+    {
+     "ingredient": "mắm ruốc",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "mắm tôm",
+      "mắm tép",
+      "nước mắm"
+     ]
+    },
+    {
+     "ingredient": "mắm tép",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "nước mắm",
+      "mắm ruốc",
+      "mắm tôm"
+     ]
+    },
+    {
+     "ingredient": "mắm tôm",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "mắm ruốc",
+      "mắm tép",
+      "nước mắm"
+     ]
+    },
+    {
+     "ingredient": "mộc nhĩ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "nấm kim châm",
+      "nấm hương khô",
+      "nấm rơm"
+     ]
+    },
+    {
+     "ingredient": "mực",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "nghêu",
+      "tôm",
+      "sò"
+     ]
+    },
+    {
+     "ingredient": "nghêu",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 2,
+     "top3": [
+      "hến",
+      "mực",
+      "sò"
+     ]
+    },
+    {
+     "ingredient": "ngò gai",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.09090909090909091,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "rau ngổ",
+      "rau răm",
+      "tía tô"
+     ]
+    },
+    {
+     "ingredient": "nấm hương khô",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "mộc nhĩ",
+      "nấm hương tươi",
+      "nấm kim châm"
+     ]
+    },
+    {
+     "ingredient": "nấm hương tươi",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 4,
+     "top3": [
+      "nấm hương khô",
+      "nấm sò",
+      "nấm đùi gà"
+     ]
+    },
+    {
+     "ingredient": "nấm sò",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "nấm hương tươi",
+      "nấm hương khô",
+      "nấm mỡ"
+     ]
+    },
+    {
+     "ingredient": "quế",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": [
+      "hoa hồi",
+      "bột nghệ",
+      "đường thốt nốt"
+     ]
+    },
+    {
+     "ingredient": "rau bí",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "hoa thiên lý",
+      "ngọn su su",
+      "rau lang"
+     ]
+    },
+    {
+     "ingredient": "rau cần",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.034482758620689655,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "rau má",
+      "rau bí",
+      "rau lang"
+     ]
+    },
+    {
+     "ingredient": "rau dền",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "rau ngót",
+      "rau đay",
+      "rau sam"
+     ]
+    },
+    {
+     "ingredient": "rau mùi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "nghệ",
+      "ớt",
+      "húng quế"
+     ]
+    },
+    {
+     "ingredient": "rau răm",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.07692307692307693,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "rau ngổ",
+      "lá lốt",
+      "tía tô"
+     ]
+    },
+    {
+     "ingredient": "rau đay",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "rau ngót",
+      "mồng tơi",
+      "ngó sen"
+     ]
+    },
+    {
+     "ingredient": "su hào",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "đu đủ xanh",
+      "củ cải trắng",
+      "măng khô"
+     ]
+    },
+    {
+     "ingredient": "su su",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "bầu",
+      "đậu đũa",
+      "măng khô"
+     ]
+    },
+    {
+     "ingredient": "sò",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "nghêu",
+      "hến",
+      "mực"
+     ]
+    },
+    {
+     "ingredient": "súp lơ trắng",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "súp lơ xanh",
+      "cà tím",
+      "đậu Hà Lan"
+     ]
+    },
+    {
+     "ingredient": "sườn non",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 14,
+     "n_ref": 2,
+     "top3": [
+      "thịt nạc vai",
+      "gan lợn",
+      "xương ống lợn"
+     ]
+    },
+    {
+     "ingredient": "sấu",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 2,
+     "top3": [
+      "khế",
+      "me chua",
+      "nước dừa"
+     ]
+    },
+    {
+     "ingredient": "thịt ba chỉ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "ếch",
+      "gan lợn",
+      "chân giò"
+     ]
+    },
+    {
+     "ingredient": "thịt bò",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "thịt nạc vai",
+      "gan lợn",
+      "thịt bò xay"
+     ]
+    },
+    {
+     "ingredient": "thịt bò xay",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.14285714285714285,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "xúc xích",
+      "gan lợn",
+      "thịt bò"
+     ]
+    },
+    {
+     "ingredient": "thịt gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 3,
+     "top3": [
+      "đùi gà",
+      "ức gà",
+      "chim cút"
+     ]
+    },
+    {
+     "ingredient": "trứng gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 2,
+     "n_ref": 2,
+     "top3": [
+      "trứng vịt",
+      "trứng cút"
+     ]
+    },
+    {
+     "ingredient": "trứng vịt",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 2,
+     "n_ref": 2,
+     "top3": [
+      "trứng cút",
+      "trứng gà"
+     ]
+    },
+    {
+     "ingredient": "tép",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "tôm",
+      "nghêu",
+      "mực"
+     ]
+    },
+    {
+     "ingredient": "tôm khô",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 10,
+     "n_ref": 2,
+     "top3": [
+      "cua đồng",
+      "ốc",
+      "mực"
+     ]
+    },
+    {
+     "ingredient": "tỏi tây",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "hẹ",
+      "hành lá",
+      "hành tím"
+     ]
+    },
+    {
+     "ingredient": "xương ống lợn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "chân giò",
+      "ếch",
+      "gan lợn"
+     ]
+    },
+    {
+     "ingredient": "đùi gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 3,
+     "top3": [
+      "thịt gà",
+      "cánh gà",
+      "chim cút"
+     ]
+    },
+    {
+     "ingredient": "đậu Hà Lan",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "ngô bao tử",
+      "đậu que",
+      "măng tây"
+     ]
+    },
+    {
+     "ingredient": "đậu phụ non",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 8,
+     "n_ref": 1,
+     "top3": [
+      "đậu phụ",
+      "mì căn",
+      "đậu nành"
+     ]
+    },
+    {
+     "ingredient": "đậu que",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "đậu Hà Lan",
+      "cà tím",
+      "su hào"
+     ]
+    },
+    {
+     "ingredient": "đậu đũa",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.05555555555555555,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cà pháo",
+      "bầu",
+      "mướp"
+     ]
+    },
+    {
+     "ingredient": "ớt chuông",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.14285714285714285,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cà tím",
+      "cà pháo",
+      "đậu Hà Lan"
+     ]
+    }
+   ]
+  },
+  "Word2Vec + lọc bổ sung (PPMI ≤ 2.0)": {
+   "agreement@1": {
+    "mean": 0.288,
+    "sd": 0.011925695879998855
+   },
+   "agreement@3": {
+    "mean": 0.46399999999999997,
+    "sd": 0.02564717874889515
+   },
+   "mrr": {
+    "mean": 0.40446412925769176,
+    "sd": 0.008999174884822552
+   },
+   "answered": {
+    "mean": 1.0,
+    "sd": 0.0
+   },
+   "seeds": 5,
+   "rows_seed0": [
+    {
+     "ingredient": "bí ngòi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.05263157894736842,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "bí đỏ",
+      "đậu Hà Lan",
+      "ớt chuông"
+     ]
+    },
+    {
+     "ingredient": "bí đao",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "bầu",
+      "mướp",
+      "măng khô"
+     ]
+    },
+    {
+     "ingredient": "bông bí",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "rau bí",
+      "rau lang",
+      "ngọn su su"
+     ]
+    },
+    {
+     "ingredient": "bắp cải",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cải thảo",
+      "cải cúc",
+      "cải ngọt"
+     ]
+    },
+    {
+     "ingredient": "bột chiên giòn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.125,
+     "n_cands": 11,
+     "n_ref": 1,
+     "top3": [
+      "gạo nếp",
+      "miến",
+      "bánh phở"
+     ]
+    },
+    {
+     "ingredient": "cua biển",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "ghẹ",
+      "sò",
+      "tép"
+     ]
+    },
+    {
+     "ingredient": "cá basa",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá trê",
+      "cá thu",
+      "cá bống"
+     ]
+    },
+    {
+     "ingredient": "cá bống",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.125,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": [
+      "cá trắm",
+      "cá nục",
+      "lươn"
+     ]
+    },
+    {
+     "ingredient": "cá diêu hồng",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá nục",
+      "lươn",
+      "cá trắm"
+     ]
+    },
+    {
+     "ingredient": "cá ngừ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá hồi",
+      "chả cá thác lác",
+      "lươn"
+     ]
+    },
+    {
+     "ingredient": "cá rô phi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": [
+      "cá trắm",
+      "cá nục",
+      "lươn"
+     ]
+    },
+    {
+     "ingredient": "cá rô đồng",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": [
+      "cá nục",
+      "cá trắm",
+      "cá diêu hồng"
+     ]
+    },
+    {
+     "ingredient": "cá thu",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá nục",
+      "cá chép",
+      "cá lóc"
+     ]
+    },
+    {
+     "ingredient": "cá trắm",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.14285714285714285,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá nục",
+      "cá bống",
+      "cá rô đồng"
+     ]
+    },
+    {
+     "ingredient": "cánh gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "đùi gà",
+      "thịt gà",
+      "chim cút"
+     ]
+    },
+    {
+     "ingredient": "cải bó xôi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.09090909090909091,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "rau cần",
+      "bông bí",
+      "rau lang"
+     ]
+    },
+    {
+     "ingredient": "cải bẹ xanh",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cải cúc",
+      "rau ngót",
+      "mồng tơi"
+     ]
+    },
+    {
+     "ingredient": "cải làn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "rau cần",
+      "cải cúc",
+      "rau lang"
+     ]
+    },
+    {
+     "ingredient": "cải ngọt",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "rau cần",
+      "rau lang",
+      "rau bí"
+     ]
+    },
+    {
+     "ingredient": "cải thảo",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.1,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "rau cần",
+      "cải làn",
+      "rau lang"
+     ]
+    },
+    {
+     "ingredient": "cải xoong",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.07692307692307693,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "rau sam",
+      "rau má",
+      "cải cúc"
+     ]
+    },
+    {
+     "ingredient": "cần tây",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.1,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "bắp cải",
+      "rong biển khô",
+      "rau má"
+     ]
+    },
+    {
+     "ingredient": "củ cải trắng",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.09090909090909091,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "măng khô",
+      "mướp",
+      "đu đủ xanh"
+     ]
+    },
+    {
+     "ingredient": "củ đậu",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "củ cải trắng",
+      "su hào",
+      "đu đủ xanh"
+     ]
+    },
+    {
+     "ingredient": "dầu lạc",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 3,
+     "n_ref": 1,
+     "top3": [
+      "dầu ăn",
+      "dầu ô liu"
+     ]
+    },
+    {
+     "ingredient": "hoa hồi",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": [
+      "ngũ vị hương",
+      "hạt nêm chay",
+      "mẻ"
+     ]
+    },
+    {
+     "ingredient": "hoa thiên lý",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.05555555555555555,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "ngọn su su",
+      "rau lang",
+      "rau bí"
+     ]
+    },
+    {
+     "ingredient": "húng lủi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "tía tô",
+      "rau răm",
+      "lá lốt"
+     ]
+    },
+    {
+     "ingredient": "hạt nêm chay",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": [
+      "ngũ vị hương",
+      "mẻ",
+      "hoa hồi"
+     ]
+    },
+    {
+     "ingredient": "khoai môn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 5,
+     "n_ref": 2,
+     "top3": [
+      "củ sen",
+      "khoai mỡ",
+      "khoai sọ"
+     ]
+    },
+    {
+     "ingredient": "khoai sọ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 5,
+     "n_ref": 1,
+     "top3": [
+      "củ sen",
+      "khoai mỡ",
+      "khoai môn"
+     ]
+    },
+    {
+     "ingredient": "khế",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "sấu",
+      "nước dừa",
+      "me chua"
+     ]
+    },
+    {
+     "ingredient": "me chua",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 3,
+     "top3": [
+      "sấu",
+      "khế",
+      "nước dừa"
+     ]
+    },
+    {
+     "ingredient": "mì căn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 8,
+     "n_ref": 1,
+     "top3": [
+      "đậu phụ non",
+      "đậu nành",
+      "đậu xanh"
+     ]
+    },
+    {
+     "ingredient": "măng khô",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0625,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "mướp",
+      "đu đủ xanh",
+      "mướp đắng"
+     ]
+    },
+    {
+     "ingredient": "mướp",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "măng khô",
+      "bầu",
+      "bí đao"
+     ]
+    },
+    {
+     "ingredient": "mắm ruốc",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "mắm tôm",
+      "mắm tép",
+      "hạt nêm"
+     ]
+    },
+    {
+     "ingredient": "mắm tép",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "nước mắm",
+      "mắm ruốc",
+      "mắm tôm"
+     ]
+    },
+    {
+     "ingredient": "mắm tôm",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "mắm ruốc",
+      "mắm tép",
+      "hạt nêm"
+     ]
+    },
+    {
+     "ingredient": "mộc nhĩ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "nấm kim châm",
+      "nấm rơm",
+      "nấm đùi gà"
+     ]
+    },
+    {
+     "ingredient": "mực",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "sò",
+      "hến",
+      "tôm khô"
+     ]
+    },
+    {
+     "ingredient": "nghêu",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 10,
+     "n_ref": 2,
+     "top3": [
+      "ốc",
+      "cua đồng",
+      "tôm khô"
+     ]
+    },
+    {
+     "ingredient": "ngò gai",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.1111111111111111,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "rau răm",
+      "tía tô",
+      "lá lốt"
+     ]
+    },
+    {
+     "ingredient": "nấm hương khô",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "nấm kim châm",
+      "nấm đùi gà",
+      "nấm rơm"
+     ]
+    },
+    {
+     "ingredient": "nấm hương tươi",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 4,
+     "top3": [
+      "nấm đùi gà",
+      "nấm rơm",
+      "mộc nhĩ"
+     ]
+    },
+    {
+     "ingredient": "nấm sò",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "nấm đùi gà",
+      "mộc nhĩ",
+      "nấm rơm"
+     ]
+    },
+    {
+     "ingredient": "quế",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": [
+      "đường thốt nốt",
+      "đường",
+      "ngũ vị hương"
+     ]
+    },
+    {
+     "ingredient": "rau bí",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "hoa thiên lý",
+      "ngọn su su",
+      "rau lang"
+     ]
+    },
+    {
+     "ingredient": "rau cần",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.034482758620689655,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "rau má",
+      "rau bí",
+      "rau lang"
+     ]
+    },
+    {
+     "ingredient": "rau dền",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "rau ngót",
+      "rau đay",
+      "rau lang"
+     ]
+    },
+    {
+     "ingredient": "rau mùi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "rau răm",
+      "tía tô",
+      "lá lốt"
+     ]
+    },
+    {
+     "ingredient": "rau răm",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.07692307692307693,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "rau ngổ",
+      "lá lốt",
+      "tía tô"
+     ]
+    },
+    {
+     "ingredient": "rau đay",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "rau ngót",
+      "mồng tơi",
+      "ngó sen"
+     ]
+    },
+    {
+     "ingredient": "su hào",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "đu đủ xanh",
+      "củ cải trắng",
+      "măng khô"
+     ]
+    },
+    {
+     "ingredient": "su su",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "bầu",
+      "đậu đũa",
+      "măng khô"
+     ]
+    },
+    {
+     "ingredient": "sò",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "hến",
+      "mực",
+      "cua biển"
+     ]
+    },
+    {
+     "ingredient": "súp lơ trắng",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cà tím",
+      "su hào",
+      "đậu que"
+     ]
+    },
+    {
+     "ingredient": "sườn non",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 14,
+     "n_ref": 2,
+     "top3": [
+      "gan lợn",
+      "ếch",
+      "chân giò"
+     ]
+    },
+    {
+     "ingredient": "sấu",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 2,
+     "top3": [
+      "khế",
+      "me chua",
+      "nước dừa"
+     ]
+    },
+    {
+     "ingredient": "thịt ba chỉ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "ếch",
+      "chân giò",
+      "xương ống lợn"
+     ]
+    },
+    {
+     "ingredient": "thịt bò",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "thịt nạc vai",
+      "thịt bò xay",
+      "bắp bò"
+     ]
+    },
+    {
+     "ingredient": "thịt bò xay",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "xúc xích",
+      "gan lợn",
+      "thịt bò"
+     ]
+    },
+    {
+     "ingredient": "thịt gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 3,
+     "top3": [
+      "đùi gà",
+      "ức gà",
+      "chim cút"
+     ]
+    },
+    {
+     "ingredient": "trứng gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 2,
+     "n_ref": 2,
+     "top3": [
+      "trứng vịt",
+      "trứng cút"
+     ]
+    },
+    {
+     "ingredient": "trứng vịt",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 2,
+     "n_ref": 2,
+     "top3": [
+      "trứng cút",
+      "trứng gà"
+     ]
+    },
+    {
+     "ingredient": "tép",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "tôm",
+      "mực",
+      "cua biển"
+     ]
+    },
+    {
+     "ingredient": "tôm khô",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 10,
+     "n_ref": 2,
+     "top3": [
+      "cua đồng",
+      "ốc",
+      "mực"
+     ]
+    },
+    {
+     "ingredient": "tỏi tây",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "hẹ",
+      "hành lá",
+      "hành tím"
+     ]
+    },
+    {
+     "ingredient": "xương ống lợn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "chân giò",
+      "ếch",
+      "gan lợn"
+     ]
+    },
+    {
+     "ingredient": "đùi gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 3,
+     "top3": [
+      "thịt gà",
+      "cánh gà",
+      "chim cút"
+     ]
+    },
+    {
+     "ingredient": "đậu Hà Lan",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "đậu đũa",
+      "cà tím",
+      "cà pháo"
+     ]
+    },
+    {
+     "ingredient": "đậu phụ non",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 8,
+     "n_ref": 1,
+     "top3": [
+      "đậu phụ",
+      "mì căn",
+      "đậu nành"
+     ]
+    },
+    {
+     "ingredient": "đậu que",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "su hào",
+      "cà pháo",
+      "ngô bao tử"
+     ]
+    },
+    {
+     "ingredient": "đậu đũa",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0625,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cà pháo",
+      "bầu",
+      "mướp"
+     ]
+    },
+    {
+     "ingredient": "ớt chuông",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cà pháo",
+      "cà chua",
+      "bầu"
+     ]
+    }
+   ]
+  },
+  "kNN dinh dưỡng": {
+   "agreement@1": {
+    "mean": 0.28,
+    "sd": 0.0
+   },
+   "agreement@3": {
+    "mean": 0.48,
+    "sd": 0.0
+   },
+   "mrr": {
+    "mean": 0.433963653476097,
+    "sd": 0.0
+   },
+   "answered": {
+    "mean": 0.9733333333333334,
+    "sd": 0.0
+   },
+   "seeds": 1,
+   "rows_seed0": [
+    {
+     "ingredient": "bí ngòi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "mướp đắng",
+      "bầu",
+      "dưa chuột"
+     ]
+    },
+    {
+     "ingredient": "bí đao",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.1,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cà tím",
+      "cà pháo",
+      "đu đủ xanh"
+     ]
+    },
+    {
+     "ingredient": "bông bí",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.047619047619047616,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cải thảo",
+      "rau đay",
+      "rau lang"
+     ]
+    },
+    {
+     "ingredient": "bắp cải",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cải ngọt",
+      "cải thìa",
+      "rau đay"
+     ]
+    },
+    {
+     "ingredient": "bột chiên giòn",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 11,
+     "n_ref": 1,
+     "top3": [
+      "bột mì",
+      "gạo tẻ",
+      "gạo nếp"
+     ]
+    },
+    {
+     "ingredient": "cua biển",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "nghêu",
+      "sò",
+      "cua đồng"
+     ]
+    },
+    {
+     "ingredient": "cá basa",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.1111111111111111,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá cơm",
+      "cá thu",
+      "cá nục"
+     ]
+    },
+    {
+     "ingredient": "cá bống",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.125,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": [
+      "cá ngừ",
+      "cá diêu hồng",
+      "cá rô phi"
+     ]
+    },
+    {
+     "ingredient": "cá diêu hồng",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá rô phi",
+      "cá lóc",
+      "cá trắm"
+     ]
+    },
+    {
+     "ingredient": "cá ngừ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá bống",
+      "cá diêu hồng",
+      "cá rô phi"
+     ]
+    },
+    {
+     "ingredient": "cá rô phi",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": [
+      "cá diêu hồng",
+      "cá lóc",
+      "cá trắm"
+     ]
+    },
+    {
+     "ingredient": "cá rô đồng",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": [
+      "cá hồi",
+      "cá chép",
+      "cá lóc"
+     ]
+    },
+    {
+     "ingredient": "cá thu",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá basa",
+      "cá trê",
+      "lươn"
+     ]
+    },
+    {
+     "ingredient": "cá trắm",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá lóc",
+      "cá diêu hồng",
+      "cá rô phi"
+     ]
+    },
+    {
+     "ingredient": "cánh gà",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "thịt gà",
+      "đùi gà",
+      "chim cút"
+     ]
+    },
+    {
+     "ingredient": "cải bó xôi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cải xoong",
+      "cải bẹ xanh",
+      "rau muống"
+     ]
+    },
+    {
+     "ingredient": "cải bẹ xanh",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cải ngọt",
+      "cải thìa",
+      "rau lang"
+     ]
+    },
+    {
+     "ingredient": "cải làn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cải thảo",
+      "rau đay",
+      "bông bí"
+     ]
+    },
+    {
+     "ingredient": "cải ngọt",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "cải thìa",
+      "cải bẹ xanh",
+      "rau lang"
+     ]
+    },
+    {
+     "ingredient": "cải thảo",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.1111111111111111,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "bông bí",
+      "rau lang",
+      "rau đay"
+     ]
+    },
+    {
+     "ingredient": "cải xoong",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cải bó xôi",
+      "cải bẹ xanh",
+      "rau muống"
+     ]
+    },
+    {
+     "ingredient": "cần tây",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.047619047619047616,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "ngó sen",
+      "bắp cải",
+      "giá đỗ"
+     ]
+    },
+    {
+     "ingredient": "củ cải trắng",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.045454545454545456,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "mướp đắng",
+      "bí ngòi",
+      "bầu"
+     ]
+    },
+    {
+     "ingredient": "củ đậu",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.047619047619047616,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cà tím",
+      "bí đao",
+      "cà chua"
+     ]
+    },
+    {
+     "ingredient": "dầu lạc",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 3,
+     "n_ref": 1,
+     "top3": [
+      "dầu vừng",
+      "dầu ăn",
+      "dầu ô liu"
+     ]
+    },
+    {
+     "ingredient": "hoa hồi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": [
+      "bột cà ri",
+      "bột nghệ",
+      "ớt bột"
+     ]
+    },
+    {
+     "ingredient": "hoa thiên lý",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.043478260869565216,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "rau má",
+      "mồng tơi",
+      "rau ngót"
+     ]
+    },
+    {
+     "ingredient": "húng lủi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "rau ngổ",
+      "kinh giới",
+      "tía tô"
+     ]
+    },
+    {
+     "ingredient": "hạt nêm chay",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "khoai môn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 5,
+     "n_ref": 2,
+     "top3": [
+      "khoai lang",
+      "khoai sọ",
+      "củ sen"
+     ]
+    },
+    {
+     "ingredient": "khoai sọ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 5,
+     "n_ref": 1,
+     "top3": [
+      "khoai tây",
+      "khoai mỡ",
+      "khoai môn"
+     ]
+    },
+    {
+     "ingredient": "khế",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "chanh",
+      "dứa",
+      "me chua"
+     ]
+    },
+    {
+     "ingredient": "me chua",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 3,
+     "top3": [
+      "sấu",
+      "khế",
+      "chanh"
+     ]
+    },
+    {
+     "ingredient": "mì căn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 8,
+     "n_ref": 1,
+     "top3": [
+      "tàu hũ ky",
+      "đậu phụ",
+      "đậu phụ non"
+     ]
+    },
+    {
+     "ingredient": "măng khô",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "đậu đũa",
+      "súp lơ xanh",
+      "đậu bắp"
+     ]
+    },
+    {
+     "ingredient": "mướp",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "bầu",
+      "su su",
+      "mướp đắng"
+     ]
+    },
+    {
+     "ingredient": "mắm ruốc",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "mắm tép",
+      "mắm tôm",
+      "nước mắm"
+     ]
+    },
+    {
+     "ingredient": "mắm tép",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "mắm ruốc",
+      "mắm tôm",
+      "nước mắm"
+     ]
+    },
+    {
+     "ingredient": "mắm tôm",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "mắm ruốc",
+      "mắm tép",
+      "nước mắm"
+     ]
+    },
+    {
+     "ingredient": "mộc nhĩ",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "nấm hương khô",
+      "nấm hương tươi",
+      "nấm sò"
+     ]
+    },
+    {
+     "ingredient": "mực",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "tép",
+      "tôm",
+      "ghẹ"
+     ]
+    },
+    {
+     "ingredient": "nghêu",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 2,
+     "top3": [
+      "sò",
+      "cua biển",
+      "cua đồng"
+     ]
+    },
+    {
+     "ingredient": "ngò gai",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "rau mùi",
+      "húng quế",
+      "diếp cá"
+     ]
+    },
+    {
+     "ingredient": "nấm hương khô",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "mộc nhĩ",
+      "nấm hương tươi",
+      "nấm đùi gà"
+     ]
+    },
+    {
+     "ingredient": "nấm hương tươi",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 4,
+     "top3": [
+      "nấm sò",
+      "nấm kim châm",
+      "nấm mỡ"
+     ]
+    },
+    {
+     "ingredient": "nấm sò",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.14285714285714285,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "nấm hương tươi",
+      "nấm kim châm",
+      "nấm mỡ"
+     ]
+    },
+    {
+     "ingredient": "quế",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": [
+      "tiêu",
+      "ớt bột",
+      "bột nghệ"
+     ]
+    },
+    {
+     "ingredient": "rau bí",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cải cúc",
+      "dọc mùng",
+      "mồng tơi"
+     ]
+    },
+    {
+     "ingredient": "rau cần",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.038461538461538464,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "dọc mùng",
+      "cải cúc",
+      "hoa chuối"
+     ]
+    },
+    {
+     "ingredient": "rau dền",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.1,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "rau lang",
+      "cải bẹ xanh",
+      "rau đay"
+     ]
+    },
+    {
+     "ingredient": "rau mùi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.08333333333333333,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "ngò gai",
+      "húng quế",
+      "ngải cứu"
+     ]
+    },
+    {
+     "ingredient": "rau răm",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "tía tô",
+      "kinh giới",
+      "lá lốt"
+     ]
+    },
+    {
+     "ingredient": "rau đay",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.05263157894736842,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "rau lang",
+      "cải thảo",
+      "cải ngọt"
+     ]
+    },
+    {
+     "ingredient": "su hào",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "cà rốt",
+      "súp lơ trắng",
+      "súp lơ xanh"
+     ]
+    },
+    {
+     "ingredient": "su su",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "bầu",
+      "mướp đắng",
+      "mướp"
+     ]
+    },
+    {
+     "ingredient": "sò",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "nghêu",
+      "cua đồng",
+      "cua biển"
+     ]
+    },
+    {
+     "ingredient": "súp lơ trắng",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.058823529411764705,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "củ cải trắng",
+      "dưa chuột",
+      "cà chua"
+     ]
+    },
+    {
+     "ingredient": "sườn non",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 14,
+     "n_ref": 2,
+     "top3": [
+      "chân giò",
+      "thịt ba chỉ",
+      "thịt băm"
+     ]
+    },
+    {
+     "ingredient": "sấu",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 2,
+     "top3": [
+      "me chua",
+      "nước dừa",
+      "khế"
+     ]
+    },
+    {
+     "ingredient": "thịt ba chỉ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.14285714285714285,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "thịt băm",
+      "chân giò",
+      "sườn non"
+     ]
+    },
+    {
+     "ingredient": "thịt bò",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "thịt nạc vai",
+      "giò lụa",
+      "ếch"
+     ]
+    },
+    {
+     "ingredient": "thịt bò xay",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "bắp bò",
+      "sườn non",
+      "chân giò"
+     ]
+    },
+    {
+     "ingredient": "thịt gà",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 6,
+     "n_ref": 3,
+     "top3": [
+      "chim cút",
+      "cánh gà",
+      "đùi gà"
+     ]
+    },
+    {
+     "ingredient": "trứng gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 2,
+     "n_ref": 2,
+     "top3": [
+      "trứng cút",
+      "trứng vịt"
+     ]
+    },
+    {
+     "ingredient": "trứng vịt",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 2,
+     "n_ref": 2,
+     "top3": [
+      "trứng gà",
+      "trứng cút"
+     ]
+    },
+    {
+     "ingredient": "tép",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "mực",
+      "tôm",
+      "ghẹ"
+     ]
+    },
+    {
+     "ingredient": "tôm khô",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 2,
+     "top3": [
+      "tôm",
+      "mực",
+      "ốc"
+     ]
+    },
+    {
+     "ingredient": "tỏi tây",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "hành lá",
+      "riềng",
+      "gừng"
+     ]
+    },
+    {
+     "ingredient": "xương ống lợn",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "đùi gà",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 6,
+     "n_ref": 3,
+     "top3": [
+      "thịt vịt",
+      "cánh gà",
+      "thịt gà"
+     ]
+    },
+    {
+     "ingredient": "đậu Hà Lan",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.037037037037037035,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "đậu đũa",
+      "hành tây",
+      "chuối xanh"
+     ]
+    },
+    {
+     "ingredient": "đậu phụ non",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 8,
+     "n_ref": 1,
+     "top3": [
+      "đậu phụ",
+      "mì căn",
+      "sữa đậu nành"
+     ]
+    },
+    {
+     "ingredient": "đậu que",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.1111111111111111,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cà rốt",
+      "su hào",
+      "măng khô"
+     ]
+    },
+    {
+     "ingredient": "đậu đũa",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.034482758620689655,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "đậu Hà Lan",
+      "đậu bắp",
+      "hành tây"
+     ]
+    },
+    {
+     "ingredient": "ớt chuông",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.08333333333333333,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "su su",
+      "bầu",
+      "mướp đắng"
+     ]
+    }
+   ]
+  },
+  "PMI ngữ cảnh": {
+   "agreement@1": {
+    "mean": 0.30666666666666664,
+    "sd": 0.0
+   },
+   "agreement@3": {
+    "mean": 0.49333333333333335,
+    "sd": 0.0
+   },
+   "mrr": {
+    "mean": 0.41971233639654687,
+    "sd": 0.0
+   },
+   "answered": {
+    "mean": 0.7733333333333333,
+    "sd": 0.0
+   },
+   "seeds": 1,
+   "rows_seed0": [
+    {
+     "ingredient": "bí ngòi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.05263157894736842,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "cà tím",
+      "cà rốt",
+      "hành tây"
+     ]
+    },
+    {
+     "ingredient": "bí đao",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "đậu đũa",
+      "su su",
+      "su hào"
+     ]
+    },
+    {
+     "ingredient": "bông bí",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cải xoong",
+      "cải bó xôi",
+      "cải bẹ xanh"
+     ]
+    },
+    {
+     "ingredient": "bắp cải",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cần tây",
+      "cải thảo",
+      "giá đỗ"
+     ]
+    },
+    {
+     "ingredient": "bột chiên giòn",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.1111111111111111,
+     "n_cands": 11,
+     "n_ref": 1,
+     "top3": [
+      "miến",
+      "bánh phở",
+      "bún"
+     ]
+    },
+    {
+     "ingredient": "cua biển",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "ghẹ",
+      "tôm",
+      "nghêu"
+     ]
+    },
+    {
+     "ingredient": "cá basa",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá hồi",
+      "cá thu",
+      "lươn"
+     ]
+    },
+    {
+     "ingredient": "cá bống",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "cá diêu hồng",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": []
+    },
+    {
+     "ingredient": "cá ngừ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.14285714285714285,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá hồi",
+      "cá cơm",
+      "chả cá thác lác"
+     ]
+    },
+    {
+     "ingredient": "cá rô phi",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "cá rô đồng",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 15,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "cá thu",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.125,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": [
+      "cá chép",
+      "cá basa",
+      "cá trê"
+     ]
+    },
+    {
+     "ingredient": "cá trắm",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 15,
+     "n_ref": 2,
+     "top3": []
+    },
+    {
+     "ingredient": "cánh gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "đùi gà",
+      "thịt gà",
+      "ức gà"
+     ]
+    },
+    {
+     "ingredient": "cải bó xôi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.125,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "bắp cải",
+      "xà lách",
+      "cần tây"
+     ]
+    },
+    {
+     "ingredient": "cải bẹ xanh",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cải thìa",
+      "bắp cải",
+      "giá đỗ"
+     ]
+    },
+    {
+     "ingredient": "cải làn",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cải thìa",
+      "cải ngọt",
+      "giá đỗ"
+     ]
+    },
+    {
+     "ingredient": "cải ngọt",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "cải thìa",
+      "giá đỗ",
+      "cải thảo"
+     ]
+    },
+    {
+     "ingredient": "cải thảo",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "cải thìa",
+      "giá đỗ",
+      "cải ngọt"
+     ]
+    },
+    {
+     "ingredient": "cải xoong",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.14285714285714285,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "xà lách",
+      "giá đỗ",
+      "cải thìa"
+     ]
+    },
+    {
+     "ingredient": "cần tây",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "bắp cải",
+      "xà lách",
+      "cải bó xôi"
+     ]
+    },
+    {
+     "ingredient": "củ cải trắng",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.125,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "đậu Hà Lan",
+      "dưa chuột",
+      "măng tươi"
+     ]
+    },
+    {
+     "ingredient": "củ đậu",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.1111111111111111,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "dưa chuột",
+      "ớt chuông",
+      "đậu Hà Lan"
+     ]
+    },
+    {
+     "ingredient": "dầu lạc",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 3,
+     "n_ref": 1,
+     "top3": [
+      "dầu vừng",
+      "dầu ăn",
+      "dầu ô liu"
+     ]
+    },
+    {
+     "ingredient": "hoa hồi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": [
+      "quế",
+      "nước tương",
+      "bột nghệ"
+     ]
+    },
+    {
+     "ingredient": "hoa thiên lý",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "húng lủi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "rau mùi",
+      "ớt",
+      "gừng"
+     ]
+    },
+    {
+     "ingredient": "hạt nêm chay",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": [
+      "tương đen",
+      "nước tương",
+      "hoa hồi"
+     ]
+    },
+    {
+     "ingredient": "khoai môn",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 5,
+     "n_ref": 2,
+     "top3": []
+    },
+    {
+     "ingredient": "khoai sọ",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 5,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "khế",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "dứa",
+      "chanh",
+      "chuối"
+     ]
+    },
+    {
+     "ingredient": "me chua",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 7,
+     "n_ref": 3,
+     "top3": [
+      "nước cốt dừa",
+      "chanh",
+      "dứa"
+     ]
+    },
+    {
+     "ingredient": "mì căn",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 8,
+     "n_ref": 1,
+     "top3": [
+      "đậu phụ",
+      "đậu phụ non",
+      "đậu nành"
+     ]
+    },
+    {
+     "ingredient": "măng khô",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "mướp",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "mắm ruốc",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "mắm tôm",
+      "nước mắm",
+      "dầu hào"
+     ]
+    },
+    {
+     "ingredient": "mắm tép",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "mắm tôm",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 1,
+     "top3": [
+      "mắm ruốc",
+      "nước mắm",
+      "dầu hào"
+     ]
+    },
+    {
+     "ingredient": "mộc nhĩ",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "nấm hương khô",
+      "nấm rơm",
+      "nấm sò"
+     ]
+    },
+    {
+     "ingredient": "mực",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "nghêu",
+      "tôm",
+      "tôm khô"
+     ]
+    },
+    {
+     "ingredient": "nghêu",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 10,
+     "n_ref": 2,
+     "top3": [
+      "mực",
+      "tôm",
+      "hến"
+     ]
+    },
+    {
+     "ingredient": "ngò gai",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "rau ngổ",
+      "ớt",
+      "rau mùi"
+     ]
+    },
+    {
+     "ingredient": "nấm hương khô",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "nấm hương tươi",
+      "mộc nhĩ",
+      "nấm rơm"
+     ]
+    },
+    {
+     "ingredient": "nấm hương tươi",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 7,
+     "n_ref": 4,
+     "top3": [
+      "nấm sò",
+      "nấm hương khô",
+      "nấm mỡ"
+     ]
+    },
+    {
+     "ingredient": "nấm sò",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 7,
+     "n_ref": 1,
+     "top3": [
+      "nấm hương tươi",
+      "nấm hương khô",
+      "nấm rơm"
+     ]
+    },
+    {
+     "ingredient": "quế",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 24,
+     "n_ref": 1,
+     "top3": [
+      "đường",
+      "hoa hồi",
+      "bột nghệ"
+     ]
+    },
+    {
+     "ingredient": "rau bí",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "rau cần",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "rau dền",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "mồng tơi",
+      "rau sam",
+      "giá đỗ"
+     ]
+    },
+    {
+     "ingredient": "rau mùi",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.25,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "gừng",
+      "nghệ",
+      "tỏi"
+     ]
+    },
+    {
+     "ingredient": "rau răm",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": []
+    },
+    {
+     "ingredient": "rau đay",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": []
+    },
+    {
+     "ingredient": "su hào",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 3,
+     "top3": [
+      "đậu Hà Lan",
+      "củ đậu",
+      "dưa chuột"
+     ]
+    },
+    {
+     "ingredient": "su su",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.16666666666666666,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "đậu que",
+      "hành tây",
+      "đậu Hà Lan"
+     ]
+    },
+    {
+     "ingredient": "sò",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "nghêu",
+      "tôm",
+      "mực"
+     ]
+    },
+    {
+     "ingredient": "súp lơ trắng",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "súp lơ xanh",
+      "cà rốt",
+      "cà chua"
+     ]
+    },
+    {
+     "ingredient": "sườn non",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 14,
+     "n_ref": 2,
+     "top3": [
+      "thịt nạc vai",
+      "thịt bò",
+      "xương ống lợn"
+     ]
+    },
+    {
+     "ingredient": "sấu",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 7,
+     "n_ref": 2,
+     "top3": []
+    },
+    {
+     "ingredient": "thịt ba chỉ",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "gan lợn",
+      "thịt nạc vai",
+      "mỡ lợn"
+     ]
+    },
+    {
+     "ingredient": "thịt bò",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "thịt nạc vai",
+      "thịt băm",
+      "sườn non"
+     ]
+    },
+    {
+     "ingredient": "thịt bò xay",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "thịt băm",
+      "xúc xích",
+      "giò lụa"
+     ]
+    },
+    {
+     "ingredient": "thịt gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 3,
+     "top3": [
+      "đùi gà",
+      "ức gà",
+      "cánh gà"
+     ]
+    },
+    {
+     "ingredient": "trứng gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 2,
+     "n_ref": 2,
+     "top3": [
+      "trứng cút"
+     ]
+    },
+    {
+     "ingredient": "trứng vịt",
+     "answered": false,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.0,
+     "n_cands": 2,
+     "n_ref": 2,
+     "top3": []
+    },
+    {
+     "ingredient": "tép",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 1,
+     "top3": [
+      "tôm",
+      "mực",
+      "nghêu"
+     ]
+    },
+    {
+     "ingredient": "tôm khô",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 10,
+     "n_ref": 2,
+     "top3": [
+      "tôm",
+      "mực",
+      "cua biển"
+     ]
+    },
+    {
+     "ingredient": "tỏi tây",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.3333333333333333,
+     "n_cands": 22,
+     "n_ref": 1,
+     "top3": [
+      "tỏi",
+      "hành tím",
+      "hành lá"
+     ]
+    },
+    {
+     "ingredient": "xương ống lợn",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 14,
+     "n_ref": 1,
+     "top3": [
+      "sườn non",
+      "thịt bò",
+      "giò lụa"
+     ]
+    },
+    {
+     "ingredient": "đùi gà",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 6,
+     "n_ref": 3,
+     "top3": [
+      "thịt gà",
+      "cánh gà",
+      "ức gà"
+     ]
+    },
+    {
+     "ingredient": "đậu Hà Lan",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.2,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "ngô bao tử",
+      "măng tươi",
+      "cà rốt"
+     ]
+    },
+    {
+     "ingredient": "đậu phụ non",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 8,
+     "n_ref": 1,
+     "top3": [
+      "đậu phụ",
+      "mì căn",
+      "đậu nành"
+     ]
+    },
+    {
+     "ingredient": "đậu que",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 1.0,
+     "rr": 0.5,
+     "n_cands": 30,
+     "n_ref": 2,
+     "top3": [
+      "cà rốt",
+      "đậu Hà Lan",
+      "hành tây"
+     ]
+    },
+    {
+     "ingredient": "đậu đũa",
+     "answered": true,
+     "hit1": 0.0,
+     "hit3": 0.0,
+     "rr": 0.14285714285714285,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "mướp đắng",
+      "măng tươi",
+      "ngô bao tử"
+     ]
+    },
+    {
+     "ingredient": "ớt chuông",
+     "answered": true,
+     "hit1": 1.0,
+     "hit3": 1.0,
+     "rr": 1.0,
+     "n_cands": 30,
+     "n_ref": 1,
+     "top3": [
+      "hành tây",
+      "cà rốt",
+      "cà chua"
+     ]
+    }
+   ]
+  },
+  "Ngẫu nhiên cùng nhóm": {
+   "n": 75,
+   "answered": 1.0,
+   "agreement@1": 0.14238528138528136,
+   "agreement@3": 0.3320649427201152,
+   "mrr": 0.3040458414376366,
+   "note": "exact expectation of a uniform random order within the food group"
+  }
+ },
+ "dev_other": {
+  "kNN dinh dưỡng": {
+   "n": 32,
+   "answered": 0.96875,
+   "agreement@1": 0.21875,
+   "agreement@3": 0.5625,
+   "mrr": 0.41057596916971917,
+   "agreement@3_answered": 0.5806451612903226
+  },
+  "PMI ngữ cảnh": {
+   "n": 32,
+   "answered": 0.65625,
+   "agreement@1": 0.3125,
+   "agreement@3": 0.40625,
+   "mrr": 0.3844122023809524,
+   "agreement@3_answered": 0.6190476190476191
+  },
+  "Ngẫu nhiên cùng nhóm": {
+   "n": 32,
+   "answered": 1.0,
+   "agreement@1": 0.14890422077922078,
+   "agreement@3": 0.372533509952691,
+   "mrr": 0.32576187889218006,
+   "note": "exact expectation of a uniform random order within the food group"
+  }
+ },
+ "test_pairs": {
+  "Word2Vec vs kNN dinh dưỡng": {
+   "mcnemar_agreement@3_seed0": {
+    "a_only": 14,
+    "b_only": 10,
+    "p": 0.5412561893463135
+   },
+   "bootstrap_rr": {
+    "diff": 0.0883870603814921,
+    "lo": -0.018437189566196496,
+    "hi": 0.19768361871385168,
+    "p": 0.11217756448710257,
+    "n": 75,
+    "p_holm": 0.4487102579484103
+   }
+  },
+  "Word2Vec vs PMI ngữ cảnh": {
+   "mcnemar_agreement@3_seed0": {
+    "a_only": 12,
+    "b_only": 9,
+    "p": 0.6636238098144531
+   },
+   "bootstrap_rr": {
+    "diff": 0.10263837746104214,
+    "lo": 0.013227604058821894,
+    "hi": 0.19348207224492053,
+    "p": 0.027394521095780843,
+    "n": 75,
+    "p_holm": 0.13697260547890422
+   }
+  },
+  "Word2Vec vs Word2Vec + lọc bổ sung (PPMI ≤ 2.0)": {
+   "mcnemar_agreement@3_seed0": {
+    "a_only": 11,
+    "b_only": 5,
+    "p": 0.210113525390625
+   },
+   "bootstrap_rr": {
+    "diff": 0.11788658459989729,
+    "lo": 0.0519956195301087,
+    "hi": 0.1976227375972267,
+    "p": 0.0011997600479904018,
+    "n": 75,
+    "p_holm": 0.007198560287942411
+   }
+  },
+  "kNN dinh dưỡng vs PMI ngữ cảnh": {
+   "mcnemar_agreement@3_seed0": {
+    "a_only": 13,
+    "b_only": 14,
+    "p": 1.0
+   },
+   "bootstrap_rr": {
+    "diff": 0.01425131707955003,
+    "lo": -0.09635634220855477,
+    "hi": 0.13045446253346765,
+    "p": 0.8088382323535293,
+    "n": 75,
+    "p_holm": 1.0
+   }
+  },
+  "kNN dinh dưỡng vs Word2Vec + lọc bổ sung (PPMI ≤ 2.0)": {
+   "mcnemar_agreement@3_seed0": {
+    "a_only": 16,
+    "b_only": 14,
+    "p": 0.8555355519056321
+   },
+   "bootstrap_rr": {
+    "diff": 0.02949952421840517,
+    "lo": -0.08780389585864419,
+    "hi": 0.14688147623599393,
+    "p": 0.6262747450509898,
+    "n": 75,
+    "p_holm": 1.0
+   }
+  },
+  "PMI ngữ cảnh vs Word2Vec + lọc bổ sung (PPMI ≤ 2.0)": {
+   "mcnemar_agreement@3_seed0": {
+    "a_only": 18,
+    "b_only": 15,
+    "p": 0.7283324808813632
+   },
+   "bootstrap_rr": {
+    "diff": 0.015248207138855167,
+    "lo": -0.10359986621351278,
+    "hi": 0.13436105178260646,
+    "p": 0.8028394321135773,
+    "n": 75,
+    "p_holm": 1.0
+   }
+  }
+ },
+ "coverage": {
+  "word2vec_vectors": {
+   "en": 175,
+   "vi_only": 39,
+   "share_ingredients": 0.9511111111111111,
+   "share_occurrences": 1.0
+  },
+  "nutrient_vectors": {
+   "share_ingredients": 0.9422222222222222,
+   "share_occurrences": 0.9788251366120219
+  },
+  "pmi_rows": {
+   "share_ingredients": 0.7555555555555555,
+   "share_occurrences": 0.9508196721311475
+  },
+  "curated_table": {
+   "ingredients_with_pair": 107,
+   "share_ingredients": 0.47555555555555556
+  }
+ },
+ "query_coverage": {
+  "all": {
+   "Bảng tra": 0.6555555555555556,
+   "Word2Vec": 1.0,
+   "kNN dinh dưỡng": 0.9444444444444444,
+   "PMI ngữ cảnh": 0.8555555555555555
+  },
+  "dev": {
+   "Bảng tra": 0.7407407407407407,
+   "Word2Vec": 1.0,
+   "kNN dinh dưỡng": 0.9629629629629629,
+   "PMI ngữ cảnh": 0.9259259259259259
+  },
+  "test": {
+   "Bảng tra": 0.6190476190476191,
+   "Word2Vec": 1.0,
+   "kNN dinh dưỡng": 0.9365079365079365,
+   "PMI ngữ cảnh": 0.8253968253968254
+  },
+  "n": 90
+ }
+}

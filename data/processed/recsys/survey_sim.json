@@ -1,0 +1,5354 @@
+{
+ "SIMULATED": true,
+ "label": "MÔ PHỎNG — chỉ kiểm đường ống, không phải kết quả",
+ "data": {
+  "n_users": 90,
+  "n_items": 180,
+  "n_ratings": 3326,
+  "n_never_eaten": 724,
+  "rating_hist": {
+   "1": 468,
+   "2": 556,
+   "3": 809,
+   "4": 750,
+   "5": 743
+  },
+  "ratings_per_user_mean": 36.955555555555556,
+  "SIMULATION": "dữ liệu MÔ PHỎNG từ mô hình ẩn nêu trong docstring simulate(); chỉ kiểm đường ống, không phải kết quả",
+  "seed": 20261018,
+  "params": {
+   "n_users": 90,
+   "n_anchor": 10,
+   "n_random": 35,
+   "dim": 6,
+   "quality_sd": 0.5,
+   "user_bias_sd": 0.4,
+   "taste_scale": 1.0,
+   "content_share": 0.6,
+   "noise_sd": 0.6,
+   "thresholds": [
+    -1.4,
+    -0.6,
+    0.2,
+    1.0
+   ],
+   "familiarity_mean": 1.8,
+   "familiarity_sd": 1.0,
+   "n_fav": 5
+  },
+  "true_rating_hist": {
+   "1": 2101,
+   "2": 2829,
+   "3": 3959,
+   "4": 3741,
+   "5": 3570
+  }
+ },
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "scenarios": {
+  "warm": {
+   "models": {
+    "ShrunkMean": {
+     "ndcg@5": {
+      "mean": 0.8096334065375244,
+      "sd": 0.006205153165833652
+     },
+     "auc": {
+      "mean": 0.6334871273739142,
+      "sd": 0.006897063407772067
+     },
+     "ndcg@5_man": {
+      "mean": 0.9166562915474581,
+      "sd": 0.006428438014355381
+     },
+     "ndcg@5_rau": {
+      "mean": 0.9221463308047007,
+      "sd": 0.0077856708533648655
+     },
+     "ndcg@5_canh": {
+      "mean": 0.937610100581877,
+      "sd": 0.003955479487079858
+     }
+    },
+    "Bias u+i": {
+     "ndcg@5": {
+      "mean": 0.8091688698118196,
+      "sd": 0.0066403146055452325
+     },
+     "auc": {
+      "mean": 0.6326124030918017,
+      "sd": 0.0080912120427923
+     },
+     "ndcg@5_man": {
+      "mean": 0.9165442782636394,
+      "sd": 0.0055360325041118865
+     },
+     "ndcg@5_rau": {
+      "mean": 0.9210975037324705,
+      "sd": 0.007985330769201217
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9380609547433936,
+      "sd": 0.004753147703441411
+     }
+    },
+    "Content (5 món hay ăn)": {
+     "ndcg@5": {
+      "mean": 0.7623846647004859,
+      "sd": 0.003717976345239657
+     },
+     "auc": {
+      "mean": 0.5573474818557231,
+      "sd": 0.006588228362449947
+     },
+     "ndcg@5_man": {
+      "mean": 0.899213828278671,
+      "sd": 0.0030885245738096626
+     },
+     "ndcg@5_rau": {
+      "mean": 0.9008893833879503,
+      "sd": 0.006548607247403383
+     },
+     "ndcg@5_canh": {
+      "mean": 0.928233911461614,
+      "sd": 0.0032464656584937643
+     }
+    },
+    "Biased MF": {
+     "ndcg@5": {
+      "mean": 0.8712274510829788,
+      "sd": 0.005760503803528417
+     },
+     "auc": {
+      "mean": 0.7320051635111622,
+      "sd": 0.008432078221034174
+     },
+     "ndcg@5_man": {
+      "mean": 0.9471419304873283,
+      "sd": 0.006704549792059541
+     },
+     "ndcg@5_rau": {
+      "mean": 0.9426687216663213,
+      "sd": 0.005350699974076045
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9561028933066436,
+      "sd": 0.0034099449669024624
+     }
+    },
+    "BPR (cặp chênh điểm)": {
+     "ndcg@5": {
+      "mean": 0.8243100636800627,
+      "sd": 0.008479201406133431
+     },
+     "auc": {
+      "mean": 0.6571905340174874,
+      "sd": 0.009020040406563996
+     },
+     "ndcg@5_man": {
+      "mean": 0.9241054052297294,
+      "sd": 0.00973493439916946
+     },
+     "ndcg@5_rau": {
+      "mean": 0.9257465977288961,
+      "sd": 0.004125022972183712
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9412980125599377,
+      "sd": 0.003883704166720378
+     }
+    },
+    "LightFM logistic ±1": {
+     "ndcg@5": {
+      "mean": 0.7989368698210221,
+      "sd": 0.004668226711853683
+     },
+     "auc": {
+      "mean": 0.6194499058125185,
+      "sd": 0.005961197183183344
+     },
+     "ndcg@5_man": {
+      "mean": 0.9148749704029868,
+      "sd": 0.0025746354228787533
+     },
+     "ndcg@5_rau": {
+      "mean": 0.9154696354972032,
+      "sd": 0.003435682454196163
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9344714320297267,
+      "sd": 0.002523399639637956
+     }
+    },
+    "LambdaMART": {
+     "ndcg@5": {
+      "mean": 0.8386007420394282,
+      "sd": 0.009426990579987986
+     },
+     "auc": {
+      "mean": 0.6785677573899642,
+      "sd": 0.013394314077569832
+     },
+     "ndcg@5_man": {
+      "mean": 0.9290156066847128,
+      "sd": 0.005622075142538828
+     },
+     "ndcg@5_rau": {
+      "mean": 0.9287363232078538,
+      "sd": 0.006097879006811357
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9471139320463324,
+      "sd": 0.006012416430778585
+     }
+    },
+    "Best personalised (chọn trong CV trong)": {
+     "ndcg@5": {
+      "mean": 0.8473858012696205,
+      "sd": 0.009975971272421742
+     },
+     "auc": {
+      "mean": 0.6946401880648173,
+      "sd": 0.018070112394970833
+     },
+     "ndcg@5_man": {
+      "mean": 0.9328415163397568,
+      "sd": 0.00968672550839257
+     },
+     "ndcg@5_rau": {
+      "mean": 0.9368787623748386,
+      "sd": 0.0029477458716661797
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9474576286943985,
+      "sd": 0.00463721300169635
+     }
+    }
+   },
+   "comparisons": {
+    "ndcg@5": {
+     "Bias u+i": {
+      "diff": -0.00046453672570475615,
+      "lo": -0.002817352543762723,
+      "hi": 0.0018610009954862041,
+      "p": 0.6942611477704459,
+      "n": 90,
+      "p_holm": 0.6942611477704459
+     },
+     "Content (5 món hay ăn)": {
+      "diff": -0.04724874183703843,
+      "lo": -0.061822543183117785,
+      "hi": -0.032273596909602895,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "Biased MF": {
+      "diff": 0.06159404454545432,
+      "lo": 0.04907361595946235,
+      "hi": 0.07426376002139365,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "BPR (cặp chênh điểm)": {
+      "diff": 0.014676657142538184,
+      "lo": 0.009475757548345265,
+      "hi": 0.019922380820672263,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "LightFM logistic ±1": {
+      "diff": -0.010696536716502267,
+      "lo": -0.017975851875822287,
+      "hi": -0.0032751859996687977,
+      "p": 0.005598880223955209,
+      "n": 90,
+      "p_holm": 0.011197760447910418
+     },
+     "LambdaMART": {
+      "diff": 0.02896733550190379,
+      "lo": 0.022292266232177557,
+      "hi": 0.0357395348968418,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "Best personalised (chọn trong CV trong)": {
+      "diff": 0.037752394732096135,
+      "lo": 0.029232435521275447,
+      "hi": 0.04652578933312077,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "role": "primary comparison (not in the Holm family)"
+     }
+    },
+    "auc": {
+     "Bias u+i": {
+      "diff": -0.0008747242821126094,
+      "lo": -0.0036767270267895114,
+      "hi": 0.0019034173865949053,
+      "p": 0.5426914617076585,
+      "n": 90,
+      "p_holm": 0.5426914617076585
+     },
+     "Content (5 món hay ăn)": {
+      "diff": -0.07613964551819101,
+      "lo": -0.09643478035176174,
+      "hi": -0.05542015995593048,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "Biased MF": {
+      "diff": 0.0985180361372479,
+      "lo": 0.08166575732842629,
+      "hi": 0.11563527296520311,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "BPR (cặp chênh điểm)": {
+      "diff": 0.023703406643573205,
+      "lo": 0.015890247312708456,
+      "hi": 0.03150343599685298,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "LightFM logistic ±1": {
+      "diff": -0.014037221561395828,
+      "lo": -0.02331623324412705,
+      "hi": -0.004401636500453509,
+      "p": 0.004399120175964807,
+      "n": 90,
+      "p_holm": 0.008798240351929614
+     },
+     "LambdaMART": {
+      "diff": 0.045080630016049957,
+      "lo": 0.03602954379390458,
+      "hi": 0.05434037623500905,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "Best personalised (chọn trong CV trong)": {
+      "diff": 0.06115306069090307,
+      "lo": 0.04943808685610443,
+      "hi": 0.07304123638063012,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "role": "primary comparison (not in the Holm family)"
+     }
+    }
+   },
+   "n_users": 90,
+   "chosen": {
+    "0": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.777587922076404
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7574896055885407
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7555017924681624
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7647383291025935
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.7666229757243314
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7745378036983853
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7639156248107289
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7620365250929022
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7671757374122503
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7632578031565206
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7195272461552604
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7215651871996851
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7094718305255325
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7128704092027075
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.7213039978894237
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7879148696939228
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7826314195221049
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7927402238978732
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7947484262303544
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7850935231057647
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7928512235494957
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7788286356665989
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7786933060734214
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7778900967700588
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7900574993545281
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7541801217352851
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.751618331065035
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7441824847527915
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7452902555407283
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7471377743536879
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7647870670166812
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7805453216957776
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7676606875242279
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7627586705535693
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.779146956263279
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 1,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 2,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 3,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 4,
+       "model": "BPR (cặp chênh điểm)"
+      }
+     ]
+    },
+    "1": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7710578984081792
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7586310133037882
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7619677016911309
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7645887158221862
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7598699675846676
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7708420670720898
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.760277723322225
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7633328558526579
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7650719964125926
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7615524553189864
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7192094137080421
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7194169684291912
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7237998879752169
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7157880305288198
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.7204169904029474
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7852412997921672
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7855721436077746
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7924646295639364
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.8146572610691009
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7888048952282057
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7884709016810577
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7762275895080508
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.784277068135574
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7899697780675008
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7854026639590189
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7462328784184203
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7466664858185931
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7525226771982955
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7403770140106967
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7327910790443101
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7622252503370991
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7671571575764555
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7833254442136193
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7687714048162121
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7739893130184997
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 1,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 2,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 3,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 4,
+       "model": "Biased MF"
+      }
+     ]
+    },
+    "2": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.768832591184022
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.7662897132246739
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7646738600904
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.7621604410100655
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.7683205164087443
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7687005897043054
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7727036003401343
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7699203209741702
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7673486089244465
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7628555230020232
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7177159319073737
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7232326414972149
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7140980827849782
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7146376197646785
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.714261305331799
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.8062252280153844
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7845417634421393
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7919910686789842
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.78642332907964
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.786599922734743
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7840824847347827
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7932844024201908
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7848324190310813
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7899299057655412
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7870434820186422
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7483242932231358
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7418427670597163
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7459995487456562
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.740210878993237
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.740265670402516
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7820389701503722
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7702606058334585
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7702593175599689
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7701924602769905
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7720173418696813
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 1,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 2,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 3,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 4,
+       "model": "BPR (cặp chênh điểm)"
+      }
+     ]
+    },
+    "3": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7569446274645587
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.746640078704797
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7762945900691167
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7697907441522857
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.7584635891368808
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7574013859931455
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7493055684206281
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7763110242439458
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7719904137943966
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7653732452783676
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7266501134325797
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7114737081256952
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7112286940912509
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7111493562851233
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.7166532703332544
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7714058170425323
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7818159930697187
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7833320375250179
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7887718140715784
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.791752026981739
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7731373503555607
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.772368148231421
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7868569396404066
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7840895241364786
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.786853363421722
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7340834167634688
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7391651167663249
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7537501131460331
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7546692770337949
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7466636428385093
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.76210009061155
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7357636578318713
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7797784758362193
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7752771050269888
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7587152922553816
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 1,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 2,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 3,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 4,
+       "model": "Biased MF"
+      }
+     ]
+    },
+    "4": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7571461506391247
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.7672545958213915
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.7662008056709285
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7608005739982024
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.775986526402853
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7635523917002957
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7680516100612294
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7657971794990095
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7620032794236614
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7779974817286238
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7254833350088701
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7301000446770515
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.724861837863739
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7103693286492273
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.7217550818565117
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7913978783350889
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7804931799822808
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7822491487028332
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7997680844544691
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7890275285802707
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7848100631899126
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7898507487072379
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7933465153168017
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7847729239283665
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7962455244678046
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7284041327349174
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7520280458819504
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.741257962641141
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7487670907783386
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7588436510237169
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.780752782823939
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.773048590639417
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7618903091327157
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7668470030989157
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7714168047252375
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 1,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 2,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 3,
+       "model": "Biased MF"
+      },
+      {
+       "fold": 4,
+       "model": "BPR (cặp chênh điểm)"
+      }
+     ]
+    }
+   }
+  },
+  "item_cold": {
+   "models": {
+    "ShrunkMean": {
+     "ndcg@5": {
+      "mean": 0.7430403314909819,
+      "sd": 0.00951781944511831
+     },
+     "auc": {
+      "mean": 0.5,
+      "sd": 0.0
+     },
+     "ndcg@5_man": {
+      "mean": 0.8736341376057926,
+      "sd": 0.009189272559149492
+     },
+     "ndcg@5_rau": {
+      "mean": 0.8798530822890669,
+      "sd": 0.0064669342167317425
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9119347727962854,
+      "sd": 0.0060911426280262
+     }
+    },
+    "Bias u+i": {
+     "ndcg@5": {
+      "mean": 0.7430403314909819,
+      "sd": 0.00951781944511831
+     },
+     "auc": {
+      "mean": 0.5,
+      "sd": 0.0
+     },
+     "ndcg@5_man": {
+      "mean": 0.8736341376057926,
+      "sd": 0.009189272559149492
+     },
+     "ndcg@5_rau": {
+      "mean": 0.8798530822890669,
+      "sd": 0.0064669342167317425
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9119347727962854,
+      "sd": 0.0060911426280262
+     }
+    },
+    "Content (5 món hay ăn)": {
+     "ndcg@5": {
+      "mean": 0.7806462041986564,
+      "sd": 0.002833107431793127
+     },
+     "auc": {
+      "mean": 0.5630619161853099,
+      "sd": 0.0038125043213364414
+     },
+     "ndcg@5_man": {
+      "mean": 0.8924206856001471,
+      "sd": 0.005366342863355526
+     },
+     "ndcg@5_rau": {
+      "mean": 0.9038794302020227,
+      "sd": 0.0059896531521438584
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9289920841467746,
+      "sd": 0.0050963822450378225
+     }
+    },
+    "Biased MF": {
+     "ndcg@5": {
+      "mean": 0.7430403314909819,
+      "sd": 0.00951781944511831
+     },
+     "auc": {
+      "mean": 0.5,
+      "sd": 0.0
+     },
+     "ndcg@5_man": {
+      "mean": 0.8736341376057926,
+      "sd": 0.009189272559149492
+     },
+     "ndcg@5_rau": {
+      "mean": 0.8798530822890669,
+      "sd": 0.0064669342167317425
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9119347727962854,
+      "sd": 0.0060911426280262
+     }
+    },
+    "BPR (cặp chênh điểm)": {
+     "ndcg@5": {
+      "mean": 0.7430403314909819,
+      "sd": 0.00951781944511831
+     },
+     "auc": {
+      "mean": 0.5,
+      "sd": 0.0
+     },
+     "ndcg@5_man": {
+      "mean": 0.8736341376057926,
+      "sd": 0.009189272559149492
+     },
+     "ndcg@5_rau": {
+      "mean": 0.8798530822890669,
+      "sd": 0.0064669342167317425
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9119347727962854,
+      "sd": 0.0060911426280262
+     }
+    },
+    "LightFM logistic ±1": {
+     "ndcg@5": {
+      "mean": 0.7585456863703578,
+      "sd": 0.007482228897640636
+     },
+     "auc": {
+      "mean": 0.5444038057466832,
+      "sd": 0.020795949570460215
+     },
+     "ndcg@5_man": {
+      "mean": 0.8879286798998602,
+      "sd": 0.009703453556053655
+     },
+     "ndcg@5_rau": {
+      "mean": 0.8840082157365895,
+      "sd": 0.006833470608093779
+     },
+     "ndcg@5_canh": {
+      "mean": 0.919242639486091,
+      "sd": 0.00988662224456968
+     }
+    },
+    "LambdaMART": {
+     "ndcg@5": {
+      "mean": 0.7541972149306,
+      "sd": 0.009233867657397274
+     },
+     "auc": {
+      "mean": 0.5294479864311222,
+      "sd": 0.012404363862649613
+     },
+     "ndcg@5_man": {
+      "mean": 0.8737794311620863,
+      "sd": 0.011005152693217042
+     },
+     "ndcg@5_rau": {
+      "mean": 0.8956800984393716,
+      "sd": 0.010624783487099219
+     },
+     "ndcg@5_canh": {
+      "mean": 0.9071939077702517,
+      "sd": 0.008081143781020587
+     }
+    },
+    "Best personalised (chọn trong CV trong)": {
+     "ndcg@5": {
+      "mean": 0.7757231907334006,
+      "sd": 0.00589109790395397
+     },
+     "auc": {
+      "mean": 0.5567390796847567,
+      "sd": 0.010799273921293684
+     },
+     "ndcg@5_man": {
+      "mean": 0.888965903210001,
+      "sd": 0.00733279965743621
+     },
+     "ndcg@5_rau": {
+      "mean": 0.9014223318562182,
+      "sd": 0.00971575529988245
+     },
+     "ndcg@5_canh": {
+      "mean": 0.929246534568074,
+      "sd": 0.004776834104267638
+     }
+    }
+   },
+   "comparisons": {
+    "ndcg@5": {
+     "Bias u+i": {
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "p": 1.0,
+      "n": 90,
+      "p_holm": 1.0
+     },
+     "Content (5 món hay ăn)": {
+      "diff": 0.03760587270767433,
+      "lo": 0.024703072958879267,
+      "hi": 0.05050418922345068,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "Biased MF": {
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "p": 1.0,
+      "n": 90,
+      "p_holm": 1.0
+     },
+     "BPR (cặp chênh điểm)": {
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "p": 1.0,
+      "n": 90,
+      "p_holm": 1.0
+     },
+     "LightFM logistic ±1": {
+      "diff": 0.015505354879375835,
+      "lo": 0.004851721603571415,
+      "hi": 0.026541301528014108,
+      "p": 0.0057988402319536095,
+      "n": 90,
+      "p_holm": 0.028994201159768047
+     },
+     "LambdaMART": {
+      "diff": 0.011156883439618164,
+      "lo": 0.00043665001642012694,
+      "hi": 0.021989160152302824,
+      "p": 0.042191561687662464,
+      "n": 90,
+      "p_holm": 0.16876624675064986
+     },
+     "Best personalised (chọn trong CV trong)": {
+      "diff": 0.032682859242418476,
+      "lo": 0.020168696717374698,
+      "hi": 0.04490986306081464,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "role": "primary comparison (not in the Holm family)"
+     }
+    },
+    "auc": {
+     "Bias u+i": {
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "p": 1.0,
+      "n": 90,
+      "p_holm": 1.0
+     },
+     "Content (5 món hay ăn)": {
+      "diff": 0.06306191618530987,
+      "lo": 0.04630416902409575,
+      "hi": 0.07975593655148555,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "Biased MF": {
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "p": 1.0,
+      "n": 90,
+      "p_holm": 1.0
+     },
+     "BPR (cặp chênh điểm)": {
+      "diff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "p": 1.0,
+      "n": 90,
+      "p_holm": 1.0
+     },
+     "LightFM logistic ±1": {
+      "diff": 0.04440380574668325,
+      "lo": 0.029797302791508752,
+      "hi": 0.058923774978900174,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "LambdaMART": {
+      "diff": 0.029447986431122234,
+      "lo": 0.016898668365196403,
+      "hi": 0.04225908365623341,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "Best personalised (chọn trong CV trong)": {
+      "diff": 0.05673907968475664,
+      "lo": 0.04043863448439339,
+      "hi": 0.07293197992732431,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "role": "primary comparison (not in the Holm family)"
+     }
+    }
+   },
+   "n_users": 90,
+   "chosen": {
+    "0": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6849065186933169
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6721393501911418
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6704857111195112
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.7042395591740721
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6777250301763872
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6849065186933169
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6721393501911418
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6704857111195112
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7042395591740721
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6777250301763872
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7478515225641722
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7213490811254668
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7259342847350426
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7487629647808426
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.7360107930314634
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6849065186933169
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6721393501911418
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6704857111195112
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.7042395591740721
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6777250301763872
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6849065186933169
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6721393501911418
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6704857111195112
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7042395591740721
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6777250301763872
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6978602015751866
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6808749850971081
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7324040332261927
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7337234255826863
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 16,
+        "epochs": 20
+       },
+       "inner_ndcg@5": 0.7020347239285449
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.721600355897094
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.6741149590003497
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7358442256704159
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 300
+       },
+       "inner_ndcg@5": 0.7305147824487853
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7235752437854984
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 1,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 2,
+       "model": "LambdaMART"
+      },
+      {
+       "fold": 3,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 4,
+       "model": "Content (5 món hay ăn)"
+      }
+     ]
+    },
+    "1": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6934933682670564
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6754374698253978
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6827705581567526
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6617717089123019
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6854216143079016
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6934933682670564
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6754374698253978
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6827705581567526
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6617717089123019
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6854216143079016
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7320658268957239
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7254460648461881
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7377841826737099
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7244628707138069
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.7381442971812007
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6934933682670564
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6754374698253978
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6827705581567526
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6617717089123019
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6854216143079016
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6934933682670564
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6754374698253978
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6827705581567526
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6617717089123019
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6854216143079016
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6896089239720871
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7182918794803923
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "epochs": 20
+       },
+       "inner_ndcg@5": 0.7133394069420668
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6814641003332084
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6973035235917807
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 300
+       },
+       "inner_ndcg@5": 0.7179940404862567
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7172995875153712
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 300
+       },
+       "inner_ndcg@5": 0.6948408439789562
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7038607461145232
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7306473416040293
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 1,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 2,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 3,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 4,
+       "model": "Content (5 món hay ăn)"
+      }
+     ]
+    },
+    "2": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6898348523767925
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6732044344335205
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6499871666545133
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6837500198750485
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6554563076665902
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6898348523767925
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6732044344335205
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6499871666545133
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6837500198750485
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6554563076665902
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.736180098336805
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7210893713225777
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7254449342334081
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7300553657033618
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.7408545790023645
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6898348523767925
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6732044344335205
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6499871666545133
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6837500198750485
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6554563076665902
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6898348523767925
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6732044344335205
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6499871666545133
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6837500198750485
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6554563076665902
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6686304796710444
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 16,
+        "epochs": 20
+       },
+       "inner_ndcg@5": 0.6994293299546873
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6948282512610341
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 16,
+        "epochs": 20
+       },
+       "inner_ndcg@5": 0.6795085752589292
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7120588572578709
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7057542234816947
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 300
+       },
+       "inner_ndcg@5": 0.7117808135508478
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7173989585784609
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7310962602761489
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 300
+       },
+       "inner_ndcg@5": 0.7119918441913118
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 1,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 2,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 3,
+       "model": "LambdaMART"
+      },
+      {
+       "fold": 4,
+       "model": "Content (5 món hay ăn)"
+      }
+     ]
+    },
+    "3": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6724382045586791
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6909733692296095
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6605394877918775
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.687510862930309
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.658678438409477
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6724382045586791
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6909733692296095
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6605394877918775
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.687510862930309
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.658678438409477
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7302032011852476
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7266617093906671
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.731912651151355
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.739775056635717
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.7168660428554294
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6724382045586791
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6909733692296095
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6605394877918775
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.687510862930309
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.658678438409477
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6724382045586791
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6909733692296095
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6605394877918775
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.687510862930309
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.658678438409477
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.694187728578874
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6904953174556244
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6835290038613254
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6824720151735835
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 16,
+        "epochs": 20
+       },
+       "inner_ndcg@5": 0.6749868651450868
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 300
+       },
+       "inner_ndcg@5": 0.701425121567143
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 300
+       },
+       "inner_ndcg@5": 0.7137513350166241
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7047341248252453
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7097123283859385
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.6835284236435982
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 1,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 2,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 3,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 4,
+       "model": "Content (5 món hay ăn)"
+      }
+     ]
+    },
+    "4": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6631884140371351
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6860552777189924
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6864913039173125
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6603282043401122
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.682008814682729
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6631884140371351
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6860552777189924
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6864913039173125
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6603282043401122
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.682008814682729
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7302985948494923
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7256213613851852
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7344413060104155
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7256771423284271
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.7275462351981351
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6631884140371351
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6860552777189924
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6864913039173125
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.6603282043401122
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.02
+       },
+       "inner_ndcg@5": 0.682008814682729
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6631884140371351
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6860552777189924
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6864913039173125
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.6603282043401122
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 4,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.682008814682729
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "epochs": 20
+       },
+       "inner_ndcg@5": 0.7141493689942783
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7060733476161096
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "epochs": 20
+       },
+       "inner_ndcg@5": 0.714461817979335
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "epochs": 20
+       },
+       "inner_ndcg@5": 0.7201737126779016
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7064632464122339
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7095594199385018
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7179487811206077
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 300
+       },
+       "inner_ndcg@5": 0.7172354639848318
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 300
+       },
+       "inner_ndcg@5": 0.7006908319605164
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 300
+       },
+       "inner_ndcg@5": 0.7025987780268049
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 1,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 2,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 3,
+       "model": "Content (5 món hay ăn)"
+      },
+      {
+       "fold": 4,
+       "model": "Content (5 món hay ăn)"
+      }
+     ]
+    }
+   }
+  },
+  "user_cold": {
+   "models": {
+    "ShrunkMean": {
+     "ndcg@5": {
+      "mean": 0.7161947089443743,
+      "sd": 0.010559135338239123
+     },
+     "auc": {
+      "mean": 0.6334260340242815,
+      "sd": 0.0017702639214715423
+     },
+     "ndcg@5_man": {
+      "mean": 0.7215783879111649,
+      "sd": 0.006858354453787176
+     },
+     "ndcg@5_rau": {
+      "mean": 0.7542545091451656,
+      "sd": 0.0037332423302618616
+     },
+     "ndcg@5_canh": {
+      "mean": 0.7986191073443928,
+      "sd": 0.0048968514292650565
+     }
+    },
+    "Bias u+i": {
+     "ndcg@5": {
+      "mean": 0.7134920312467526,
+      "sd": 0.003500501476032259
+     },
+     "auc": {
+      "mean": 0.6341516951030866,
+      "sd": 0.0024362490248197874
+     },
+     "ndcg@5_man": {
+      "mean": 0.723503878467421,
+      "sd": 0.007509758196982472
+     },
+     "ndcg@5_rau": {
+      "mean": 0.7547293173007154,
+      "sd": 0.006653063648487375
+     },
+     "ndcg@5_canh": {
+      "mean": 0.7992098090078307,
+      "sd": 0.003647857700357136
+     }
+    },
+    "Content (5 món hay ăn)": {
+     "ndcg@5": {
+      "mean": 0.7074844293035903,
+      "sd": 1.1102230246251565e-16
+     },
+     "auc": {
+      "mean": 0.5584306689256913,
+      "sd": 7.850462293418876e-17
+     },
+     "ndcg@5_man": {
+      "mean": 0.6882201247477436,
+      "sd": 7.850462293418876e-17
+     },
+     "ndcg@5_rau": {
+      "mean": 0.6977457707170456,
+      "sd": 5.551115123125783e-17
+     },
+     "ndcg@5_canh": {
+      "mean": 0.7600484655374249,
+      "sd": 1.1102230246251565e-16
+     }
+    },
+    "Biased MF": {
+     "ndcg@5": {
+      "mean": 0.7976083350826488,
+      "sd": 0.008386288021695476
+     },
+     "auc": {
+      "mean": 0.7092235233391938,
+      "sd": 0.004249840957362507
+     },
+     "ndcg@5_man": {
+      "mean": 0.8001701356266274,
+      "sd": 0.014005648181827942
+     },
+     "ndcg@5_rau": {
+      "mean": 0.8049691673539525,
+      "sd": 0.0035203675881027505
+     },
+     "ndcg@5_canh": {
+      "mean": 0.8394673880360879,
+      "sd": 0.006813766684436664
+     }
+    },
+    "BPR (cặp chênh điểm)": {
+     "ndcg@5": {
+      "mean": 0.8346923785113525,
+      "sd": 0.0018935427739400282
+     },
+     "auc": {
+      "mean": 0.7285396235429169,
+      "sd": 0.0026362041456799586
+     },
+     "ndcg@5_man": {
+      "mean": 0.8134418455704833,
+      "sd": 0.009434644714054412
+     },
+     "ndcg@5_rau": {
+      "mean": 0.8244341977377267,
+      "sd": 0.013527977905163814
+     },
+     "ndcg@5_canh": {
+      "mean": 0.8530628457722358,
+      "sd": 0.007646462828594972
+     }
+    },
+    "LightFM logistic ±1": {
+     "ndcg@5": {
+      "mean": 0.7011641257433912,
+      "sd": 0.00353619316030398
+     },
+     "auc": {
+      "mean": 0.6184694562642303,
+      "sd": 0.0025330995976980695
+     },
+     "ndcg@5_man": {
+      "mean": 0.7064616878572393,
+      "sd": 0.00991648567807231
+     },
+     "ndcg@5_rau": {
+      "mean": 0.7380951616325185,
+      "sd": 0.005085341366436492
+     },
+     "ndcg@5_canh": {
+      "mean": 0.7917486205643245,
+      "sd": 0.0032200249035797875
+     }
+    },
+    "LambdaMART": {
+     "ndcg@5": {
+      "mean": 0.7677230038845954,
+      "sd": 0.014888140171124399
+     },
+     "auc": {
+      "mean": 0.669481046654284,
+      "sd": 0.005286868071738578
+     },
+     "ndcg@5_man": {
+      "mean": 0.7471833097853378,
+      "sd": 0.0073019476983672595
+     },
+     "ndcg@5_rau": {
+      "mean": 0.7765464625512394,
+      "sd": 0.015439859296986677
+     },
+     "ndcg@5_canh": {
+      "mean": 0.8154450911837067,
+      "sd": 0.005469990608217545
+     }
+    },
+    "Best personalised (chọn trong CV trong)": {
+     "ndcg@5": {
+      "mean": 0.8346923785113525,
+      "sd": 0.0018935427739400282
+     },
+     "auc": {
+      "mean": 0.7285396235429169,
+      "sd": 0.0026362041456799586
+     },
+     "ndcg@5_man": {
+      "mean": 0.8134418455704833,
+      "sd": 0.009434644714054412
+     },
+     "ndcg@5_rau": {
+      "mean": 0.8244341977377267,
+      "sd": 0.013527977905163814
+     },
+     "ndcg@5_canh": {
+      "mean": 0.8530628457722358,
+      "sd": 0.007646462828594972
+     }
+    }
+   },
+   "comparisons": {
+    "ndcg@5": {
+     "Bias u+i": {
+      "diff": -0.0027026776976215396,
+      "lo": -0.009256062498113227,
+      "hi": 0.0036329262115204833,
+      "p": 0.4185162967406519,
+      "n": 90,
+      "p_holm": 0.8370325934813038
+     },
+     "Content (5 món hay ăn)": {
+      "diff": -0.008710279640783873,
+      "lo": -0.04623326333805538,
+      "hi": 0.02751308731626791,
+      "p": 0.6414717056588682,
+      "n": 90,
+      "p_holm": 0.8370325934813038
+     },
+     "Biased MF": {
+      "diff": 0.08141362613827458,
+      "lo": 0.060469984970532444,
+      "hi": 0.10268463228133544,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "BPR (cặp chênh điểm)": {
+      "diff": 0.11849766956697813,
+      "lo": 0.09641186917089431,
+      "hi": 0.14242926539496786,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "LightFM logistic ±1": {
+      "diff": -0.01503058320098325,
+      "lo": -0.03670048803850875,
+      "hi": 0.0063758915578850444,
+      "p": 0.16336732653469307,
+      "n": 90,
+      "p_holm": 0.4901019796040792
+     },
+     "LambdaMART": {
+      "diff": 0.05152829494022102,
+      "lo": 0.030998499650957464,
+      "hi": 0.07309544878792755,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "Best personalised (chọn trong CV trong)": {
+      "diff": 0.11849766956697813,
+      "lo": 0.09641186917089431,
+      "hi": 0.14242926539496786,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "role": "primary comparison (not in the Holm family)"
+     }
+    },
+    "auc": {
+     "Bias u+i": {
+      "diff": 0.0007256610788049259,
+      "lo": -0.0011491822287527246,
+      "hi": 0.0026226938688365285,
+      "p": 0.4455108978204359,
+      "n": 90,
+      "p_holm": 0.4455108978204359
+     },
+     "Content (5 món hay ăn)": {
+      "diff": -0.07499536509859026,
+      "lo": -0.09518674052929703,
+      "hi": -0.055068066860527905,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "Biased MF": {
+      "diff": 0.07579748931491223,
+      "lo": 0.0621761611607408,
+      "hi": 0.08963706589697411,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "BPR (cặp chênh điểm)": {
+      "diff": 0.09511358951863524,
+      "lo": 0.0818957702361408,
+      "hi": 0.10848140351721236,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "LightFM logistic ±1": {
+      "diff": -0.014956577760051179,
+      "lo": -0.024032708843787876,
+      "hi": -0.0060161808066954295,
+      "p": 0.0021995600879824036,
+      "n": 90,
+      "p_holm": 0.004399120175964807
+     },
+     "LambdaMART": {
+      "diff": 0.03605501263000234,
+      "lo": 0.026646408581882653,
+      "hi": 0.0456338764292135,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "p_holm": 0.0011997600479904018
+     },
+     "Best personalised (chọn trong CV trong)": {
+      "diff": 0.09511358951863524,
+      "lo": 0.0818957702361408,
+      "hi": 0.10848140351721236,
+      "p": 0.0001999600079984003,
+      "n": 90,
+      "role": "primary comparison (not in the Holm family)"
+     }
+    }
+   },
+   "n_users": 90,
+   "chosen": {
+    "0": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.7358715283407983
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.6965728741151592
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7148076588422851
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.698164907573029
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7200156165296724
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7311251573685297
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.6893726080106745
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7152202876183761
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.6922453017464062
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7252296684750892
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.713248748982002
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7034350851863788
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7077036042446744
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.700182177685826
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.7128525304190708
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7750089118856208
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7546603135655056
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7801843716881437
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7892185748809338
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7364989780362156
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8083219615694969
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7987331267881369
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8047363446461104
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8049326956784051
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8027754265878895
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.698333641351946
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6732526519886329
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6817104646336234
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6744606482723655
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6997139604911391
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7773120913719742
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7075618131732342
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7558041538253061
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7426832660684446
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7499953540842049
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 1,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 2,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 3,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 4,
+       "model": "BPR (cặp chênh điểm)"
+      }
+     ]
+    },
+    "1": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.716253792830812
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.6836040968765386
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.714130507987096
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7315686409091159
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7049490995544838
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7134789878157521
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6938557423227172
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7102957287912761
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7286460849344706
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7028649769803077
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7117704222279735
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7109915833641106
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7016313951217678
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7199890114624942
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.6930397343416063
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7545693279009472
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7482166291557625
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7397309946125158
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7863680524163034
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7509016049613372
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8018691250953812
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.785603535106627
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7752509961453113
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7977144254258408
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7914687543662055
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6887356389283292
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6962149606532592
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6920310430345884
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6982905507361229
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6472084503200669
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7614598739405439
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7360577664822232
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7465992872201337
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7771311994145712
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7369628525231642
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 1,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 2,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 3,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 4,
+       "model": "BPR (cặp chênh điểm)"
+      }
+     ]
+    },
+    "2": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7082182053482519
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7192368765082975
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.6872413544698995
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6857092400197405
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7275682186923551
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7107637898948683
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7240712266777601
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.6844103777623446
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6899137898012752
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7326181218257853
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7056547435613462
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7247197066447207
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7023086391825144
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7084258815425656
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.6963131755868056
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7512421262683352
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7740176468952331
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.718065228680492
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7587603839361609
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7715339391889424
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8088228472053464
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7995798641953655
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7717545140985026
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8035019517134967
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.810325944014207
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6397063769483884
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7045523826259411
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6612198080472379
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6972363219303309
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6853832603359297
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7541684642465888
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7297137394415097
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7471806980613959
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7397071597770634
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7368510505768758
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 1,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 2,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 3,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 4,
+       "model": "BPR (cặp chênh điểm)"
+      }
+     ]
+    },
+    "3": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 1.0
+       },
+       "inner_ndcg@5": 0.6912600944039027
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7094850192232182
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7225565468856087
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7165238965302879
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7110599107619701
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.6858833177487301
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7012690426407132
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7254169000947258
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7195640455625383
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 15.0
+       },
+       "inner_ndcg@5": 0.7168300619545412
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.7091839121315254
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7065772089759381
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.7144380401430289
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7037184562928673
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.7035045289745919
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7598039722021728
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7698747712296635
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7632084940836158
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 4,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7622284070886588
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7581072266648589
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8001652222450111
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.795001342515702
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8307711045089793
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8075637867329001
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7911698662600964
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6727506210812368
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6831305518837733
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6794732539303384
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.690072371456593
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.7124804725703927
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 300
+       },
+       "inner_ndcg@5": 0.7546596987359845
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.716521253739771
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7504707043884572
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7384804404626154
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7481366679214337
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 1,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 2,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 3,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 4,
+       "model": "BPR (cặp chênh điểm)"
+      }
+     ]
+    },
+    "4": {
+     "ShrunkMean": [
+      {
+       "fold": 0,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.6966938926390954
+      },
+      {
+       "fold": 1,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7305441558388703
+      },
+      {
+       "fold": 2,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.709129019955621
+      },
+      {
+       "fold": 3,
+       "params": {
+        "k": 10.0
+       },
+       "inner_ndcg@5": 0.7284510295141611
+      },
+      {
+       "fold": 4,
+       "params": {
+        "k": 3.0
+       },
+       "inner_ndcg@5": 0.7131584267416841
+      }
+     ],
+     "Bias u+i": [
+      {
+       "fold": 0,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.6971911793592861
+      },
+      {
+       "fold": 1,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7409620010561945
+      },
+      {
+       "fold": 2,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.7079401930949767
+      },
+      {
+       "fold": 3,
+       "params": {
+        "lam": 5.0
+       },
+       "inner_ndcg@5": 0.7329499059933103
+      },
+      {
+       "fold": 4,
+       "params": {
+        "lam": 1.0
+       },
+       "inner_ndcg@5": 0.719755393749316
+      }
+     ],
+     "Content (5 món hay ăn)": [
+      {
+       "fold": 0,
+       "params": {},
+       "inner_ndcg@5": 0.6998337644050476
+      },
+      {
+       "fold": 1,
+       "params": {},
+       "inner_ndcg@5": 0.7181486566800012
+      },
+      {
+       "fold": 2,
+       "params": {},
+       "inner_ndcg@5": 0.6879777066979109
+      },
+      {
+       "fold": 3,
+       "params": {},
+       "inner_ndcg@5": 0.7103716707048177
+      },
+      {
+       "fold": 4,
+       "params": {},
+       "inner_ndcg@5": 0.721090348030175
+      }
+     ],
+     "Biased MF": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7618779321603896
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7643628443523253
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7482049353508874
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7891221555340749
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.1
+       },
+       "inner_ndcg@5": 0.7780891742955239
+      }
+     ],
+     "BPR (cặp chênh điểm)": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7721957716002633
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8323116647367201
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7819447077828502
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.7949303338563221
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "lam": 0.01
+       },
+       "inner_ndcg@5": 0.8194539088082818
+      }
+     ],
+     "LightFM logistic ±1": [
+      {
+       "fold": 0,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6624436431756466
+      },
+      {
+       "fold": 1,
+       "params": {
+        "dim": 16,
+        "epochs": 20
+       },
+       "inner_ndcg@5": 0.6610985251325564
+      },
+      {
+       "fold": 2,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6752210516383451
+      },
+      {
+       "fold": 3,
+       "params": {
+        "dim": 16,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6916242253479029
+      },
+      {
+       "fold": 4,
+       "params": {
+        "dim": 8,
+        "epochs": 60
+       },
+       "inner_ndcg@5": 0.6925144172275495
+      }
+     ],
+     "LambdaMART": [
+      {
+       "fold": 0,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7318390365365034
+      },
+      {
+       "fold": 1,
+       "params": {
+        "num_leaves": 15,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7456352785494316
+      },
+      {
+       "fold": 2,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7364531195824991
+      },
+      {
+       "fold": 3,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7798191079158786
+      },
+      {
+       "fold": 4,
+       "params": {
+        "num_leaves": 7,
+        "n_estimators": 100
+       },
+       "inner_ndcg@5": 0.7618006762041553
+      }
+     ],
+     "Best personalised (chọn trong CV trong)": [
+      {
+       "fold": 0,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 1,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 2,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 3,
+       "model": "BPR (cặp chênh điểm)"
+      },
+      {
+       "fold": 4,
+       "model": "BPR (cặp chênh điểm)"
+      }
+     ]
+    }
+   }
+  }
+ }
+}
