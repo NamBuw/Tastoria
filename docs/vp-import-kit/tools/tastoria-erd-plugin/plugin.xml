@@ -1,0 +1,2 @@
+<plugin id="tastoria.erd" name="Tastoria ERD builder" description="Builds DB tables, FKs and ER diagrams from a TSV spec (CLI only)" provider="Tastoria" class="tastoria.erd.ErdPlugin" version="1.0.0">
+</plugin>
