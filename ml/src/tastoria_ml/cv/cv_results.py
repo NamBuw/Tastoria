@@ -380,3 +380,54 @@ def main(cmd: str, *args: str) -> None:
 
 if __name__ == "__main__":
     main(*sys.argv[1:])
+
+
+# ------------------------------------------------------------------ freshness figures
+
+
+def fig_freshness(out_cm: Path, out_bar: Path) -> None:
+    plt = _style()
+    fr_dir = REPO / "data" / "processed" / "cv" / "freshness"
+    labels = ["tươi", "dùng sớm", "dùng ngay"]
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.9))
+    for ax, arm, title in ((axes[0], "svm_d8dedup4", "SVM (HSV+LBP+GLCM)"),
+                           (axes[1], "cnn_d8dedup4_x3", "MobileNetV3-Small")):
+        cm = np.array(json.loads((fr_dir / f"{arm}.json").read_text())["repeats"][0]["overall"]["confusion"])
+        R = cm / cm.sum(1, keepdims=True)
+        ax.grid(False)
+        ax.imshow(R, cmap="Blues", vmin=0, vmax=1)
+        for i in range(3):
+            for j in range(3):
+                ax.text(j, i, f"{cm[i, j]:,}".replace(",", ".") + f"\n{R[i, j]:.2f}", ha="center", va="center",
+                        fontsize=8, color="white" if R[i, j] > 0.5 else INK)
+        ax.set_xticks(range(3), labels)
+        ax.set_yticks(range(3), labels)
+        ax.set_xlabel("Dự đoán")
+        ax.set_ylabel("Thật")
+        ax.set_title(title, fontsize=10)
+    fig.suptitle("Độ tươi: ma trận nhầm lẫn out-of-fold, nhóm đã gộp cận trùng (d8, ≤4 bit), lần lặp 0", fontsize=10)
+    fig.tight_layout()
+    fig.savefig(out_cm)
+    plt.close(fig)
+
+    groups = [("lot", "theo lô gốc"), ("dedup4", "+ pHash ≤4"), ("d8dedup4", "+ pHash xoay/lật ≤4")]
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.8), sharey=True)
+    for ax, ds, title in ((axes[0], "agrifreshnet", "AgriFreshNET (8 loại, 3 mức)"),
+                          (axes[1], "local_spinach_leaf", "Local Spinach (3 loại rau lá, 2 mức)")):
+        for k, (g, gl) in enumerate(groups):
+            s = json.loads((fr_dir / f"summary_{g}.json").read_text())
+            for m, arm in enumerate(("svm", "cnn")):
+                v = s[f"{arm}_per_dataset"][ds]["accuracy"]
+                x = k * 3 + m
+                ax.bar(x, v["mean"], width=0.9, color=PALETTE[m], edgecolor="#fcfcfb", linewidth=2,
+                       label=("SVM" if m == 0 else "MobileNetV3") if k == 0 else None)
+                ax.errorbar(x, v["mean"], yerr=v["sd"], color=INK, capsize=3, lw=1)
+                ax.text(x, v["mean"] + 0.01, f"{v['mean']:.3f}", ha="center", fontsize=7, color=INK)
+        ax.set_xticks([0.5, 3.5, 6.5], [gl for _, gl in groups], fontsize=8)
+        ax.set_ylim(0, 1.08)
+        ax.set_title(title, fontsize=10)
+    axes[0].set_ylabel("Accuracy out-of-fold (TB ± sd, 3 lần lặp)")
+    axes[0].legend(frameon=False, fontsize=8, loc="lower left")
+    fig.tight_layout()
+    fig.savefig(out_bar)
+    plt.close(fig)

@@ -1,0 +1,56 @@
+{
+  "phash_threshold_for_groups": 4,
+  "by_distance": {
+    "0": {
+      "pairs": 193,
+      "cross_fold_pairs": 130,
+      "same_label_share": 0.9896373056994818
+    },
+    "2": {
+      "pairs": 740,
+      "cross_fold_pairs": 510,
+      "same_label_share": 0.9351351351351351
+    },
+    "4": {
+      "pairs": 2083,
+      "cross_fold_pairs": 1352,
+      "same_label_share": 0.8655784925588094
+    },
+    "6": {
+      "pairs": 5635,
+      "cross_fold_pairs": 3489,
+      "same_label_share": 0.7751552795031056
+    },
+    "8": {
+      "pairs": 13778,
+      "cross_fold_pairs": 8713,
+      "same_label_share": 0.7038757439396138
+    },
+    "10": {
+      "pairs": 29214,
+      "cross_fold_pairs": 19224,
+      "same_label_share": 0.6614979119600192
+    },
+    "12": {
+      "pairs": 57157,
+      "cross_fold_pairs": 39312,
+      "same_label_share": 0.6222334972094407
+    }
+  },
+  "by_dataset": {
+    "agrifreshnet": {
+      "images": 5183,
+      "pairs": 945,
+      "cross_fold_pairs": 439,
+      "images_with_cross_fold_twin": 246,
+      "share_images_with_twin": 0.04746285934786803
+    },
+    "local_spinach_leaf": {
+      "images": 3999,
+      "pairs": 1138,
+      "cross_fold_pairs": 913,
+      "images_with_cross_fold_twin": 1368,
+      "share_images_with_twin": 0.3420855213803451
+    }
+  }
+}

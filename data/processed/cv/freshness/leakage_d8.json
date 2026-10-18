@@ -1,0 +1,46 @@
+{
+  "hash": "pHash of 224 px letterbox, min over 8 rotations/mirrors",
+  "by_distance": {
+    "0": {
+      "pairs": 370,
+      "cross_fold_pairs_lot_folds": 263,
+      "label_conflict_pairs": 2
+    },
+    "2": {
+      "pairs": 1374,
+      "cross_fold_pairs_lot_folds": 1015,
+      "label_conflict_pairs": 74
+    },
+    "4": {
+      "pairs": 3863,
+      "cross_fold_pairs_lot_folds": 2796,
+      "label_conflict_pairs": 589
+    },
+    "6": {
+      "pairs": 11882,
+      "cross_fold_pairs_lot_folds": 8551,
+      "label_conflict_pairs": 3267
+    },
+    "8": {
+      "pairs": 34176,
+      "cross_fold_pairs_lot_folds": 25126,
+      "label_conflict_pairs": 12192
+    }
+  },
+  "by_dataset": {
+    "agrifreshnet": {
+      "images": 5183,
+      "pairs": 1069,
+      "cross_fold_pairs": 528,
+      "images_with_cross_fold_twin": 326,
+      "share_images_with_twin": 0.06289793555855681
+    },
+    "local_spinach_leaf": {
+      "images": 3999,
+      "pairs": 2794,
+      "cross_fold_pairs": 2268,
+      "images_with_cross_fold_twin": 2406,
+      "share_images_with_twin": 0.6016504126031508
+    }
+  }
+}

@@ -179,6 +179,50 @@ def near_pairs(h: np.ndarray, block: np.ndarray, thr: int) -> np.ndarray:
     return np.concatenate(out) if out else np.zeros((0, 3), np.int64)
 
 
+def _d8_one(i: int) -> list[int]:
+    from tastoria_ml.cv.phash import phash
+
+    a = np.asarray(_X[i])
+    vs = [a, np.rot90(a, 1), np.rot90(a, 2), np.rot90(a, 3)]
+    vs += [v[:, ::-1] for v in vs]
+    return [phash(np.ascontiguousarray(v)) for v in vs]
+
+
+_X = None
+
+
+def phashes_d8(workers: int = 12) -> np.ndarray:
+    """pHash of the 8 rotations / mirror images (dihedral group) of each 224 px letterboxed image, (n, 8).
+
+    Local Spinach ships rotated and mirrored copies of the same leaf photo; a plain pHash misses them.
+    """
+    global _X
+    p = WORK / "phash_d8.npy"
+    if p.exists():
+        return np.load(p)
+    import multiprocessing as mp
+
+    _, _X, _ = load_cache()
+    with ProcessPoolExecutor(workers, mp_context=mp.get_context("fork")) as ex:
+        H = np.array(list(ex.map(_d8_one, range(len(_X)), chunksize=64)), dtype=np.uint64)
+    np.save(p, H)
+    return H
+
+
+def near_pairs_d8(H: np.ndarray, block: np.ndarray, thr: int) -> np.ndarray:
+    """Pairs (i < j) in the same block whose distance min over the 8 transforms of i vs j is ≤ thr."""
+    out = []
+    for b in np.unique(block):
+        idx = np.where(block == b)[0]
+        h0 = H[idx, 0]
+        for a in range(len(idx) - 1):
+            d = _popcount64(np.bitwise_xor(H[idx[a]][None, :], h0[a + 1 :, None])).min(1)
+            k = np.where(d <= thr)[0]
+            if len(k):
+                out.append(np.stack([np.full(len(k), idx[a]), idx[a + 1 + k], d[k]], 1))
+    return np.concatenate(out) if out else np.zeros((0, 3), np.int64)
+
+
 def merge_groups(groups: np.ndarray, pairs: np.ndarray) -> np.ndarray:
     """Union of the original groups and the near-duplicate graph (connected components)."""
     n = len(groups)
@@ -230,7 +274,40 @@ def leakage_report(thr: int = 6, repeat: int = 0) -> dict:
     return out
 
 
-def corrected_groups(thr: int = 6) -> np.ndarray:
+def leakage_report_d8(thr: int = 4, repeat: int = 0) -> dict:
+    df, _, _ = load_cache()
+    H = phashes_d8()
+    block = (df.dataset + "/" + df.produce).values
+    pairs = near_pairs_d8(H, block, 8)
+    np.save(WORK / "phash_d8_pairs.npy", pairs)
+    f = folds(df, repeat)
+    out = {"hash": "pHash of 224 px letterbox, min over 8 rotations/mirrors", "by_distance": {}, "by_dataset": {}}
+    for t in (0, 2, 4, 6, 8):
+        pp_ = pairs[pairs[:, 2] <= t]
+        cross = pp_[f[pp_[:, 0]] != f[pp_[:, 1]]]
+        out["by_distance"][t] = {"pairs": int(len(pp_)), "cross_fold_pairs_lot_folds": int(len(cross)),
+                                 "label_conflict_pairs": int((df.y.values[pp_[:, 0]] != df.y.values[pp_[:, 1]]).sum())}
+    sel = pairs[pairs[:, 2] <= thr]
+    for ds, g in df.groupby("dataset"):
+        idx = np.zeros(len(df), bool)
+        idx[g.index.values] = True
+        ps_ = sel[idx[sel[:, 0]]]
+        cross = ps_[f[ps_[:, 0]] != f[ps_[:, 1]]]
+        leaked = set(cross[:, 0].tolist()) | set(cross[:, 1].tolist())
+        out["by_dataset"][ds] = {"images": int(len(g)), "pairs": int(len(ps_)), "cross_fold_pairs": int(len(cross)),
+                                 "images_with_cross_fold_twin": int(len(leaked)),
+                                 "share_images_with_twin": float(len(leaked) / len(g))}
+    return out
+
+
+def corrected_groups(thr: int = 6, d8: bool = False) -> np.ndarray:
+    df, _, _ = load_cache()
+    if d8:
+        f = WORK / "phash_d8_pairs.npy"
+        if not f.exists():
+            leakage_report_d8(thr)
+        pairs = np.load(f)
+        return merge_groups(df.lot.values, pairs[pairs[:, 2] <= thr])
     df, _, _ = load_cache()
     pairs = np.load(WORK / "phash_pairs.npy") if (WORK / "phash_pairs.npy").exists() else None
     if pairs is None:
@@ -314,10 +391,10 @@ def get_groups(kind: str) -> np.ndarray:
     df, _, _ = load_cache()
     if kind == "lot":
         return df.lot.values
-    m = re.fullmatch(r"dedup(\d+)", kind)
+    m = re.fullmatch(r"(d8)?dedup(\d+)", kind)
     if not m:
         raise ValueError(kind)
-    return corrected_groups(int(m.group(1)))
+    return corrected_groups(int(m.group(2)), d8=bool(m.group(1)))
 
 
 def run_svm(repeats: int = 3, groups: str = "lot") -> dict:
@@ -650,6 +727,7 @@ def main() -> None:
         _log_mlflow(f"svm_hsv_lbp_glcm_{a.groups}", res)
     elif a.step == "leakage":
         (OUT / "leakage.json").write_text(json.dumps(leakage_report(a.thr), indent=2))
+        (OUT / "leakage_d8.json").write_text(json.dumps(leakage_report_d8(a.thr), indent=2))
     elif a.step == "onnx":
         print(json.dumps(export_onnx(), indent=2))
     elif a.step == "report2":
