@@ -39,17 +39,23 @@ SEEDS = (0, 1, 2, 3, 4)
 K = 10
 
 GRIDS: dict[str, list[dict]] = {
-    "ItemKNN": [{"k": k, "shrink": h} for k in (10, 20, 50, 100, 200, 500, 1000) for h in (0.0, 20.0)],
-    "EASE": [{"lam": lam, "max_items": 20000} for lam in (100.0, 300.0, 1000.0, 3000.0, 10000.0)],
+    "ItemKNN": [{"k": k, "shrink": h} for k in (10, 20, 50, 100, 200, 500, 1000) for h in (0.0, 20.0)]
+    + [{"k": k, "shrink": h} for k in (1000, 2000) for h in (100.0,)] + [{"k": 2000, "shrink": 20.0}],
+    "EASE": [{"lam": lam, "max_items": 20000} for lam in (100.0, 300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0)],
+    # validation NDCG peaks within the first epochs on the time split (checked in a first 100-epoch sweep,
+    # data/processed/recsys/tuning_bpr_first_sweep.json), so 30 epochs with a checkpoint every 2
     "BPR-MF (NumPy)": [
-        {"dim": d, "lam": lam, "lr": 0.05, "epochs": 100} for d in (16, 32, 64, 128) for lam in (1e-5, 1e-4, 1e-3, 1e-2)
+        {"dim": d, "lam": lam, "lr": lr, "epochs": 30}
+        for d in (16, 32, 64, 128)
+        for lam in (1e-5, 1e-4, 1e-3, 1e-2)
+        for lr in (0.01, 0.05)
     ],
     "BPR (implicit)": [
         {"factors": f, "lr": lr, "reg": reg, "iterations": it}
         for f in (32, 64, 128)
         for lr in (0.01, 0.05, 0.1)
         for reg in (0.001, 0.01, 0.1)
-        for it in (100, 300)
+        for it in (20, 50, 100, 300)
     ],
     "ALS (implicit)": [
         {"factors": f, "reg": reg, "alpha": a, "iterations": 15}
@@ -58,11 +64,11 @@ GRIDS: dict[str, list[dict]] = {
         for a in (1.0, 5.0, 20.0, 50.0)
     ],
     "LightFM WARP": [
-        {"dim": d, "lr": lr, "item_alpha": ia, "epochs": 30} for d in (32, 64) for lr in (0.05,) for ia in (0.0, 1e-6)
+        {"dim": d, "lr": lr, "item_alpha": ia, "epochs": 20} for d in (32, 64) for lr in (0.05,) for ia in (0.0, 1e-6)
     ]
-    + [{"dim": 64, "lr": 0.02, "item_alpha": 0.0, "epochs": 30}],
+    + [{"dim": 64, "lr": 0.02, "item_alpha": 0.0, "epochs": 20}],
 }
-CHECKPOINTED = {"BPR-MF (NumPy)": ("epochs", 10), "LightFM WARP": ("epochs", 5)}
+CHECKPOINTED = {"BPR-MF (NumPy)": ("epochs", 2), "LightFM WARP": ("epochs", 2)}
 USES_FEATURES = {"LightFM WARP"}
 
 
