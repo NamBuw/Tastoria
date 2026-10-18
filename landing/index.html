@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tastoria – mâm cơm Việt từ đồ có sẵn</title>
+<meta name="description" content="Tastoria nhận diện nguyên liệu trong ảnh tủ lạnh rồi ghép một mâm cơm Việt (mặn, rau, canh) từ đồ đang có, ưu tiên đồ sắp hỏng và bám mức calo của bữa. Đồ án môn học.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F6F0E2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1A1612" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/gioi-thieu/img/icon.svg" type="image/svg+xml">
+<link rel="preload" href="/gioi-thieu/fonts/be-vietnam-pro-400Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/gioi-thieu/fonts/be-vietnam-pro-700Bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/gioi-thieu/style.css">
+</head>
+<body>
+<a class="skip" href="#noi-dung">Bỏ qua phần đầu trang</a>
+
+<header class="top">
+  <div class="wrap top-row">
+    <a class="brand" href="/gioi-thieu/" aria-label="Tastoria, trang giới thiệu">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <circle cx="32" cy="32" r="25" class="tray"/>
+        <circle cx="32" cy="32" r="6.5" class="rice"/>
+        <circle cx="32" cy="17" r="6.3" class="dish"/>
+        <circle cx="19" cy="39.5" r="6.3" class="dish"/>
+        <circle cx="45" cy="39.5" r="6.3" class="dish"/>
+      </svg>
+      <span>Tastoria</span>
+    </a>
+    <nav aria-label="Mục trong trang">
+      <ul>
+        <li><a href="#cach-dung">Cách dùng</a></li>
+        <li><a href="#so-lieu">Số liệu</a></li>
+        <li><a href="#du-lieu-ca-nhan">Dữ liệu cá nhân</a></li>
+        <li><a href="#khao-sat">Khảo sát</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="noi-dung">
+  <section class="hero wrap" aria-labelledby="tieu-de">
+    <div class="hero-text">
+      <h1 id="tieu-de">Chụp tủ lạnh, nhận một mâm cơm nấu được từ đồ đang có</h1>
+      <p class="lead">Tastoria nhận diện nguyên liệu trong ảnh, đưa vào kho của bạn, rồi ghép một mâm cơm Việt gồm
+        món mặn, món rau, món canh và cơm. Mâm ưu tiên dùng đồ sắp hỏng trước và giữ lượng calo gần mức bạn đặt cho
+        bữa đó.</p>
+      <div class="actions">
+        <a class="btn primary" href="/">Dùng trên web</a>
+        <a class="btn secondary" href="/tai-ve/tastoria-0.1.0.apk" download>Tải APK Android <span class="note">(bản 0.1.0, khoảng 51&nbsp;MB)</span></a>
+      </div>
+      <p class="small">Bản web và bản Android dùng chung một tài khoản. Bản Android chưa có trên cửa hàng ứng dụng;
+        cài từ tệp APK cần cho phép cài ứng dụng từ nguồn này trên máy.</p>
+    </div>
+    <figure class="phone hero-shot">
+      <picture>
+        <source srcset="/gioi-thieu/img/mam-dark.webp" media="(prefers-color-scheme: dark)">
+        <img src="/gioi-thieu/img/mam-light.webp" width="390" height="844" fetchpriority="high"
+             alt="Màn hình Mâm cơm hôm nay: mâm tròn có Thịt rang cháy cạnh, Bắp cải luộc, Canh rau ngót thịt băm và cơm, kèm khoảng calo mỗi người 409–631 kcal.">
+      </picture>
+    </figure>
+  </section>
+
+  <section id="cach-dung" class="band" aria-labelledby="cach-dung-h">
+    <div class="wrap">
+      <h2 id="cach-dung-h">Cách dùng: 3 bước</h2>
+      <ol class="steps">
+        <li class="step">
+          <div class="step-text">
+            <span class="num" aria-hidden="true">1</span>
+            <h3>Chụp ảnh</h3>
+            <p>Chụp từng ngăn tủ lạnh, hoặc túi đồ vừa mua (tối đa 2 ảnh mỗi lần). Máy chủ nhận diện nguyên liệu và
+              ước lượng độ tươi; bạn xem lại, sửa tên và khối lượng trước khi lưu vào kho. Cũng có thể thêm đồ bằng
+              tay, không cần ảnh.</p>
+            <p>Ảnh gốc bị xoá sau 30 ngày, trừ khi bạn đồng ý góp ảnh để huấn luyện lại mô hình.</p>
+          </div>
+          <figure class="phone">
+            <picture>
+              <source srcset="/gioi-thieu/img/quet-dark.webp" media="(prefers-color-scheme: dark)">
+              <img src="/gioi-thieu/img/quet-light.webp" width="390" height="844" loading="lazy" decoding="async"
+                   alt="Màn hình Quét: chọn Toàn tủ lạnh hoặc Đồ vừa mua, nút Chụp ảnh và Chọn ảnh có sẵn.">
+            </picture>
+          </figure>
+        </li>
+        <li class="step">
+          <div class="step-text">
+            <span class="num" aria-hidden="true">2</span>
+            <h3>Kho xếp đồ cần dùng trước lên trên</h3>
+            <p>Mỗi lô đồ có ngày mua và thời gian bảo quản ngăn mát của loại đó, nên kho biết lô nào sắp hỏng.
+              Lô cần dùng ngay được đẩy lên đầu danh sách và được ưu tiên khi ghép mâm.</p>
+          </div>
+          <figure class="phone">
+            <picture>
+              <source srcset="/gioi-thieu/img/kho-dark.webp" media="(prefers-color-scheme: dark)">
+              <img src="/gioi-thieu/img/kho-light.webp" width="390" height="844" loading="lazy" decoding="async"
+                   alt="Màn hình Kho: 10 lô, đồ cần dùng trước ở trên; mỗi lô có tên, khối lượng, độ tươi và ngày mua.">
+            </picture>
+          </figure>
+        </li>
+        <li class="step">
+          <div class="step-text">
+            <span class="num" aria-hidden="true">3</span>
+            <h3>Nhận mâm cơm</h3>
+            <p>Mỗi mâm gồm một món mặn, một món rau, một món canh và cơm, cho số người ăn bạn chọn. Calo hiện thành
+              khoảng mỗi người, so với mục tiêu năng lượng của bữa. Bạn có thể đổi từng món, xem còn thiếu nguyên liệu
+              gì, rồi nấu cả mâm theo thứ tự việc trên một màn hình. Nấu xong, kho tự trừ phần đã dùng.</p>
+          </div>
+          <figure class="phone">
+            <picture>
+              <source srcset="/gioi-thieu/img/nau-dark.webp" media="(prefers-color-scheme: dark)">
+              <img src="/gioi-thieu/img/nau-light.webp" width="390" height="844" loading="lazy" decoding="async"
+                   alt="Màn hình Nấu cả mâm: dòng thời gian việc của ba món, bước đang làm và nút Xong bước này.">
+            </picture>
+          </figure>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="so-lieu" class="wrap" aria-labelledby="so-lieu-h">
+    <h2 id="so-lieu-h">Số liệu hiện có</h2>
+    <p class="section-lead">Các con số dưới đây là số đo của nhóm tại thời điểm làm bản 0.1.0, kèm giới hạn của từng
+      con số.</p>
+    <div class="facts">
+      <article class="fact">
+        <p class="big">180 <span>công thức</span></p>
+        <p>171 công thức đã xuất bản và được dùng để ghép mâm; 9 công thức còn ở dạng nháp.</p>
+      </article>
+      <article class="fact">
+        <p class="big">223 <span>nguyên liệu</span></p>
+        <p>181 nguyên liệu lấy thành phần dinh dưỡng từ Bảng thành phần thực phẩm Việt Nam 2007 (Viện Dinh dưỡng),
+          30 từ cơ sở dữ liệu USDA khi bảng Việt Nam không có mục phù hợp, 12 chưa có nguồn.</p>
+      </article>
+      <article class="fact">
+        <p class="big">4,7&nbsp;% <span>sai số calo trung vị</span></p>
+        <p>So với 45 món có công bố thành phần của Viện Dinh dưỡng. 80&nbsp;% số món sai lệch không quá 21,4&nbsp;%,
+          nên app hiện calo thành khoảng ±21&nbsp;% chứ không phải một con số.</p>
+      </article>
+      <article class="fact">
+        <p class="big">22 <span>lớp nguyên liệu</span></p>
+        <p>Bộ phát hiện YOLO26n. Kết quả sơ bộ, chỉ trên ảnh công khai (Open Images V7 và một bộ ảnh rau củ trên
+          Mendeley Data): mAP50 0,424, mAP50-95 0,278 trên tập kiểm tra. 9/22 lớp chưa có ảnh huấn luyện và chưa có
+          ảnh tủ lạnh thật nào, nên con số này chưa nói được độ chính xác khi chụp tủ lạnh.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="du-lieu-ca-nhan" class="band" aria-labelledby="du-lieu-h">
+    <div class="wrap">
+      <h2 id="du-lieu-h">Dữ liệu cá nhân</h2>
+      <ul class="list">
+        <li><strong>Đồng ý theo từng mục đích.</strong> Hồ sơ sức khoẻ, cá nhân hoá gợi ý và góp ảnh quét là ba mục
+          riêng; không mục nào được tích sẵn. Bạn rút lại từng mục trong Cài đặt.</li>
+        <li><strong>Chỉ số cơ thể được mã hoá.</strong> Giới tính, năm sinh, chiều cao và cân nặng lưu ở dạng mã hoá,
+          dùng để tính mục tiêu năng lượng.</li>
+        <li><strong>Ảnh quét giữ 30 ngày.</strong> Sau đó ảnh gốc bị xoá, trừ khi bạn đồng ý góp ảnh.</li>
+        <li><strong>Tải dữ liệu và xoá tài khoản.</strong> Trong Cài đặt có thể tải về toàn bộ dữ liệu của mình. Xoá
+          tài khoản thì xoá cả dữ liệu gắn với tài khoản đó.</li>
+        <li>Cách xử lý dữ liệu được thiết kế theo Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="khao-sat" class="wrap survey" aria-labelledby="khao-sat-h">
+    <h2 id="khao-sat-h">Khảo sát gu món ăn</h2>
+    <p>Nhóm đang thu điểm chấm món để huấn luyện phần xếp hạng món theo gu. Phiếu có khoảng 45 món cơm nhà; với mỗi
+      món, chọn điểm 1 đến 5 hoặc "Chưa ăn bao giờ", rồi chọn tối đa 5 món nhà bạn hay ăn. Mất khoảng 5 phút. Không
+      cần tài khoản, không hỏi tên, email hay thông tin sức khoẻ.</p>
+    <a class="btn primary" href="/khao-sat">Tham gia khảo sát gu món ăn</a>
+  </section>
+
+  <section class="band" aria-labelledby="do-an-h">
+    <div class="wrap">
+      <h2 id="do-an-h">Về dự án</h2>
+      <p>Tastoria là đồ án chung của ba môn: Xử lý ảnh (nhận diện nguyên liệu và độ tươi), Học máy (xếp hạng món theo
+        gu, kiểm định calo) và Phát triển ứng dụng thông minh (ứng dụng web, Android và máy chủ). Đây là bản thử
+        nghiệm, chưa phải sản phẩm thương mại; thông tin calo chỉ để tham khảo, không thay cho tư vấn dinh dưỡng.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Tastoria 0.1.0 · Ảnh màn hình chụp từ bản 0.1.0 · Phông chữ Be Vietnam Pro (giấy phép SIL Open Font License 1.1)</p>
+    <p><a href="/">Mở ứng dụng</a> · <a href="/khao-sat">Khảo sát</a> · <a href="/tai-ve/tastoria-0.1.0.apk" download>Tải APK</a></p>
+  </div>
+</footer>
+</body>
+</html>
