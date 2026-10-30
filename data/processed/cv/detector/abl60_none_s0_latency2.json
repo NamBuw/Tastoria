@@ -1,0 +1,71 @@
+{
+  "run": "abl60_none_s0",
+  "model": "yolo26n.pt",
+  "cpu": "INTEL(R) XEON(R) GOLD 6542Y",
+  "load_avg_at_start": [
+    "3.49",
+    "5.29",
+    "6.01"
+  ],
+  "note": "shared server, other jobs running; not the target VPS",
+  "raw": {
+    "onnx": "ml/runs/detect/abl60_none_s0/weights/best_raw_640.onnx",
+    "onnx_bytes": 9803024,
+    "output_shape": [
+      1,
+      17,
+      8400
+    ],
+    "mode": "raw",
+    "imgsz": 640,
+    "threads": 2,
+    "n": 100,
+    "letterbox_ms": {
+      "p50": 1.649881131015718,
+      "p95": 2.5540465489029884
+    },
+    "model_ms": {
+      "p50": 27.109824935905635,
+      "p95": 27.773555740714073
+    },
+    "post_ms": {
+      "p50": 0.23891497403383255,
+      "p95": 0.3335873130708933
+    },
+    "total_ms": {
+      "p50": 29.10231053829193,
+      "p95": 30.420563835650682
+    },
+    "onnxruntime": "1.31.0"
+  },
+  "e2e": {
+    "onnx": "ml/runs/detect/abl60_none_s0/weights/best_e2e_640.onnx",
+    "onnx_bytes": 9814811,
+    "output_shape": [
+      1,
+      300,
+      6
+    ],
+    "mode": "e2e",
+    "imgsz": 640,
+    "threads": 2,
+    "n": 100,
+    "letterbox_ms": {
+      "p50": 1.5665274113416672,
+      "p95": 2.470260020345449
+    },
+    "model_ms": {
+      "p50": 26.139477384276688,
+      "p95": 31.215171026997268
+    },
+    "post_ms": {
+      "p50": 0.07514690514653921,
+      "p95": 0.09910843800753355
+    },
+    "total_ms": {
+      "p50": 27.8119754511863,
+      "p95": 33.09287463780492
+    },
+    "onnxruntime": "1.31.0"
+  }
+}

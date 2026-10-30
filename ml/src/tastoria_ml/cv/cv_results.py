@@ -431,3 +431,54 @@ def fig_freshness(out_cm: Path, out_bar: Path) -> None:
     fig.tight_layout()
     fig.savefig(out_bar)
     plt.close(fig)
+
+
+# ------------------------------------------------------------------ counting summary
+
+
+def counting_summary(runs: list[str], modes=("nms", "e2e")) -> dict:
+    cdir = REPO / "data" / "processed" / "cv" / "counting"
+    out = {"runs": runs}
+    for mode in modes:
+        js = [json.loads((cdir / f"{r}__{mode}.json").read_text()) for r in runs]
+        keys = ("mae", "rel_mae", "exact", "within1")
+        o = {"conf_selected_on_val": [j["conf_selected_on_val"] for j in js]}
+        for part in ("detector", "detector_gt_present_pairs", "median_baseline"):
+            o[part] = {k: mean_sd([j["test"][part][k] for j in js]) for k in keys}
+            o[part]["n_pairs"] = [j["test"][part]["n_pairs"] for j in js]
+        o["per_class"] = {}
+        for c in js[0]["test"]["per_class"]:
+            o["per_class"][c] = {
+                "detector": {k: mean_sd([j["test"]["per_class"][c]["detector"][k] for j in js]) for k in keys},
+                "median_baseline": js[0]["test"]["per_class"][c]["median_baseline"],
+                "n_pairs": [j["test"]["per_class"][c]["detector"]["n_pairs"] for j in js],
+                "train_median": js[0]["test"]["per_class"][c]["train_median"],
+            }
+        o["by_source"] = {s: {k: mean_sd([j["test"]["by_source"][s][k] for j in js]) for k in keys}
+                          for s in ("oi", "bd")}
+        o["excluded_group_of_pairs"] = js[0]["test"]["excluded_group_of_pairs"]
+        out[mode] = o
+    (RES / "counting.json").write_text(json.dumps(out, indent=2, ensure_ascii=False))
+    return out
+
+
+def fig_counting(cs: dict, out: Path) -> None:
+    plt = _style()
+    pc = cs["nms"]["per_class"]
+    cls = list(pc)
+    fig, ax = plt.subplots(figsize=(9, 3.8))
+    x = np.arange(len(cls))
+    det = [pc[c]["detector"]["mae"]["mean"] for c in cls]
+    sd = [pc[c]["detector"]["mae"]["sd"] or 0 for c in cls]
+    med = [pc[c]["median_baseline"]["mae"] for c in cls]
+    ax.bar(x - 0.2, det, 0.38, color=PALETTE[0], edgecolor="#fcfcfb", linewidth=2, label="YOLO26n (NMS), TB ± sd 3 seed")
+    ax.errorbar(x - 0.2, det, yerr=sd, fmt="none", color=INK, capsize=3, lw=1)
+    ax.bar(x + 0.2, med, 0.38, color=PALETTE[1], edgecolor="#fcfcfb", linewidth=2,
+           label="trung vị theo lớp (biết trước lớp có mặt)")
+    ax.set_xticks(x, cls, rotation=20)
+    ax.set_ylabel("MAE số vật / cặp (ảnh, lớp)")
+    ax.legend(frameon=False, fontsize=8)
+    ax.set_title("Đếm trên test theo lớp: MAE (thấp hơn là tốt hơn); tập cặp của hai cột khác nhau, xem bảng")
+    fig.tight_layout()
+    fig.savefig(out)
+    plt.close(fig)

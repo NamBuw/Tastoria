@@ -154,6 +154,8 @@ def evaluate(name: str, mode: str = "nms") -> dict:
         "excluded_group_of_pairs": int(gof[:, cols].sum()),
         "detector": masked_metrics(c, ch, gof, cols),
         "median_baseline": masked_metrics(c, base, gof, cols),
+        # same pair set as the median baseline (class present in GT), for a like-for-like comparison
+        "detector_gt_present_pairs": masked_metrics(c, np.where(c > 0, ch, 0), gof | (c == 0), cols),
         "per_class": {},
     }
     for k in cols:

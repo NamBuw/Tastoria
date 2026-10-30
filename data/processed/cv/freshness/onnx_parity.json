@@ -1,0 +1,18 @@
+{
+  "model": "MobileNetV3-Small, ImageNet init, trained on all 9,182 public images (same recipe as CV)",
+  "onnx": "ml/runs/freshness/mobilenetv3_small_final.onnx",
+  "onnx_bytes": 6094414,
+  "onnx_sha256": "d9ee1faeb9a33ce49229923a028e900cd49ece080f9e026d57c594e83ae81c13",
+  "opset": 17,
+  "parity_images": 50,
+  "max_abs_logit_diff": 5.7220458984375e-05,
+  "max_abs_prob_diff": 2.598389983177185e-07,
+  "argmax_agreement": 1.0,
+  "cpu_latency_ms_2threads": {
+    "p50": 1.1828109854832292,
+    "p95": 1.4033891377039254
+  },
+  "onnxruntime": "1.31.0",
+  "torch": "2.8.0+cu126",
+  "note": "parity images are training images of the final model; parity checks the export, not accuracy"
+}
