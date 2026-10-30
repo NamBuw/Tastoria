@@ -13,3 +13,28 @@ document.querySelectorAll('[data-ingredient]').forEach(button => {
     document.getElementById('recipe-description').textContent = idea[1];
   });
 });
+
+// Web can be published before its signed Android build is ready.
+const download = document.getElementById('android-download');
+if (download) {
+  const url = download.getAttribute('href');
+  const label = download.textContent;
+  const checkDownload = async () => {
+    try {
+      const response = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      if (response.ok) {
+        download.setAttribute('href', url);
+        download.removeAttribute('aria-disabled');
+        download.textContent = label;
+        return;
+      }
+      download.removeAttribute('href');
+      download.setAttribute('aria-disabled', 'true');
+      download.textContent = 'Android 0.1.2 đang được cập nhật…';
+    } catch {
+      // Network failure: retain the ordinary download link and retry later.
+    }
+    setTimeout(checkDownload, 30000);
+  };
+  checkDownload();
+}
