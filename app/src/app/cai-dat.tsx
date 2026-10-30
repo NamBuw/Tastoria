@@ -1,6 +1,6 @@
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
 import { api, API_URL, ApiError, call, refreshSession, type Schemas } from '@/api/client';
@@ -85,9 +85,7 @@ function ProfileSection() {
   const [draft, setDraft] = useState<BodyDraft | null>(null);
   const [saved, setSaved] = useState(false);
   const [target, setTarget] = useState(false);
-  useEffect(() => {
-    if (profile.data && !draft) setDraft(profileToDraft(profile.data));
-  }, [profile.data, draft]);
+  if (profile.data && !draft) setDraft(profileToDraft(profile.data));
   const save = useMutation({
     mutationFn: (adult: boolean) => call(api.PUT('/me/profile', { body: draftToUpdate(draft!, adult) })),
     onSuccess: () => {
@@ -101,7 +99,7 @@ function ProfileSection() {
   if (!p.health_profile_consented) {
     return (
       <Notice>
-        <T>Bạn chưa đồng ý lưu hồ sơ sức khoẻ nên Tastoria chưa tính mục tiêu năng lượng. Bật trong mục "Đồng ý sử dụng dữ liệu".</T>
+        <T>Bạn chưa đồng ý lưu hồ sơ sức khoẻ nên Tastoria chưa tính mục tiêu năng lượng. Bật trong mục &quot;Đồng ý sử dụng dữ liệu&quot;.</T>
       </Notice>
     );
   }
@@ -156,13 +154,11 @@ function AllergenSection() {
   const [a, setA] = useState<string[] | null>(null);
   const [none, setNone] = useState(false);
   const [diet, setDiet] = useState<string | null>(null);
-  useEffect(() => {
-    if (profile.data && a === null) {
-      setA(profile.data.allergen_codes);
-      setNone(profile.data.allergen_codes.length === 0);
-      setDiet(profile.data.diet_code);
-    }
-  }, [profile.data, a]);
+  if (profile.data && a === null) {
+    setA(profile.data.allergen_codes);
+    setNone(profile.data.allergen_codes.length === 0);
+    setDiet(profile.data.diet_code);
+  }
   const save = useMutation({
     mutationFn: async () => {
       await call(api.PUT('/me/allergens', { body: { allergen_codes: none ? [] : a ?? [] } }));
@@ -185,9 +181,7 @@ function FavsSection() {
   const qc = useQueryClient();
   const profile = useProfile();
   const [ids, setIds] = useState<string[] | null>(null);
-  useEffect(() => {
-    if (profile.data && ids === null) setIds(profile.data.favorite_recipe_ids);
-  }, [profile.data, ids]);
+  if (profile.data && ids === null) setIds(profile.data.favorite_recipe_ids);
   const save = useMutation({
     mutationFn: () => call(api.PUT('/me/favorites', { body: { recipe_ids: ids ?? [] } })),
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.profile }),
@@ -207,9 +201,7 @@ function KitchenSection() {
   const qc = useQueryClient();
   const settings = useSettings();
   const [s, setS] = useState<Schemas['UserSettings'] | null>(null);
-  useEffect(() => {
-    if (settings.data && !s) setS(settings.data);
-  }, [settings.data, s]);
+  if (settings.data && !s) setS(settings.data);
   const save = useMutation({
     mutationFn: () =>
       call(api.PUT('/me/settings', { body: { burners: s!.burners, default_persons: s!.default_persons, timezone: s!.timezone } })),
@@ -266,7 +258,7 @@ function ConsentSection() {
   return (
     <View style={{ gap: space.md }}>
       <T tone="muted">
-        Rút đồng ý "Cá nhân hoá" xoá lịch sử tương tác dùng để học gu; rút "Hồ sơ sức khoẻ" xoá chỉ số cơ thể. Việc xoá hoàn tất trong 24
+        Rút đồng ý &quot;Cá nhân hoá&quot; xoá lịch sử tương tác dùng để học gu; rút &quot;Hồ sơ sức khoẻ&quot; xoá chỉ số cơ thể. Việc xoá hoàn tất trong 24
         giờ.
       </T>
       {policies.map((pq) => {

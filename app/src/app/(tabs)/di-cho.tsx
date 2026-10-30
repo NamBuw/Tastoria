@@ -69,7 +69,7 @@ export default function Shopping() {
       {bought.length ? (
         <Section title={`Đã mua (${bought.length})`}>
           <T v="small" tone="muted">
-            Đồ đã mua chưa tự vào kho. Chụp "đồ vừa mua" ở Trang chủ hoặc thêm trong Kho.
+            Đồ đã mua chưa tự vào kho. Chụp &quot;đồ vừa mua&quot; ở Trang chủ hoặc thêm trong Kho.
           </T>
           <Card style={{ gap: 0 }}>
             {bought.map((i) => (

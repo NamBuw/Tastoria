@@ -1,7 +1,12 @@
 import { type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  AccessibilityInfo,
   ActivityIndicator,
+  Animated,
+  Easing,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -15,6 +20,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Circle } from 'react-native-svg';
 
 import { font, radius, size, space, TOUCH, useTheme } from '@/theme';
 
@@ -22,13 +28,13 @@ import { font, radius, size, space, TOUCH, useTheme } from '@/theme';
 
 type Variant = 'body' | 'small' | 'label' | 'title' | 'h1' | 'h2' | 'huge';
 const VARIANTS: Record<Variant, TextStyle> = {
-  small: { fontSize: size.xs, lineHeight: 18, fontFamily: font.regular },
-  body: { fontSize: size.sm, lineHeight: 22, fontFamily: font.regular },
-  label: { fontSize: size.sm, lineHeight: 20, fontFamily: font.semibold },
-  title: { fontSize: size.md, lineHeight: 24, fontFamily: font.semibold },
-  h2: { fontSize: size.lg, lineHeight: 28, fontFamily: font.bold },
-  h1: { fontSize: size.xl, lineHeight: 32, fontFamily: font.bold },
-  huge: { fontSize: size.huge, lineHeight: 44, fontFamily: font.bold },
+  small: { fontSize: size.xs, lineHeight: 19, fontFamily: font.regular },
+  body: { fontSize: size.sm, lineHeight: 23, fontFamily: font.regular },
+  label: { fontSize: size.sm, lineHeight: 21, fontFamily: font.semibold },
+  title: { fontSize: size.md, lineHeight: 24, fontFamily: font.semibold, letterSpacing: -0.1 },
+  h2: { fontSize: size.lg, lineHeight: 27, fontFamily: font.bold, letterSpacing: -0.3 },
+  h1: { fontSize: size.xl, lineHeight: 32, fontFamily: font.bold, letterSpacing: -0.5 },
+  huge: { fontSize: size.huge, lineHeight: 44, fontFamily: font.bold, letterSpacing: -0.8 },
 };
 
 export function T({
@@ -36,7 +42,7 @@ export function T({
   tone = 'text',
   style,
   ...p
-}: TextProps & { v?: Variant; tone?: 'text' | 'muted' | 'accent' | 'danger' | 'onAccent' }) {
+}: TextProps & { v?: Variant; tone?: 'text' | 'muted' | 'accent' | 'danger' | 'onAccent' | 'herb' }) {
   const { c } = useTheme();
   return <Text {...p} style={[VARIANTS[v], { color: c[tone] }, style]} />;
 }
@@ -69,7 +75,7 @@ export function Screen({
         <View style={[styles.scroll, { flex: 1 }]}>{inner}</View>
       )}
       {footer ? (
-        <View style={[styles.footer, { backgroundColor: c.bg, borderTopColor: c.surfaceAlt }]}>
+        <View style={[styles.footer, { backgroundColor: c.bg, borderTopColor: c.hairline }]}>
           <View style={styles.footerInner}>{footer}</View>
         </View>
       ) : null}
@@ -80,7 +86,11 @@ export function Screen({
 export function Card({ children, style, testID }: { children: ReactNode; style?: StyleProp<ViewStyle>; testID?: string }) {
   const { c } = useTheme();
   return (
-    <View testID={testID} style={[styles.card, { backgroundColor: c.surface, borderColor: c.surfaceAlt }, style]}>{children}</View>
+    <View
+      testID={testID}
+      style={[styles.card, { backgroundColor: c.surface, borderColor: c.hairline, boxShadow: `0 1px 2px ${c.shadow}, 0 6px 16px -10px ${c.shadow}` }, style]}>
+      {children}
+    </View>
   );
 }
 
@@ -90,9 +100,9 @@ export function Row({ children, style, gap = space.sm }: { children: ReactNode; 
 
 export function Section({ title, children, right }: { title: string; children: ReactNode; right?: ReactNode }) {
   return (
-    <View style={{ gap: space.sm }}>
-      <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
-        <T v="title" accessibilityRole="header" style={{ flexShrink: 1 }}>
+    <View style={{ gap: space.md }}>
+      <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap', minHeight: 32 }}>
+        <T v="h2" accessibilityRole="header" style={{ flexShrink: 1, fontSize: 19 }}>
           {title}
         </T>
         {right}
@@ -134,8 +144,8 @@ export function Button({
   const { c } = useTheme();
   const off = disabled || loading;
   const bg = kind === 'primary' ? c.accent : kind === 'danger' ? c.danger : kind === 'secondary' ? c.surface : 'transparent';
-  const fg = kind === 'primary' || kind === 'danger' ? c.onAccent : c.accent;
-  const border = kind === 'secondary' ? c.accent : 'transparent';
+  const fg = kind === 'primary' || kind === 'danger' ? c.onAccent : kind === 'secondary' ? c.text : c.accent;
+  const border = kind === 'secondary' ? c.border : 'transparent';
   return (
     <Pressable
       testID={testID}
@@ -147,7 +157,8 @@ export function Button({
       style={({ pressed }) => [
         styles.btn,
         big && styles.btnBig,
-        { backgroundColor: bg, borderColor: border, opacity: off ? 0.55 : pressed ? 0.85 : 1 },
+        { backgroundColor: bg, borderColor: border, opacity: off ? 0.5 : 1, transform: [{ scale: pressed && !off ? 0.98 : 1 }] },
+        kind === 'primary' && !off ? { boxShadow: `0 6px 14px -8px ${c.accent}` } : null,
         style,
       ]}>
       {loading ? <ActivityIndicator color={fg} /> : icon}
@@ -201,7 +212,8 @@ export function Chip({
         styles.chip,
         {
           backgroundColor: selected ? c.accentSoft : c.surface,
-          borderColor: selected ? c.accent : c.border,
+          borderColor: selected ? c.accent : c.hairline,
+          borderWidth: selected ? 1.5 : 1,
           opacity: disabled ? 0.5 : pressed ? 0.85 : 1,
         },
       ]}>
@@ -244,7 +256,7 @@ export function Radio({ label, selected, onPress }: { label: string; selected: b
       accessibilityState={{ selected, checked: selected }}
       style={[
         styles.chip,
-        { backgroundColor: selected ? c.accentSoft : c.surface, borderColor: selected ? c.accent : c.border },
+        { backgroundColor: selected ? c.accentSoft : c.surface, borderColor: selected ? c.accent : c.hairline, borderWidth: selected ? 1.5 : 1 },
       ]}>
       <View style={[styles.radioDot, { borderColor: selected ? c.accent : c.border }]}>
         {selected ? <View style={[styles.radioInner, { backgroundColor: c.accent }]} /> : null}
@@ -373,13 +385,56 @@ export function Stepper({
 
 // ---- states -------------------------------------------------------------------------------------
 
-export function Loading({ label = 'Đang tải…' }: { label?: string }) {
-  const { c } = useTheme();
+/** Loading placeholder: shimmering skeleton rows shaped like the content, with a spoken label. */
+export function Loading({ label = 'Đang tải…', rows = 2 }: { label?: string; rows?: number }) {
   return (
-    <View style={{ padding: space.xl, alignItems: 'center', gap: space.sm }} accessibilityLiveRegion="polite">
-      <ActivityIndicator color={c.accent} />
-      <T tone="muted">{label}</T>
+    <View style={{ gap: space.sm }} accessibilityLiveRegion="polite" accessibilityLabel={label} accessibilityRole="progressbar">
+      {Array.from({ length: rows }, (_, i) => (
+        <Skeleton key={i} height={68} />
+      ))}
+      <T v="small" tone="muted">
+        {label}
+      </T>
     </View>
+  );
+}
+
+export function Skeleton({ height = 16, width = '100%', r = radius.md }: { height?: number; width?: number | `${number}%`; r?: number }) {
+  const { c } = useTheme();
+  const [o] = useState(() => new Animated.Value(0.55));
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(o, { toValue: 1, duration: 700, useNativeDriver: Platform.OS !== 'web' }),
+        Animated.timing(o, { toValue: 0.55, duration: 700, useNativeDriver: Platform.OS !== 'web' }),
+      ]),
+    );
+    if (!reduceMotion.current) loop.start();
+    return () => loop.stop();
+  }, [o]);
+  return <Animated.View style={{ height, width, borderRadius: r, backgroundColor: c.surfaceAlt, opacity: o }} />;
+}
+
+/** Shared "reduce motion" flag, read once. */
+const reduceMotion = { current: false as boolean | null };
+AccessibilityInfo?.isReduceMotionEnabled?.().then((v) => (reduceMotion.current = v)).catch(() => undefined);
+
+/** One-shot entrance: content rises 8 dp and fades in once when it first mounts. */
+export function Rise({ children, delay = 0, style }: { children: ReactNode; delay?: number; style?: StyleProp<ViewStyle> }) {
+  const [v] = useState(() => new Animated.Value(reduceMotion.current ? 1 : 0));
+  useEffect(() => {
+    Animated.timing(v, {
+      toValue: 1,
+      duration: 380,
+      delay,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: Platform.OS !== 'web',
+    }).start();
+  }, [v, delay]);
+  return (
+    <Animated.View style={[style, { opacity: v, transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) }] }]}>
+      {children}
+    </Animated.View>
   );
 }
 
@@ -397,17 +452,30 @@ export function ErrorBox({ message, onRetry }: { message: string; onRetry?: () =
 
 export function Notice({ children, tone = 'info' }: { children: ReactNode; tone?: 'info' | 'ok' | 'warn' }) {
   const { c } = useTheme();
-  const bg = tone === 'ok' ? c.okSoft : tone === 'warn' ? c.dangerSoft : c.surfaceAlt;
-  return <View style={[styles.card, { backgroundColor: bg, borderColor: 'transparent', gap: space.xs }]}>{children}</View>;
+  const bg = tone === 'ok' ? c.okSoft : tone === 'warn' ? c.warnSoft : c.surfaceAlt;
+  const bar = tone === 'ok' ? c.herb : tone === 'warn' ? c.fresh.dung_som : c.border;
+  return (
+    <View style={[styles.card, { backgroundColor: bg, borderColor: 'transparent', borderLeftColor: bar, borderLeftWidth: 4, gap: space.xs }]}>
+      {children}
+    </View>
+  );
 }
 
+/** Empty state: a small empty plate drawing, what is missing, and the next action. */
 export function Empty({ title, body, action }: { title: string; body?: string; action?: ReactNode }) {
+  const { c } = useTheme();
   return (
-    <Card style={{ alignItems: 'flex-start', gap: space.sm }}>
-      <T v="title">{title}</T>
-      {body ? <T tone="muted">{body}</T> : null}
+    <View
+      style={[styles.card, { backgroundColor: 'transparent', borderColor: c.border, borderStyle: 'dashed', alignItems: 'center', paddingVertical: space.xl, gap: space.sm }]}>
+      <Svg width={72} height={72} viewBox="0 0 72 72" accessibilityElementsHidden importantForAccessibility="no">
+        <Circle cx="36" cy="36" r="30" fill={c.dish} stroke={c.glaze} strokeWidth="2.5" />
+        <Circle cx="36" cy="36" r="24" fill="none" stroke={c.glaze} strokeWidth="1" strokeDasharray="2 4" />
+        <Circle cx="36" cy="36" r="14" fill="none" stroke={c.hairline} strokeWidth="1.5" />
+      </Svg>
+      <T v="title" style={{ textAlign: 'center' }}>{title}</T>
+      {body ? <T tone="muted" style={{ textAlign: 'center', maxWidth: 320 }}>{body}</T> : null}
       {action}
-    </Card>
+    </View>
   );
 }
 
@@ -434,7 +502,8 @@ export function Sheet({
         <View
           testID={testID}
           accessibilityViewIsModal
-          style={[styles.sheet, { backgroundColor: c.bg, borderColor: c.surfaceAlt }]}>
+          style={[styles.sheet, { backgroundColor: c.bg, borderColor: c.hairline }]}>
+          <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: c.border, marginTop: -4 }} />
           <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
             <T v="h2" accessibilityRole="header" style={{ flexShrink: 1 }}>
               {title}
@@ -461,7 +530,7 @@ export function ProgressDots({ step, total, label }: { step: number; total: numb
   return (
     <View style={{ gap: space.xs }} accessibilityLabel={`Bước ${step} trên ${total}: ${label}`}>
       <T v="small" tone="muted">
-        Bước {step}/{total} · {label}
+        Bước {step}/{total}: {label}
       </T>
       <View style={{ flexDirection: 'row', gap: 6 }}>
         {Array.from({ length: total }, (_, i) => (
@@ -476,11 +545,11 @@ export function ProgressDots({ step, total, label }: { step: number; total: numb
 }
 
 const styles = StyleSheet.create({
-  scroll: { flexGrow: 1, paddingHorizontal: space.lg, paddingVertical: space.lg },
-  inner: { width: '100%', maxWidth: 560, alignSelf: 'center', gap: space.lg },
+  scroll: { flexGrow: 1, paddingHorizontal: space.lg, paddingTop: space.lg, paddingBottom: space.xxl },
+  inner: { width: '100%', maxWidth: 560, alignSelf: 'center', gap: space.xl },
   footer: { borderTopWidth: StyleSheet.hairlineWidth, paddingHorizontal: space.lg, paddingVertical: space.md },
   footerInner: { width: '100%', maxWidth: 560, alignSelf: 'center', gap: space.sm },
-  card: { borderRadius: radius.md, borderWidth: 1, padding: space.lg, gap: space.sm },
+  card: { borderRadius: radius.lg, borderWidth: 1, padding: space.lg, gap: space.sm },
   btn: {
     minHeight: TOUCH,
     borderRadius: radius.pill,
@@ -492,7 +561,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: space.sm,
   },
-  btnBig: { minHeight: 72, borderRadius: radius.lg, justifyContent: 'flex-start', paddingHorizontal: space.lg },
+  btnBig: { minHeight: 76, borderRadius: radius.lg, justifyContent: 'flex-start', paddingHorizontal: space.lg, gap: space.md },
   chip: {
     minHeight: TOUCH,
     borderRadius: radius.pill,
@@ -506,7 +575,7 @@ const styles = StyleSheet.create({
   radioInner: { width: 10, height: 10, borderRadius: 5 },
   box: { width: 26, height: 26, borderRadius: 6, borderWidth: 2, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   input: {
-    minHeight: TOUCH,
+    minHeight: 52,
     borderWidth: 1,
     borderRadius: radius.sm,
     paddingHorizontal: space.md,

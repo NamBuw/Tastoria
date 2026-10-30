@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { errorText, fieldErrors } from '@/api/errors';
 import { useSession } from '@/auth/session';
-import { BrandHeader } from '@/components/Brand';
+import { BrandHeader, PublicHomeLink } from '@/components/Brand';
 import { Button, ErrorBox, Field, LinkButton, Row, Screen, T } from '@/components/ui';
 
 export default function Login() {
@@ -20,7 +20,7 @@ export default function Login() {
     setErr(null);
     try {
       await signIn(email.trim(), password);
-      router.replace('/');
+      router.replace('/bep');
     } catch (e) {
       setErr(e);
     } finally {
@@ -30,9 +30,10 @@ export default function Login() {
 
   return (
     <Screen testID="screen-login">
-      <BrandHeader subtitle="Mâm cơm từ đồ đang có trong bếp" />
+      <BrandHeader />
+      <T tone="muted">Đăng nhập để mở kho bếp, lên mâm và lưu lại những bữa ngon của bạn.</T>
       <T v="h2" accessibilityRole="header">
-        Đăng nhập
+        Chào bạn, vào bếp thôi!
       </T>
       <Field
         label="Email"
@@ -62,6 +63,7 @@ export default function Login() {
         <LinkButton label="Tạo tài khoản" testID="go-register" onPress={() => router.push('/dang-ky')} />
       </Row>
       <LinkButton label="Làm khảo sát gu món ăn (không cần tài khoản)" onPress={() => router.push('/khao-sat')} />
+      <PublicHomeLink />
     </Screen>
   );
 }

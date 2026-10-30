@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { errorText, fieldErrors } from '@/api/errors';
 import { useSession } from '@/auth/session';
-import { BrandHeader } from '@/components/Brand';
+import { BrandHeader, PublicHomeLink } from '@/components/Brand';
 import { Button, ErrorBox, Field, LinkButton, Screen, T } from '@/components/ui';
 import { isCode } from '@/api/client';
 
@@ -35,7 +35,7 @@ export default function Register() {
 
   return (
     <Screen testID="screen-register">
-      <BrandHeader subtitle="Mâm cơm từ đồ đang có trong bếp" />
+      <BrandHeader subtitle="Bắt đầu câu chuyện từ căn bếp của bạn" />
       <T v="h2" accessibilityRole="header">
         Tạo tài khoản
       </T>
@@ -81,6 +81,7 @@ export default function Register() {
         disabled={!email || password.length < MIN || password !== again}
       />
       <LinkButton label="Đã có tài khoản? Đăng nhập" onPress={() => router.replace('/dang-nhap')} />
+      <PublicHomeLink />
     </Screen>
   );
 }

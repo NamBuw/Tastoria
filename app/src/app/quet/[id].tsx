@@ -51,7 +51,7 @@ export default function ConfirmScan() {
   });
   const discard = useMutation({
     mutationFn: () => call(api.POST('/scans/{id}/discard', { params: { path: { id } } })),
-    onSuccess: () => goTab('/'),
+    onSuccess: () => goTab('/bep'),
   });
 
   if (scan.isLoading) return <Screen><Loading label="Đang tải kết quả quét…" /></Screen>;
@@ -152,7 +152,7 @@ export default function ConfirmScan() {
       {unseen.length ? (
         <Section title="Lần này không thấy">
           <T v="small" tone="muted">
-            Sẽ được đánh dấu "chưa thấy"; bạn xác nhận lại ở Kho.
+            Sẽ được đánh dấu &quot;chưa thấy&quot;; bạn xác nhận lại ở Kho.
           </T>
           <T>{unseen.map((l) => l.ingredient_name_vi).join(', ')}</T>
         </Section>

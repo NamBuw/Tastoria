@@ -81,7 +81,7 @@ export default function Cooking() {
         </>
       }>
       <T tone="muted">
-        Dọn mâm lúc {fmtClock(serveAt)} · món lâu nhất bắt đầu trước · màn hình luôn sáng khi nấu
+        Dọn mâm lúc {fmtClock(serveAt)}. Món lâu nhất bắt đầu trước, màn hình luôn sáng khi nấu.
       </T>
       {s.status !== 'in_progress' ? (
         <Notice tone="warn">
@@ -108,7 +108,7 @@ export default function Cooking() {
                         top: e.kind === 'passive' ? 5 : 0,
                         bottom: e.kind === 'passive' ? 5 : 0,
                         borderRadius: 4,
-                        backgroundColor: done.includes(stepKey(e)) ? c.border : e.kind === 'active' ? c.accent : c.trayRim,
+                        backgroundColor: done.includes(stepKey(e)) ? c.border : e.kind === 'active' ? c.accent : c.herb,
                       }}
                     />
                   ))}
@@ -127,14 +127,14 @@ export default function Cooking() {
             ))
           : null}
         <T v="small" tone="muted">
-          Vạch đậm: việc phải đứng bếp · vạch mảnh: chờ (ninh, ngâm, ướp) · vạch dọc: bây giờ
+          Đỏ: việc phải đứng bếp. Xanh mảnh: chờ (ninh, ngâm, ướp). Vạch dọc: bây giờ.
         </T>
       </Card>
 
       {current ? (
-        <Card testID="cook-current" style={{ borderColor: c.accent, borderWidth: 2 }}>
+        <Card testID="cook-current" style={{ borderColor: c.accent, borderWidth: 2, backgroundColor: c.surface, gap: space.md }}>
           <T v="small" tone="muted">
-            Bước hiện tại · {name(current.recipe_id)} · bước {current.step_no}
+            Bước hiện tại: {name(current.recipe_id)}, bước {current.step_no}
           </T>
           <T v="huge" style={{ fontSize: 28, lineHeight: 38 }}>
             {current.text_vi}
@@ -153,7 +153,7 @@ export default function Cooking() {
         </Card>
       ) : (
         <Notice tone="ok">
-          <T>Đã xong mọi bước phải đứng bếp. Chờ các món đang ninh rồi bấm "Nấu xong".</T>
+          <T>Đã xong mọi bước phải đứng bếp. Chờ các món đang ninh rồi bấm &quot;Nấu xong&quot;.</T>
         </Notice>
       )}
 
@@ -170,7 +170,7 @@ export default function Cooking() {
                   </T>
                 </Row>
                 <T v="h2" accessibilityLiveRegion="polite">
-                  còn {fmtLeft(endAt - now)} · xong lúc {fmtClock(endAt)}
+                  còn {fmtLeft(endAt - now)}, xong lúc {fmtClock(endAt)}
                 </T>
               </Card>
             );
@@ -181,7 +181,7 @@ export default function Cooking() {
       <Section title="Toàn bộ lịch">
         {ordered.map((e) => (
           <Row key={stepKey(e)} style={{ flexWrap: 'nowrap', alignItems: 'flex-start' }}>
-            <T v="label" style={{ width: 52 }}>
+            <T v="label" tone={done.includes(stepKey(e)) ? 'muted' : 'accent'} style={{ width: 52, fontVariant: ['tabular-nums'] }}>
               {fmtClock(view.base + e.start_offset_s * 1000)}
             </T>
             <T tone={done.includes(stepKey(e)) ? 'muted' : 'text'} style={{ flex: 1 }}>

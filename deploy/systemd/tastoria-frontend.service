@@ -1,0 +1,8 @@
+[Unit]
+Description=Deploy CI-approved Tastoria frontend and signed Android APK
+After=network-online.target
+[Service]
+Type=oneshot
+Environment=TASTORIA_LIVE_DEPLOY=%h/NamBuw/Tastoria/deploy
+ExecStart=%h/NamBuw/Tastoria/deploy/scripts/pull-frontend.sh
+TimeoutStartSec=3600

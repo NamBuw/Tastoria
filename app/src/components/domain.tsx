@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, Defs, Ellipse, G, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import type { Schemas } from '@/api/client';
-import { font, radius, space, useTheme } from '@/theme';
+import { font, radius, space, useTheme, type Palette } from '@/theme';
 
 import { T } from './ui';
 
@@ -23,7 +23,9 @@ export function FreshBadge({ value, small }: { value: Freshness; small?: boolean
   const { c } = useTheme();
   const color = c.fresh[value];
   return (
-    <View style={styles.badge} accessibilityLabel={`Độ tươi: ${FRESH_LABEL[value]}`}>
+    <View
+      style={[styles.badge, { backgroundColor: c.freshSoft[value], paddingHorizontal: small ? 8 : 10, paddingVertical: small ? 2 : 4 }]}
+      accessibilityLabel={`Độ tươi: ${FRESH_LABEL[value]}`}>
       <View
         style={[
           styles.dot,
@@ -53,7 +55,60 @@ export const SLOT_LABEL: Record<'man' | 'rau' | 'canh', string> = { man: 'Mặn'
 
 type TrayItem = Pick<Schemas['MealPlanItem'], 'id' | 'slot' | 'recipe_name_vi'>;
 
-/** Top-down round tray: rice bowl in the centre, 2–3 dishes around (v1 §5.2 motif). */
+/** One dish drawn from above in a 100×100 box: Bát Tràng plate/bowl with a simple food shape per slot. */
+function DishArt({ slot, c }: { slot: 'man' | 'rau' | 'canh'; c: Palette }) {
+  const leaf = c.herb;
+  if (slot === 'canh')
+    return (
+      <G>
+        <Circle cx="50" cy="50" r="47" fill={c.dish} stroke={c.glaze} strokeWidth="3" />
+        <Circle cx="50" cy="50" r="40" fill="none" stroke={c.glaze} strokeWidth="1.2" strokeDasharray="3 5" />
+        <Circle cx="50" cy="50" r="33" fill="#D9B45A" opacity={0.55} />
+        <Circle cx="50" cy="50" r="33" fill="none" stroke="#B88B2E" strokeWidth="1" opacity={0.6} />
+        <Ellipse cx="40" cy="44" rx="9" ry="4.5" fill={leaf} transform="rotate(-30 40 44)" />
+        <Ellipse cx="58" cy="56" rx="8" ry="4" fill={leaf} transform="rotate(25 58 56)" />
+        <Ellipse cx="55" cy="38" rx="6" ry="3" fill={leaf} opacity={0.85} transform="rotate(60 55 38)" />
+        <Circle cx="44" cy="60" r="4" fill="#C77A55" />
+        <Circle cx="62" cy="44" r="3.2" fill="#C77A55" />
+        <Circle cx="36" cy="54" r="2" fill="#FFFFFF" opacity={0.6} />
+      </G>
+    );
+  if (slot === 'rau')
+    return (
+      <G>
+        <Circle cx="50" cy="50" r="47" fill={c.dish} stroke={c.glaze} strokeWidth="3" />
+        <Circle cx="50" cy="50" r="38" fill="none" stroke={c.glaze} strokeWidth="1" opacity={0.5} />
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((a, i) => (
+          <Ellipse
+            key={a}
+            cx="50"
+            cy={i % 2 ? 33 : 30}
+            rx="8"
+            ry="17"
+            fill={i % 2 ? leaf : '#4E9A5C'}
+            transform={`rotate(${a} 50 50)`}
+          />
+        ))}
+        <Circle cx="50" cy="50" r="9" fill="#9CCB7A" />
+      </G>
+    );
+  return (
+    <G>
+      <Ellipse cx="50" cy="50" rx="47" ry="47" fill={c.dish} stroke={c.glaze} strokeWidth="3" />
+      <Path d="M50 9 l3 5 -3 5 -3 -5z M50 81 l3 5 -3 5 -3 -5z M9 50 l5 -3 5 3 -5 3z M81 50 l5 -3 5 3 -5 3z" fill={c.glaze} />
+      <Rect x="30" y="32" width="18" height="14" rx="5" fill="#9A5A2E" transform="rotate(-12 39 39)" />
+      <Rect x="50" y="30" width="17" height="13" rx="5" fill="#B06A35" transform="rotate(14 58 36)" />
+      <Rect x="34" y="50" width="17" height="14" rx="5" fill="#B06A35" transform="rotate(8 42 57)" />
+      <Rect x="53" y="49" width="16" height="14" rx="5" fill="#8C4E26" transform="rotate(-10 61 56)" />
+      <Circle cx="48" cy="47" r="2.2" fill={leaf} />
+      <Circle cx="60" cy="45" r="1.8" fill={leaf} />
+      <Circle cx="44" cy="62" r="1.8" fill={leaf} />
+      <Circle cx="52" cy="58" r="1.5" fill="#D9472F" />
+    </G>
+  );
+}
+
+/** Top-down lacquered round tray (mâm): rice bowl in the centre, 2–3 dishes around (v1 §5.2 motif). */
 export function Tray({
   items,
   bowls,
@@ -71,74 +126,65 @@ export function Tray({
   const order = { man: 0, rau: 1, canh: 2 } as const;
   const sorted = [...items].sort((a, b) => order[a.slot] - order[b.slot]);
   const angles = sorted.length === 3 ? [-90, 150, 30] : sorted.length === 2 ? [180, 0] : [-90];
-  const dishD = S * 0.33;
-  const bowlD = S * 0.24;
-  const r = S * 0.3;
+  const k = S / 100;
+  const dishD = 31; // in tray units
+  const R = 27.5;
+  const pos = sorted.map((_, i) => {
+    const a = (angles[i] * Math.PI) / 180;
+    return { x: 50 + R * Math.cos(a), y: 50 + R * Math.sin(a) };
+  });
   return (
     <View
       style={{ width: S, height: S, alignSelf: 'center' }}
       accessibilityLabel={`Mâm: ${sorted.map((i) => `${SLOT_LABEL[i.slot]} ${i.recipe_name_vi}`).join(', ')}, cơm ở giữa`}>
-      <View
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: S / 2,
-          backgroundColor: c.tray,
-          borderWidth: S * 0.035,
-          borderColor: c.trayRim,
-        }}
-      />
-      <View
-        style={[
-          styles.circle,
-          {
-            width: bowlD,
-            height: bowlD,
-            borderRadius: bowlD / 2,
-            left: S / 2 - bowlD / 2,
-            top: S / 2 - bowlD / 2,
-            backgroundColor: c.rice,
-            borderColor: c.trayRim,
-          },
-        ]}>
-        <Text style={{ fontFamily: font.semibold, color: c.text, fontSize: compact ? 12 : 15 }}>Cơm</Text>
-        {bowls && !compact ? (
-          <Text style={{ fontFamily: font.regular, color: c.muted, fontSize: 12, textAlign: 'center' }}>
-            {fmtBowls(bowls)} bát/người
-          </Text>
-        ) : null}
-      </View>
+      <Svg width={S} height={S} viewBox="0 0 100 100" accessibilityElementsHidden importantForAccessibility="no">
+        <Defs>
+          <RadialGradient id="lacq" cx="42%" cy="38%" r="70%">
+            <Stop offset="0" stopColor={c.trayGrain} />
+            <Stop offset="1" stopColor={c.tray} />
+          </RadialGradient>
+        </Defs>
+        <Circle cx="50" cy="51.2" r="49" fill="#000" opacity={0.12} />
+        <Circle cx="50" cy="50" r="49" fill={c.trayRim} />
+        <Circle cx="50" cy="50" r="46" fill="url(#lacq)" />
+        <Circle cx="50" cy="50" r="44.2" fill="none" stroke={c.trayRim} strokeWidth="0.5" opacity={0.7} />
+        {[36, 30, 22].map((r) => (
+          <Circle key={r} cx="50" cy="50" r={r} fill="none" stroke="#000" strokeWidth="0.35" opacity={0.08} />
+        ))}
+        <Path d="M20 26 A40 40 0 0 1 46 9" stroke="#FFFFFF" strokeWidth="1.6" fill="none" opacity={0.18} strokeLinecap="round" />
+        {sorted.map((it, i) => (
+          <G key={it.id}>
+            <Circle cx={pos[i].x + 0.8} cy={pos[i].y + 1.6} r={dishD / 2} fill="#000" opacity={0.22} />
+            <G transform={`translate(${pos[i].x - dishD / 2} ${pos[i].y - dishD / 2}) scale(${dishD / 100})`}>
+              <DishArt slot={it.slot} c={c} />
+            </G>
+          </G>
+        ))}
+        {/* rice bowl */}
+        <Circle cx="50.6" cy="51.4" r="11.5" fill="#000" opacity={0.22} />
+        <Circle cx="50" cy="50" r="11.5" fill={c.dish} stroke={c.glaze} strokeWidth="1" />
+        <Circle cx="50" cy="50" r="9.5" fill="none" stroke={c.glaze} strokeWidth="0.4" strokeDasharray="1 1.6" />
+        <Circle cx="50" cy="50" r="8" fill={c.rice} />
+        {[
+          [47, 47], [52, 46], [49, 51], [54, 50], [46, 53], [51, 54], [50, 48.5],
+        ].map(([x, y], j) => (
+          <Ellipse key={j} cx={x} cy={y} rx="1.1" ry="0.55" fill="#E4DED0" transform={`rotate(${j * 40} ${x} ${y})`} />
+        ))}
+      </Svg>
+      {!compact && bowls ? (
+        <View pointerEvents="none" style={[styles.tag, { left: S / 2 - 46, width: 92, top: S / 2 + 12 * k, backgroundColor: c.surface }]}>
+          <Text style={{ fontFamily: font.semibold, fontSize: 12, color: c.text }}>Cơm {fmtBowls(bowls)} bát</Text>
+        </View>
+      ) : null}
       {sorted.map((it, i) => {
-        const a = (angles[i] * Math.PI) / 180;
-        const cx = S / 2 + r * Math.cos(a);
-        const cy = S / 2 + r * Math.sin(a);
-        const content = (
-          <>
-            <Text style={{ fontFamily: font.semibold, color: c.accent, fontSize: compact ? 11 : 13 }}>
-              {SLOT_LABEL[it.slot]}
-            </Text>
-            {!compact ? (
-              <Text
-                numberOfLines={3}
-                style={{ fontFamily: font.medium, color: c.text, fontSize: 13, lineHeight: 17, textAlign: 'center' }}>
-                {it.recipe_name_vi}
-              </Text>
-            ) : null}
-          </>
+        const d = dishD * k;
+        const left = pos[i].x * k - d / 2;
+        const top = pos[i].y * k - d / 2;
+        const tag = compact ? null : (
+          <View pointerEvents="none" style={[styles.tag, { backgroundColor: c.surface, bottom: -10, alignSelf: 'center' }]}>
+            <Text style={{ fontFamily: font.semibold, fontSize: 12, color: c.accent }}>{SLOT_LABEL[it.slot]}</Text>
+          </View>
         );
-        const style = [
-          styles.circle,
-          {
-            width: dishD,
-            height: dishD,
-            borderRadius: dishD / 2,
-            left: cx - dishD / 2,
-            top: cy - dishD / 2,
-            backgroundColor: c.dish,
-            borderColor: c.accent,
-            padding: 6,
-          },
-        ];
         return onPressItem ? (
           <Pressable
             key={it.id}
@@ -146,12 +192,12 @@ export function Tray({
             accessibilityRole="button"
             accessibilityLabel={`${SLOT_LABEL[it.slot]}: ${it.recipe_name_vi}. Chạm để xem, đổi món hoặc xem thiếu gì`}
             onPress={() => onPressItem(it)}
-            style={({ pressed }) => [...style, { opacity: pressed ? 0.85 : 1 }]}>
-            {content}
+            style={({ pressed }) => [styles.hit, { left, top, width: d, height: d, borderRadius: d / 2, transform: [{ scale: pressed ? 0.96 : 1 }] }]}>
+            {tag}
           </Pressable>
         ) : (
-          <View key={it.id} style={style}>
-            {content}
+          <View key={it.id} style={[styles.hit, { left, top, width: d, height: d }]}>
+            {tag}
           </View>
         );
       })}
@@ -197,7 +243,7 @@ export function KcalBar({
         </T>
       </View>
       <View
-        style={{ height: 14, borderRadius: 7, backgroundColor: c.surfaceAlt, overflow: 'hidden' }}
+        style={{ height: 12, borderRadius: 6, backgroundColor: c.surfaceAlt, overflow: 'hidden' }}
         accessibilityLabel={`Khoảng ${Math.round(low)} đến ${Math.round(high)} kcal mỗi người${
           target ? `, mục tiêu bữa ${Math.round(target)} kcal` : ''
         }`}>
@@ -208,8 +254,8 @@ export function KcalBar({
             width: `${Math.max(2, ((high - low) / max) * 100)}%`,
             top: 0,
             bottom: 0,
-            backgroundColor: c.accent,
-            borderRadius: 7,
+            backgroundColor: c.herb,
+            borderRadius: 6,
           }}
         />
         {target ? (
@@ -218,7 +264,7 @@ export function KcalBar({
       </View>
       <T v="small" tone="muted">
         {target
-          ? `Vạch dọc: mục tiêu bữa ${Math.round(target)} kcal · ${status}`
+          ? `Vạch dọc: mục tiêu bữa ${Math.round(target)} kcal, ${status}`
           : 'Chưa có mục tiêu năng lượng. Đặt trong Cài đặt › Hồ sơ.'}
       </T>
     </View>
@@ -278,8 +324,9 @@ export function Icon({ name, color, size: s = 24 }: { name: IconName; color: str
 }
 
 const styles = StyleSheet.create({
-  badge: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  dot: { width: 12, height: 12, borderRadius: 6 },
-  circle: { position: 'absolute', alignItems: 'center', justifyContent: 'center', borderWidth: 2 },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 999, alignSelf: 'flex-start' },
+  dot: { width: 10, height: 10, borderRadius: 5 },
+  hit: { position: 'absolute', alignItems: 'center', justifyContent: 'flex-end' },
+  tag: { position: 'absolute', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 999, alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.25)' },
   pill: { borderRadius: radius.pill },
 });

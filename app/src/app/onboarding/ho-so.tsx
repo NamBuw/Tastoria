@@ -52,13 +52,18 @@ export default function ProfileSteps() {
   // resume at the first step the server has not confirmed (FR-09-12)
   useEffect(() => {
     if (!user || consents.isLoading || profile.isLoading || idx !== null) return;
-    getProgress(user.id).then((p) => setIdx(Math.min(p.step, steps.length - 1)));
-    if (profile.data) {
-      setDraft(profileToDraft(profile.data));
-      setAllergens(profile.data.allergen_codes);
-      setDiet(profile.data.diet_code);
-      setFavs(profile.data.favorite_recipe_ids);
-    }
+    let cancelled = false;
+    getProgress(user.id).then((p) => {
+      if (cancelled) return;
+      if (profile.data) {
+        setDraft(profileToDraft(profile.data));
+        setAllergens(profile.data.allergen_codes);
+        setDiet(profile.data.diet_code);
+        setFavs(profile.data.favorite_recipe_ids);
+      }
+      setIdx(Math.min(p.step, steps.length - 1));
+    });
+    return () => { cancelled = true; };
   }, [user, consents.isLoading, profile.isLoading, profile.data, idx, steps.length]);
 
   if (idx === null) return <Screen><Loading /></Screen>;
@@ -72,7 +77,7 @@ export default function ProfileSteps() {
     if (next >= steps.length) {
       if (user) await saveProgress(user.id, { done: true });
       await qc.invalidateQueries({ queryKey: qk.profile });
-      router.replace('/');
+      router.replace('/bep');
     } else setIdx(next);
   };
 
@@ -188,7 +193,7 @@ export default function ProfileSteps() {
       <>
         {!none && allergens.length === 0 ? (
           <T v="small" tone="muted">
-            Chọn ít nhất một nhóm, hoặc chọn "Không dị ứng nhóm nào".
+            Chọn ít nhất một nhóm, hoặc chọn &quot;Không dị ứng nhóm nào&quot;.
           </T>
         ) : null}
         <Button label="Tiếp" testID="step-next" loading={busy} disabled={!none && allergens.length === 0} onPress={saveAllergens} />

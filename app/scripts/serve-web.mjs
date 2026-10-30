@@ -4,9 +4,11 @@
 //   API_TARGET=http://127.0.0.1:8000 PORT=8080 node scripts/serve-web.mjs
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import http from 'node:http';
+import { fileURLToPath } from 'node:url';
 import { extname, join, normalize, resolve } from 'node:path';
 
 const root = resolve(process.env.DIST ?? 'dist');
+const landing = fileURLToPath(new URL('../../landing/', import.meta.url));
 const port = Number(process.env.PORT ?? 8080);
 const host = process.env.HOST ?? '127.0.0.1';
 const target = new URL(process.env.API_TARGET ?? 'http://127.0.0.1:8000');
@@ -16,6 +18,7 @@ const TYPES = {
   '.css': 'text/css; charset=utf-8',
   '.json': 'application/json',
   '.png': 'image/png',
+  '.webp': 'image/webp',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
@@ -43,6 +46,19 @@ http
   .createServer((req, res) => {
     const path = decodeURIComponent((req.url ?? '/').split('?')[0]);
     if (path.startsWith('/api/') || path === '/healthz' || path === '/readyz') return proxy(req, res);
+    if (path === '/gioi-thieu') {
+      res.writeHead(301, { location: '/gioi-thieu/' });
+      return res.end();
+    }
+    const publicPage = path === '/' || path === '/gioi-thieu/';
+    const publicAsset = /^\/gioi-thieu\/(?:style\.css|story\.js|(?:fonts|img)\/[A-Za-z0-9._-]+)$/.test(path);
+    if (publicPage || publicAsset) {
+      const publicFile = publicPage ? join(landing, 'index.html') : join(landing, path.slice('/gioi-thieu/'.length));
+      if (!existsSync(publicFile) || !statSync(publicFile).isFile()) { res.writeHead(404); return res.end(); }
+      res.writeHead(200, { 'content-type': TYPES[extname(publicFile)] ?? 'application/octet-stream', 'cache-control': 'no-cache' });
+      return createReadStream(publicFile).pipe(res);
+    }
+    if (path.startsWith('/gioi-thieu/')) { res.writeHead(404); return res.end(); }
     let file = normalize(join(root, path));
     if (!file.startsWith(root)) {
       res.writeHead(400);

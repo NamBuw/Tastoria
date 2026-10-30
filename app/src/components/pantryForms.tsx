@@ -61,7 +61,7 @@ export function IngredientSearch({
             ))}
           </Row>
         ) : (
-          <T tone="muted">Không thấy nguyên liệu "{debounced}" trong danh mục.</T>
+          <T tone="muted">Không thấy nguyên liệu &quot;{debounced}&quot; trong danh mục.</T>
         )
       ) : null}
     </View>

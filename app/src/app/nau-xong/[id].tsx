@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
@@ -16,7 +16,6 @@ import { space } from '@/theme';
 /** Nấu xong một chạm (UC20) + hoàn tác trong 10 phút (UC21). */
 export default function Finished() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
   const qc = useQueryClient();
   const session = useCookSession(id);
   const catalog = useCatalog();

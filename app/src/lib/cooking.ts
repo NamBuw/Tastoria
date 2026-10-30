@@ -52,7 +52,7 @@ export const stepKey = (e: Schemas['ScheduleEntry']) => `${e.recipe_id}:${e.step
 
 /** Re-render every second; times are absolute (started_at + offset), so a sleeping app never drifts. */
 export function useNow(intervalMs = 1000): number {
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), intervalMs);
     return () => clearInterval(t);

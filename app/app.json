@@ -2,7 +2,7 @@
   "expo": {
     "name": "Tastoria",
     "slug": "tastoria",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "tastoria",
@@ -10,7 +10,7 @@
     "backgroundColor": "#F6F0E2",
     "android": {
       "package": "net.ctslab.tastoria",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "backgroundColor": "#F6F0E2",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

@@ -61,7 +61,7 @@ function Shell() {
     if (status === 'loading') return;
     const isPublic = PUBLIC.has(first);
     if (status === 'signedOut' && !isPublic) router.replace('/dang-nhap');
-    if (status === 'signedIn' && (first === 'dang-nhap' || first === 'dang-ky')) router.replace('/');
+    if (status === 'signedIn' && (first === 'dang-nhap' || first === 'dang-ky')) router.replace('/bep');
   }, [status, first, router]);
 
   useEffect(() => (status === 'signedIn' ? startOutbox() : undefined), [status]);
@@ -78,6 +78,7 @@ function Shell() {
           contentStyle: { backgroundColor: c.bg },
           headerBackTitle: 'Quay lại',
         }}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />

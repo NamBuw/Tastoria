@@ -21,7 +21,7 @@ x-backend: &backend
 
 services:
   nginx:
-    image: tastoria-web:${TASTORIA_IMAGE_TAG:-latest}
+    image: tastoria-web:${TASTORIA_WEB_TAG:-${TASTORIA_IMAGE_TAG:-latest}}
     build:
       context: ..
       dockerfile: deploy/web.Dockerfile

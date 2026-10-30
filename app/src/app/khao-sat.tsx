@@ -9,7 +9,7 @@ import { errorText } from '@/api/errors';
 import { BrandHeader } from '@/components/Brand';
 import { SLOT_LABEL } from '@/components/domain';
 import { Button, Card, Checkbox, Chip, ErrorBox, Field, LinkButton, Loading, Notice, Row, Screen, Section, T } from '@/components/ui';
-import { radius, space, TOUCH, useTheme } from '@/theme';
+import { radius, TOUCH, useTheme } from '@/theme';
 
 const KEY = 'tastoria.survey.v1';
 type Saved = { id: string; token: string };
@@ -90,7 +90,7 @@ function Start({ onStarted, onNotOpen }: { onStarted: (s: Saved) => void; onNotO
     <Screen testID="screen-survey-start" footer={<Button label="Bắt đầu" testID="survey-start" disabled={!agree || !p} loading={start.isPending} onPress={() => start.mutate()} />}>
       <BrandHeader subtitle="Khảo sát gu món ăn" />
       <T>
-        Phiếu gồm khoảng 45 món cơm nhà. Với mỗi món, chọn điểm từ 1 (không thích) đến 5 (rất thích), hoặc "Chưa ăn bao giờ". Mất khoảng 5
+        Phiếu gồm khoảng 45 món cơm nhà. Với mỗi món, chọn điểm từ 1 (không thích) đến 5 (rất thích), hoặc &quot;Chưa ăn bao giờ&quot;. Mất khoảng 5
         phút. Không cần tài khoản.
       </T>
       {policy.isLoading ? <Loading /> : null}
@@ -123,9 +123,7 @@ function Form({ saved, onReset, onDone, onClosed }: { saved: Saved; onReset: () 
   });
   const [favs, setFavs] = useState<string[] | null>(null);
   const [q, setQ] = useState('');
-  useEffect(() => {
-    if (r.data && favs === null) setFavs(r.data.favorite_recipe_ids);
-  }, [r.data, favs]);
+  if (r.data && favs === null) setFavs(r.data.favorite_recipe_ids);
   useEffect(() => {
     if (r.data?.completed_at) onDone(); // already sent from this browser earlier
   }, [r.data, onDone]);

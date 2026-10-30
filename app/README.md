@@ -28,7 +28,7 @@ The keystore and its password live outside the repo in `~/.config/tastoria/` (re
 
 ```bash
 export ANDROID_HOME=$HOME/Android/Sdk JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-export EXPO_PUBLIC_API_URL=https://safework.ctslab.net/api/v1
+export EXPO_PUBLIC_API_URL=https://tastoria.ctslab.net/api/v1
 set -a; . ~/.config/tastoria/keystore.env; set +a
 npx expo prebuild --platform android --clean --no-install
 (cd android && ./gradlew assembleRelease)    # → android/app/build/outputs/apk/release/app-release.apk
@@ -60,3 +60,7 @@ WEB_URL=http://127.0.0.1:8080 python scripts/e2e_flow.py docs/screenshots
 
 Scan (`/scans`) and survey (`/survey/*`) endpoints are in the contract but not in the backend yet; the app shows
 "Quét ảnh chưa mở" / "Khảo sát chưa mở" when the POST answers 404.
+
+## Public website and releases
+
+The website root `/` serves the public landing; `/bep` opens the authenticated app. CI/CD and signed Android releases are documented in [deploy/FRONTEND-CD.md](../deploy/FRONTEND-CD.md).

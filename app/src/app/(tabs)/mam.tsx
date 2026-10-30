@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { Pressable, useWindowDimensions, View } from 'react-native';
 
 import { api, ApiError, call, isCode, type Schemas } from '@/api/client';
 import { errorText } from '@/api/errors';
@@ -31,10 +31,7 @@ export default function TrayScreen() {
 
   return (
     <Screen testID="screen-tray" scrollKey={plan && !composing ? plan.id : `new-${meal}`}>
-      <Row>
-        <Radio label="Bữa trưa" selected={meal === 'lunch'} onPress={() => setMeal('lunch')} />
-        <Radio label="Bữa tối" selected={meal === 'dinner'} onPress={() => setMeal('dinner')} />
-      </Row>
+      <MealSwitch meal={meal} onChange={setMeal} />
       {latest.isLoading ? <Loading /> : null}
       {latest.error ? <ErrorBox message={errorText(latest.error)} onRetry={() => latest.refetch()} /> : null}
       {plan && !composing ? (
@@ -43,6 +40,39 @@ export default function TrayScreen() {
         <Composer meal={meal} defaultPersons={plan?.persons} onDone={() => setComposing(false)} onCancel={plan ? () => setComposing(false) : undefined} />
       ) : null}
     </Screen>
+  );
+}
+
+function MealSwitch({ meal, onChange }: { meal: Meal; onChange: (m: Meal) => void }) {
+  const { c } = useTheme();
+  return (
+    <View
+      accessibilityRole="radiogroup"
+      style={{ flexDirection: 'row', backgroundColor: c.surfaceAlt, borderRadius: radius.pill, padding: 4, gap: 4 }}>
+      {(['lunch', 'dinner'] as const).map((m) => {
+        const on = meal === m;
+        return (
+          <Pressable
+            key={m}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: on, checked: on }}
+            onPress={() => onChange(m)}
+            style={{
+              flex: 1,
+              minHeight: 44,
+              borderRadius: radius.pill,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: on ? c.surface : 'transparent',
+              boxShadow: on ? `0 1px 3px ${c.shadow}` : undefined,
+            }}>
+            <T v="label" style={{ color: on ? c.text : c.muted }}>
+              {MEAL_LABEL[m]}
+            </T>
+          </Pressable>
+        );
+      })}
+    </View>
   );
 }
 
@@ -302,13 +332,13 @@ function PlanView({ plan, onNew }: { plan: Plan; onNew: () => void }) {
   });
 
   const pinnedNames = (lots.data?.items ?? []).filter((l) => plan.pinned_lot_ids.includes(l.id)).map((l) => l.ingredient_name_vi);
-  const traySize = Math.min(width - 32, 340);
+  const traySize = Math.min(width - 48, 330);
 
   return (
     <View style={{ gap: space.lg }} testID="plan-view">
       <View>
-        <T v="h2" accessibilityRole="header">
-          {MEAL_LABEL[plan.meal]} · {plan.persons} người
+        <T v="h1" accessibilityRole="header">
+          {MEAL_LABEL[plan.meal]} cho {plan.persons} người
         </T>
         <T tone="muted">
           {plan.status === 'accepted' ? 'Đã nhận mâm' : 'Chạm một món để xem, đổi món hoặc xem thiếu gì'}
@@ -318,12 +348,19 @@ function PlanView({ plan, onNew }: { plan: Plan; onNew: () => void }) {
         setDish(active.find((a) => a.id === it.id) ?? null);
         setMode('menu');
       }} />
-      <View style={{ gap: space.xs }}>
-        {active.map((i) => (
-          <T key={i.id}>
-            <T v="label">{SLOT_LABEL[i.slot]}:</T> {i.recipe_name_vi}
-            {i.substitutions.length ? ' (có đồ thay)' : ''}
-          </T>
+      <View style={{ borderRadius: radius.lg, borderWidth: 1, borderColor: c.hairline, backgroundColor: c.surface, overflow: 'hidden' }}>
+        {active.map((i, n) => (
+          <View
+            key={i.id}
+            style={{ flexDirection: 'row', gap: space.md, padding: space.md, paddingHorizontal: space.lg, borderTopWidth: n ? 1 : 0, borderTopColor: c.hairline }}>
+            <T v="label" tone="accent" style={{ width: 44 }}>
+              {SLOT_LABEL[i.slot]}
+            </T>
+            <View style={{ flex: 1 }}>
+              <T v="label">{i.recipe_name_vi}</T>
+              {i.substitutions.length ? <T v="small" tone="muted">có đồ thay</T> : null}
+            </View>
+          </View>
         ))}
       </View>
       {plan.reason_vi ? (
@@ -436,7 +473,7 @@ function PlanView({ plan, onNew }: { plan: Plan; onNew: () => void }) {
             {swap.isPending ? <Loading label="Đang tìm món khác…" /> : null}
             {isCode(swap.error, 'no_alternative') ? (
               <Notice tone="warn">
-                <T>{errorText(swap.error)} Xem "Thiếu gì?" để thay nguyên liệu, hoặc thêm đồ cần mua vào danh sách đi chợ.</T>
+                <T>{errorText(swap.error)} Xem &quot;Thiếu gì?&quot; để thay nguyên liệu, hoặc thêm đồ cần mua vào danh sách đi chợ.</T>
                 <Button label="Thiếu gì?" kind="secondary" onPress={() => setMode('missing')} />
               </Notice>
             ) : swap.error ? (

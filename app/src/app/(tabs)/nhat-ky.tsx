@@ -26,7 +26,8 @@ export default function Journal() {
   const { c } = useTheme();
   const { status } = useSession();
   const [offset, setOffset] = useState(0);
-  const week = isoWeek(new Date(Date.now() + offset * 7 * 86400000));
+  const [openedAt] = useState(() => Date.now());
+  const week = isoWeek(new Date(openedAt + offset * 7 * 86400000));
   const q = useQuery({ queryKey: qk.journal(week), queryFn: () => call(api.GET('/journal', { params: { query: { week } } })), enabled: status === 'signedIn' });
   const days = q.data?.days ?? [];
   const max = Math.max(1, ...days.map((d) => Math.max(d.kcal_per_person ?? 0, d.e_target_kcal ?? 0)));
@@ -35,6 +36,11 @@ export default function Journal() {
 
   return (
     <Screen testID="screen-journal">
+      <View style={{ gap: space.sm, borderLeftWidth: 3, borderLeftColor: c.accent, paddingLeft: space.lg }}>
+        <T v="small" tone="accent">TASTE AND WRITE YOUR STORY</T>
+        <T v="huge">Những bữa ngon ở lại.</T>
+        <T tone="muted">Nhìn lại từng mâm cơm, từng ngày bạn dành thời gian cho căn bếp.</T>
+      </View>
       <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
         <Button kind="ghost" label="‹ Tuần trước" onPress={() => setOffset(offset - 1)} />
         <T v="title">Tuần {week.split('-W')[1]}/{week.split('-W')[0]}</T>

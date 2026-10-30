@@ -80,7 +80,7 @@ def run():
         tid('add-lot-submit').click()
         tid('sheet-add-lot').wait_for(state='detached')
         pg.wait_for_timeout(300)
-    pg.get_by_text('10 lô, đồ cần dùng trước ở trên').wait_for()
+    pg.get_by_text('10 lô trong kho').wait_for()
     shot('12-kho')
     # tray
     pg.goto(BASE+'/mam'); tid('screen-tray').wait_for()

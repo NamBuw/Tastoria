@@ -8,7 +8,7 @@ import { fmtG, FreshBadge } from '@/components/domain';
 import { daysAgoIso, IngredientSearch, PurchaseDate, QuantityEditor } from '@/components/pantryForms';
 import { Button, Card, Empty, ErrorBox, Loading, Notice, Row, Screen, Section, Sheet, T } from '@/components/ui';
 import { useLots } from '@/lib/queries';
-import { space } from '@/theme';
+import { radius, space, useTheme } from '@/theme';
 
 type Lot = Schemas['PantryLot'];
 type Qty = Schemas['QuantityInput'];
@@ -22,6 +22,7 @@ function fmtDate(iso: string) {
 
 /** Kho theo lô (UC14): list, add by hand, edit amount / date, confirm "kiểm tra" lots, mark used up, discard. */
 export default function Pantry() {
+  const { c } = useTheme();
   const lots = useLots();
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<Lot | null>(null);
@@ -30,8 +31,8 @@ export default function Pantry() {
 
   return (
     <Screen testID="screen-pantry">
-      <Button label="Thêm đồ bằng tay" testID="pantry-add" onPress={() => setAdding(true)} />
-      {lots.isLoading ? <Loading /> : null}
+      <Button label="Thêm đồ bằng tay" kind="secondary" testID="pantry-add" onPress={() => setAdding(true)} />
+      {lots.isLoading ? <Loading rows={4} /> : null}
       {lots.error ? <ErrorBox message={errorText(lots.error)} onRetry={() => lots.refetch()} /> : null}
       {lots.data && items.length === 0 ? (
         <Empty title="Kho đang trống" body="Chụp tủ lạnh ở Trang chủ, hoặc thêm từng món bằng tay." />
@@ -39,23 +40,24 @@ export default function Pantry() {
       {check.length ? (
         <Notice tone="warn">
           <T>
-            {check.length} lô ở mức "kiểm tra trước khi dùng". Tastoria không dùng chúng khi ghép mâm cho tới khi bạn xác nhận vẫn dùng được.
+            {check.length} lô ở mức &quot;kiểm tra trước khi dùng&quot;. Tastoria không dùng chúng khi ghép mâm cho tới khi bạn xác nhận vẫn dùng được.
           </T>
         </Notice>
       ) : null}
       {items.length ? (
-        <Section title={`${items.length} lô, đồ cần dùng trước ở trên`}>
+        <Section title={`${items.length} lô trong kho`}>
+          <T v="small" tone="muted" style={{ marginTop: -space.sm }}>Đồ cần dùng trước xếp ở trên. Chạm một lô để sửa lượng, ngày mua.</T>
           <View style={{ gap: space.sm }}>
             {items.map((l) => (
               <Pressable key={l.id} accessibilityRole="button" onPress={() => setEditing(l)} testID={`lot-${l.ingredient_name_vi}`}>
-                <Card style={{ gap: 4 }}>
+                <Card style={{ gap: 6, borderRadius: radius.md, borderLeftWidth: 4, borderLeftColor: c.fresh[l.freshness_label], paddingVertical: space.md }}>
                   <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
                     <T v="title" style={{ flexShrink: 1 }}>
                       {l.ingredient_name_vi}
                     </T>
-                    <T v="label">{fmtG(l.balance_g_min, l.balance_g_max)}</T>
+                    <T v="label" style={{ fontVariant: ['tabular-nums'] }}>{fmtG(l.balance_g_min, l.balance_g_max)}</T>
                   </Row>
-                  <FreshBadge value={l.freshness_label} />
+                  <FreshBadge value={l.freshness_label} small />
                   <T v="small" tone="muted">
                     {l.acquired_basis === 'purchase_date_entered' ? `Mua ${fmtDate(l.acquired_at)}` : `Thấy lần đầu ${fmtDate(l.acquired_at)}`}
                     {l.status === 'not_seen' ? ' · lần quét gần nhất không thấy' : ''}
