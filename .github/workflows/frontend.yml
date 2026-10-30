@@ -36,6 +36,10 @@ jobs:
           PORT=8137 node scripts/serve-web.mjs > /tmp/tastoria-preview.log 2>&1 &
           cd ..
           python3 app/scripts/frontend_smoke.py
+      - name: Check production nginx routing
+        run: |
+          docker build -f deploy/web.Dockerfile -t tastoria-web:ci .
+          bash deploy/scripts/check-web-image.sh tastoria-web:ci
       - uses: actions/upload-artifact@v4
         with:
           name: tastoria-web-${{ github.sha }}

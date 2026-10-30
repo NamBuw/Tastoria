@@ -13,7 +13,7 @@ npm --prefix app run lint
 python3 app/scripts/contrast.py > /dev/null
 echo "Publishing web before the Android build"
 docker build -f deploy/web.Dockerfile -t "tastoria-web:$tag" .
-docker run --rm --network tastoria_backend "tastoria-web:$tag" nginx -t
+bash deploy/scripts/check-web-image.sh "tastoria-web:$tag"
 # Persist only a frontend override; keep backend/catalog/model version untouched.
 previous="$(docker inspect tastoria-nginx-1 --format '{{.Config.Image}}')"
 previous_tag="${previous#tastoria-web:}"
@@ -39,20 +39,27 @@ if [ "$ok" != 1 ]; then
   set_tag "$previous_tag"; compose up -d --no-deps --no-build nginx
   echo 'Frontend health check failed; previous image restored.' >&2; exit 1
 fi
-# Existing signing key stays on the server and is never uploaded to GitHub.
-set -a
-source "${TASTORIA_KEYSTORE_ENV:-$HOME/.config/tastoria/keystore.env}"
-set +a
-: "${TASTORIA_UPLOAD_STORE_FILE:?Release signing is required}"
-export ANDROID_HOME="${ANDROID_HOME:-$HOME/Android/Sdk}"
-export JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-17-openjdk-amd64}"
-export EXPO_PUBLIC_API_URL="${TASTORIA_PUBLIC_API:-https://tastoria.ctslab.net/api/v1}"
-export CI=1 EXPO_NO_TELEMETRY=1
-(cd app && npx expo prebuild --platform android --clean --no-install && cd android && ./gradlew assembleRelease --no-daemon)
 version="$(node -p "require('./app/app.json').expo.version")"
-mkdir -p "$apk_dir"
-cp app/android/app/build/outputs/apk/release/app-release.apk "$apk_dir/tastoria-$version.apk.tmp"
-mv "$apk_dir/tastoria-$version.apk.tmp" "$apk_dir/tastoria-$version.apk"
+app_tree="$(git rev-parse HEAD:app)"
+if [ -f "$apk_dir/tastoria-$version.apk" ] && [ "$(cat "$apk_dir/tastoria-$version.source" 2>/dev/null || true)" = "$app_tree" ]; then
+  echo "Signed APK $version already matches this app source; skipping rebuild."
+else
+  # Existing signing key stays on the server and is never uploaded to GitHub.
+  set -a
+  source "${TASTORIA_KEYSTORE_ENV:-$HOME/.config/tastoria/keystore.env}"
+  set +a
+  : "${TASTORIA_UPLOAD_STORE_FILE:?Release signing is required}"
+  export ANDROID_HOME="${ANDROID_HOME:-$HOME/Android/Sdk}"
+  export JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-17-openjdk-amd64}"
+  export EXPO_PUBLIC_API_URL="${TASTORIA_PUBLIC_API:-https://tastoria.ctslab.net/api/v1}"
+  export CI=1 EXPO_NO_TELEMETRY=1
+  (cd app && npx expo prebuild --platform android --clean --no-install && cd android && ./gradlew assembleRelease --no-daemon)
+  mkdir -p "$apk_dir"
+  cp app/android/app/build/outputs/apk/release/app-release.apk "$apk_dir/tastoria-$version.apk.tmp"
+  mv "$apk_dir/tastoria-$version.apk.tmp" "$apk_dir/tastoria-$version.apk"
+
+  printf '%s\n' "$app_tree" > "$apk_dir/tastoria-$version.source"
+fi
 
 printf '%s\t%s\tfrontend + APK %s\n' "$(date -u +%FT%TZ)" "$sha" "$version" >> "$live_dir/releases.log"
 echo "Deployed $sha, APK $version"
