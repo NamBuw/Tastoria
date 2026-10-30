@@ -59,7 +59,7 @@ http
       return createReadStream(apk).pipe(res);
     }
     const publicPage = path === '/' || path === '/gioi-thieu/';
-    const publicAsset = /^\/gioi-thieu\/(?:style\.css|story\.js|food-scene\.js|(?:fonts|img|vendor)\/[A-Za-z0-9._-]+)$/.test(path);
+    const publicAsset = /^\/gioi-thieu\/(?:style\.css|story\.js|(?:fonts|img)\/[A-Za-z0-9._-]+)$/.test(path);
     if (publicPage || publicAsset) {
       const publicFile = publicPage ? join(landing, 'index.html') : join(landing, path.slice('/gioi-thieu/'.length));
       if (!existsSync(publicFile) || !statSync(publicFile).isFile()) { res.writeHead(404); return res.end(); }

@@ -29,12 +29,7 @@ with sync_playwright() as p:
         assert page.get_by_role('link', name='Đăng nhập', exact=True).get_attribute('href') == '/dang-nhap'
         page.locator('[data-ingredient=tofu]').click()
         assert page.locator('#recipe-name').inner_text() == 'Đậu phụ sốt nấm'
-    page.locator('#food-stage.webgl-ready canvas').wait_for()
-    page.locator('#motion-toggle').click()
-    assert page.locator('body').evaluate("el => el.classList.contains('motion-paused')")
-    page.emulate_media(reduced_motion='reduce')
-    page.reload()
-    assert page.locator('#motion-toggle').get_attribute('aria-pressed') == 'false'
+    assert page.locator('#food-stage canvas').count() == 0
     plain = browser.new_context(java_script_enabled=False).new_page()
     plain.goto(BASE + '/')
     assert plain.get_by_role('heading', name='Taste and write your story.').is_visible()
@@ -42,6 +37,14 @@ with sync_playwright() as p:
     plain.close()
     page.get_by_role('link', name='Đăng nhập', exact=True).click()
     page.get_by_test_id('screen-login').wait_for()
+    for width in (320, 390, 1440):
+        page.set_viewport_size({'width': width, 'height': 900})
+        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    page.get_by_test_id('login-password').fill('fixture-password')
+    page.get_by_role('button', name='Hiện mật khẩu', exact=True).click()
+    assert page.get_by_test_id('login-password').evaluate('el => el.type') == 'text'
+    page.get_by_role('button', name='Ẩn mật khẩu', exact=True).click()
+    assert page.get_by_test_id('login-password').evaluate('el => el.type') == 'password'
     page.get_by_role('link', name='← Về trang giới thiệu Tastoria').click()
     page.get_by_role('heading', name='Taste and write your story.').wait_for()
     page.get_by_role('link', name='Đăng ký', exact=False).first.click()

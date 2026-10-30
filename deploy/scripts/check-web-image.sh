@@ -19,6 +19,4 @@ curl -fsS "$base/gioi-thieu/style.css" | grep -- '--paper' > /dev/null
 curl -fsS "$base/gioi-thieu/story.js" | grep 'data-ingredient' > /dev/null
 curl -fsS "$base/bep" | grep '_expo/static/js' > /dev/null
 curl -fsS "$base/dang-nhap" | grep '_expo/static/js' > /dev/null
-curl -fsS "$base/gioi-thieu/food-scene.js" | grep 'mountFoodScene' > /dev/null
-curl -fsS "$base/gioi-thieu/vendor/three.module.min.js" > /dev/null
 echo 'nginx HTTP preflight passed: public root, legacy landing, assets, app routes.'

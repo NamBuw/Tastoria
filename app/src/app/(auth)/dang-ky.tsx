@@ -3,8 +3,8 @@ import { useState } from 'react';
 
 import { errorText, fieldErrors } from '@/api/errors';
 import { useSession } from '@/auth/session';
-import { BrandHeader, PublicHomeLink } from '@/components/Brand';
-import { Button, ErrorBox, Field, LinkButton, Screen, T } from '@/components/ui';
+import { AuthField, AuthLink, AuthShell } from '@/components/AuthShell';
+import { Button, ErrorBox } from '@/components/ui';
 import { isCode } from '@/api/client';
 
 const MIN = 10;
@@ -34,12 +34,8 @@ export default function Register() {
   };
 
   return (
-    <Screen testID="screen-register">
-      <BrandHeader subtitle="Bắt đầu câu chuyện từ căn bếp của bạn" />
-      <T v="h2" accessibilityRole="header">
-        Tạo tài khoản
-      </T>
-      <Field
+    <AuthShell testID="screen-register" title="Mở bếp của bạn." subtitle="Một tài khoản để lưu nguyên liệu, lên mâm và viết tiếp chuyện bếp.">
+      <AuthField
         label="Email"
         testID="register-email"
         value={email}
@@ -50,7 +46,7 @@ export default function Register() {
         inputMode="email"
         error={fe.email ?? (isCode(err, 'invalid_email', 'email_taken') ? errorText(err) : undefined)}
       />
-      <Field
+      <AuthField
         label="Mật khẩu"
         testID="register-password"
         value={password}
@@ -60,7 +56,7 @@ export default function Register() {
         hint={`Ít nhất ${MIN} ký tự.`}
         error={fe.password ?? (isCode(err, 'weak_password') ? errorText(err) : undefined)}
       />
-      <Field
+      <AuthField
         label="Nhập lại mật khẩu"
         testID="register-password2"
         value={again}
@@ -71,17 +67,17 @@ export default function Register() {
       />
       {err && !isCode(err, 'invalid_email', 'email_taken', 'weak_password') ? <ErrorBox message={errorText(err)} /> : null}
       {isCode(err, 'email_taken') ? (
-        <LinkButton label="Đăng nhập bằng email này" onPress={() => router.replace('/dang-nhap')} />
+        <AuthLink label="Đăng nhập bằng email này" onPress={() => router.replace('/dang-nhap')} />
       ) : null}
       <Button
+        style={{ minHeight: 56, borderRadius: 12 }}
         label="Tạo tài khoản"
         testID="register-submit"
         onPress={submit}
         loading={busy}
         disabled={!email || password.length < MIN || password !== again}
       />
-      <LinkButton label="Đã có tài khoản? Đăng nhập" onPress={() => router.replace('/dang-nhap')} />
-      <PublicHomeLink />
-    </Screen>
+      <AuthLink label="Đã có tài khoản? Đăng nhập" onPress={() => router.replace('/dang-nhap')} />
+    </AuthShell>
   );
 }

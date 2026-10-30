@@ -12,3 +12,6 @@ Implementation: original ceramic plate geometry with real-photo texture; pointer
 Identity: bowl + two steam strokes. Palette: chilli orange, lime, cream, dark olive. Removes the asterisk and serif wordmark.
 
 All food photos are sourced photographs; see landing/img/CREDITS.md. Generated images from an earlier cancelled request were not imported or referenced.
+
+## Latest revision
+User removed the 3D direction. Removed Three.js, canvas scene, circular plate, floating tags and perspective photo cards. Real photography remains flat. Authentication now uses a responsive split layout on desktop and a focused single-column form on mobile, with password visibility controls.

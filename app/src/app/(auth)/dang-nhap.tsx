@@ -3,8 +3,9 @@ import { useState } from 'react';
 
 import { errorText, fieldErrors } from '@/api/errors';
 import { useSession } from '@/auth/session';
-import { BrandHeader, PublicHomeLink } from '@/components/Brand';
-import { Button, ErrorBox, Field, LinkButton, Row, Screen, T } from '@/components/ui';
+import { AuthField, AuthLink, AuthShell } from '@/components/AuthShell';
+import { View } from 'react-native';
+import { Button, ErrorBox, Row, T } from '@/components/ui';
 
 export default function Login() {
   const { signIn } = useSession();
@@ -16,6 +17,7 @@ export default function Login() {
   const fe = fieldErrors(err);
 
   const submit = async () => {
+    if (busy || !email.trim() || !password) return;
     setBusy(true);
     setErr(null);
     try {
@@ -29,14 +31,11 @@ export default function Login() {
   };
 
   return (
-    <Screen testID="screen-login">
-      <BrandHeader />
-      <T tone="muted">Đăng nhập để mở kho bếp, lên mâm và lưu lại những bữa ngon của bạn.</T>
-      <T v="h2" accessibilityRole="header">
-        Chào bạn, vào bếp thôi!
-      </T>
-      <Field
+    <AuthShell testID="screen-login" title="Về bếp thôi." subtitle="Đăng nhập để tiếp tục câu chuyện bữa ngon của bạn.">
+      <AuthField
         label="Email"
+        placeholder="ban@example.com"
+        autoCorrect={false}
         testID="login-email"
         value={email}
         onChangeText={setEmail}
@@ -46,24 +45,25 @@ export default function Login() {
         inputMode="email"
         error={fe.email}
       />
-      <Field
+      <AuthField
         label="Mật khẩu"
+        placeholder="Nhập mật khẩu của bạn"
         testID="login-password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
         autoComplete="current-password"
+        returnKeyType="go"
         onSubmitEditing={submit}
         error={fe.password}
       />
       {err ? <ErrorBox message={errorText(err)} /> : null}
-      <Button label="Đăng nhập" testID="login-submit" onPress={submit} loading={busy} disabled={!email || !password} />
-      <Row style={{ justifyContent: 'space-between' }}>
-        <LinkButton label="Quên mật khẩu?" onPress={() => router.push('/quen-mat-khau')} />
-        <LinkButton label="Tạo tài khoản" testID="go-register" onPress={() => router.push('/dang-ky')} />
+      <View style={{ alignItems: 'flex-end', marginTop: -12 }}><AuthLink label="Quên mật khẩu?" onPress={() => router.push('/quen-mat-khau')} /></View>
+      <Button label="Đăng nhập →" accessibilityLabel="Đăng nhập" testID="login-submit" onPress={submit} loading={busy} disabled={!email.trim() || !password} style={{ minHeight: 56, borderRadius: 12 }} />
+      <Row style={{ justifyContent: 'center', gap: 4 }}>
+        <T tone="muted" style={{ fontSize: 13 }}>Bạn mới đến Tastoria?</T>
+        <AuthLink label="Tạo tài khoản" testID="go-register" onPress={() => router.push('/dang-ky')} />
       </Row>
-      <LinkButton label="Làm khảo sát gu món ăn (không cần tài khoản)" onPress={() => router.push('/khao-sat')} />
-      <PublicHomeLink />
-    </Screen>
+    </AuthShell>
   );
 }
