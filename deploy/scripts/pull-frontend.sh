@@ -9,6 +9,11 @@ checkout="$state_dir/checkout"
 if [ ! -d "$checkout/.git" ]; then
   git clone --no-checkout git@github-nambuw:NamBuw/Tastoria.git "$checkout"
 fi
+# The first CI run has not promoted anything yet; absence is not a deployment failure.
+remote_status=0
+git -C "$checkout" ls-remote --exit-code origin refs/heads/deploy/frontend > /dev/null || remote_status=$?
+[ "$remote_status" != 2 ] || exit 0
+[ "$remote_status" = 0 ] || exit "$remote_status"
 git -C "$checkout" fetch origin main deploy/frontend
 sha="$(git -C "$checkout" rev-parse origin/deploy/frontend)"
 git -C "$checkout" merge-base --is-ancestor "$sha" origin/main
