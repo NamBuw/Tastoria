@@ -16,7 +16,7 @@ else:
     raise RuntimeError('Preview server did not start')
 
 with sync_playwright() as p:
-    browser = p.chromium.launch()
+    browser = p.chromium.launch(args=['--enable-unsafe-swiftshader'])
     page = browser.new_page()
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
@@ -27,8 +27,19 @@ with sync_playwright() as p:
         assert page.url == BASE + '/'
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         assert page.get_by_role('link', name='Đăng nhập', exact=True).get_attribute('href') == '/dang-nhap'
-        page.get_by_role('button', name='Đậu phụ', exact=True).click()
+        page.locator('[data-ingredient=tofu]').click()
         assert page.locator('#recipe-name').inner_text() == 'Đậu phụ sốt nấm'
+    page.locator('#food-stage.webgl-ready canvas').wait_for()
+    page.locator('#motion-toggle').click()
+    assert page.locator('body').evaluate("el => el.classList.contains('motion-paused')")
+    page.emulate_media(reduced_motion='reduce')
+    page.reload()
+    assert page.locator('#motion-toggle').get_attribute('aria-pressed') == 'false'
+    plain = browser.new_context(java_script_enabled=False).new_page()
+    plain.goto(BASE + '/')
+    assert plain.get_by_role('heading', name='Taste and write your story.').is_visible()
+    assert plain.locator('#food-stage img').is_visible()
+    plain.close()
     page.get_by_role('link', name='Đăng nhập', exact=True).click()
     page.get_by_test_id('screen-login').wait_for()
     page.get_by_role('link', name='← Về trang giới thiệu Tastoria').click()

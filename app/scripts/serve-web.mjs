@@ -7,7 +7,8 @@ import http from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { extname, join, normalize, resolve } from 'node:path';
 
-const root = resolve(process.env.DIST ?? 'dist');
+const root = resolve(process.env.DIST ?? fileURLToPath(new URL('../dist/', import.meta.url)));
+const downloads = fileURLToPath(new URL('../../dist/', import.meta.url));
 const landing = fileURLToPath(new URL('../../landing/', import.meta.url));
 const port = Number(process.env.PORT ?? 8080);
 const host = process.env.HOST ?? '127.0.0.1';
@@ -50,8 +51,15 @@ http
       res.writeHead(301, { location: '/gioi-thieu/' });
       return res.end();
     }
+    if (path.startsWith('/tai-ve/')) {
+      const match = /^\/tai-ve\/(tastoria-[0-9][0-9A-Za-z.-]*\.apk)$/.exec(path);
+      const apk = match ? join(downloads, match[1]) : '';
+      if (!apk || !existsSync(apk)) { res.writeHead(404); return res.end(); }
+      res.writeHead(200, { 'content-type': 'application/vnd.android.package-archive', 'content-disposition': `attachment; filename="${match[1]}"` });
+      return createReadStream(apk).pipe(res);
+    }
     const publicPage = path === '/' || path === '/gioi-thieu/';
-    const publicAsset = /^\/gioi-thieu\/(?:style\.css|story\.js|(?:fonts|img)\/[A-Za-z0-9._-]+)$/.test(path);
+    const publicAsset = /^\/gioi-thieu\/(?:style\.css|story\.js|food-scene\.js|(?:fonts|img|vendor)\/[A-Za-z0-9._-]+)$/.test(path);
     if (publicPage || publicAsset) {
       const publicFile = publicPage ? join(landing, 'index.html') : join(landing, path.slice('/gioi-thieu/'.length));
       if (!existsSync(publicFile) || !statSync(publicFile).isFile()) { res.writeHead(404); return res.end(); }

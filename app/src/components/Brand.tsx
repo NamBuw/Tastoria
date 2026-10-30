@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { Platform, View } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 
 import { radius, space, useTheme } from '@/theme';
 
@@ -8,20 +8,15 @@ import { LinkButton, T } from './ui';
 
 export const SLOGAN = 'Taste and write your story';
 
-/** App mark: round tray seen from above, rice bowl in the centre and three dishes. */
+/** Tastoria's own mark: a bowl and two rising strokes of steam. */
 export function TrayMark({ size = 56 }: { size?: number }) {
   const { c } = useTheme();
   return (
     <Svg width={size} height={size} viewBox="0 0 64 64" accessibilityElementsHidden importantForAccessibility="no">
-      <Circle cx="32" cy="32" r="31" fill={c.trayRim} />
-      <Circle cx="32" cy="32" r="28.5" fill={c.tray} />
-      <Circle cx="32" cy="32" r="8" fill={c.rice} stroke={c.glaze} strokeWidth="1.5" />
-      <Circle cx="32" cy="14.5" r="8" fill={c.dish} stroke={c.glaze} strokeWidth="2" />
-      <Circle cx="32" cy="14.5" r="4.5" fill="#B06A35" />
-      <Circle cx="16.8" cy="40.8" r="8" fill={c.dish} stroke={c.glaze} strokeWidth="2" />
-      <Circle cx="16.8" cy="40.8" r="4.5" fill={c.herb} />
-      <Circle cx="47.2" cy="40.8" r="8" fill={c.dish} stroke={c.glaze} strokeWidth="2" />
-      <Circle cx="47.2" cy="40.8" r="5" fill="#D9B45A" />
+      <Path d="M9 30h46c-1 14-11 24-23 24S10 44 9 30Z" fill={c.accent} />
+      <Path d="M18 59h28" stroke={c.text} strokeWidth="5" strokeLinecap="round" />
+      <Path d="M25 8c-9 8 7 9-1 17M40 5c-9 8 7 10-1 17" fill="none" stroke={c.text} strokeWidth="5" strokeLinecap="round" />
+      <Path d="M16 36h32" stroke={c.surface} strokeWidth="3" strokeLinecap="round" />
     </Svg>
   );
 }

@@ -2,17 +2,17 @@
   "expo": {
     "name": "Tastoria",
     "slug": "tastoria",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "tastoria",
     "userInterfaceStyle": "automatic",
-    "backgroundColor": "#F6F0E2",
+    "backgroundColor": "#FFF9ED",
     "android": {
       "package": "net.ctslab.tastoria",
-      "versionCode": 3,
+      "versionCode": 4,
       "adaptiveIcon": {
-        "backgroundColor": "#F6F0E2",
+        "backgroundColor": "#FFF9ED",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
@@ -31,8 +31,8 @@
       "favicon": "./assets/images/favicon.png",
       "name": "Tastoria",
       "lang": "vi",
-      "themeColor": "#A84B26",
-      "backgroundColor": "#F6F0E2"
+      "themeColor": "#F3512C",
+      "backgroundColor": "#FFF9ED"
     },
     "plugins": [
       "expo-router",

@@ -1,63 +1,47 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Tastoria — Taste and write your story</title>
-<meta name="description" content="Từ nguyên liệu sẵn có đến mâm cơm Việt của riêng bạn. Cùng Tastoria chọn món, vào bếp và lưu lại câu chuyện mỗi bữa ăn.">
-<meta name="theme-color" content="#f8f3e8">
-<link rel="icon" href="/gioi-thieu/img/icon.svg" type="image/svg+xml">
-<link rel="preload" href="/gioi-thieu/fonts/be-vietnam-pro-400Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/gioi-thieu/style.css?v=0.1.2">
-<script src="/gioi-thieu/story.js?v=0.1.2" defer></script>
+<meta name="description" content="Nguyên liệu quen. Câu chuyện mới. Cùng Tastoria khám phá món Việt, lên mâm từ đồ sẵn có và lưu lại hành trình vào bếp.">
+<meta name="theme-color" content="#f3512c">
+<link rel="icon" href="/gioi-thieu/img/brand-mark.svg?v=3" type="image/svg+xml">
+<link rel="preload" href="/gioi-thieu/fonts/be-vietnam-pro-700Bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/gioi-thieu/img/bun-dau.jpg" as="image">
+<link rel="stylesheet" href="/gioi-thieu/style.css?v=0.1.3">
+<script src="/gioi-thieu/story.js?v=0.1.3" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Đến nội dung chính</a>
 <header class="header wrap">
- <a class="wordmark" href="/" aria-label="Tastoria, trang chủ">tastoria<span class="brand-dot">✳</span></a>
- <nav aria-label="Điều hướng chính"><a href="#cau-chuyen">Câu chuyện</a><a href="#can-bep">Căn bếp</a><a href="#nhat-ky">Nhật ký</a></nav>
- <div class="auth-links" aria-label="Tài khoản"><a class="login-link" href="/dang-nhap">Đăng nhập</a><a class="button small" href="/dang-ky">Đăng ký <span aria-hidden="true">↗</span></a></div>
+ <a class="wordmark" href="/" aria-label="Tastoria, trang chủ"><img src="/gioi-thieu/img/brand-mark.svg" width="44" height="44" alt="">tastoria<span class="wordmark-period">.</span></a>
+ <nav aria-label="Điều hướng chính"><a href="#kham-pha">Khám phá</a><a href="#can-bep">Bếp của bạn</a><a href="#nhat-ky">Chuyện bếp</a></nav>
+ <div class="auth-links"><a class="login-link" href="/dang-nhap">Đăng nhập</a><a class="button small" href="/dang-ky">Đăng ký <span aria-hidden="true">↗</span></a></div>
 </header>
 <main id="main">
- <section class="hero wrap" aria-labelledby="hero-title">
-  <div class="hero-copy">
-   <p class="eyebrow"><span class="little-line"></span> MỘT CĂN BẾP. VẠN CÂU CHUYỆN.</p>
-   <h1 id="hero-title">Taste and<br>write <em>your<br>story.</em></h1>
-   <p class="hero-vietnamese">Mỗi bữa ngon, một câu chuyện.</p>
-   <p class="hero-description">Có những câu chuyện bắt đầu từ một căn bếp.<br class="desktop"> Từ nguyên liệu sẵn có, cùng Tastoria nấu nên<br class="desktop"> mâm cơm mang hương vị của riêng bạn.</p>
-   <a class="button" href="/bep">Bắt đầu câu chuyện của bạn <span aria-hidden="true">↗</span></a>
-   <a class="text-link" href="#can-bep">Khám phá căn bếp <span aria-hidden="true">↓</span></a>
+ <section class="hero" aria-labelledby="hero-title">
+  <div class="hero-top wrap"><p class="eyebrow"><span class="status-dot"></span> NGUYÊN LIỆU QUEN. CÂU CHUYỆN MỚI.</p><button id="motion-toggle" class="motion-toggle" type="button" aria-pressed="true">Ⅱ <span>Tắt chuyển động</span></button></div>
+  <div class="hero-layout wrap">
+   <div class="hero-copy"><h1 id="hero-title" aria-label="Taste and write your story."><span>Taste<span class="dot">.</span></span><span class="headline-small">and write</span><span class="headline-last">your story<span class="dot">.</span></span></h1><p class="hero-vietnamese">Nấu một bữa ngon.<br>Kể một chuyện của riêng mình.</p><p class="hero-description">Từ những gì đang có trong tủ lạnh đến mâm cơm khiến bạn muốn về nhà.</p><a class="button lime" href="/bep">Khám phá căn bếp của bạn <span aria-hidden="true">↗</span></a><p class="hero-footnote">Bắt đầu từ nguyên liệu. Kết thúc bằng một bữa ngon.</p></div>
+   <div class="hero-visual" id="food-stage"><div class="orbit orbit-one" aria-hidden="true"></div><div class="orbit orbit-two" aria-hidden="true"></div><div class="plate-shadow" aria-hidden="true"></div><div class="food-fallback"><img src="/gioi-thieu/img/bun-dau.jpg" width="1600" height="1067" fetchpriority="high" alt="Mâm bún đậu thật với nem rán vàng, thịt luộc, dưa chuột và bún trắng, ảnh của Quang Nguyen Vinh."></div><div id="food-canvas" aria-hidden="true"></div><div class="floating-tag tag-fresh"><span class="tag-icon" aria-hidden="true">↗</span><div>Vị quen thuộc.<br><strong>Cảm hứng mới.</strong></div></div><div class="floating-tag tag-note"><span>CHUYỆN NGON #01</span><strong>Mâm nhà mình.</strong><span>Thêm người, thêm vui.</span></div><div class="scene-hint"><span aria-hidden="true">↔</span> Di chuột để đổi góc nhìn</div></div>
   </div>
-  <div class="hero-art">
-   <span class="photo-note">ngon nhất là cơm nhà.</span>
-   <figure><img src="/gioi-thieu/img/vietnamese-table.jpg" width="1400" height="933" fetchpriority="high" alt="Mọi người cùng thưởng thức bún, nem, thịt nướng và rau thơm bên mâm cơm Việt."><figcaption>MỘT MÂM CƠM · NHIỀU ĐIỀU ĐỂ KỂ</figcaption></figure>
-   <div class="seal" aria-label="Nấu bằng cả trái tim"><span>NẤU BẰNG</span><b>♡</b><span>CẢ TRÁI TIM</span></div>
-   <div class="photo-label"><span>01 / CHUYỆN QUÂY QUẦN</span><p>Thêm một đôi đũa,<br>thêm một câu chuyện.</p></div>
-  </div>
+  <div class="hero-bottom wrap"><a href="#kham-pha">CUỘN ĐỂ NẾM MỘT CHÚT CẢM HỨNG <span aria-hidden="true">↓</span></a><span>Ảnh thật. Vị thật. Chuyện của bạn.</span></div>
  </section>
- <div class="ribbon" aria-hidden="true"><span>Nguyên liệu quen</span><i>✳</i><span>Cảm hứng mới</span><i>✳</i><span>Mâm cơm nhà</span><i>✳</i><span>Câu chuyện riêng</span><i>✳</i></div>
- <section class="intro wrap section" id="cau-chuyen">
-  <p class="eyebrow">01 — CHUYỆN CỦA TASTORIA</p>
-  <div><h2>Không cần đi đâu xa.<br>Cảm hứng ở ngay <em>trong bếp.</em></h2>
-  <div class="intro-bottom"><span class="asterisk" aria-hidden="true">✳</span><p>Mớ rau còn tươi, vài quả trứng, chút nguyên liệu từ buổi chợ sáng. Những điều bình thường ấy có thể trở thành một bữa ăn đáng nhớ. Tastoria giúp bạn bắt đầu từ những gì đang có — rồi viết tiếp câu chuyện theo cách của mình.</p></div></div>
+ <section class="discovery section" id="kham-pha">
+  <div class="wrap section-heading reveal"><div><p class="eyebrow">01 / MỞ VỊ GIÁC</p><h2>Một chút quen.<br><span>Một trời cảm hứng.</span></h2></div><p>Không cần những nguyên liệu xa lạ.<br>Chỉ cần một cách nhìn mới<br>về bữa ăn mỗi ngày.</p></div>
+  <div class="gallery-stage wrap"><div class="food-gallery">
+   <article class="food-card card-one" tabindex="0"><div class="food-card-image"><img src="/gioi-thieu/img/fresh-bowl.jpg" width="1200" height="1797" loading="lazy" alt="Bát bún nhiều rau xanh, cà rốt và đậu phụ, ảnh chụp của cottonbro studio."></div><div class="food-card-label"><div><span>TƯƠI MỘT CHÚT</span><h3>Một bữa nhiều xanh.</h3></div><span aria-hidden="true">01</span></div></article>
+   <article class="food-card card-two" tabindex="0"><div class="food-card-image"><img src="/gioi-thieu/img/vietnamese-table.jpg" width="1400" height="933" loading="lazy" alt="Mọi người cùng gắp món trên mâm, ảnh chụp của Jakub Kapusnak."></div><div class="food-card-label"><div><span>GẦN NHAU MỘT CHÚT</span><h3>Có nhau, ngon hơn.</h3></div><span aria-hidden="true">02</span></div></article>
+   <article class="food-card card-three" tabindex="0"><div class="food-card-image"><img src="/gioi-thieu/img/pho.jpg" width="1600" height="1067" loading="lazy" alt="Bát món nóng với thịt, khoai và rau thơm, ảnh chụp của Tranmautritam."></div><div class="food-card-label"><div><span>ẤM MỘT CHÚT</span><h3>Vị ngon ở lại.</h3></div><span aria-hidden="true">03</span></div></article>
+  </div><p class="gallery-caption">Những lát cắt ẩm thực để lấy cảm hứng · Không phải thực đơn được gợi ý cho bạn.</p></div>
  </section>
- <section class="kitchen section" id="can-bep">
-  <div class="wrap"><div class="section-heading"><div><p class="eyebrow">02 — TỪ TỦ LẠNH ĐẾN BÀN ĂN</p><h2>Hôm nay,<br><em>bếp có gì?</em></h2></div><p>Một chút gợi ý để câu hỏi “hôm nay ăn gì”<br>trở thành niềm vui vào bếp.</p></div>
-   <div class="kitchen-grid">
-    <div class="recipe-demo"><div class="demo-top"><span class="eyebrow">SỔ GỢI Ý NHỎ</span><span>VÍ DỤ MINH HOẠ</span></div><h3>Chọn một nguyên liệu,<br>thử một ý tưởng.</h3>
-     <div class="ingredient-options" role="group" aria-label="Chọn nguyên liệu minh hoạ"><button type="button" data-ingredient="egg" aria-pressed="true">Trứng</button><button type="button" data-ingredient="tofu" aria-pressed="false">Đậu phụ</button><button type="button" data-ingredient="greens" aria-pressed="false">Rau xanh</button></div>
-     <div class="demo-result" aria-live="polite"><span class="recipe-number" aria-hidden="true">↗</span><div><p class="eyebrow">MỘT Ý TƯỞNG CHO BẾP NHÀ</p><h4 id="recipe-name">Trứng sốt cà chua</h4><p id="recipe-description">Trứng mềm, cà chua chín và một chút hành. Một món quen để bắt đầu bữa cơm.</p></div></div>
-     <p class="demo-note">Đây là ví dụ, chưa dựa trên kho hoặc hồ sơ của bạn. Mở ứng dụng để lên mâm từ nguyên liệu thực tế.</p><a href="/bep" class="text-link">Lên mâm của bạn <span aria-hidden="true">↗</span></a>
-    </div>
-    <ol class="steps"><li><span>01</span><div><h3>Mở tủ lạnh. Tìm cảm hứng.</h3><p>Chụp nguyên liệu hoặc thêm bằng tay. Xem lại thông tin trước khi lưu vào kho bếp.</p></div></li><li><span>02</span><div><h3>Gom vị quen thành mâm ngon.</h3><p>Nhận gợi ý mâm cơm Việt từ đồ sẵn có, ưu tiên nguyên liệu cần dùng sớm.</p></div></li><li><span>03</span><div><h3>Vào bếp. Viết tiếp câu chuyện.</h3><p>Theo các bước nấu, hoàn thành bữa ăn và nhìn lại những mâm cơm trong nhật ký.</p></div></li></ol>
-   </div>
-  </div>
- </section>
- <section class="journal wrap section" id="nhat-ky">
-  <div class="journal-art" aria-label="Minh hoạ một trang sổ bếp"><div class="notebook"><div class="notebook-top"><span>TASTORIA / CHUYỆN BẾP</span><span>01</span></div><p class="handwritten">Hôm nay mình<br>nấu một chút thương.</p><div class="notebook-rule"></div><p>Món quen. Người thương.<br>Một bữa cơm vừa đủ.</p><span class="notebook-flower" aria-hidden="true">✳</span><small>TRANG MINH HOẠ · CÂU CHUYỆN CỦA BẠN ĐANG CHỜ</small></div></div>
-  <div class="journal-copy"><p class="eyebrow">03 — NHỮNG BỮA ĂN Ở LẠI</p><h2>Nếm một hương vị.<br>Giữ một <em>kỷ niệm.</em></h2><p>Có món nấu lần đầu còn vụng. Có mâm cơm chỉ vài món nhưng ai cũng muốn ăn thêm. Nhật ký Tastoria là nơi nhìn lại hành trình vào bếp — từng bữa, từng ngày.</p><a class="text-link" href="/nhat-ky">Mở nhật ký của bạn <span aria-hidden="true">↗</span></a></div>
- </section>
- <section class="invitation"><div class="wrap"><span class="invitation-flower" aria-hidden="true">✳</span><p class="eyebrow">CÂU CHUYỆN TIẾP THEO LÀ CỦA BẠN</p><h2>Bếp đã sẵn sàng.<br><em>Còn bạn thì sao?</em></h2><a class="button cream" href="/bep">Cùng vào bếp <span aria-hidden="true">↗</span></a><p class="download"><a id="android-download" href="/tai-ve/tastoria-0.1.2.apk" download>Tải bản Android · APK 0.1.2</a></p></div></section>
- <section class="faq wrap section"><p class="eyebrow">MỘT VÀI ĐIỀU NHỎ</p><div><details><summary>Tastoria bắt đầu từ đâu?</summary><p>Tastoria là dự án thử nghiệm về nhận diện nguyên liệu, gợi ý mâm cơm Việt và hỗ trợ nấu ăn. Bạn có thể dùng bản web hoặc Android với cùng một tài khoản.</p></details><details><summary>Tôi có cần chụp ảnh nguyên liệu không?</summary><p>Không bắt buộc. Bạn có thể thêm nguyên liệu bằng tay trong Kho. Nếu dùng ảnh, hãy kiểm tra và chỉnh lại kết quả nhận diện trước khi lưu.</p></details><details><summary>Ảnh và dữ liệu của tôi được quản lý thế nào?</summary><p>Bạn chọn đồng ý riêng cho từng mục đích trong ứng dụng. Ảnh quét gốc được giữ 30 ngày, trừ khi bạn đồng ý góp ảnh. Trong Cài đặt, bạn có thể rút đồng ý, tải dữ liệu hoặc xoá tài khoản.</p></details><details><summary>Tôi muốn góp gu món ăn của mình?</summary><p>Bạn có thể <a href="/khao-sat">tham gia khảo sát gu món ăn</a> mà không cần tài khoản. Các câu trả lời giúp nhóm nghiên cứu cách gợi ý món phù hợp hơn.</p></details></div></section>
+ <section class="kitchen section" id="can-bep"><div class="wrap kitchen-grid">
+  <div class="kitchen-copy reveal"><p class="eyebrow">02 / BẾP CỦA BẠN</p><h2>Tủ lạnh có gì,<br><span>mình nấu đó.</span></h2><p>Mớ rau sáng nay. Vài quả trứng còn lại.<br>Một bữa ngon có thể bắt đầu từ rất ít.</p><ol class="steps"><li><span>01</span><div><h3>Nhìn vào tủ lạnh.</h3><p>Chụp ảnh hoặc thêm nguyên liệu bằng tay.</p></div></li><li><span>02</span><div><h3>Gom thành một mâm.</h3><p>Gợi ý món Việt từ kho, ưu tiên đồ cần dùng sớm.</p></div></li><li><span>03</span><div><h3>Nấu và thưởng thức.</h3><p>Theo các bước nấu. Lưu bữa ngon vào nhật ký.</p></div></li></ol><a href="/bep" class="text-link">Mở kho bếp của mình <span aria-hidden="true">↗</span></a></div>
+  <div class="recipe-demo reveal"><div class="demo-top"><span>SỔ TAY BẾP NHỎ</span><span>THỬ MỘT CHÚT ↓</span></div><h3>Hôm nay bạn có…</h3><div class="ingredient-options" role="group" aria-label="Chọn nguyên liệu minh hoạ"><button type="button" data-ingredient="egg" aria-pressed="true"><span aria-hidden="true">01</span>Trứng</button><button type="button" data-ingredient="tofu" aria-pressed="false"><span aria-hidden="true">02</span>Đậu phụ</button><button type="button" data-ingredient="greens" aria-pressed="false"><span aria-hidden="true">03</span>Rau xanh</button></div><div class="demo-result" aria-live="polite"><span class="result-label">MỘT Ý TƯỞNG NHO NHỎ</span><h4 id="recipe-name">Trứng sốt cà chua</h4><p id="recipe-description">Trứng mềm, cà chua chín và một chút hành. Một món quen để bắt đầu bữa cơm.</p></div><a class="button" href="/bep">Lên mâm từ kho của bạn <span aria-hidden="true">↗</span></a><p class="demo-note">Ví dụ minh hoạ, chưa dựa trên kho hay hồ sơ của bạn.</p></div>
+ </div></section>
+ <section class="story-section" id="nhat-ky"><div class="story-photo"><img src="/gioi-thieu/img/vietnamese-table.jpg" width="1400" height="933" loading="lazy" alt="Khoảnh khắc cùng nhau thưởng thức một mâm cơm Việt."><span class="photo-credit">Ảnh: Jakub Kapusnak / Foodiesfeed</span></div><div class="story-content reveal"><p class="eyebrow">03 / GIỮ LẠI ĐIỀU NGON</p><h2>Có những bữa ăn,<br>mình nhớ<br><span>rất lâu.</span></h2><p>Lần đầu nấu món mẹ hay làm. Một bữa cơm sau ngày dài. Hay đơn giản là hôm nay, mình đã vào bếp.</p><p>Nhật ký Tastoria giữ lại hành trình ấy — từng mâm cơm, từng ngày.</p><a class="button lime" href="/nhat-ky">Viết tiếp chuyện bếp <span aria-hidden="true">↗</span></a></div></section>
+ <section class="invitation section"><div class="wrap reveal"><p class="eyebrow">BỮA NGON TIẾP THEO BẮT ĐẦU TỪ BẠN.</p><h2>Let's make<br><span>something tasty.</span></h2><div class="invitation-actions"><a class="button" href="/bep">Cùng vào bếp <span aria-hidden="true">↗</span></a><a id="android-download" class="text-link" href="/tai-ve/tastoria-0.1.3.apk" download>Tải Android · APK 0.1.3 <span aria-hidden="true">↓</span></a></div></div><div class="invitation-outline" aria-hidden="true">tastoria.</div></section>
+ <section class="faq wrap section"><div><p class="eyebrow">TRƯỚC KHI VÀO BẾP</p><h2>Thêm một<br>chút thông tin.</h2></div><div><details><summary>Tôi có cần tài khoản để xem Tastoria?</summary><p>Bạn có thể khám phá trang này và làm khảo sát mà không đăng nhập. Khi muốn dùng kho nguyên liệu, lên mâm hoặc lưu nhật ký, hãy tạo tài khoản để giữ dữ liệu riêng của mình.</p></details><details><summary>Tôi có bắt buộc chụp ảnh tủ lạnh không?</summary><p>Không. Bạn có thể nhập nguyên liệu bằng tay. Nếu dùng ảnh, hãy kiểm tra và sửa kết quả nhận diện trước khi lưu vào kho.</p></details><details><summary>Ảnh và dữ liệu của tôi được quản lý thế nào?</summary><p>Bạn chọn đồng ý riêng cho từng mục đích. Ảnh quét được giữ 30 ngày, trừ khi bạn đồng ý góp ảnh. Bạn có thể rút đồng ý, tải dữ liệu hoặc xoá tài khoản trong Cài đặt.</p></details><details><summary>Tôi có thể góp gu món ăn của mình?</summary><p>Có. <a href="/khao-sat">Khảo sát gu món ăn</a> không cần tài khoản. Tastoria hiện là dự án thử nghiệm về nhận diện nguyên liệu và gợi ý mâm cơm Việt.</p></details></div></section>
 </main>
-<footer class="footer wrap"><div><a class="wordmark" href="/">tastoria<span class="brand-dot">✳</span></a><p>Taste and write your story.</p></div><div><a href="/bep">Ứng dụng</a><a href="/khao-sat">Góp một chút gu</a><a href="#main">Về đầu trang ↑</a></div><small>Một dự án thử nghiệm, dành cho những căn bếp Việt.<br>Ảnh: Jakub Kapusnak / <a href="https://www.foodiesfeed.com/free-food-photo/feasting-on-vietnamese-traditional-food">Foodiesfeed</a> · CC0</small></footer>
+<footer class="footer"><div class="wrap"><div class="footer-top"><a class="wordmark" href="/"><img src="/gioi-thieu/img/brand-mark.svg" width="48" height="48" alt="">tastoria.</a><p>Taste and write your story.</p><a href="#main" class="back-top" aria-label="Về đầu trang">↑</a></div><div class="footer-bottom"><span>Dành cho những căn bếp Việt.</span><a href="/khao-sat">Góp một chút gu</a><details class="credits"><summary>Nguồn ảnh & cảm hứng</summary><p>Ảnh chụp: <a href="https://www.pexels.com/photo/bowl-with-yummy-vietnamese-meal-5118734/">Quang Nguyen Vinh</a>, <a href="https://www.pexels.com/photo/healthy-food-in-a-bowl-3297807/">cottonbro studio</a>, <a href="https://www.pexels.com/photo/food-on-bowl-98874/">Tranmautritam</a> / Pexels; <a href="https://www.foodiesfeed.com/free-food-photo/feasting-on-vietnamese-traditional-food">Jakub Kapusnak / Foodiesfeed</a>. Tham khảo chuyển động: <a href="https://github.com/codrops/3DCarousel">Codrops 3DCarousel</a>. Không sử dụng ảnh món ăn do AI tạo.</p></details></div></div></footer>
 </body></html>
