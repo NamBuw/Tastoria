@@ -33,9 +33,11 @@ if (download) {
   const label = download.innerHTML;
   const checkDownload = async () => {
     try {
-      const response = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      // A CDN may retain an earlier 404 while the signed APK is building.
+      const readyUrl = `${url}?ready=${Date.now()}`;
+      const response = await fetch(readyUrl, { method: 'HEAD', cache: 'no-store' });
       if (response.ok) {
-        download.setAttribute('href', url);
+        download.setAttribute('href', readyUrl);
         download.removeAttribute('aria-disabled');
         download.innerHTML = label;
         return;

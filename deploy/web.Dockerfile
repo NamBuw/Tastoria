@@ -21,4 +21,3 @@ COPY --from=web /app/dist /usr/share/nginx/tastoria
 COPY landing/index.html landing/style.css landing/story.js /usr/share/nginx/landing/
 COPY landing/fonts /usr/share/nginx/landing/fonts
 COPY landing/img /usr/share/nginx/landing/img
-

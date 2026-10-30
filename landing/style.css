@@ -144,7 +144,7 @@ h1 .headline-last { font-size: .67em; color: var(--paper); line-height: 1.02; wh
  .hero-top { padding-top: 22px; gap: 10px; } .hero-top .eyebrow { font-size: 7px; letter-spacing: .07em; }  .status-dot { width: 5px; height: 5px; }
  .hero-layout { grid-template-columns: 1fr; padding-top: 35px; padding-bottom: 45px; gap: 10px; } h1 { font-size: clamp(86px, 20vw, 135px); } h1 .headline-small { margin: 18px 0; } h1 .headline-last { font-size: .57em; }
  .hero-vietnamese { margin-top: 23px; font-size: 18px; } .hero-description { max-width: 320px; margin: 14px 0 20px; } .hero-footnote { font-size: 8px; } .hero-copy .button { min-height: 54px; }
- .hero-visual { width: 112%; margin-left: -6%; height: 450px; margin-top: 30px; } .food-fallback { inset: 8%; }    
+ .hero-visual { width: 112%; margin-left: -6%; height: 450px; margin-top: 30px; } .food-fallback { inset: 8%; }
    .hero-bottom { padding-block: 17px; } .hero-bottom > span { display: none; } .hero-bottom a { justify-content: space-between; width: 100%; font-size: 8px; }
  .section { padding-block: 70px; } h2 { font-size: clamp(34px, 8.5vw, 52px); } .section-heading { display: block; margin-bottom: 30px; } .section-heading > p { margin-top: 25px; } .section-heading .eyebrow { margin-bottom: 20px; }
  .gallery-stage { width: 100%; } .food-gallery { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 20px 30px 35px; perspective: none; transform-style: flat; } .food-card { flex: 0 0 78vw; max-width: 360px; scroll-snap-align: center;  }   .food-card-image { height: 340px; } .food-card:hover, .food-card:focus-visible { transform: none; } .food-card h3 { font-size: 20px; } .gallery-caption { padding-inline: 25px; margin-top: 20px; font-size: 9px; }
