@@ -1,0 +1,40 @@
+== AD01 Quét và xác nhận nguyên liệu.svg: 0
+== AD02 Nhận và sử dụng mâm cơm.svg: 0
+== AD03 Hoàn tác – quyết định nghiệp vụ.svg: 0
+== AR01 Các tầng và phụ thuộc triển khai.svg: 0
+== CL09 UC09–10 Hồ sơ và đồng ý.svg: 0
+== CL13 UC13 Xác nhận kết quả quét.svg: 0
+== CL15 UC15 Đề xuất mâm cơm.svg: 0
+== CL20 UC20 Hoàn tất nấu.svg: 0
+== CL30 UC30 Triển khai mô hình.svg: 0
+== DB01 Kho và lịch sử giao dịch.svg: 0
+== DB02 Công thức, mâm và phiên nấu.svg: 0
+== DB03 Quét ảnh và kết quả.svg: 0
+== DM01 Miền kho nguyên liệu.svg: 0
+== DM02 Miền mâm cơm và phiên nấu.svg: 0
+== DS01 Thiết kế chức năng hoàn tất nấu.svg: 0
+== DS02 UC13 Thiết kế xác nhận quét.svg: 0
+== DS03 UC15 Thiết kế tạo mâm.svg: 0
+== PK01 Tài khoản & bảo mật.svg: 0
+== PK02 Quyền riêng tư.svg: 0
+== PK03 Hồ sơ & mục tiêu.svg: 0
+== PK04 Kho & quét.svg: 0
+== PK05 Mâm cơm.svg: 0
+== PK06 Nấu & nhật ký.svg: 0
+== PK07 Khảo sát gu.svg: 0
+== PK08 Quản trị nội dung & dữ liệu.svg: 0
+== PK09 Vận hành mô hình.svg: 0
+== PK10 Tác vụ định kỳ.svg: 0
+== SQ01 Hoàn tất nấu – chống ghi lặp.svg: 0
+== SQ02 Hoàn tác trong thời hạn.svg: 0
+== SQ03 Xác nhận quét – ghi kho một lần.svg: 0
+== UC00 Use case tổng quát – người nấu.svg: 0
+== UC01 Use case công khai và tài khoản.svg: 0
+== UC02 Quét và mở rộng gợi ý mâm.svg: 0
+== UC03 Các chức năng bổ sung của người dùng.svg: 0
+== UC04 Biên soạn dữ liệu.svg: 0
+== UC05 Vận hành mô hình và khảo sát.svg: 0
+== UC06 Quản trị quyền dữ liệu.svg: 0
+== UC07 Gán nhãn dữ liệu.svg: 0
+== UC08 Tác vụ theo lịch.svg: 0
+TỔNG 0

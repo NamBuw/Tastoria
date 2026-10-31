@@ -1,0 +1,31 @@
+\chapter*{PHẠM VI VÀ CÁCH ĐỌC BÁO CÁO}
+\addcontentsline{toc}{chapter}{PHẠM VI VÀ CÁCH ĐỌC BÁO CÁO}
+Báo cáo sử dụng ba tài liệu trong {\small\texttt{PTTKHT}}: {\small\texttt{SLIDE-\allowbreak{}INFOR-\allowbreak{}SYSTEM-\allowbreak{}ANAL-\allowbreak{}DESIGN.\allowbreak{}rar}} (5 tập slide), {\small\texttt{TAILIEU.\allowbreak{}rar}} (2 sách) và {\small\texttt{TỪ PHÂN TÍCH ĐẾN THIẾT KẾ.\allowbreak{}pdf}}. Bộ slide nhấn mạnh chuỗi \textbf{ngữ cảnh \ensuremath{\rightarrow} yêu cầu \ensuremath{\rightarrow} hành vi \ensuremath{\rightarrow} lớp phân tích \ensuremath{\rightarrow} thiết kế}. Báo cáo áp dụng chuỗi đó cho Tastoria, không chuyển nguyên mô hình bán hàng của bài mẫu sang miền nấu ăn.
+
+Tài liệu cũ trong Tastoria cung cấp đường cơ sở yêu cầu; mã nguồn và DDL giúp xác định cách hiện thực. Khi hai nguồn lệch nhau, báo cáo ghi rõ ở bảng đối chiếu. Việc có mã nguồn không đồng nghĩa một tính năng đã đạt chỉ tiêu nghiệm thu. Không lấy số kiểm thử cũ, kết quả ML trên tập khác hoặc ảnh giao diện làm bằng chứng cho độ chính xác thực tế.
+
+Sơ đồ được tạo bằng \textbf{Visual Paradigm CE 18.1}, qua plugin Open API phát triển từ bộ mới {\small\texttt{PTTKHT/\allowbreak{}\allowbreak{}DesignV2/\allowbreak{}\allowbreak{}vp}} ngày 28/\allowbreak{}10/\allowbreak{}2026. Tệp {\small\texttt{.\allowbreak{}vpp}} chứa phần tử mô hình và quan hệ chỉnh sửa được. Ảnh trong báo cáo được xuất từ VP và giữ watermark CE. Các hình DB dùng ký pháp lớp UML \guillemotleft{}table\guillemotright{} để biểu diễn cấu trúc bảng, không gọi nhầm là Chen ERD.
+
+Báo cáo được tổ chức theo trình tự khảo sát \ensuremath{\rightarrow} xác định yêu cầu \ensuremath{\rightarrow} phân tích \ensuremath{\rightarrow} thiết kế \ensuremath{\rightarrow} hiện thực và kiểm thử. Chương 6 tổng hợp đánh giá và hướng phát triển. Bảng dưới giúp tra cứu các nội dung của khung bài tập nhóm trong cấu trúc theo pha.
+
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{PHẠM VI VÀ CÁCH ĐỌC BÁO CÁO}\\
+\toprule
+\textbf{Nội dung cần trình bày} & \textbf{Vị trí trong báo cáo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Nội dung cần trình bày} & \textbf{Vị trí trong báo cáo} \\
+\midrule\endhead
+\bottomrule\endfoot
+Lý do lựa chọn, sản phẩm tương tự & Chương 1 \\ \addlinespace[3pt]
+Yêu cầu chức năng, phi chức năng & Chương 2 \\ \addlinespace[3pt]
+UC tổng quát, phân rã, đặc tả và mô hình phân tích & Chương 3; Phụ lục A \\ \addlinespace[3pt]
+Lựa chọn kiến trúc, công nghệ, thiết kế lớp và tương tác & Mục 4.1--4.5 \\ \addlinespace[3pt]
+Lưu trữ và cấu trúc dữ liệu & Mục 4.6; Phụ lục B \\ \addlinespace[3pt]
+Giao diện theo chức năng & Mục 4.7 \\ \addlinespace[3pt]
+Hiện thực, kiểm thử và giới hạn bằng chứng & Chương 5 \\ \addlinespace[3pt]
+Nội dung mới, khó và phát triển tiếp & Chương 6 \\ \addlinespace[3pt]
+\end{longtable}}
+Mỗi pha có đầu vào và sản phẩm bàn giao riêng. Mô hình phân tích mô tả bài toán, mục tiêu và trách nhiệm nghiệp vụ; mô hình thiết kế lựa chọn thành phần phần mềm và cơ chế hiện thực. Tên module, transaction và API không được dùng thay cho việc giải thích yêu cầu nghiệp vụ.

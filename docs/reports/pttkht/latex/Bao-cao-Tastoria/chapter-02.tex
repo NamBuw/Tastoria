@@ -1,0 +1,116 @@
+\chapter{XÁC ĐỊNH YÊU CẦU HỆ THỐNG}
+Pha yêu cầu chuyển nhu cầu khảo sát thành các chức năng, ràng buộc nghiệp vụ và chỉ tiêu có thể kiểm chứng. Đầu ra là đường cơ sở yêu cầu; các ngưỡng mục tiêu không được coi là số đo đã đạt.
+
+\section{Phạm vi, biên hệ thống và tác nhân}
+Trong phạm vi: tài khoản, hồ sơ và đồng ý xử lý dữ liệu; nhập/\allowbreak{}quét và xác nhận kho; đề xuất mâm, đổi món và nguyên liệu thay thế; đi chợ; lịch nấu; hoàn tất/\allowbreak{}hoàn tác; nhật ký; khảo sát gu; công cụ quản trị dữ liệu và mô hình; tác vụ định kỳ.
+
+Ngoài phạm vi bản hiện tại: mua bán/\allowbreak{}giao hàng, tính năng lượng chính xác từ ảnh món đã nấu, chứng nhận an toàn thực phẩm bằng ảnh, nhiều hồ sơ thành viên cùng quản lý một hộ, thực đơn tuần tự động và phát hành iOS. Huấn luyện mô hình là quy trình ngoại tuyến; ứng dụng sử dụng mô hình đã đăng ký/\allowbreak{}triển khai.
+
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{Phạm vi, biên hệ thống và tác nhân}\\
+\toprule
+\textbf{Tác nhân} & \textbf{Mục tiêu và kênh tương tác} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Tác nhân} & \textbf{Mục tiêu và kênh tương tác} \\
+\midrule\endhead
+\bottomrule\endfoot
+A01 Khách & Xem trang giới thiệu, đăng ký, đăng nhập, khôi phục mật khẩu \\ \addlinespace[3pt]
+A02 Người dùng & Quản lý dữ liệu và quá trình nấu của chính mình qua app/\allowbreak{}web \\ \addlinespace[3pt]
+A03 Người tham gia khảo sát & Chấm món qua đường dẫn khảo sát, không bắt buộc tài khoản app \\ \addlinespace[3pt]
+A04 Quản trị viên & Xử lý yêu cầu dữ liệu, kiểm toán; không mặc nhiên có màn hình admin trong app \\ \addlinespace[3pt]
+A05 Người biên soạn & Nhập, kiểm tra danh mục/\allowbreak{}công thức và cặp thay thế qua công cụ vận hành \\ \addlinespace[3pt]
+A06 Người vận hành mô hình & Quản lý khảo sát, bản xuất dữ liệu, phiên bản và triển khai mô hình \\ \addlinespace[3pt]
+A07 Người gán nhãn & Gán nhãn ảnh được phép dùng qua công cụ chuyên dụng \\ \addlinespace[3pt]
+A08 Bộ lập lịch & Tác nhân kích hoạt từ môi trường chạy đối với các UC bảo trì \\ \addlinespace[3pt]
+A09 Dịch vụ email & Hỗ trợ gửi thư khôi phục mật khẩu \\ \addlinespace[3pt]
+A10 Công cụ gán nhãn & Tích hợp vào quy trình gán nhãn; không đồng nhất với người gán nhãn \\ \addlinespace[3pt]
+\end{longtable}}
+Người ăn cùng là bên liên quan, không phải actor nếu không trực tiếp tương tác. Người dùng khai dị ứng của họ trong yêu cầu tạo mâm. PostgreSQL, mô hình ONNX và worker là thành phần bên trong, không vẽ thành tác nhân người dùng.
+
+\section{Yêu cầu chức năng và tiêu chí chấp nhận}
+Các mã F01--F12 dưới đây là nhóm yêu cầu của báo cáo, không thay thế mã FR chi tiết trong kho mã nguồn.
+
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{}}
+\caption{Yêu cầu chức năng và tiêu chí chấp nhận}\\
+\toprule
+\textbf{Mã} & \textbf{Yêu cầu} & \textbf{Tiêu chí chấp nhận quan sát được} & \textbf{UC} \\
+\midrule\endfirsthead
+\multicolumn{4}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Mã} & \textbf{Yêu cầu} & \textbf{Tiêu chí chấp nhận quan sát được} & \textbf{UC} \\
+\midrule\endhead
+\bottomrule\endfoot
+F01 & Phân biệt nội dung công khai và dữ liệu cá nhân & Khách xem landing không bị chuyển sang đăng nhập; vào kho phải có phiên hợp lệ & 01--04 \\ \addlinespace[3pt]
+F02 & Quản lý đồng ý theo mục đích & Không ghi sự kiện cá nhân hóa khi chưa đồng ý; thay đổi đồng ý có lịch sử & 05--08 \\ \addlinespace[3pt]
+F03 & Hồ sơ ảnh hưởng ràng buộc mâm & Dị ứng cập nhật được dùng khi tạo mâm mới; không lấy dữ liệu người khác & 09--11 \\ \addlinespace[3pt]
+F04 & Quét ảnh bất đồng bộ & Nhận mã lần quét, xem trạng thái; tải ảnh lỗi có thông báo; chưa xác nhận thì kho không đổi & 12--13 \\ \addlinespace[3pt]
+F05 & Kho lưu theo lô & Hai lần nhập cùng nguyên liệu giữ được hai lô/\allowbreak{}ngày nhập khác nhau & 14 \\ \addlinespace[3pt]
+F06 & Ghép mâm theo lượng kho tổng & Với tổng nhu cầu vượt lượng khả dụng, không trả mâm như thể đủ nguyên liệu & 15 \\ \addlinespace[3pt]
+F07 & Đổi món vẫn tuân ràng buộc & Giữ món không đổi, kiểm lại kho/\allowbreak{}dị ứng/\allowbreak{}thời gian cho toàn mâm & 16--17 \\ \addlinespace[3pt]
+F08 & Theo dõi nguyên liệu cần mua & Thêm/\allowbreak{}sửa/\allowbreak{}đánh dấu món cần mua, không tự tăng kho chỉ vì thêm vào danh sách & 18 \\ \addlinespace[3pt]
+F09 & Lịch nấu theo nguồn lực & Không trùng hai bước cần thao tác chủ động; số bước chiếm bếp đồng thời không vượt số họng & 19 \\ \addlinespace[3pt]
+F10 & Hoàn tất chống ghi lặp & Gửi lại cùng yêu cầu không tạo lần trừ kho thứ hai; lỗi giao dịch không để trạng thái nửa chừng & 20 \\ \addlinespace[3pt]
+F11 & Hoàn tác có giới hạn & Trong 10 phút: ghi giao dịch đảo; quá hạn: từ chối, giữ nguyên lịch sử & 21--22 \\ \addlinespace[3pt]
+F12 & Quản trị và vận hành có kiểm soát & Phân quyền, lưu phiên bản mô hình; bản xuất tuân phạm vi đồng ý; job kẹt có xử lý & 23--34 \\ \addlinespace[3pt]
+\end{longtable}}
+\section{Quy tắc nghiệp vụ}
+\begin{enumerate}
+\item \textbf{Mâm ăn:} 1--6 người. Mâm một người có 2 món; mâm từ hai người thông thường gồm mặn, rau, canh; trường hợp giảm cấu trúc khi không khả thi phải được giải thích. Số món active khác tổng số dòng lịch sử đổi món.
+\item \textbf{Lượng cần:} {\small\texttt{need = grams \ensuremath{\times} persons /\allowbreak{}\allowbreak{} servings}}. Đồ đếm được làm tròn theo quy tắc đơn vị; không cộng số ``quả'' với số gam.
+\item \textbf{Khả thi kho:} tổng nhu cầu một nguyên liệu trên mọi món không vượt cận dưới lượng khả dụng; gia vị luôn có miễn kiểm kho nhưng không miễn kiểm dị ứng.
+\item \textbf{Dị ứng/\allowbreak{}chế độ ăn:} lọc trước xếp hạng; điểm sở thích cao không được bù cho vi phạm điều kiện loại trừ.
+\item \textbf{Nhận diện chỉ đề xuất:} chỉnh kết quả quét chưa ghi kho; chỉ xác nhận mới ghi. Quét toàn tủ không tự xóa lô không nhìn thấy.
+\item \textbf{Nấu xong:} trừ kho, cập nhật phiên và mâm trong cùng giao dịch. Kho thay đổi trong lúc nấu có thể tạo thiếu hụt; phản hồi phải chỉ rõ, không tạo số tồn âm giả.
+\item \textbf{Hoàn tác:} ghi bản ghi đảo tham chiếu bản ghi trừ gốc, không xóa lịch sử. Thời hạn tính theo thời điểm hoàn tất ở máy chủ.
+\item \textbf{Độ tươi:} chỉ là gợi ý ưu tiên sử dụng. Worker hiện chưa triển khai bộ phân loại độ tươi; không mô tả xác suất độ tươi từ ảnh như kết quả đã có.
+\item \textbf{Calo:} số ước tính từ công thức/\allowbreak{}nguồn dinh dưỡng, không đo trực tiếp từ ảnh. Báo cáo kỹ thuật không đưa công thức này thành tư vấn dinh dưỡng cá nhân.
+\end{enumerate}
+\section{Yêu cầu phi chức năng}
+Các ngưỡng dưới đây là \textbf{mục tiêu SRS}, không phải số đo đã đạt. Giữ nguyên môi trường đo khi nghiệm thu để kết quả so sánh được.
+
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{}}
+\caption{Yêu cầu phi chức năng}\\
+\toprule
+\textbf{Nhóm} & \textbf{Yêu cầu/\allowbreak{}đích đo} & \textbf{Cách kiểm chứng} \\
+\midrule\endfirsthead
+\multicolumn{3}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Nhóm} & \textbf{Yêu cầu/\allowbreak{}đích đo} & \textbf{Cách kiểm chứng} \\
+\midrule\endhead
+\bottomrule\endfoot
+Hiệu năng & {\small\texttt{POST /\allowbreak{}\allowbreak{}meal-\allowbreak{}plans}} p95 \ensuremath{\leq} 1 s: 200 món, 30 lô/\allowbreak{}người, 10 người đồng thời, \ensuremath{\geq}300 yêu cầu, môi trường 2 vCPU/\allowbreak{}4 GB & Kiểm thử tải và lưu cấu hình, log request \\ \addlinespace[3pt]
+Truy vấn & Các endpoint đọc chính p95 \ensuremath{\leq} 300 ms với 20 người đồng thời theo SRS & Đo riêng mỗi endpoint, không gộp trung bình \\ \addlinespace[3pt]
+Lịch nấu & p95 \ensuremath{\leq} 2 s; có giới hạn thời gian bộ giải và phương án dự phòng & Test bất khả thi, hết thời gian và giới hạn số bếp \\ \addlinespace[3pt]
+Toàn vẹn & Chống gửi lặp, khóa bản ghi, rollback khi lỗi & Test hai request đồng thời; chèn lỗi giữa các bước ghi \\ \addlinespace[3pt]
+Bảo mật & Kiểm tra chủ sở hữu mọi tài nguyên; xoay refresh token; giới hạn thử đăng nhập & Test người A đọc/\allowbreak{}sửa tài nguyên người B; token bị thu hồi \\ \addlinespace[3pt]
+Quyền dữ liệu & Đồng ý riêng từng mục đích; ảnh/\allowbreak{}tệp không công khai; xuất/\allowbreak{}xóa có quy trình & Kiểm DB, API và tệp sau thao tác; kiểm quyền URL tải \\ \addlinespace[3pt]
+Dễ sử dụng & SRS đặt SUS \ensuremath{\geq}68 và \ensuremath{\geq}80\% hoàn thành nhiệm vụ với 8--10 người & Cần nghiên cứu người dùng; hiện không tự điền kết quả \\ \addlinespace[3pt]
+Tiếp cận & Vùng chạm \ensuremath{\geq}44dp, chữ có tương phản phù hợp, trạng thái không chỉ dùng màu & Kiểm tự động kết hợp bàn phím/\allowbreak{}trình đọc màn hình \\ \addlinespace[3pt]
+Bảo trì & Ranh giới module, truy vết BR--test, hợp đồng API & import-\allowbreak{}linter, kiểm đặc tả và kiểm thử hồi quy \\ \addlinespace[3pt]
+Phục hồi & Sao lưu phải khôi phục được, không chỉ tạo được tệp & Diễn tập restore trên môi trường riêng và ghi thời gian \\ \addlinespace[3pt]
+\end{longtable}}
+\section{Truy vết nhu cầu và ưu tiên}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{}}
+\caption{Truy vết nhu cầu và ưu tiên}\\
+\toprule
+\textbf{Mục tiêu /\allowbreak{} nhu cầu} & \textbf{Yêu cầu} & \textbf{UC và phân hệ} & \textbf{Tiêu chí quan sát} \\
+\midrule\endfirsthead
+\multicolumn{4}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Mục tiêu /\allowbreak{} nhu cầu} & \textbf{Yêu cầu} & \textbf{UC và phân hệ} & \textbf{Tiêu chí quan sát} \\
+\midrule\endhead
+\bottomrule\endfoot
+BO01 /\allowbreak{} SN01 & F04--F05 Quét và quản lý kho & UC12--14 /\allowbreak{} PK4 & Bỏ kết quả quét không ghi lô; xác nhận lại không tạo lô trùng \\ \addlinespace[3pt]
+BO02 /\allowbreak{} SN02 & F06--F08 Ghép mâm, đổi món, đi chợ & UC15--18 /\allowbreak{} PK5 & Tổng lượng dùng chung không vượt phương án khả thi được chọn \\ \addlinespace[3pt]
+BO03 /\allowbreak{} SN03 & F09 Lập lịch nấu & UC19 /\allowbreak{} PK6 & Không chồng thao tác chủ động; số bếp không vượt khai báo \\ \addlinespace[3pt]
+BO04 /\allowbreak{} SN04 & F10--F11 Hoàn tất, hoàn tác, nhật ký & UC20--22 /\allowbreak{} PK6 & Retry giữ nguyên lượng kho; hoàn tác tạo giao dịch đảo \\ \addlinespace[3pt]
+BO05 /\allowbreak{} SN05 & F01--F03 Tài khoản, quyền dữ liệu, hồ sơ & UC01--11 /\allowbreak{} PK1--3 & Thao tác chỉ tác động dữ liệu thuộc người dùng; đồng ý có thể rút \\ \addlinespace[3pt]
+BO02, BO05 /\allowbreak{} vận hành & F12 Dữ liệu và mô hình & UC23--34 /\allowbreak{} PK7--10 & Công thức, artifact và bản triển khai có nguồn và phiên bản \\ \addlinespace[3pt]
+\end{longtable}}
+Mức ưu tiên dùng để tổ chức nghiệm thu: luồng kho \ensuremath{\rightarrow} mâm \ensuremath{\rightarrow} nấu \ensuremath{\rightarrow} hoàn tất và cơ chế quyền dữ liệu là lõi; đổi món, đi chợ và nhật ký mở rộng tính hữu dụng; công cụ vận hành bảo đảm khả năng duy trì dữ liệu và mô hình. Đây không phải lý do bỏ kiểm quyền hoặc toàn vẹn ở bản đầu. Các tính năng tương lai được tách khỏi tiêu chí nghiệm thu hiện tại.

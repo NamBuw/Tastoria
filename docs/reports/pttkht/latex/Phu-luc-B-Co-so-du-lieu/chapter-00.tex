@@ -1,0 +1,1846 @@
+\chapter{PHỤ LỤC B --- CẤU TRÚC BẢNG VÀ RÀNG BUỘC}
+Nguồn: {\small\texttt{Tastoria/\allowbreak{}\allowbreak{}db/\allowbreak{}\allowbreak{}schema.\allowbreak{}sql}}, SHA-\allowbreak{}256 {\small\texttt{d626650dcfb6\allowbreak{}c604d4707ea1\allowbreak{}6b8af486e1ef\allowbreak{}9575cfd6bbe5\allowbreak{}c6e9b2d21963\allowbreak{}8252}}. Có 62 bảng trong tệp nguồn. Các migration bổ sung phải đọc cùng khi mô tả DB đã triển khai; phụ lục này không giả định đã truy vấn schema production.
+
+\section{idempotency\_\allowbreak{}keys}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{idempotency\_\allowbreak{}keys}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{key}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{request\_\allowbreak{}\allowbreak{}sha256}} & {\small\texttt{bytea NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{status\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{response\_\allowbreak{}\allowbreak{}body}} & {\small\texttt{jsonb NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}idempotency\_\allowbreak{}\allowbreak{}keys PRIMARY KEY (user\_\allowbreak{}\allowbreak{}id, key)}}
+\end{itemize}
+\section{users}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{users}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{email}} & {\small\texttt{citext NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{password\_\allowbreak{}\allowbreak{}hash}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{role}} & {\small\texttt{user\_\allowbreak{}\allowbreak{}role\_\allowbreak{}\allowbreak{}t NOT NULL DEFAULT 'user'}} \\ \addlinespace[3pt]
+{\small\texttt{status}} & {\small\texttt{user\_\allowbreak{}\allowbreak{}status\_\allowbreak{}\allowbreak{}t NOT NULL DEFAULT 'active'}} \\ \addlinespace[3pt]
+{\small\texttt{token\_\allowbreak{}\allowbreak{}version}} & {\small\texttt{integer NOT NULL DEFAULT 0}} \\ \addlinespace[3pt]
+{\small\texttt{failed\_\allowbreak{}\allowbreak{}logins}} & {\small\texttt{smallint NOT NULL DEFAULT 0}} \\ \addlinespace[3pt]
+{\small\texttt{locked\_\allowbreak{}\allowbreak{}until}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+{\small\texttt{updated\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}users PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}users\_\allowbreak{}\allowbreak{}email UNIQUE (email)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}users\_\allowbreak{}\allowbreak{}token\_\allowbreak{}\allowbreak{}version CHECK (token\_\allowbreak{}\allowbreak{}version >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}users\_\allowbreak{}\allowbreak{}failed\_\allowbreak{}\allowbreak{}logins CHECK (failed\_\allowbreak{}\allowbreak{}logins >= 0)}}
+\end{itemize}
+\section{refresh\_\allowbreak{}tokens}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{refresh\_\allowbreak{}tokens}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{family\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{token\_\allowbreak{}\allowbreak{}sha256}} & {\small\texttt{bytea NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{issued\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{expires\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{revoked\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{replaced\_\allowbreak{}\allowbreak{}by\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}agent}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}refresh\_\allowbreak{}\allowbreak{}tokens PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}refresh\_\allowbreak{}\allowbreak{}tokens\_\allowbreak{}\allowbreak{}token\_\allowbreak{}\allowbreak{}sha256 UNIQUE (token\_\allowbreak{}\allowbreak{}sha256)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}refresh\_\allowbreak{}\allowbreak{}tokens\_\allowbreak{}\allowbreak{}replaced\_\allowbreak{}\allowbreak{}by\_\allowbreak{}\allowbreak{}id UNIQUE (replaced\_\allowbreak{}\allowbreak{}by\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}refresh\_\allowbreak{}\allowbreak{}tokens\_\allowbreak{}\allowbreak{}expiry CHECK (expires\_\allowbreak{}\allowbreak{}at > issued\_\allowbreak{}\allowbreak{}at)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}refresh\_\allowbreak{}\allowbreak{}tokens\_\allowbreak{}\allowbreak{}not\_\allowbreak{}\allowbreak{}self CHECK (replaced\_\allowbreak{}\allowbreak{}by\_\allowbreak{}\allowbreak{}id <> id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}refresh\_\allowbreak{}\allowbreak{}tokens\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}refresh\_\allowbreak{}\allowbreak{}tokens\_\allowbreak{}\allowbreak{}replaced\_\allowbreak{}\allowbreak{}by\_\allowbreak{}\allowbreak{}id FOREIGN KEY (replaced\_\allowbreak{}\allowbreak{}by\_\allowbreak{}\allowbreak{}id) REFERENCES refresh\_\allowbreak{}\allowbreak{}tokens (id)}}
+\end{itemize}
+\section{password\_\allowbreak{}resets}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{password\_\allowbreak{}resets}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{token\_\allowbreak{}\allowbreak{}sha256}} & {\small\texttt{bytea NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+{\small\texttt{expires\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{used\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}password\_\allowbreak{}\allowbreak{}resets PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}password\_\allowbreak{}\allowbreak{}resets\_\allowbreak{}\allowbreak{}token\_\allowbreak{}\allowbreak{}sha256 UNIQUE (token\_\allowbreak{}\allowbreak{}sha256)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}password\_\allowbreak{}\allowbreak{}resets\_\allowbreak{}\allowbreak{}expiry CHECK (expires\_\allowbreak{}\allowbreak{}at > created\_\allowbreak{}\allowbreak{}at)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}password\_\allowbreak{}\allowbreak{}resets\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\end{itemize}
+\section{consent\_\allowbreak{}purposes}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{consent\_\allowbreak{}purposes}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{description\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{data\_\allowbreak{}\allowbreak{}category}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{is\_\allowbreak{}\allowbreak{}sensitive}} & {\small\texttt{boolean NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{is\_\allowbreak{}\allowbreak{}required}} & {\small\texttt{boolean NOT NULL DEFAULT false}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}consent\_\allowbreak{}\allowbreak{}purposes PRIMARY KEY (code)}}
+\end{itemize}
+\section{policy\_\allowbreak{}versions}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{policy\_\allowbreak{}versions}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{purpose\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{version}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{text\_\allowbreak{}\allowbreak{}sha256}} & {\small\texttt{bytea NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{effective\_\allowbreak{}\allowbreak{}from}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}policy\_\allowbreak{}\allowbreak{}versions PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}policy\_\allowbreak{}\allowbreak{}versions\_\allowbreak{}\allowbreak{}purpose\_\allowbreak{}\allowbreak{}code\_\allowbreak{}\allowbreak{}version UNIQUE (purpose\_\allowbreak{}\allowbreak{}code, version)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}policy\_\allowbreak{}\allowbreak{}versions\_\allowbreak{}\allowbreak{}purpose\_\allowbreak{}\allowbreak{}code FOREIGN KEY (purpose\_\allowbreak{}\allowbreak{}code) REFERENCES consent\_\allowbreak{}\allowbreak{}purposes (code)}}
+\end{itemize}
+\section{consent\_\allowbreak{}events}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{consent\_\allowbreak{}events}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{policy\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{action}} & {\small\texttt{consent\_\allowbreak{}\allowbreak{}action\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{channel}} & {\small\texttt{consent\_\allowbreak{}\allowbreak{}channel\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{app\_\allowbreak{}\allowbreak{}version}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT clock\_\allowbreak{}\allowbreak{}timestamp()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}consent\_\allowbreak{}\allowbreak{}events PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}consent\_\allowbreak{}\allowbreak{}events\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}consent\_\allowbreak{}\allowbreak{}events\_\allowbreak{}\allowbreak{}policy\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id FOREIGN KEY (policy\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id) REFERENCES policy\_\allowbreak{}\allowbreak{}versions (id)}}
+\end{itemize}
+\section{dsr\_\allowbreak{}requests}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{dsr\_\allowbreak{}requests}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{subject\_\allowbreak{}\allowbreak{}ref}} & {\small\texttt{bytea NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{type}} & {\small\texttt{dsr\_\allowbreak{}\allowbreak{}type\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{status}} & {\small\texttt{dsr\_\allowbreak{}\allowbreak{}status\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{received\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{acknowledged\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{completed\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{result\_\allowbreak{}\allowbreak{}key}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{note}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}dsr\_\allowbreak{}\allowbreak{}requests PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}dsr\_\allowbreak{}\allowbreak{}requests\_\allowbreak{}\allowbreak{}completed\_\allowbreak{}\allowbreak{}at CHECK (completed\_\allowbreak{}\allowbreak{}at IS NULL OR completed\_\allowbreak{}\allowbreak{}at >= received\_\allowbreak{}\allowbreak{}at)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}dsr\_\allowbreak{}\allowbreak{}requests\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE SET NULL}}
+\end{itemize}
+\section{audit\_\allowbreak{}log}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{audit\_\allowbreak{}log}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{bigint GENERATED ALWAYS AS IDENTITY}} \\ \addlinespace[3pt]
+{\small\texttt{actor\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{actor\_\allowbreak{}\allowbreak{}role}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{action}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{entity}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{entity\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{purpose}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{request\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}audit\_\allowbreak{}\allowbreak{}log PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}audit\_\allowbreak{}\allowbreak{}log\_\allowbreak{}\allowbreak{}actor\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (actor\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE SET NULL}}
+\end{itemize}
+\section{food\_\allowbreak{}groups}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{food\_\allowbreak{}groups}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}food\_\allowbreak{}\allowbreak{}groups PRIMARY KEY (code)}}
+\end{itemize}
+\section{nutrient\_\allowbreak{}sources}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{nutrient\_\allowbreak{}sources}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{version}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{license}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{url}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}nutrient\_\allowbreak{}\allowbreak{}sources PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}nutrient\_\allowbreak{}\allowbreak{}sources\_\allowbreak{}\allowbreak{}code UNIQUE (code)}}
+\end{itemize}
+\section{food\_\allowbreak{}items}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{food\_\allowbreak{}items}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{source\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{source\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}en}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{refuse\_\allowbreak{}\allowbreak{}pct}} & {\small\texttt{numeric}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}food\_\allowbreak{}\allowbreak{}items PRIMARY KEY (source\_\allowbreak{}\allowbreak{}id, source\_\allowbreak{}\allowbreak{}code)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}food\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}refuse\_\allowbreak{}\allowbreak{}pct CHECK (refuse\_\allowbreak{}\allowbreak{}pct BETWEEN 0 AND 100)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}food\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}id FOREIGN KEY (source\_\allowbreak{}\allowbreak{}id) REFERENCES nutrient\_\allowbreak{}\allowbreak{}sources (id)}}
+\end{itemize}
+\section{nutrients}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{nutrients}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{unit}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}nutrients PRIMARY KEY (code)}}
+\end{itemize}
+\section{food\_\allowbreak{}nutrients}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{food\_\allowbreak{}nutrients}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{source\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{source\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{nutrient\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{per\_\allowbreak{}\allowbreak{}100g}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}food\_\allowbreak{}\allowbreak{}nutrients PRIMARY KEY (source\_\allowbreak{}\allowbreak{}id, source\_\allowbreak{}\allowbreak{}code, nutrient\_\allowbreak{}\allowbreak{}code)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}food\_\allowbreak{}\allowbreak{}nutrients\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}100g CHECK (per\_\allowbreak{}\allowbreak{}100g >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}food\_\allowbreak{}\allowbreak{}nutrients\_\allowbreak{}\allowbreak{}nutrient\_\allowbreak{}\allowbreak{}code FOREIGN KEY (nutrient\_\allowbreak{}\allowbreak{}code) REFERENCES nutrients (code)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}food\_\allowbreak{}\allowbreak{}nutrients\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}code FOREIGN KEY (source\_\allowbreak{}\allowbreak{}id, source\_\allowbreak{}\allowbreak{}code) REFERENCES food\_\allowbreak{}\allowbreak{}items (source\_\allowbreak{}\allowbreak{}id, source\_\allowbreak{}\allowbreak{}code)}}
+\end{itemize}
+\section{allergen\_\allowbreak{}groups}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{allergen\_\allowbreak{}groups}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}en}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{basis}} & {\small\texttt{allergen\_\allowbreak{}\allowbreak{}basis\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}allergen\_\allowbreak{}\allowbreak{}groups PRIMARY KEY (code)}}
+\end{itemize}
+\section{diets}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{diets}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}diets PRIMARY KEY (code)}}
+\end{itemize}
+\section{diet\_\allowbreak{}exclusions}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{diet\_\allowbreak{}exclusions}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{diet\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{food\_\allowbreak{}\allowbreak{}group\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}diet\_\allowbreak{}\allowbreak{}exclusions PRIMARY KEY (diet\_\allowbreak{}\allowbreak{}code, food\_\allowbreak{}\allowbreak{}group\_\allowbreak{}\allowbreak{}code)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}diet\_\allowbreak{}\allowbreak{}exclusions\_\allowbreak{}\allowbreak{}diet\_\allowbreak{}\allowbreak{}code FOREIGN KEY (diet\_\allowbreak{}\allowbreak{}code) REFERENCES diets (code)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}diet\_\allowbreak{}\allowbreak{}exclusions\_\allowbreak{}\allowbreak{}food\_\allowbreak{}\allowbreak{}group\_\allowbreak{}\allowbreak{}code FOREIGN KEY (food\_\allowbreak{}\allowbreak{}group\_\allowbreak{}\allowbreak{}code) REFERENCES food\_\allowbreak{}\allowbreak{}groups (code)}}
+\end{itemize}
+\section{ingredients}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{ingredients}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{food\_\allowbreak{}\allowbreak{}group\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{comp\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{smallint}} \\ \addlinespace[3pt]
+{\small\texttt{comp\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{is\_\allowbreak{}\allowbreak{}staple}} & {\small\texttt{boolean NOT NULL DEFAULT false}} \\ \addlinespace[3pt]
+{\small\texttt{countable}} & {\small\texttt{boolean NOT NULL DEFAULT false}} \\ \addlinespace[3pt]
+{\small\texttt{shelf\_\allowbreak{}\allowbreak{}life\_\allowbreak{}\allowbreak{}days}} & {\small\texttt{numeric}} \\ \addlinespace[3pt]
+{\small\texttt{shelf\_\allowbreak{}\allowbreak{}life\_\allowbreak{}\allowbreak{}basis}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{is\_\allowbreak{}\allowbreak{}active}} & {\small\texttt{boolean NOT NULL DEFAULT true}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+{\small\texttt{updated\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}ingredients PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}ingredients\_\allowbreak{}\allowbreak{}comp\_\allowbreak{}\allowbreak{}pair CHECK ((comp\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}id IS NULL) = (comp\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}code IS NULL))}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}ingredients\_\allowbreak{}\allowbreak{}shelf\_\allowbreak{}\allowbreak{}life\_\allowbreak{}\allowbreak{}days CHECK (shelf\_\allowbreak{}\allowbreak{}life\_\allowbreak{}\allowbreak{}days > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}ingredients\_\allowbreak{}\allowbreak{}food\_\allowbreak{}\allowbreak{}group\_\allowbreak{}\allowbreak{}code FOREIGN KEY (food\_\allowbreak{}\allowbreak{}group\_\allowbreak{}\allowbreak{}code) REFERENCES food\_\allowbreak{}\allowbreak{}groups (code)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}ingredients\_\allowbreak{}\allowbreak{}comp\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}comp\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}code FOREIGN KEY (comp\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}id, comp\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}code) REFERENCES food\_\allowbreak{}\allowbreak{}items (source\_\allowbreak{}\allowbreak{}id, source\_\allowbreak{}\allowbreak{}code)}}
+\end{itemize}
+\section{ingredient\_\allowbreak{}synonyms}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{ingredient\_\allowbreak{}synonyms}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{synonym}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{lang}} & {\small\texttt{lang\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{source}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}synonyms PRIMARY KEY (ingredient\_\allowbreak{}\allowbreak{}id, synonym, lang)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}synonyms\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\end{itemize}
+\section{ingredient\_\allowbreak{}allergens}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{ingredient\_\allowbreak{}allergens}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{allergen\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}allergens PRIMARY KEY (ingredient\_\allowbreak{}\allowbreak{}id, allergen\_\allowbreak{}\allowbreak{}code)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}allergens\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}allergens\_\allowbreak{}\allowbreak{}allergen\_\allowbreak{}\allowbreak{}code FOREIGN KEY (allergen\_\allowbreak{}\allowbreak{}code) REFERENCES allergen\_\allowbreak{}\allowbreak{}groups (code)}}
+\end{itemize}
+\section{ingredient\_\allowbreak{}units}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{ingredient\_\allowbreak{}units}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{unit\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{grams\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}unit}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{source}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}units PRIMARY KEY (ingredient\_\allowbreak{}\allowbreak{}id, unit\_\allowbreak{}\allowbreak{}code)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}units\_\allowbreak{}\allowbreak{}grams\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}unit CHECK (grams\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}unit > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}units\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\end{itemize}
+\section{qty\_\allowbreak{}levels}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{qty\_\allowbreak{}levels}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{food\_\allowbreak{}\allowbreak{}group\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{level}} & {\small\texttt{qty\_\allowbreak{}\allowbreak{}level\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{g\_\allowbreak{}\allowbreak{}min}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{g\_\allowbreak{}\allowbreak{}max}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}qty\_\allowbreak{}\allowbreak{}levels PRIMARY KEY (food\_\allowbreak{}\allowbreak{}group\_\allowbreak{}\allowbreak{}code, level)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}qty\_\allowbreak{}\allowbreak{}levels\_\allowbreak{}\allowbreak{}1 CHECK (g\_\allowbreak{}\allowbreak{}min <= g\_\allowbreak{}\allowbreak{}max)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}qty\_\allowbreak{}\allowbreak{}levels\_\allowbreak{}\allowbreak{}g\_\allowbreak{}\allowbreak{}min CHECK (g\_\allowbreak{}\allowbreak{}min >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}qty\_\allowbreak{}\allowbreak{}levels\_\allowbreak{}\allowbreak{}food\_\allowbreak{}\allowbreak{}group\_\allowbreak{}\allowbreak{}code FOREIGN KEY (food\_\allowbreak{}\allowbreak{}group\_\allowbreak{}\allowbreak{}code) REFERENCES food\_\allowbreak{}\allowbreak{}groups (code)}}
+\end{itemize}
+\section{cooking\_\allowbreak{}methods}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{cooking\_\allowbreak{}methods}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}cooking\_\allowbreak{}\allowbreak{}methods PRIMARY KEY (code)}}
+\end{itemize}
+\section{tags}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{tags}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{kind}} & {\small\texttt{tag\_\allowbreak{}\allowbreak{}kind\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}tags PRIMARY KEY (code)}}
+\end{itemize}
+\section{recipes}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{recipes}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{slot}} & {\small\texttt{slot\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{servings}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{method\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{status}} & {\small\texttt{recipe\_\allowbreak{}\allowbreak{}status\_\allowbreak{}\allowbreak{}t NOT NULL DEFAULT 'draft'}} \\ \addlinespace[3pt]
+{\small\texttt{notes}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+{\small\texttt{updated\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}recipes PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}recipes\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}slot UNIQUE (id, slot)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}recipes\_\allowbreak{}\allowbreak{}servings CHECK (servings > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}recipes\_\allowbreak{}\allowbreak{}method\_\allowbreak{}\allowbreak{}code FOREIGN KEY (method\_\allowbreak{}\allowbreak{}code) REFERENCES cooking\_\allowbreak{}\allowbreak{}methods (code)}}
+\end{itemize}
+\section{recipe\_\allowbreak{}ingredients}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{recipe\_\allowbreak{}ingredients}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{grams}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{role}} & {\small\texttt{ingredient\_\allowbreak{}\allowbreak{}role\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{is\_\allowbreak{}\allowbreak{}optional}} & {\small\texttt{boolean NOT NULL DEFAULT false}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}ingredients PRIMARY KEY (recipe\_\allowbreak{}\allowbreak{}id, ingredient\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}ingredients\_\allowbreak{}\allowbreak{}grams CHECK (grams > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}ingredients\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id) REFERENCES recipes (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}ingredients\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\end{itemize}
+\section{recipe\_\allowbreak{}steps}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{recipe\_\allowbreak{}steps}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{step\_\allowbreak{}\allowbreak{}no}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{text\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{kind}} & {\small\texttt{step\_\allowbreak{}\allowbreak{}kind\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{minutes}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{uses\_\allowbreak{}\allowbreak{}burner}} & {\small\texttt{boolean NOT NULL DEFAULT false}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}steps PRIMARY KEY (recipe\_\allowbreak{}\allowbreak{}id, step\_\allowbreak{}\allowbreak{}no)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}steps\_\allowbreak{}\allowbreak{}minutes CHECK (minutes > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}steps\_\allowbreak{}\allowbreak{}step\_\allowbreak{}\allowbreak{}no CHECK (step\_\allowbreak{}\allowbreak{}no > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}steps\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id) REFERENCES recipes (id)}}
+\end{itemize}
+\section{recipe\_\allowbreak{}tags}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{recipe\_\allowbreak{}tags}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{tag\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}tags PRIMARY KEY (recipe\_\allowbreak{}\allowbreak{}id, tag\_\allowbreak{}\allowbreak{}code)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}tags\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id) REFERENCES recipes (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}tags\_\allowbreak{}\allowbreak{}tag\_\allowbreak{}\allowbreak{}code FOREIGN KEY (tag\_\allowbreak{}\allowbreak{}code) REFERENCES tags (code)}}
+\end{itemize}
+\section{recipe\_\allowbreak{}sources}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{recipe\_\allowbreak{}sources}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{url}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{title}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{accessed\_\allowbreak{}\allowbreak{}on}} & {\small\texttt{date NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}sources PRIMARY KEY (recipe\_\allowbreak{}\allowbreak{}id, url)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}sources\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id) REFERENCES recipes (id)}}
+\end{itemize}
+\section{recipe\_\allowbreak{}nutrition}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{recipe\_\allowbreak{}nutrition}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{nutrient\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{per\_\allowbreak{}\allowbreak{}serving}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{computed\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{data\_\allowbreak{}\allowbreak{}version}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}nutrition PRIMARY KEY (recipe\_\allowbreak{}\allowbreak{}id, nutrient\_\allowbreak{}\allowbreak{}code)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}nutrition\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}serving CHECK (per\_\allowbreak{}\allowbreak{}serving >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}nutrition\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id) REFERENCES recipes (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}nutrition\_\allowbreak{}\allowbreak{}nutrient\_\allowbreak{}\allowbreak{}code FOREIGN KEY (nutrient\_\allowbreak{}\allowbreak{}code) REFERENCES nutrients (code)}}
+\end{itemize}
+\section{vision\_\allowbreak{}classes}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{vision\_\allowbreak{}classes}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{name\_\allowbreak{}\allowbreak{}en}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{countable}} & {\small\texttt{boolean NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{instance\_\allowbreak{}\allowbreak{}def}} & {\small\texttt{instance\_\allowbreak{}\allowbreak{}def\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{has\_\allowbreak{}\allowbreak{}freshness\_\allowbreak{}\allowbreak{}model}} & {\small\texttt{boolean NOT NULL DEFAULT false}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}vision\_\allowbreak{}\allowbreak{}classes PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}vision\_\allowbreak{}\allowbreak{}classes\_\allowbreak{}\allowbreak{}code UNIQUE (code)}}
+\end{itemize}
+\section{vision\_\allowbreak{}class\_\allowbreak{}ingredients}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{vision\_\allowbreak{}class\_\allowbreak{}ingredients}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{is\_\allowbreak{}\allowbreak{}default}} & {\small\texttt{boolean NOT NULL DEFAULT false}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}ingredients PRIMARY KEY (vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id, ingredient\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}ingredients\_\allowbreak{}\allowbreak{}vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id FOREIGN KEY (vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id) REFERENCES vision\_\allowbreak{}\allowbreak{}classes (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}ingredients\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\end{itemize}
+\section{profiles}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{profiles}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{sex\_\allowbreak{}\allowbreak{}enc}} & {\small\texttt{bytea}} \\ \addlinespace[3pt]
+{\small\texttt{birth\_\allowbreak{}\allowbreak{}year\_\allowbreak{}\allowbreak{}enc}} & {\small\texttt{bytea}} \\ \addlinespace[3pt]
+{\small\texttt{height\_\allowbreak{}\allowbreak{}cm\_\allowbreak{}\allowbreak{}enc}} & {\small\texttt{bytea}} \\ \addlinespace[3pt]
+{\small\texttt{weight\_\allowbreak{}\allowbreak{}kg\_\allowbreak{}\allowbreak{}enc}} & {\small\texttt{bytea}} \\ \addlinespace[3pt]
+{\small\texttt{enc\_\allowbreak{}\allowbreak{}key\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{activity\_\allowbreak{}\allowbreak{}level}} & {\small\texttt{activity\_\allowbreak{}\allowbreak{}level\_\allowbreak{}\allowbreak{}t}} \\ \addlinespace[3pt]
+{\small\texttt{goal}} & {\small\texttt{goal\_\allowbreak{}\allowbreak{}t}} \\ \addlinespace[3pt]
+{\small\texttt{kcal\_\allowbreak{}\allowbreak{}target}} & {\small\texttt{integer}} \\ \addlinespace[3pt]
+{\small\texttt{kcal\_\allowbreak{}\allowbreak{}source}} & {\small\texttt{kcal\_\allowbreak{}\allowbreak{}source\_\allowbreak{}\allowbreak{}t}} \\ \addlinespace[3pt]
+{\small\texttt{diet\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{updated\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}profiles PRIMARY KEY (user\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}profiles\_\allowbreak{}\allowbreak{}kcal\_\allowbreak{}\allowbreak{}target CHECK (kcal\_\allowbreak{}\allowbreak{}target BETWEEN 800 AND 5000)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}profiles\_\allowbreak{}\allowbreak{}kcal\_\allowbreak{}\allowbreak{}pair CHECK ((kcal\_\allowbreak{}\allowbreak{}target IS NULL) = (kcal\_\allowbreak{}\allowbreak{}source IS NULL))}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}profiles\_\allowbreak{}\allowbreak{}expert CHECK (kcal\_\allowbreak{}\allowbreak{}source IS NULL OR (goal IS NOT DISTINCT FROM 'expert') = (kcal\_\allowbreak{}\allowbreak{}source = 'expert'))}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}profiles\_\allowbreak{}\allowbreak{}enc\_\allowbreak{}\allowbreak{}key CHECK (num\_\allowbreak{}\allowbreak{}nonnulls(sex\_\allowbreak{}\allowbreak{}enc, birth\_\allowbreak{}\allowbreak{}year\_\allowbreak{}\allowbreak{}enc, height\_\allowbreak{}\allowbreak{}cm\_\allowbreak{}\allowbreak{}enc, weight\_\allowbreak{}\allowbreak{}kg\_\allowbreak{}\allowbreak{}enc) = 0 OR enc\_\allowbreak{}\allowbreak{}key\_\allowbreak{}\allowbreak{}id IS NOT NULL)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}profiles\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}profiles\_\allowbreak{}\allowbreak{}diet\_\allowbreak{}\allowbreak{}code FOREIGN KEY (diet\_\allowbreak{}\allowbreak{}code) REFERENCES diets (code)}}
+\end{itemize}
+\section{user\_\allowbreak{}allergens}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{user\_\allowbreak{}allergens}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{allergen\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}allergens PRIMARY KEY (user\_\allowbreak{}\allowbreak{}id, allergen\_\allowbreak{}\allowbreak{}code)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}allergens\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}allergens\_\allowbreak{}\allowbreak{}allergen\_\allowbreak{}\allowbreak{}code FOREIGN KEY (allergen\_\allowbreak{}\allowbreak{}code) REFERENCES allergen\_\allowbreak{}\allowbreak{}groups (code)}}
+\end{itemize}
+\section{user\_\allowbreak{}favorite\_\allowbreak{}recipes}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{user\_\allowbreak{}favorite\_\allowbreak{}recipes}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}favorite\_\allowbreak{}\allowbreak{}recipes PRIMARY KEY (user\_\allowbreak{}\allowbreak{}id, recipe\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}favorite\_\allowbreak{}\allowbreak{}recipes\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}favorite\_\allowbreak{}\allowbreak{}recipes\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id) REFERENCES recipes (id)}}
+\end{itemize}
+\section{user\_\allowbreak{}settings}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{user\_\allowbreak{}settings}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{burners}} & {\small\texttt{smallint NOT NULL DEFAULT 2}} \\ \addlinespace[3pt]
+{\small\texttt{default\_\allowbreak{}\allowbreak{}persons}} & {\small\texttt{smallint NOT NULL DEFAULT 2}} \\ \addlinespace[3pt]
+{\small\texttt{timezone}} & {\small\texttt{text NOT NULL DEFAULT 'Asia/\allowbreak{}\allowbreak{}Ho\_\allowbreak{}\allowbreak{}Chi\_\allowbreak{}\allowbreak{}Minh'}} \\ \addlinespace[3pt]
+{\small\texttt{updated\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}settings PRIMARY KEY (user\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}settings\_\allowbreak{}\allowbreak{}burners CHECK (burners BETWEEN 1 AND 4)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}settings\_\allowbreak{}\allowbreak{}default\_\allowbreak{}\allowbreak{}persons CHECK (default\_\allowbreak{}\allowbreak{}persons BETWEEN 1 AND 6)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}settings\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\end{itemize}
+\section{pantry\_\allowbreak{}lots}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{pantry\_\allowbreak{}lots}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{initial\_\allowbreak{}\allowbreak{}g\_\allowbreak{}\allowbreak{}min}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{initial\_\allowbreak{}\allowbreak{}g\_\allowbreak{}\allowbreak{}max}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{acquired\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{acquired\_\allowbreak{}\allowbreak{}basis}} & {\small\texttt{acquired\_\allowbreak{}\allowbreak{}basis\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{status}} & {\small\texttt{lot\_\allowbreak{}\allowbreak{}status\_\allowbreak{}\allowbreak{}t NOT NULL DEFAULT 'in\_\allowbreak{}\allowbreak{}stock'}} \\ \addlinespace[3pt]
+{\small\texttt{p\_\allowbreak{}\allowbreak{}tuoi}} & {\small\texttt{real}} \\ \addlinespace[3pt]
+{\small\texttt{p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}som}} & {\small\texttt{real}} \\ \addlinespace[3pt]
+{\small\texttt{p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}ngay}} & {\small\texttt{real}} \\ \addlinespace[3pt]
+{\small\texttt{p\_\allowbreak{}\allowbreak{}kiem\_\allowbreak{}\allowbreak{}tra}} & {\small\texttt{real}} \\ \addlinespace[3pt]
+{\small\texttt{freshness\_\allowbreak{}\allowbreak{}observed\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{freshness\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}checked\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{source\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+{\small\texttt{updated\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}lots PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}lots\_\allowbreak{}\allowbreak{}initial\_\allowbreak{}\allowbreak{}g\_\allowbreak{}\allowbreak{}min CHECK (initial\_\allowbreak{}\allowbreak{}g\_\allowbreak{}\allowbreak{}min >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}lots\_\allowbreak{}\allowbreak{}1 CHECK (initial\_\allowbreak{}\allowbreak{}g\_\allowbreak{}\allowbreak{}min <= initial\_\allowbreak{}\allowbreak{}g\_\allowbreak{}\allowbreak{}max)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}lots\_\allowbreak{}\allowbreak{}p\_\allowbreak{}\allowbreak{}range CHECK (p\_\allowbreak{}\allowbreak{}tuoi BETWEEN 0 AND 1 AND p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}som BETWEEN 0 AND 1 AND p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}ngay BETWEEN 0 AND 1 AND p\_\allowbreak{}\allowbreak{}kiem\_\allowbreak{}\allowbreak{}tra BETWEEN 0 AND 1)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}lots\_\allowbreak{}\allowbreak{}p\_\allowbreak{}\allowbreak{}group CHECK (num\_\allowbreak{}\allowbreak{}nulls(p\_\allowbreak{}\allowbreak{}tuoi, p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}som, p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}ngay, p\_\allowbreak{}\allowbreak{}kiem\_\allowbreak{}\allowbreak{}tra) IN (0, 4))}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}lots\_\allowbreak{}\allowbreak{}p\_\allowbreak{}\allowbreak{}sum CHECK (p\_\allowbreak{}\allowbreak{}tuoi IS NULL OR abs(p\_\allowbreak{}\allowbreak{}tuoi + p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}som + p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}ngay + p\_\allowbreak{}\allowbreak{}kiem\_\allowbreak{}\allowbreak{}tra -\allowbreak{} 1) <= 0.\allowbreak{}01)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}lots\_\allowbreak{}\allowbreak{}p\_\allowbreak{}\allowbreak{}observed CHECK (p\_\allowbreak{}\allowbreak{}tuoi IS NULL OR freshness\_\allowbreak{}\allowbreak{}observed\_\allowbreak{}\allowbreak{}at IS NOT NULL)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}lots\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}lots\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\end{itemize}
+\section{pantry\_\allowbreak{}transactions}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{pantry\_\allowbreak{}transactions}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{bigint GENERATED ALWAYS AS IDENTITY}} \\ \addlinespace[3pt]
+{\small\texttt{lot\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{delta\_\allowbreak{}\allowbreak{}g\_\allowbreak{}\allowbreak{}min}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{delta\_\allowbreak{}\allowbreak{}g\_\allowbreak{}\allowbreak{}max}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{reason}} & {\small\texttt{pantry\_\allowbreak{}\allowbreak{}tx\_\allowbreak{}\allowbreak{}reason\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{ref\_\allowbreak{}\allowbreak{}type}} & {\small\texttt{pantry\_\allowbreak{}\allowbreak{}ref\_\allowbreak{}\allowbreak{}type\_\allowbreak{}\allowbreak{}t}} \\ \addlinespace[3pt]
+{\small\texttt{ref\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{reverses\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{bigint}} \\ \addlinespace[3pt]
+{\small\texttt{urgency\_\allowbreak{}\allowbreak{}at\_\allowbreak{}\allowbreak{}event}} & {\small\texttt{real}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}transactions PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}transactions\_\allowbreak{}\allowbreak{}reverses\_\allowbreak{}\allowbreak{}id UNIQUE (reverses\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}transactions\_\allowbreak{}\allowbreak{}ref\_\allowbreak{}\allowbreak{}pair CHECK ((ref\_\allowbreak{}\allowbreak{}type IS NULL) = (ref\_\allowbreak{}\allowbreak{}id IS NULL))}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}transactions\_\allowbreak{}\allowbreak{}undo CHECK ((reason = 'undo') = (reverses\_\allowbreak{}\allowbreak{}id IS NOT NULL))}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}transactions\_\allowbreak{}\allowbreak{}not\_\allowbreak{}\allowbreak{}self CHECK (reverses\_\allowbreak{}\allowbreak{}id <> id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}transactions\_\allowbreak{}\allowbreak{}urgency CHECK (urgency\_\allowbreak{}\allowbreak{}at\_\allowbreak{}\allowbreak{}event >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}transactions\_\allowbreak{}\allowbreak{}lot\_\allowbreak{}\allowbreak{}id FOREIGN KEY (lot\_\allowbreak{}\allowbreak{}id) REFERENCES pantry\_\allowbreak{}\allowbreak{}lots (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}pantry\_\allowbreak{}\allowbreak{}transactions\_\allowbreak{}\allowbreak{}reverses\_\allowbreak{}\allowbreak{}id FOREIGN KEY (reverses\_\allowbreak{}\allowbreak{}id) REFERENCES pantry\_\allowbreak{}\allowbreak{}transactions (id)}}
+\end{itemize}
+\section{model\_\allowbreak{}versions}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{model\_\allowbreak{}versions}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{name}} & {\small\texttt{model\_\allowbreak{}\allowbreak{}name\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{version}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{artifact\_\allowbreak{}\allowbreak{}key}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{sha256}} & {\small\texttt{bytea NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{preprocess\_\allowbreak{}\allowbreak{}version}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{metrics}} & {\small\texttt{jsonb NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{gate\_\allowbreak{}\allowbreak{}report\_\allowbreak{}\allowbreak{}key}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{mlflow\_\allowbreak{}\allowbreak{}run\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{status}} & {\small\texttt{model\_\allowbreak{}\allowbreak{}status\_\allowbreak{}\allowbreak{}t NOT NULL DEFAULT 'candidate'}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}versions PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}versions\_\allowbreak{}\allowbreak{}name\_\allowbreak{}\allowbreak{}version UNIQUE (name, version)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}versions\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}name UNIQUE (id, name)}}
+\end{itemize}
+\section{model\_\allowbreak{}version\_\allowbreak{}classes}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{model\_\allowbreak{}version\_\allowbreak{}classes}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{class\_\allowbreak{}\allowbreak{}index}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}classes PRIMARY KEY (model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id, class\_\allowbreak{}\allowbreak{}index)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}classes\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id UNIQUE (model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id, vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}classes\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}index CHECK (class\_\allowbreak{}\allowbreak{}index >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}classes\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id FOREIGN KEY (model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id) REFERENCES model\_\allowbreak{}\allowbreak{}versions (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}classes\_\allowbreak{}\allowbreak{}vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id FOREIGN KEY (vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id) REFERENCES vision\_\allowbreak{}\allowbreak{}classes (id)}}
+\end{itemize}
+\section{model\_\allowbreak{}deployments}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{model\_\allowbreak{}deployments}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{name}} & {\small\texttt{model\_\allowbreak{}\allowbreak{}name\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{active\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{previous\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{switched\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{switched\_\allowbreak{}\allowbreak{}by}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}deployments PRIMARY KEY (name)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}deployments\_\allowbreak{}\allowbreak{}active\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id UNIQUE (active\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}deployments\_\allowbreak{}\allowbreak{}previous CHECK (previous\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id <> active\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}deployments\_\allowbreak{}\allowbreak{}active\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}name FOREIGN KEY (active\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id, name) REFERENCES model\_\allowbreak{}\allowbreak{}versions (id, name)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}deployments\_\allowbreak{}\allowbreak{}previous\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}name FOREIGN KEY (previous\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id, name) REFERENCES model\_\allowbreak{}\allowbreak{}versions (id, name)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}deployments\_\allowbreak{}\allowbreak{}switched\_\allowbreak{}\allowbreak{}by FOREIGN KEY (switched\_\allowbreak{}\allowbreak{}by) REFERENCES users (id) ON DELETE SET NULL}}
+\end{itemize}
+\section{scans}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{scans}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{mode}} & {\small\texttt{scan\_\allowbreak{}\allowbreak{}mode\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{status}} & {\small\texttt{scan\_\allowbreak{}\allowbreak{}status\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{error\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{attempts}} & {\small\texttt{smallint NOT NULL DEFAULT 0}} \\ \addlinespace[3pt]
+{\small\texttt{detector\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{classifier\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{preprocess\_\allowbreak{}\allowbreak{}version}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{enqueued\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{started\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{finished\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{confirmed\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}scans PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}scans\_\allowbreak{}\allowbreak{}attempts CHECK (attempts >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}scans\_\allowbreak{}\allowbreak{}confirmed CHECK ((status = 'confirmed') = (confirmed\_\allowbreak{}\allowbreak{}at IS NOT NULL))}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}scans\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}scans\_\allowbreak{}\allowbreak{}detector\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id FOREIGN KEY (detector\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id) REFERENCES model\_\allowbreak{}\allowbreak{}versions (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}scans\_\allowbreak{}\allowbreak{}classifier\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id FOREIGN KEY (classifier\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id) REFERENCES model\_\allowbreak{}\allowbreak{}versions (id)}}
+\end{itemize}
+\section{scan\_\allowbreak{}images}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{scan\_\allowbreak{}images}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{scan\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{ordinal}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{shelf\_\allowbreak{}\allowbreak{}group}} & {\small\texttt{smallint NOT NULL DEFAULT 1}} \\ \addlinespace[3pt]
+{\small\texttt{storage\_\allowbreak{}\allowbreak{}key}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{width}} & {\small\texttt{integer NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{height}} & {\small\texttt{integer NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{contributed}} & {\small\texttt{boolean NOT NULL DEFAULT false}} \\ \addlinespace[3pt]
+{\small\texttt{purged\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}images PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}images\_\allowbreak{}\allowbreak{}storage\_\allowbreak{}\allowbreak{}key UNIQUE (storage\_\allowbreak{}\allowbreak{}key)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}images\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}ordinal UNIQUE (scan\_\allowbreak{}\allowbreak{}id, ordinal)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}images\_\allowbreak{}\allowbreak{}ordinal CHECK (ordinal BETWEEN 1 AND 2)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}images\_\allowbreak{}\allowbreak{}size CHECK (width > 0 AND height > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}images\_\allowbreak{}\allowbreak{}shelf\_\allowbreak{}\allowbreak{}group CHECK (shelf\_\allowbreak{}\allowbreak{}group >= 1)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}images\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}id FOREIGN KEY (scan\_\allowbreak{}\allowbreak{}id) REFERENCES scans (id) ON DELETE CASCADE}}
+\end{itemize}
+\section{scan\_\allowbreak{}items}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{scan\_\allowbreak{}items}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{scan\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{origin}} & {\small\texttt{scan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}origin\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{model\_\allowbreak{}\allowbreak{}count}} & {\small\texttt{smallint}} \\ \addlinespace[3pt]
+{\small\texttt{final\_\allowbreak{}\allowbreak{}count}} & {\small\texttt{smallint}} \\ \addlinespace[3pt]
+{\small\texttt{qty\_\allowbreak{}\allowbreak{}level}} & {\small\texttt{qty\_\allowbreak{}\allowbreak{}level\_\allowbreak{}\allowbreak{}t}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}action}} & {\small\texttt{scan\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}action\_\allowbreak{}\allowbreak{}t NOT NULL DEFAULT 'kept'}} \\ \addlinespace[3pt]
+{\small\texttt{original\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}freshness}} & {\small\texttt{freshness\_\allowbreak{}\allowbreak{}t}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+{\small\texttt{updated\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}items PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}count CHECK (model\_\allowbreak{}\allowbreak{}count >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}final\_\allowbreak{}\allowbreak{}count CHECK (final\_\allowbreak{}\allowbreak{}count BETWEEN 0 AND 99)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}relabeled CHECK (user\_\allowbreak{}\allowbreak{}action <> 'relabeled' OR original\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id IS NOT NULL)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}original CHECK (original\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id IS NULL OR (origin = 'model' AND original\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id <> ingredient\_\allowbreak{}\allowbreak{}id))}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}added CHECK (origin = 'model' OR (model\_\allowbreak{}\allowbreak{}count IS NULL AND user\_\allowbreak{}\allowbreak{}action <> 'deleted'))}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}id FOREIGN KEY (scan\_\allowbreak{}\allowbreak{}id) REFERENCES scans (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}original\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (original\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\end{itemize}
+\section{detections}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{detections}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{bigint GENERATED ALWAYS AS IDENTITY}} \\ \addlinespace[3pt]
+{\small\texttt{scan\_\allowbreak{}\allowbreak{}image\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{scan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{x1}} & {\small\texttt{real NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{y1}} & {\small\texttt{real NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{x2}} & {\small\texttt{real NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{y2}} & {\small\texttt{real NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{confidence}} & {\small\texttt{real NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{p\_\allowbreak{}\allowbreak{}tuoi}} & {\small\texttt{real}} \\ \addlinespace[3pt]
+{\small\texttt{p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}som}} & {\small\texttt{real}} \\ \addlinespace[3pt]
+{\small\texttt{p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}ngay}} & {\small\texttt{real}} \\ \addlinespace[3pt]
+{\small\texttt{p\_\allowbreak{}\allowbreak{}kiem\_\allowbreak{}\allowbreak{}tra}} & {\small\texttt{real}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}detections PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}detections\_\allowbreak{}\allowbreak{}1 CHECK (0 <= x1 AND x1 < x2 AND x2 <= 1 AND 0 <= y1 AND y1 < y2 AND y2 <= 1)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}detections\_\allowbreak{}\allowbreak{}confidence CHECK (confidence BETWEEN 0 AND 1)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}detections\_\allowbreak{}\allowbreak{}p\_\allowbreak{}\allowbreak{}range CHECK (p\_\allowbreak{}\allowbreak{}tuoi BETWEEN 0 AND 1 AND p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}som BETWEEN 0 AND 1 AND p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}ngay BETWEEN 0 AND 1 AND p\_\allowbreak{}\allowbreak{}kiem\_\allowbreak{}\allowbreak{}tra BETWEEN 0 AND 1)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}detections\_\allowbreak{}\allowbreak{}p\_\allowbreak{}\allowbreak{}group CHECK (num\_\allowbreak{}\allowbreak{}nulls(p\_\allowbreak{}\allowbreak{}tuoi, p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}som, p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}ngay, p\_\allowbreak{}\allowbreak{}kiem\_\allowbreak{}\allowbreak{}tra) IN (0, 4))}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}detections\_\allowbreak{}\allowbreak{}p\_\allowbreak{}\allowbreak{}sum CHECK (p\_\allowbreak{}\allowbreak{}tuoi IS NULL OR abs(p\_\allowbreak{}\allowbreak{}tuoi + p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}som + p\_\allowbreak{}\allowbreak{}dung\_\allowbreak{}\allowbreak{}ngay + p\_\allowbreak{}\allowbreak{}kiem\_\allowbreak{}\allowbreak{}tra -\allowbreak{} 1) <= 0.\allowbreak{}01)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}detections\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}image\_\allowbreak{}\allowbreak{}id FOREIGN KEY (scan\_\allowbreak{}\allowbreak{}image\_\allowbreak{}\allowbreak{}id) REFERENCES scan\_\allowbreak{}\allowbreak{}images (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}detections\_\allowbreak{}\allowbreak{}scan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id FOREIGN KEY (scan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id) REFERENCES scan\_\allowbreak{}\allowbreak{}items (id) ON DELETE SET NULL}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}detections\_\allowbreak{}\allowbreak{}vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id FOREIGN KEY (vision\_\allowbreak{}\allowbreak{}class\_\allowbreak{}\allowbreak{}id) REFERENCES vision\_\allowbreak{}\allowbreak{}classes (id)}}
+\end{itemize}
+\section{substitution\_\allowbreak{}pairs}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{substitution\_\allowbreak{}pairs}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{substitute\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{context\_\allowbreak{}\allowbreak{}slot}} & {\small\texttt{slot\_\allowbreak{}\allowbreak{}t}} \\ \addlinespace[3pt]
+{\small\texttt{context\_\allowbreak{}\allowbreak{}method\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{ratio}} & {\small\texttt{numeric NOT NULL DEFAULT 1}} \\ \addlinespace[3pt]
+{\small\texttt{score}} & {\small\texttt{real NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{source}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{curated}} & {\small\texttt{boolean NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}substitution\_\allowbreak{}\allowbreak{}pairs PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}substitution\_\allowbreak{}\allowbreak{}pairs\_\allowbreak{}\allowbreak{}ctx UNIQUE NULLS NOT DISTINCT (ingredient\_\allowbreak{}\allowbreak{}id, substitute\_\allowbreak{}\allowbreak{}id, context\_\allowbreak{}\allowbreak{}slot, context\_\allowbreak{}\allowbreak{}method\_\allowbreak{}\allowbreak{}code)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}substitution\_\allowbreak{}\allowbreak{}pairs\_\allowbreak{}\allowbreak{}1 CHECK (ingredient\_\allowbreak{}\allowbreak{}id <> substitute\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}substitution\_\allowbreak{}\allowbreak{}pairs\_\allowbreak{}\allowbreak{}ratio CHECK (ratio > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}substitution\_\allowbreak{}\allowbreak{}pairs\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}substitution\_\allowbreak{}\allowbreak{}pairs\_\allowbreak{}\allowbreak{}substitute\_\allowbreak{}\allowbreak{}id FOREIGN KEY (substitute\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}substitution\_\allowbreak{}\allowbreak{}pairs\_\allowbreak{}\allowbreak{}context\_\allowbreak{}\allowbreak{}method\_\allowbreak{}\allowbreak{}code FOREIGN KEY (context\_\allowbreak{}\allowbreak{}method\_\allowbreak{}\allowbreak{}code) REFERENCES cooking\_\allowbreak{}\allowbreak{}methods (code)}}
+\end{itemize}
+\section{ingredient\_\allowbreak{}embeddings}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{ingredient\_\allowbreak{}embeddings}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{vector}} & {\small\texttt{vector(100) NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}embeddings PRIMARY KEY (ingredient\_\allowbreak{}\allowbreak{}id, model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}embeddings\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}embeddings\_\allowbreak{}\allowbreak{}model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id FOREIGN KEY (model\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id) REFERENCES model\_\allowbreak{}\allowbreak{}versions (id)}}
+\end{itemize}
+\section{shopping\_\allowbreak{}items}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{shopping\_\allowbreak{}items}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{qty\_\allowbreak{}\allowbreak{}g}} & {\small\texttt{numeric}} \\ \addlinespace[3pt]
+{\small\texttt{note}} & {\small\texttt{text}} \\ \addlinespace[3pt]
+{\small\texttt{status}} & {\small\texttt{shopping\_\allowbreak{}\allowbreak{}status\_\allowbreak{}\allowbreak{}t NOT NULL DEFAULT 'open'}} \\ \addlinespace[3pt]
+{\small\texttt{source\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+{\small\texttt{updated\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}shopping\_\allowbreak{}\allowbreak{}items PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}shopping\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}qty\_\allowbreak{}\allowbreak{}g CHECK (qty\_\allowbreak{}\allowbreak{}g > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}shopping\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}shopping\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\end{itemize}
+\section{meal\_\allowbreak{}plans}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{meal\_\allowbreak{}plans}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{meal}} & {\small\texttt{meal\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{persons}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{max\_\allowbreak{}\allowbreak{}minutes}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{status}} & {\small\texttt{meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}status\_\allowbreak{}\allowbreak{}t NOT NULL DEFAULT 'proposed'}} \\ \addlinespace[3pt]
+{\small\texttt{e\_\allowbreak{}\allowbreak{}target\_\allowbreak{}\allowbreak{}kcal}} & {\small\texttt{numeric}} \\ \addlinespace[3pt]
+{\small\texttt{kcal\_\allowbreak{}\allowbreak{}low}} & {\small\texttt{numeric}} \\ \addlinespace[3pt]
+{\small\texttt{kcal\_\allowbreak{}\allowbreak{}high}} & {\small\texttt{numeric}} \\ \addlinespace[3pt]
+{\small\texttt{rice\_\allowbreak{}\allowbreak{}bowls\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}person}} & {\small\texttt{numeric}} \\ \addlinespace[3pt]
+{\small\texttt{reason\_\allowbreak{}\allowbreak{}vi}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{ranker\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{params\_\allowbreak{}\allowbreak{}version}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+{\small\texttt{updated\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plans PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plans\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id UNIQUE (id, user\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plans\_\allowbreak{}\allowbreak{}persons CHECK (persons BETWEEN 1 AND 6)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plans\_\allowbreak{}\allowbreak{}max\_\allowbreak{}\allowbreak{}minutes CHECK (max\_\allowbreak{}\allowbreak{}minutes BETWEEN 10 AND 180)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plans\_\allowbreak{}\allowbreak{}e\_\allowbreak{}\allowbreak{}target\_\allowbreak{}\allowbreak{}kcal CHECK (e\_\allowbreak{}\allowbreak{}target\_\allowbreak{}\allowbreak{}kcal > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plans\_\allowbreak{}\allowbreak{}kcal\_\allowbreak{}\allowbreak{}pair CHECK ((kcal\_\allowbreak{}\allowbreak{}low IS NULL) = (kcal\_\allowbreak{}\allowbreak{}high IS NULL))}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plans\_\allowbreak{}\allowbreak{}kcal\_\allowbreak{}\allowbreak{}range CHECK (kcal\_\allowbreak{}\allowbreak{}low >= 0 AND kcal\_\allowbreak{}\allowbreak{}low <= kcal\_\allowbreak{}\allowbreak{}high)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plans\_\allowbreak{}\allowbreak{}rice\_\allowbreak{}\allowbreak{}bowls CHECK (rice\_\allowbreak{}\allowbreak{}bowls\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}person BETWEEN 0.\allowbreak{}5 AND 3 AND rice\_\allowbreak{}\allowbreak{}bowls\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}person * 2 = trunc(rice\_\allowbreak{}\allowbreak{}bowls\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}person * 2))}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plans\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plans\_\allowbreak{}\allowbreak{}ranker\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ranker\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id) REFERENCES model\_\allowbreak{}\allowbreak{}versions (id)}}
+\end{itemize}
+\section{meal\_\allowbreak{}plan\_\allowbreak{}coeater\_\allowbreak{}allergens}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{meal\_\allowbreak{}plan\_\allowbreak{}coeater\_\allowbreak{}allergens}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{allergen\_\allowbreak{}\allowbreak{}code}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}coeater\_\allowbreak{}\allowbreak{}allergens PRIMARY KEY (meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id, allergen\_\allowbreak{}\allowbreak{}code)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}coeater\_\allowbreak{}\allowbreak{}allergens\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id FOREIGN KEY (meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id) REFERENCES meal\_\allowbreak{}\allowbreak{}plans (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}coeater\_\allowbreak{}\allowbreak{}allergens\_\allowbreak{}\allowbreak{}allergen\_\allowbreak{}\allowbreak{}code FOREIGN KEY (allergen\_\allowbreak{}\allowbreak{}code) REFERENCES allergen\_\allowbreak{}\allowbreak{}groups (code)}}
+\end{itemize}
+\section{meal\_\allowbreak{}plan\_\allowbreak{}pins}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{meal\_\allowbreak{}plan\_\allowbreak{}pins}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{lot\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}pins PRIMARY KEY (meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id, lot\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}pins\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id FOREIGN KEY (meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id) REFERENCES meal\_\allowbreak{}\allowbreak{}plans (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}pins\_\allowbreak{}\allowbreak{}lot\_\allowbreak{}\allowbreak{}id FOREIGN KEY (lot\_\allowbreak{}\allowbreak{}id) REFERENCES pantry\_\allowbreak{}\allowbreak{}lots (id) ON DELETE CASCADE}}
+\end{itemize}
+\section{meal\_\allowbreak{}plan\_\allowbreak{}items}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{meal\_\allowbreak{}plan\_\allowbreak{}items}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{slot}} & {\small\texttt{slot\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{status}} & {\small\texttt{plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}status\_\allowbreak{}\allowbreak{}t NOT NULL DEFAULT 'active'}} \\ \addlinespace[3pt]
+{\small\texttt{replaced\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{swap\_\allowbreak{}\allowbreak{}reason}} & {\small\texttt{swap\_\allowbreak{}\allowbreak{}reason\_\allowbreak{}\allowbreak{}t}} \\ \addlinespace[3pt]
+{\small\texttt{rank\_\allowbreak{}\allowbreak{}score}} & {\small\texttt{real NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{servings\_\allowbreak{}\allowbreak{}scale}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{kcal\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}person}} & {\small\texttt{numeric}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}replaced\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id UNIQUE (replaced\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id UNIQUE (id, meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id, recipe\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}servings\_\allowbreak{}\allowbreak{}scale CHECK (servings\_\allowbreak{}\allowbreak{}scale > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}kcal\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}person CHECK (kcal\_\allowbreak{}\allowbreak{}per\_\allowbreak{}\allowbreak{}person >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}not\_\allowbreak{}\allowbreak{}self CHECK (replaced\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id <> id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id FOREIGN KEY (meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id) REFERENCES meal\_\allowbreak{}\allowbreak{}plans (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}replaced\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id FOREIGN KEY (replaced\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id) REFERENCES meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}slot FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id, slot) REFERENCES recipes (id, slot)}}
+\end{itemize}
+\section{meal\_\allowbreak{}plan\_\allowbreak{}item\_\allowbreak{}substitutions}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{meal\_\allowbreak{}plan\_\allowbreak{}item\_\allowbreak{}substitutions}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{item\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{original\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{substitute\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{grams}} & {\small\texttt{numeric NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{origin}} & {\small\texttt{substitution\_\allowbreak{}\allowbreak{}origin\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}substitutions PRIMARY KEY (item\_\allowbreak{}\allowbreak{}id, original\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}substitutions\_\allowbreak{}\allowbreak{}grams CHECK (grams > 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}substitutions\_\allowbreak{}\allowbreak{}distinct CHECK (original\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id <> substitute\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}substitutions\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id FOREIGN KEY (item\_\allowbreak{}\allowbreak{}id) REFERENCES meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}substitutions\_\allowbreak{}\allowbreak{}original\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (original\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}substitutions\_\allowbreak{}\allowbreak{}substitute\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id FOREIGN KEY (substitute\_\allowbreak{}\allowbreak{}ingredient\_\allowbreak{}\allowbreak{}id) REFERENCES ingredients (id)}}
+\end{itemize}
+\section{cook\_\allowbreak{}sessions}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{cook\_\allowbreak{}sessions}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{status}} & {\small\texttt{cook\_\allowbreak{}\allowbreak{}status\_\allowbreak{}\allowbreak{}t NOT NULL DEFAULT 'in\_\allowbreak{}\allowbreak{}progress'}} \\ \addlinespace[3pt]
+{\small\texttt{serve\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{burners}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{started\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{completed\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{reverted\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}sessions PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}sessions\_\allowbreak{}\allowbreak{}burners CHECK (burners BETWEEN 1 AND 4)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}sessions\_\allowbreak{}\allowbreak{}completed CHECK ((status = 'completed') = (completed\_\allowbreak{}\allowbreak{}at IS NOT NULL AND reverted\_\allowbreak{}\allowbreak{}at IS NULL))}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}sessions\_\allowbreak{}\allowbreak{}reverted CHECK ((status = 'reverted') = (reverted\_\allowbreak{}\allowbreak{}at IS NOT NULL))}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}sessions\_\allowbreak{}\allowbreak{}order CHECK (completed\_\allowbreak{}\allowbreak{}at >= started\_\allowbreak{}\allowbreak{}at AND reverted\_\allowbreak{}\allowbreak{}at >= completed\_\allowbreak{}\allowbreak{}at AND (reverted\_\allowbreak{}\allowbreak{}at IS NULL OR completed\_\allowbreak{}\allowbreak{}at IS NOT NULL))}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}sessions\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id FOREIGN KEY (meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id) REFERENCES meal\_\allowbreak{}\allowbreak{}plans (id) ON DELETE CASCADE}}
+\end{itemize}
+\section{cook\_\allowbreak{}schedule\_\allowbreak{}entries}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{cook\_\allowbreak{}schedule\_\allowbreak{}entries}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{cook\_\allowbreak{}\allowbreak{}session\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{step\_\allowbreak{}\allowbreak{}no}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{start\_\allowbreak{}\allowbreak{}offset\_\allowbreak{}\allowbreak{}s}} & {\small\texttt{integer NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{end\_\allowbreak{}\allowbreak{}offset\_\allowbreak{}\allowbreak{}s}} & {\small\texttt{integer NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}schedule\_\allowbreak{}\allowbreak{}entries PRIMARY KEY (cook\_\allowbreak{}\allowbreak{}session\_\allowbreak{}\allowbreak{}id, recipe\_\allowbreak{}\allowbreak{}id, step\_\allowbreak{}\allowbreak{}no)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}schedule\_\allowbreak{}\allowbreak{}entries\_\allowbreak{}\allowbreak{}1 CHECK (start\_\allowbreak{}\allowbreak{}offset\_\allowbreak{}\allowbreak{}s < end\_\allowbreak{}\allowbreak{}offset\_\allowbreak{}\allowbreak{}s)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}schedule\_\allowbreak{}\allowbreak{}entries\_\allowbreak{}\allowbreak{}start CHECK (start\_\allowbreak{}\allowbreak{}offset\_\allowbreak{}\allowbreak{}s >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}schedule\_\allowbreak{}\allowbreak{}entries\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}session\_\allowbreak{}\allowbreak{}id FOREIGN KEY (cook\_\allowbreak{}\allowbreak{}session\_\allowbreak{}\allowbreak{}id) REFERENCES cook\_\allowbreak{}\allowbreak{}sessions (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}cook\_\allowbreak{}\allowbreak{}schedule\_\allowbreak{}\allowbreak{}entries\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}step\_\allowbreak{}\allowbreak{}no FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id, step\_\allowbreak{}\allowbreak{}no) REFERENCES recipe\_\allowbreak{}\allowbreak{}steps (recipe\_\allowbreak{}\allowbreak{}id, step\_\allowbreak{}\allowbreak{}no)}}
+\end{itemize}
+\section{interactions}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{interactions}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{user\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{type}} & {\small\texttt{interaction\_\allowbreak{}\allowbreak{}type\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{position}} & {\small\texttt{smallint}} \\ \addlinespace[3pt]
+{\small\texttt{swap\_\allowbreak{}\allowbreak{}reason}} & {\small\texttt{swap\_\allowbreak{}\allowbreak{}reason\_\allowbreak{}\allowbreak{}t}} \\ \addlinespace[3pt]
+{\small\texttt{ranker\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid}} \\ \addlinespace[3pt]
+{\small\texttt{propensity}} & {\small\texttt{real}} \\ \addlinespace[3pt]
+{\small\texttt{occurred\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{received\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}interactions PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}interactions\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}needs\_\allowbreak{}\allowbreak{}plan CHECK (meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id IS NULL OR meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id IS NOT NULL)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}interactions\_\allowbreak{}\allowbreak{}position CHECK (position >= 0)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}interactions\_\allowbreak{}\allowbreak{}propensity CHECK (propensity > 0 AND propensity <= 1)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}interactions\_\allowbreak{}\allowbreak{}swap\_\allowbreak{}\allowbreak{}reason CHECK (swap\_\allowbreak{}\allowbreak{}reason IS NULL OR type = 'swapped')}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}interactions\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (user\_\allowbreak{}\allowbreak{}id) REFERENCES users (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}interactions\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id) REFERENCES recipes (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}interactions\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id, meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id, recipe\_\allowbreak{}\allowbreak{}id) REFERENCES meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items (id, meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id, recipe\_\allowbreak{}\allowbreak{}id) ON DELETE SET NULL (meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}interactions\_\allowbreak{}\allowbreak{}ranker\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id FOREIGN KEY (ranker\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id) REFERENCES model\_\allowbreak{}\allowbreak{}versions (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}interactions\_\allowbreak{}\allowbreak{}meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}user\_\allowbreak{}\allowbreak{}id FOREIGN KEY (meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}id, user\_\allowbreak{}\allowbreak{}id) REFERENCES meal\_\allowbreak{}\allowbreak{}plans (id, user\_\allowbreak{}\allowbreak{}id) ON DELETE CASCADE}}
+\end{itemize}
+\section{survey\_\allowbreak{}forms}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{survey\_\allowbreak{}forms}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{version}} & {\small\texttt{text NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{n\_\allowbreak{}\allowbreak{}anchor}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{n\_\allowbreak{}\allowbreak{}random}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{is\_\allowbreak{}\allowbreak{}open}} & {\small\texttt{boolean NOT NULL DEFAULT false}} \\ \addlinespace[3pt]
+{\small\texttt{created\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL DEFAULT now()}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}forms PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}forms\_\allowbreak{}\allowbreak{}version UNIQUE (version)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}forms\_\allowbreak{}\allowbreak{}sizes CHECK (n\_\allowbreak{}\allowbreak{}anchor >= 0 AND n\_\allowbreak{}\allowbreak{}random >= 0 AND n\_\allowbreak{}\allowbreak{}anchor + n\_\allowbreak{}\allowbreak{}random > 0)}}
+\end{itemize}
+\section{survey\_\allowbreak{}form\_\allowbreak{}anchors}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{survey\_\allowbreak{}form\_\allowbreak{}anchors}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{form\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}form\_\allowbreak{}\allowbreak{}anchors PRIMARY KEY (form\_\allowbreak{}\allowbreak{}id, recipe\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}form\_\allowbreak{}\allowbreak{}anchors\_\allowbreak{}\allowbreak{}form\_\allowbreak{}\allowbreak{}id FOREIGN KEY (form\_\allowbreak{}\allowbreak{}id) REFERENCES survey\_\allowbreak{}\allowbreak{}forms (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}form\_\allowbreak{}\allowbreak{}anchors\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id) REFERENCES recipes (id)}}
+\end{itemize}
+\section{survey\_\allowbreak{}respondents}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{survey\_\allowbreak{}respondents}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{id}} & {\small\texttt{uuid NOT NULL DEFAULT gen\_\allowbreak{}\allowbreak{}random\_\allowbreak{}\allowbreak{}uuid()}} \\ \addlinespace[3pt]
+{\small\texttt{form\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{policy\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{consented\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{completed\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz}} \\ \addlinespace[3pt]
+{\small\texttt{channel}} & {\small\texttt{survey\_\allowbreak{}\allowbreak{}channel\_\allowbreak{}\allowbreak{}t NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}respondents PRIMARY KEY (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}respondents\_\allowbreak{}\allowbreak{}form\_\allowbreak{}\allowbreak{}id FOREIGN KEY (form\_\allowbreak{}\allowbreak{}id) REFERENCES survey\_\allowbreak{}\allowbreak{}forms (id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}respondents\_\allowbreak{}\allowbreak{}policy\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id FOREIGN KEY (policy\_\allowbreak{}\allowbreak{}version\_\allowbreak{}\allowbreak{}id) REFERENCES policy\_\allowbreak{}\allowbreak{}versions (id)}}
+\end{itemize}
+\section{survey\_\allowbreak{}assignments}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{survey\_\allowbreak{}assignments}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{respondent\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{display\_\allowbreak{}\allowbreak{}order}} & {\small\texttt{smallint NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{is\_\allowbreak{}\allowbreak{}anchor}} & {\small\texttt{boolean NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}assignments PRIMARY KEY (respondent\_\allowbreak{}\allowbreak{}id, recipe\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT uq\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}assignments\_\allowbreak{}\allowbreak{}respondent\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}display\_\allowbreak{}\allowbreak{}order UNIQUE (respondent\_\allowbreak{}\allowbreak{}id, display\_\allowbreak{}\allowbreak{}order)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}assignments\_\allowbreak{}\allowbreak{}display\_\allowbreak{}\allowbreak{}order CHECK (display\_\allowbreak{}\allowbreak{}order >= 1)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}assignments\_\allowbreak{}\allowbreak{}respondent\_\allowbreak{}\allowbreak{}id FOREIGN KEY (respondent\_\allowbreak{}\allowbreak{}id) REFERENCES survey\_\allowbreak{}\allowbreak{}respondents (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}assignments\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id) REFERENCES recipes (id)}}
+\end{itemize}
+\section{survey\_\allowbreak{}ratings}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{survey\_\allowbreak{}ratings}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{respondent\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{rating}} & {\small\texttt{smallint}} \\ \addlinespace[3pt]
+{\small\texttt{never\_\allowbreak{}\allowbreak{}eaten}} & {\small\texttt{boolean NOT NULL DEFAULT false}} \\ \addlinespace[3pt]
+{\small\texttt{answered\_\allowbreak{}\allowbreak{}at}} & {\small\texttt{timestamptz NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}ratings PRIMARY KEY (respondent\_\allowbreak{}\allowbreak{}id, recipe\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}ratings\_\allowbreak{}\allowbreak{}rating CHECK (rating BETWEEN 1 AND 5)}}
+\item \raggedright {\small\texttt{CONSTRAINT ck\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}ratings\_\allowbreak{}\allowbreak{}1 CHECK ((rating IS NULL) = never\_\allowbreak{}\allowbreak{}eaten)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}ratings\_\allowbreak{}\allowbreak{}respondent\_\allowbreak{}\allowbreak{}id\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (respondent\_\allowbreak{}\allowbreak{}id, recipe\_\allowbreak{}\allowbreak{}id) REFERENCES survey\_\allowbreak{}\allowbreak{}assignments (respondent\_\allowbreak{}\allowbreak{}id, recipe\_\allowbreak{}\allowbreak{}id) ON DELETE CASCADE}}
+\end{itemize}
+\section{survey\_\allowbreak{}favorites}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{7.850cm}@{\hspace{3mm}}L{7.850cm}@{}}
+\caption{survey\_\allowbreak{}favorites}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endfirsthead
+\multicolumn{2}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Cột} & \textbf{Kiểu và ràng buộc khai báo} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small\texttt{respondent\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+{\small\texttt{recipe\_\allowbreak{}\allowbreak{}id}} & {\small\texttt{uuid NOT NULL}} \\ \addlinespace[3pt]
+\end{longtable}}
+\textbf{Ràng buộc đặt tên trong CREATE TABLE:}
+
+\begin{itemize}
+\item \raggedright {\small\texttt{CONSTRAINT pk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}favorites PRIMARY KEY (respondent\_\allowbreak{}\allowbreak{}id, recipe\_\allowbreak{}\allowbreak{}id)}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}favorites\_\allowbreak{}\allowbreak{}respondent\_\allowbreak{}\allowbreak{}id FOREIGN KEY (respondent\_\allowbreak{}\allowbreak{}id) REFERENCES survey\_\allowbreak{}\allowbreak{}respondents (id) ON DELETE CASCADE}}
+\item \raggedright {\small\texttt{CONSTRAINT fk\_\allowbreak{}\allowbreak{}survey\_\allowbreak{}\allowbreak{}favorites\_\allowbreak{}\allowbreak{}recipe\_\allowbreak{}\allowbreak{}id FOREIGN KEY (recipe\_\allowbreak{}\allowbreak{}id) REFERENCES recipes (id)}}
+\end{itemize}
+\section{Ràng buộc bổ sung, index và view}
+Cạnh FK phát sinh từ ALTER TABLE và index không được bỏ qua khi nghiệm thu mô hình. DDL đầy đủ đi kèm trong evidence/\allowbreak{}schema-\allowbreak{}source.sql; một số ràng buộc chỉ có ở migration mới.
+
+\begin{quote}\scriptsize\ttfamily\raggedright
+ALTER\ TABLE\ ở\ cuối\ tệp.\newline{}-\allowbreak{}-\allowbreak{}\ Bất\ biến\ mà\ chuẩn\ hoá\ dựa\ vào\ (docs/\allowbreak{}sad/\allowbreak{}04-\allowbreak{}chuan-\allowbreak{}hoa.md\ mục\ 4)\ được\ ép\ trong\ CSDL,\ không\ chỉ\ ở\ service:\newline{}-\allowbreak{}-\allowbreak{}\ \ \ *\ trigger\ trg\_\allowbreak{}append\_\allowbreak{}only:\ consent\_\allowbreak{}events,\ audit\_\allowbreak{}log,\ pantry\_\allowbreak{}transactions,\ interactions\ chỉ\ ghi\ thêm;
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+ALTER\ TABLE\ idempotency\_\allowbreak{}keys\ ADD\ CONSTRAINT\ fk\_\allowbreak{}idempotency\_\allowbreak{}keys\_\allowbreak{}user\_\allowbreak{}id\ FOREIGN\ KEY\ (user\_\allowbreak{}id)\ REFERENCES\ users\ (id)\ ON\ DELETE\ CASCADE;
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+ALTER\ TABLE\ pantry\_\allowbreak{}lots\ ADD\ CONSTRAINT\ fk\_\allowbreak{}pantry\_\allowbreak{}lots\_\allowbreak{}freshness\_\allowbreak{}model\_\allowbreak{}version\_\allowbreak{}id\ FOREIGN\ KEY\ (freshness\_\allowbreak{}model\_\allowbreak{}version\_\allowbreak{}id)\ REFERENCES\ model\_\allowbreak{}versions\ (id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+ALTER\ TABLE\ pantry\_\allowbreak{}lots\ ADD\ CONSTRAINT\ fk\_\allowbreak{}pantry\_\allowbreak{}lots\_\allowbreak{}source\_\allowbreak{}scan\_\allowbreak{}item\_\allowbreak{}id\ FOREIGN\ KEY\ (source\_\allowbreak{}scan\_\allowbreak{}item\_\allowbreak{}id)\ REFERENCES\ scan\_\allowbreak{}items\ (id)\ ON\ DELETE\ SET\ NULL;
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+ALTER\ TABLE\ shopping\_\allowbreak{}items\ ADD\ CONSTRAINT\ fk\_\allowbreak{}shopping\_\allowbreak{}items\_\allowbreak{}source\_\allowbreak{}meal\_\allowbreak{}plan\_\allowbreak{}item\_\allowbreak{}id\ FOREIGN\ KEY\ (source\_\allowbreak{}meal\_\allowbreak{}plan\_\allowbreak{}item\_\allowbreak{}id)\ REFERENCES\ meal\_\allowbreak{}plan\_\allowbreak{}items\ (id)\ ON\ DELETE\ SET\ NULL;
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ UNIQUE\ INDEX\ ux\_\allowbreak{}meal\_\allowbreak{}plan\_\allowbreak{}items\_\allowbreak{}active\_\allowbreak{}slot\ ON\ meal\_\allowbreak{}plan\_\allowbreak{}items\ (meal\_\allowbreak{}plan\_\allowbreak{}id,\ slot)\ WHERE\ status\ =\ 'active';
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ UNIQUE\ INDEX\ ux\_\allowbreak{}recipes\_\allowbreak{}name\_\allowbreak{}vi\_\allowbreak{}live\ ON\ recipes\ (name\_\allowbreak{}vi)\ WHERE\ status\ <>\ 'retired';
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ UNIQUE\ INDEX\ ux\_\allowbreak{}ingredients\_\allowbreak{}name\_\allowbreak{}vi\_\allowbreak{}active\ ON\ ingredients\ (name\_\allowbreak{}vi)\ WHERE\ is\_\allowbreak{}active;
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ UNIQUE\ INDEX\ ux\_\allowbreak{}vision\_\allowbreak{}class\_\allowbreak{}ingredients\_\allowbreak{}default\ ON\ vision\_\allowbreak{}class\_\allowbreak{}ingredients\ (vision\_\allowbreak{}class\_\allowbreak{}id)\ WHERE\ is\_\allowbreak{}default;
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ UNIQUE\ INDEX\ ux\_\allowbreak{}cook\_\allowbreak{}sessions\_\allowbreak{}one\_\allowbreak{}live\ ON\ cook\_\allowbreak{}sessions\ (meal\_\allowbreak{}plan\_\allowbreak{}id)\ WHERE\ status\ IN\ ('in\_\allowbreak{}progress',\ 'completed');
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}recipe\_\allowbreak{}ingredients\_\allowbreak{}ingredient\_\allowbreak{}id\ ON\ recipe\_\allowbreak{}ingredients\ (ingredient\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}ingredient\_\allowbreak{}allergens\_\allowbreak{}allergen\_\allowbreak{}code\ ON\ ingredient\_\allowbreak{}allergens\ (allergen\_\allowbreak{}code);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}pantry\_\allowbreak{}lots\_\allowbreak{}user\_\allowbreak{}id\_\allowbreak{}status\ ON\ pantry\_\allowbreak{}lots\ (user\_\allowbreak{}id,\ status);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}pantry\_\allowbreak{}transactions\_\allowbreak{}lot\_\allowbreak{}id\ ON\ pantry\_\allowbreak{}transactions\ (lot\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}interactions\_\allowbreak{}user\_\allowbreak{}id\_\allowbreak{}occurred\_\allowbreak{}at\ ON\ interactions\ (user\_\allowbreak{}id,\ occurred\_\allowbreak{}at\ DESC);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}meal\_\allowbreak{}plans\_\allowbreak{}user\_\allowbreak{}id\_\allowbreak{}created\_\allowbreak{}at\ ON\ meal\_\allowbreak{}plans\ (user\_\allowbreak{}id,\ created\_\allowbreak{}at\ DESC);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}meal\_\allowbreak{}plan\_\allowbreak{}items\_\allowbreak{}meal\_\allowbreak{}plan\_\allowbreak{}id\ ON\ meal\_\allowbreak{}plan\_\allowbreak{}items\ (meal\_\allowbreak{}plan\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}scans\_\allowbreak{}user\_\allowbreak{}id\_\allowbreak{}created\_\allowbreak{}at\ ON\ scans\ (user\_\allowbreak{}id,\ created\_\allowbreak{}at\ DESC);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}scan\_\allowbreak{}items\_\allowbreak{}scan\_\allowbreak{}id\ ON\ scan\_\allowbreak{}items\ (scan\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}detections\_\allowbreak{}scan\_\allowbreak{}image\_\allowbreak{}id\ ON\ detections\ (scan\_\allowbreak{}image\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}consent\_\allowbreak{}events\_\allowbreak{}user\_\allowbreak{}id\_\allowbreak{}created\_\allowbreak{}at\ ON\ consent\_\allowbreak{}events\ (user\_\allowbreak{}id,\ created\_\allowbreak{}at\ DESC);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}dsr\_\allowbreak{}requests\_\allowbreak{}status\_\allowbreak{}received\_\allowbreak{}at\ ON\ dsr\_\allowbreak{}requests\ (status,\ received\_\allowbreak{}at);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}refresh\_\allowbreak{}tokens\_\allowbreak{}user\_\allowbreak{}id\ ON\ refresh\_\allowbreak{}tokens\ (user\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}refresh\_\allowbreak{}tokens\_\allowbreak{}family\_\allowbreak{}id\ ON\ refresh\_\allowbreak{}tokens\ (family\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}shopping\_\allowbreak{}items\_\allowbreak{}user\_\allowbreak{}id\_\allowbreak{}status\ ON\ shopping\_\allowbreak{}items\ (user\_\allowbreak{}id,\ status);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}audit\_\allowbreak{}log\_\allowbreak{}created\_\allowbreak{}at\ ON\ audit\_\allowbreak{}log\ (created\_\allowbreak{}at);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}cook\_\allowbreak{}sessions\_\allowbreak{}meal\_\allowbreak{}plan\_\allowbreak{}id\ ON\ cook\_\allowbreak{}sessions\ (meal\_\allowbreak{}plan\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}survey\_\allowbreak{}ratings\_\allowbreak{}recipe\_\allowbreak{}id\ ON\ survey\_\allowbreak{}ratings\ (recipe\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}pantry\_\allowbreak{}transactions\_\allowbreak{}ref\ ON\ pantry\_\allowbreak{}transactions\ (ref\_\allowbreak{}type,\ ref\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}audit\_\allowbreak{}log\_\allowbreak{}actor\_\allowbreak{}user\_\allowbreak{}id\ ON\ audit\_\allowbreak{}log\ (actor\_\allowbreak{}user\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}dsr\_\allowbreak{}requests\_\allowbreak{}user\_\allowbreak{}id\ ON\ dsr\_\allowbreak{}requests\ (user\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}password\_\allowbreak{}resets\_\allowbreak{}user\_\allowbreak{}id\ ON\ password\_\allowbreak{}resets\ (user\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}detections\_\allowbreak{}scan\_\allowbreak{}item\_\allowbreak{}id\ ON\ detections\ (scan\_\allowbreak{}item\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}pantry\_\allowbreak{}lots\_\allowbreak{}source\_\allowbreak{}scan\_\allowbreak{}item\_\allowbreak{}id\ ON\ pantry\_\allowbreak{}lots\ (source\_\allowbreak{}scan\_\allowbreak{}item\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}meal\_\allowbreak{}plan\_\allowbreak{}pins\_\allowbreak{}lot\_\allowbreak{}id\ ON\ meal\_\allowbreak{}plan\_\allowbreak{}pins\ (lot\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}shopping\_\allowbreak{}items\_\allowbreak{}source\_\allowbreak{}meal\_\allowbreak{}plan\_\allowbreak{}item\_\allowbreak{}id\ ON\ shopping\_\allowbreak{}items\ (source\_\allowbreak{}meal\_\allowbreak{}plan\_\allowbreak{}item\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}interactions\_\allowbreak{}meal\_\allowbreak{}plan\_\allowbreak{}item\_\allowbreak{}id\ ON\ interactions\ (meal\_\allowbreak{}plan\_\allowbreak{}item\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}interactions\_\allowbreak{}meal\_\allowbreak{}plan\_\allowbreak{}id\_\allowbreak{}user\_\allowbreak{}id\ ON\ interactions\ (meal\_\allowbreak{}plan\_\allowbreak{}id,\ user\_\allowbreak{}id);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}idempotency\_\allowbreak{}keys\_\allowbreak{}created\_\allowbreak{}at\ ON\ idempotency\_\allowbreak{}keys\ (created\_\allowbreak{}at);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}refresh\_\allowbreak{}tokens\_\allowbreak{}expires\_\allowbreak{}at\ ON\ refresh\_\allowbreak{}tokens\ (expires\_\allowbreak{}at);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}password\_\allowbreak{}resets\_\allowbreak{}expires\_\allowbreak{}at\ ON\ password\_\allowbreak{}resets\ (expires\_\allowbreak{}at);
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}scans\_\allowbreak{}stuck\ ON\ scans\ (started\_\allowbreak{}at)\ WHERE\ status\ IN\ ('queued',\ 'processing');
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ INDEX\ ix\_\allowbreak{}scan\_\allowbreak{}images\_\allowbreak{}purge\ ON\ scan\_\allowbreak{}images\ (scan\_\allowbreak{}id)\ WHERE\ purged\_\allowbreak{}at\ IS\ NULL\ AND\ NOT\ contributed;
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ VIEW\ v\_\allowbreak{}current\_\allowbreak{}consents\ AS\newline{}SELECT\ DISTINCT\ ON\ (ce.user\_\allowbreak{}id,\ pv.purpose\_\allowbreak{}code)\newline{}\ \ \ \ \ \ \ ce.user\_\allowbreak{}id,\newline{}\ \ \ \ \ \ \ pv.purpose\_\allowbreak{}code,\newline{}\ \ \ \ \ \ \ ce.action,\newline{}\ \ \ \ \ \ \ (ce.action\ =\ 'grant')\ AS\ is\_\allowbreak{}granted,\newline{}\ \ \ \ \ \ \ ce.policy\_\allowbreak{}version\_\allowbreak{}id,\newline{}\ \ \ \ \ \ \ pv.version\ AS\ policy\_\allowbreak{}version,\newline{}\ \ \ \ \ \ \ (pv.id\ =\ (SELECT\ p2.id\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FROM\ policy\_\allowbreak{}versions\ p2\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ WHERE\ p2.purpose\_\allowbreak{}code\ =\ pv.purpose\_\allowbreak{}code\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ AND\ p2.effective\_\allowbreak{}from\ <=\ now()\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ORDER\ BY\ p2.effective\_\allowbreak{}from\ DESC\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ LIMIT\ 1))\ AS\ on\_\allowbreak{}current\_\allowbreak{}policy,\newline{}\ \ \ \ \ \ \ ce.channel,\newline{}\ \ \ \ \ \ \ ce.created\_\allowbreak{}at\ AS\ decided\_\allowbreak{}at\newline{}\ \ FROM\ consent\_\allowbreak{}events\ ce\newline{}\ \ JOIN\ policy\_\allowbreak{}versions\ pv\ ON\ pv.id\ =\ ce.policy\_\allowbreak{}version\_\allowbreak{}id\newline{}\ ORDER\ BY\ ce.user\_\allowbreak{}id,\ pv.purpose\_\allowbreak{}code,\ ce.created\_\allowbreak{}at\ DESC,\ ce.id\ DESC;
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ VIEW\ v\_\allowbreak{}pantry\_\allowbreak{}lot\_\allowbreak{}balance\ AS\newline{}SELECT\ l.id\ AS\ lot\_\allowbreak{}id,\newline{}\ \ \ \ \ \ \ l.user\_\allowbreak{}id,\newline{}\ \ \ \ \ \ \ l.ingredient\_\allowbreak{}id,\newline{}\ \ \ \ \ \ \ l.status,\newline{}\ \ \ \ \ \ \ l.acquired\_\allowbreak{}at,\newline{}\ \ \ \ \ \ \ GREATEST(0,\ l.initial\_\allowbreak{}g\_\allowbreak{}min\ +\ t.sum\_\allowbreak{}min)\ AS\ g\_\allowbreak{}min,\newline{}\ \ \ \ \ \ \ GREATEST(0,\ l.initial\_\allowbreak{}g\_\allowbreak{}max\ +\ t.sum\_\allowbreak{}max)\ AS\ g\_\allowbreak{}max,\newline{}\ \ \ \ \ \ \ t.n\ AS\ n\_\allowbreak{}transactions\newline{}\ \ FROM\ pantry\_\allowbreak{}lots\ l\newline{}\ CROSS\ JOIN\ LATERAL\ (SELECT\ COALESCE(sum(x.delta\_\allowbreak{}g\_\allowbreak{}min),\ 0)\ AS\ sum\_\allowbreak{}min,\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ COALESCE(sum(x.delta\_\allowbreak{}g\_\allowbreak{}max),\ 0)\ AS\ sum\_\allowbreak{}max,\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count(*)\ AS\ n\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FROM\ pantry\_\allowbreak{}transactions\ x\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ WHERE\ x.lot\_\allowbreak{}id\ =\ l.id)\ t;
+\end{quote}
+\begin{quote}\scriptsize\ttfamily\raggedright
+CREATE\ VIEW\ v\_\allowbreak{}journal\_\allowbreak{}days\ AS\newline{}SELECT\ d.user\_\allowbreak{}id,\newline{}\ \ \ \ \ \ \ d.local\_\allowbreak{}date,\newline{}\ \ \ \ \ \ \ d.cooked\_\allowbreak{}sessions,\newline{}\ \ \ \ \ \ \ d.kcal\_\allowbreak{}dishes\_\allowbreak{}per\_\allowbreak{}person,\newline{}\ \ \ \ \ \ \ d.rice\_\allowbreak{}bowls\_\allowbreak{}per\_\allowbreak{}person,\newline{}\ \ \ \ \ \ \ d.kcal\_\allowbreak{}dishes\_\allowbreak{}per\_\allowbreak{}person\ +\ COALESCE(d.rice\_\allowbreak{}bowls\_\allowbreak{}per\_\allowbreak{}person,\ 0)\ *\ app\_\allowbreak{}param('rice\_\allowbreak{}bowl\_\allowbreak{}kcal')\ AS\ kcal\_\allowbreak{}per\_\allowbreak{}person,\newline{}\ \ \ \ \ \ \ d.e\_\allowbreak{}target\_\allowbreak{}kcal,\newline{}\ \ \ \ \ \ \ COALESCE(u.urgent\_\allowbreak{}lots\_\allowbreak{}used,\ 0)\ AS\ urgent\_\allowbreak{}lots\_\allowbreak{}used\newline{}\ \ FROM\ (SELECT\ mp.user\_\allowbreak{}id,\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cs.completed\_\allowbreak{}at\ AT\ TIME\ ZONE\ COALESCE(us.timezone,\ 'Asia/\allowbreak{}Ho\_\allowbreak{}Chi\_\allowbreak{}Minh'))::date\ AS\ local\_\allowbreak{}date,\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count(*)\ AS\ cooked\_\allowbreak{}sessions,\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sum(k.kcal)\ AS\ kcal\_\allowbreak{}dishes\_\allowbreak{}per\_\allowbreak{}person,\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sum(mp.rice\_\allowbreak{}bowls\_\allowbreak{}per\_\allowbreak{}person)\ AS\ rice\_\allowbreak{}bowls\_\allowbreak{}per\_\allowbreak{}person,\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sum(mp.e\_\allowbreak{}target\_\allowbreak{}kcal)\ AS\ e\_\allowbreak{}target\_\allowbreak{}kcal\newline{}\ \ \ \ \ \ \ \ \ \ FROM\ cook\_\allowbreak{}sessions\ cs\newline{}\ \ \ \ \ \ \ \ \ \ JOIN\ meal\_\allowbreak{}plans\ mp\ ON\ mp.id\ =\ cs.meal\_\allowbreak{}plan\_\allowbreak{}id\newline{}\ \ \ \ \ \ \ \ \ \ LEFT\ JOIN\ user\_\allowbreak{}settings\ us\ ON\ us.user\_\allowbreak{}id\ =\ mp.user\_\allowbreak{}id\newline{}\ \ \ \ \ \ \ \ \ \ LEFT\ JOIN\ LATERAL\ (SELECT\ sum(i.kcal\_\allowbreak{}per\_\allowbreak{}person)\ AS\ kcal\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FROM\ meal\_\allowbreak{}plan\_\allowbreak{}items\ i\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ WHERE\ i.meal\_\allowbreak{}plan\_\allowbreak{}id\ =\ mp.id\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ AND\ i.status\ =\ 'active')\ k\ ON\ true\newline{}\ \ \ \ \ \ \ \ \ WHERE\ cs.status\ =\ 'completed'\newline{}\ \ \ \ \ \ \ \ \ GROUP\ BY\ 1,\ 2)\ d\newline{}\ \ LEFT\ JOIN\ (SELECT\ mp.user\_\allowbreak{}id,\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cs.completed\_\allowbreak{}at\ AT\ TIME\ ZONE\ COALESCE(us.timezone,\ 'Asia/\allowbreak{}Ho\_\allowbreak{}Chi\_\allowbreak{}Minh'))::date\ AS\ local\_\allowbreak{}date,\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count(DISTINCT\ t.lot\_\allowbreak{}id)\ AS\ urgent\_\allowbreak{}lots\_\allowbreak{}used\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FROM\ cook\_\allowbreak{}sessions\ cs\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ JOIN\ meal\_\allowbreak{}plans\ mp\ ON\ mp.id\ =\ cs.meal\_\allowbreak{}plan\_\allowbreak{}id\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ LEFT\ JOIN\ user\_\allowbreak{}settings\ us\ ON\ us.user\_\allowbreak{}id\ =\ mp.user\_\allowbreak{}id\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ JOIN\ pantry\_\allowbreak{}transactions\ t\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ON\ t.ref\_\allowbreak{}type\ =\ 'cook\_\allowbreak{}session'\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ AND\ t.ref\_\allowbreak{}id\ =\ cs.id\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ AND\ t.reason\ =\ 'cook\_\allowbreak{}deduct'\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ AND\ t.urgency\_\allowbreak{}at\_\allowbreak{}event\ BETWEEN\ app\_\allowbreak{}param('fresh\_\allowbreak{}u\_\allowbreak{}soon')\ AND\ app\_\allowbreak{}param('fresh\_\allowbreak{}u\_\allowbreak{}check')\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ WHERE\ cs.status\ =\ 'completed'\newline{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ GROUP\ BY\ 1,\ 2)\ u\newline{}\ \ \ \ ON\ u.user\_\allowbreak{}id\ =\ d.user\_\allowbreak{}id\ AND\ u.local\_\allowbreak{}date\ =\ d.local\_\allowbreak{}date;
+\end{quote}

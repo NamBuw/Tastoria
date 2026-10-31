@@ -1,0 +1,78 @@
+\chapter{HIỆN THỰC, KIỂM THỬ VÀ ĐỐI CHIẾU}
+Pha hiện thực ánh xạ thiết kế vào module, API, bảng và giao diện có trong dự án. Pha kiểm thử xác định liệu kết quả có đáp ứng đường cơ sở yêu cầu hay không. Báo cáo phân biệt việc đọc mã, kiểm tài liệu và chạy thử ứng dụng.
+
+\section{Truy vết yêu cầu -- mô hình -- thành phần}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{2.417cm}@{\hspace{3mm}}L{2.417cm}@{\hspace{3mm}}L{2.417cm}@{\hspace{3mm}}L{2.417cm}@{\hspace{3mm}}L{2.417cm}@{\hspace{3mm}}L{2.417cm}@{}}
+\caption{Truy vết yêu cầu -- mô hình -- thành phần}\\
+\toprule
+\textbf{Nhóm yêu cầu} & \textbf{UC} & \textbf{Hành vi /\allowbreak{} mô hình} & \textbf{Thành phần thực hiện} & \textbf{Dữ liệu} & \textbf{Ca cần chứng minh} \\
+\midrule\endfirsthead
+\multicolumn{6}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Nhóm yêu cầu} & \textbf{UC} & \textbf{Hành vi /\allowbreak{} mô hình} & \textbf{Thành phần thực hiện} & \textbf{Dữ liệu} & \textbf{Ca cần chứng minh} \\
+\midrule\endhead
+\bottomrule\endfoot
+F01--F03 & 01--11 & PK01--03, CL09 & identity/\allowbreak{}profile/\allowbreak{}privacy & users, consents, profiles & Truy cập chéo, thu hồi phiên, rút đồng ý \\ \addlinespace[3pt]
+F04--F05 & 12--14 & PK04, AD01, CL13, DS02, SQ03, DM01, DB01/\allowbreak{}03 & scan, pantry, worker & scans, items, lots, transactions & Quét không đổi kho; xác nhận lặp \\ \addlinespace[3pt]
+F06--F08 & 15--18 & PK05, UC02, AD02, CL15, DS03, DM02, DB02 & meal, substitute & plans, items, substitutions & Vượt kho tổng; dị ứng; đổi món bất khả thi \\ \addlinespace[3pt]
+F09--F11 & 19--22 & PK06, AD03, CL20, SQ01/\allowbreak{}02, DS01 & cooking, pantry, journal & sessions, transactions & Retry; rollback; hoàn tác đúng hạn/\allowbreak{}quá hạn \\ \addlinespace[3pt]
+F12 & 23--34 & PK07--10, CL30 & survey, catalog, mlops, admin, jobs & model\_\allowbreak{}versions, surveys, audit & Phân quyền, version mismatch, restore \\ \addlinespace[3pt]
+\end{longtable}}
+\section{Đối chiếu thiết kế với hiện trạng mã nguồn}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{}}
+\caption{Đối chiếu thiết kế với hiện trạng mã nguồn}\\
+\toprule
+\textbf{Nội dung} & \textbf{Nguồn cũ /\allowbreak{} nhận định dễ sai} & \textbf{Hiện trạng cần dùng} \\
+\midrule\endfirsthead
+\multicolumn{3}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Nội dung} & \textbf{Nguồn cũ /\allowbreak{} nhận định dễ sai} & \textbf{Hiện trạng cần dùng} \\
+\midrule\endhead
+\bottomrule\endfoot
+Địa chỉ công khai & Báo cáo cũ ghi safework.ctslab.net & Tastoria dùng tastoria.ctslab.net \\ \addlinespace[3pt]
+Độ tươi từ ảnh & UC12 có bước suy luận độ tươi & Worker chưa có freshness model triển khai; coi là khả năng thiết kế \\ \addlinespace[3pt]
+Complete lặp & Sequence cũ coi completed luôn lỗi & Service hiện trả tóm tắt completed, không trừ lặp \\ \addlinespace[3pt]
+Thời hạn hoàn tác & Dễ lấy completed\_\allowbreak{}at client làm mốc & Dùng thời điểm máy chủ ghi hoàn tất \\ \addlinespace[3pt]
+Bảng công thức/\allowbreak{}nguyên liệu & Dễ mặc định ID là bigint & DDL dùng uuid; pantry\_\allowbreak{}transactions.id mới là bigint \\ \addlinespace[3pt]
+Số dòng món/\allowbreak{}mâm & Dễ gán bảng items chỉ có 2--3 dòng & Lịch sử thay món có thể nhiều dòng; 2--3 là số món active ở miền rút gọn \\ \addlinespace[3pt]
+NFR và kết quả & Có mục tiêu p95/\allowbreak{}SUS nên ghi ``đạt'' & Phải có log đo/\allowbreak{}phiếu thử tương ứng mới kết luận \\ \addlinespace[3pt]
+Người thực hiện & Có tác giả báo cáo cũ nên gán toàn nhóm & Chờ danh sách và phân công thực tế \\ \addlinespace[3pt]
+\end{longtable}}
+\section{Thiết kế kiểm thử và tiêu chí nghiệm thu}
+Bảng sau là các ca nghiệm thu đề xuất từ phân tích, chưa phải biên bản đã chạy. Mỗi ca cần lưu phiên bản mã, dữ liệu đầu vào, phản hồi API và trạng thái DB trước--sau. Chỉ kiểm thông báo giao diện là chưa đủ để chứng minh toàn vẹn.
+
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{}}
+\caption{Thiết kế kiểm thử và tiêu chí nghiệm thu}\\
+\toprule
+\textbf{Mã} & \textbf{UC /\allowbreak{} quy tắc} & \textbf{Thiết lập và kích hoạt} & \textbf{Kết quả mong đợi} \\
+\midrule\endfirsthead
+\multicolumn{4}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Mã} & \textbf{UC /\allowbreak{} quy tắc} & \textbf{Thiết lập và kích hoạt} & \textbf{Kết quả mong đợi} \\
+\midrule\endhead
+\bottomrule\endfoot
+TC01 & UC13, xác nhận một lần & Hai yêu cầu đồng thời cho cùng scan done & Một lần áp dụng kho; request sau nhận trạng thái đã xác nhận \\ \addlinespace[3pt]
+TC02 & UC13, nhập liệu hợp lệ & Thiếu mức lượng của nguyên liệu cần ước lượng & Báo lỗi đúng mục; không tạo lô hoặc confirmed \\ \addlinespace[3pt]
+TC03 & UC15, lượng chung & Hai món cùng dùng nguyên liệu, tổng vượt tồn & Không trả tổ hợp đó như mâm khả thi \\ \addlinespace[3pt]
+TC04 & UC16, kiểm lại mâm & Đổi món làm tăng tổng nhu cầu hoặc vi phạm dị ứng & Loại ứng viên không hợp lệ; giữ phần mâm cũ nếu không tìm được \\ \addlinespace[3pt]
+TC05 & UC19, tài nguyên & Các bước cạnh tranh một bếp và thao tác chủ động & Không vượt số bếp; thứ tự công việc được giữ \\ \addlinespace[3pt]
+TC06 & UC20, lũy đẳng & Gửi lại cùng Idempotency-\allowbreak{}Key sau thành công & Phản hồi đã lưu; số giao dịch trừ không tăng \\ \addlinespace[3pt]
+TC07 & UC20, bảo vệ trạng thái & Gửi complete với khóa mới cho phiên completed & Trả tóm tắt hiện có; không trừ kho lần hai \\ \addlinespace[3pt]
+TC08 & UC20, nguyên tử & Gây lỗi sau ghi kho nhưng trước hoàn tất giao dịch & Rollback mọi thay đổi trong giao dịch \\ \addlinespace[3pt]
+TC09 & UC21, thời hạn & Hoàn tác trước, tại và sau hạn máy chủ & Cho phép đúng biên quy định; quá hạn giữ nguyên dữ liệu \\ \addlinespace[3pt]
+TC10 & UC21, đảo một lần & Gửi lại undo cho phiên reverted & Không có giao dịch đảo thứ hai \\ \addlinespace[3pt]
+TC11 & Quyền sở hữu & Người B đọc/\allowbreak{}sửa scan, lô hoặc phiên của A & Không lộ hoặc sửa dữ liệu của A \\ \addlinespace[3pt]
+TC12 & UC30, phiên bản & Artifact/\allowbreak{}ánh xạ lớp không phù hợp worker & Không coi phiên bản đó là triển khai thành công \\ \addlinespace[3pt]
+\end{longtable}}
+Với TC09, mã hiện tại từ chối khi now lớn hơn completed\_\allowbreak{}at cộng thời hạn; vì vậy trường hợp bằng đúng hạn cần có ca riêng thay vì chỉ thử trước/\allowbreak{}sau bằng phút. Với TC08, lỗi phải được đưa vào môi trường thử riêng; không dùng dữ liệu đang vận hành để tạo lỗi có chủ ý.
+
+\section{Kết quả kiểm tra tài liệu và giới hạn bằng chứng}
+Bộ tài liệu được kiểm ở các mức: số UC và phân hệ; đường dẫn ảnh; xuất mô hình bằng Visual Paradigm; bố cục SVG; nhãn bị rút gọn; dẫn chiếu hình/\allowbreak{}bảng; chữ ngoài vùng trang PDF. Nhật ký được lưu trong thư mục evidence. Việc kiểm tài liệu không thay thế các ca chức năng ở mục 5.3, đánh giá thuật toán với người dùng hay đo NFR trên môi trường triển khai.
+
+Bài tiểu luận PTTKHT và bài thiết kế V2 được dùng làm mẫu phương pháp: trình bày bối cảnh trước yêu cầu, phân tích trách nhiệm trước lớp thiết kế, giải thích quan hệ và nối mô hình với dữ liệu/\allowbreak{}mã. Nội dung miền SafeWork hoặc ABC Online Shop không được chuyển sang Tastoria. Báo cáo tổ chức nội dung theo pha; phân công được ghi ở trang đầu.
+
+\section{Điều kiện nghiệm thu ứng dụng}
+Để kết luận ứng dụng đạt yêu cầu, cần chạy các ca ở mục 5.3 trên môi trường xác định, lưu đầu vào/\allowbreak{}đầu ra và kiểm trạng thái DB. NFR cần có cấu hình đo và báo cáo tương ứng; các mục tiêu p95 hoặc SUS ở Chương 2 chưa phải kết quả. Đối với mô hình ảnh, phải đánh giá đúng artifact và tập dữ liệu, tách khỏi việc kiểm tính nguyên tử của thao tác xác nhận. Đối với vận hành, cần bằng chứng tải artifact, kiểm quyền và diễn tập khôi phục, không chỉ log tạo tệp sao lưu.

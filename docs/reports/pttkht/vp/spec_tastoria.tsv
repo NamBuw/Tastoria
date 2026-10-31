@@ -1,0 +1,1243 @@
+NEWPROJECT
+FONTSIZE	15
+CPTCENTER	1
+EXTDIR	3	2
+PKG	pUC00	Use case tổng quát – người nấu
+USEPKG	pUC00
+ACTOR	aUC00	Người dùng	-	-
+UC	uc10	UC10 Cập nhật hồ sơ và dị ứng	-	-	-
+UC	uc12	UC12 Quét nguyên liệu	-	-	-
+UC	uc14	UC14 Quản lý kho theo lô	-	-	-
+UC	uc15	UC15 Nhận mâm cơm hôm nay	Đổi món;Thay nguyên liệu	-	-
+UC	uc19	UC19 Lập lịch và bắt đầu nấu	-	-	-
+UC	uc20	UC20 Xác nhận nấu xong	-	-	-
+UC	uc22	UC22 Xem nhật ký	-	-	-
+UC	uc05	UC05 Quản lý đồng ý	-	-	-
+DIAG	UC00	UC	UC00 Use case tổng quát – người nấu
+LINK	rUC000	aUC00	uc10
+LINK	rUC001	aUC00	uc12
+LINK	rUC002	aUC00	uc14
+LINK	rUC003	aUC00	uc15
+LINK	rUC004	aUC00	uc19
+LINK	rUC005	aUC00	uc20
+LINK	rUC006	aUC00	uc22
+LINK	rUC007	aUC00	uc05
+NOTE	footUC00	Tastoria | UC00
+SYS	UC00	sysUC00	Tastoria	241	21	682	1569
+SHOW	UC00	aUC00	52	745	30	60	-
+SHOW	UC00	uc10	357	68	388	70	sysUC00
+FIT	UC00
+CONN	UC00	rUC000	-	-	82,776;357,103
+SHOW	UC00	uc12	357	257	388	70	sysUC00
+CONN	UC00	rUC001	-	-	82,776;357,292
+SHOW	UC00	uc14	357	446	388	70	sysUC00
+CONN	UC00	rUC002	-	-	82,776;357,481
+SHOW	UC00	uc15	357	635	388	150	sysUC00
+CONN	UC00	rUC003	-	-	82,776;357,710
+SHOW	UC00	uc19	357	824	388	70	sysUC00
+CONN	UC00	rUC004	-	-	82,776;357,859
+SHOW	UC00	uc20	357	1013	388	70	sysUC00
+CONN	UC00	rUC005	-	-	82,776;357,1048
+SHOW	UC00	uc22	357	1202	388	70	sysUC00
+CONN	UC00	rUC006	-	-	82,776;357,1237
+SHOW	UC00	uc05	357	1391	388	70	sysUC00
+CONN	UC00	rUC007	-	-	82,776;357,1426
+SHOW	UC00	footUC00	20	1655	300	40	-
+BOUNDS	UC00	sysUC00	241	21	682	1569
+PKG	pUC01	Use case công khai và tài khoản
+USEPKG	pUC01
+ACTOR	aUC01	Khách	-	-
+UC	uc01	UC01 Đăng ký tài khoản	-	-	-
+UC	uc02	UC02 Đăng nhập	-	-	-
+UC	uc04	UC04 Đặt lại mật khẩu	-	-	-
+UC	uc23	UC23 Tham gia khảo sát gu	-	-	-
+DIAG	UC01	UC	UC01 Use case công khai và tài khoản
+LINK	rUC010	aUC01	uc01
+LINK	rUC011	aUC01	uc02
+LINK	rUC012	aUC01	uc04
+LINK	rUC013	aUC01	uc23
+NOTE	footUC01	Tastoria | UC01
+SYS	UC01	sysUC01	Tastoria	241	21	682	813
+SHOW	UC01	aUC01	52	367	30	60	-
+SHOW	UC01	uc01	357	68	388	70	sysUC01
+FIT	UC01
+CONN	UC01	rUC010	-	-	82,398;357,103
+SHOW	UC01	uc02	357	257	388	70	sysUC01
+CONN	UC01	rUC011	-	-	82,398;357,292
+SHOW	UC01	uc04	357	446	388	70	sysUC01
+CONN	UC01	rUC012	-	-	82,398;357,481
+SHOW	UC01	uc23	357	635	388	70	sysUC01
+CONN	UC01	rUC013	-	-	82,398;357,670
+SHOW	UC01	footUC01	20	899	300	40	-
+BOUNDS	UC01	sysUC01	241	21	682	813
+PKG	pUC02	Phân rã use case
+USEPKG	pUC02
+UC	uc13	UC13 Xác nhận kết quả quét	-	-	-
+UC	uc16	UC16 Đổi một món	-	-	-
+UC	uc17	UC17 Chọn thay thế nguyên liệu	-	-	-
+EXTD	ext16	uc16	uc15	Đổi món	Người dùng yêu cầu đổi món
+EXTD	ext17	uc17	uc15	Thay nguyên liệu	Người dùng chọn thay thế hợp lệ
+DIAG	UC02	UC	UC02 Quét và mở rộng gợi ý mâm
+NOTE	footUC02	Tastoria | UC02
+SYS	UC02	sys02	Tastoria	21	21	1134	567
+SHOW	UC02	uc12	84	84	336	70	sys02
+SHOW	UC02	uc13	682	84	336	70	sys02
+SHOW	UC02	uc15	84	336	336	150	sys02
+SHOW	UC02	uc16	682	262	336	70	sys02
+SHOW	UC02	uc17	682	441	336	70	sys02
+FIT	UC02
+CONN	UC02	ext16	-	-	682,298;420,381
+CONN	UC02	ext17	-	-	682,476;420,448
+SHOW	UC02	footUC02	20	653	300	40	-
+BOUNDS	UC02	sys02	21	21	1134	567
+PKG	pUC03	Các chức năng bổ sung của người dùng
+USEPKG	pUC03
+ACTOR	aUC03	Người dùng	-	-
+UC	uc03	UC03 Đăng xuất	-	-	-
+UC	uc06	UC06 Tải dữ liệu cá nhân	-	-	-
+UC	uc07	UC07 Xóa tài khoản	-	-	-
+UC	uc08	UC08 Yêu cầu về xử lý dữ liệu	-	-	-
+UC	uc09	UC09 Thiết lập hồ sơ	-	-	-
+UC	uc11	UC11 Đặt mục tiêu năng lượng	-	-	-
+UC	uc18	UC18 Quản lý danh sách đi chợ	-	-	-
+UC	uc21	UC21 Hoàn tác trừ kho	-	-	-
+DIAG	UC03	UC	UC03 Các chức năng bổ sung của người dùng
+LINK	rUC030	aUC03	uc03
+LINK	rUC031	aUC03	uc06
+LINK	rUC032	aUC03	uc07
+LINK	rUC033	aUC03	uc08
+LINK	rUC034	aUC03	uc09
+LINK	rUC035	aUC03	uc11
+LINK	rUC036	aUC03	uc18
+LINK	rUC037	aUC03	uc21
+NOTE	footUC03	Tastoria | UC03
+SYS	UC03	sysUC03	Tastoria	241	21	682	1569
+SHOW	UC03	aUC03	52	745	30	60	-
+SHOW	UC03	uc03	357	68	388	70	sysUC03
+FIT	UC03
+CONN	UC03	rUC030	-	-	82,776;357,103
+SHOW	UC03	uc06	357	257	388	70	sysUC03
+CONN	UC03	rUC031	-	-	82,776;357,292
+SHOW	UC03	uc07	357	446	388	70	sysUC03
+CONN	UC03	rUC032	-	-	82,776;357,481
+SHOW	UC03	uc08	357	635	388	70	sysUC03
+CONN	UC03	rUC033	-	-	82,776;357,670
+SHOW	UC03	uc09	357	824	388	70	sysUC03
+CONN	UC03	rUC034	-	-	82,776;357,859
+SHOW	UC03	uc11	357	1013	388	70	sysUC03
+CONN	UC03	rUC035	-	-	82,776;357,1048
+SHOW	UC03	uc18	357	1202	388	70	sysUC03
+CONN	UC03	rUC036	-	-	82,776;357,1237
+SHOW	UC03	uc21	357	1391	388	70	sysUC03
+CONN	UC03	rUC037	-	-	82,776;357,1426
+SHOW	UC03	footUC03	20	1655	300	40	-
+BOUNDS	UC03	sysUC03	241	21	682	1569
+PKG	pUC04	Biên soạn dữ liệu
+USEPKG	pUC04
+ACTOR	aUC04	Người biên soạn	-	-
+UC	uc25	UC25 Nhập kho công thức	-	-	-
+UC	uc26	UC26 Quản lý cặp thay thế	-	-	-
+DIAG	UC04	UC	UC04 Biên soạn dữ liệu
+LINK	rUC040	aUC04	uc25
+LINK	rUC041	aUC04	uc26
+NOTE	footUC04	Tastoria | UC04
+SYS	UC04	sysUC04	Tastoria	241	21	682	435
+SHOW	UC04	aUC04	52	178	30	60	-
+SHOW	UC04	uc25	357	68	388	70	sysUC04
+FIT	UC04
+CONN	UC04	rUC040	-	-	82,208;357,103
+SHOW	UC04	uc26	357	257	388	70	sysUC04
+CONN	UC04	rUC041	-	-	82,208;357,292
+SHOW	UC04	footUC04	20	521	300	40	-
+BOUNDS	UC04	sysUC04	241	21	682	435
+PKG	pUC05	Vận hành mô hình và khảo sát
+USEPKG	pUC05
+ACTOR	aUC05	Người vận hành mô hình	-	-
+UC	uc24	UC24 Quản lý đợt khảo sát	-	-	-
+UC	uc28	UC28 Xuất dữ liệu huấn luyện	-	-	-
+UC	uc29	UC29 Kiểm định phiên bản mô hình	-	-	-
+UC	uc30	UC30 Triển khai và quay lui	-	-	-
+DIAG	UC05	UC	UC05 Vận hành mô hình và khảo sát
+LINK	rUC050	aUC05	uc24
+LINK	rUC051	aUC05	uc28
+LINK	rUC052	aUC05	uc29
+LINK	rUC053	aUC05	uc30
+NOTE	footUC05	Tastoria | UC05
+SYS	UC05	sysUC05	Tastoria	241	21	682	813
+SHOW	UC05	aUC05	52	367	30	60	-
+SHOW	UC05	uc24	357	68	388	70	sysUC05
+FIT	UC05
+CONN	UC05	rUC050	-	-	82,398;357,103
+SHOW	UC05	uc28	357	257	388	70	sysUC05
+CONN	UC05	rUC051	-	-	82,398;357,292
+SHOW	UC05	uc29	357	446	388	70	sysUC05
+CONN	UC05	rUC052	-	-	82,398;357,481
+SHOW	UC05	uc30	357	635	388	70	sysUC05
+CONN	UC05	rUC053	-	-	82,398;357,670
+SHOW	UC05	footUC05	20	899	300	40	-
+BOUNDS	UC05	sysUC05	241	21	682	813
+PKG	pUC06	Quản trị quyền dữ liệu
+USEPKG	pUC06
+ACTOR	aUC06	Quản trị viên	-	-
+UC	uc27	UC27 Xử lý yêu cầu dữ liệu	-	-	-
+DIAG	UC06	UC	UC06 Quản trị quyền dữ liệu
+LINK	rUC060	aUC06	uc27
+NOTE	footUC06	Tastoria | UC06
+SYS	UC06	sysUC06	Tastoria	241	21	682	246
+SHOW	UC06	aUC06	52	84	30	60	-
+SHOW	UC06	uc27	357	68	388	70	sysUC06
+FIT	UC06
+CONN	UC06	rUC060	-	-	82,114;357,103
+SHOW	UC06	footUC06	20	332	300	40	-
+BOUNDS	UC06	sysUC06	241	21	682	246
+PKG	pUC07	Gán nhãn dữ liệu
+USEPKG	pUC07
+ACTOR	aUC07	Người gán nhãn	-	-
+UC	uc31	UC31 Gán nhãn ảnh góp	-	-	-
+DIAG	UC07	UC	UC07 Gán nhãn dữ liệu
+LINK	rUC070	aUC07	uc31
+NOTE	footUC07	Tastoria | UC07
+SYS	UC07	sysUC07	Tastoria	241	21	682	246
+SHOW	UC07	aUC07	52	84	30	60	-
+SHOW	UC07	uc31	357	68	388	70	sysUC07
+FIT	UC07
+CONN	UC07	rUC070	-	-	82,114;357,103
+SHOW	UC07	footUC07	20	332	300	40	-
+BOUNDS	UC07	sysUC07	241	21	682	246
+PKG	pUC08	Tác vụ theo lịch
+USEPKG	pUC08
+ACTOR	aUC08	Bộ lập lịch	-	-
+UC	uc32	UC32 Xóa ảnh quét quá hạn	-	-	-
+UC	uc33	UC33 Sao lưu dữ liệu	-	-	-
+UC	uc34	UC34 Dọn job và khóa hết hạn	-	-	-
+DIAG	UC08	UC	UC08 Tác vụ theo lịch
+LINK	rUC080	aUC08	uc32
+LINK	rUC081	aUC08	uc33
+LINK	rUC082	aUC08	uc34
+NOTE	footUC08	Tastoria | UC08
+SYS	UC08	sysUC08	Tastoria	241	21	682	624
+SHOW	UC08	aUC08	52	273	30	60	-
+SHOW	UC08	uc32	357	68	388	70	sysUC08
+FIT	UC08
+CONN	UC08	rUC080	-	-	82,303;357,103
+SHOW	UC08	uc33	357	257	388	70	sysUC08
+CONN	UC08	rUC081	-	-	82,303;357,292
+SHOW	UC08	uc34	357	446	388	70	sysUC08
+CONN	UC08	rUC082	-	-	82,303;357,481
+SHOW	UC08	footUC08	20	710	300	40	-
+BOUNDS	UC08	sysUC08	241	21	682	624
+PKG	viewPK01	Tài khoản & bảo mật
+USEPKG	viewPK01
+ACTOR	PK01A01	Khách	-	-
+ACTOR	PK01A02	Người dùng	-	-
+ACTOR	PK01A09	Dịch vụ email	-	-
+DIAG	PK01	UC	PK01 Tài khoản & bảo mật
+LINK	PK01UC01A01	PK01A01	uc01
+LINK	PK01UC02A01	PK01A01	uc02
+LINK	PK01UC03A02	PK01A02	uc03
+LINK	PK01UC04A01	PK01A01	uc04
+LINK	PK01UC04A09	PK01A09	uc04
+NOTE	footPK01	Tastoria | PK01
+SYS	PK01	sysPK01	Tastoria / Tài khoản & bảo mật	273	21	777	766
+SHOW	PK01	PK01A01	31	94	30	60	-
+SHOW	PK01	PK01A02	31	304	30	60	-
+SHOW	PK01	PK01A09	31	514	30	60	-
+SHOW	PK01	uc01	367	68	525	70	sysPK01
+FIT	PK01
+CONN	PK01	PK01UC01A01	-	-	62,124;368,103
+SHOW	PK01	uc02	367	236	525	70	sysPK01
+CONN	PK01	PK01UC02A01	-	-	62,124;368,271
+SHOW	PK01	uc03	367	404	525	70	sysPK01
+CONN	PK01	PK01UC03A02	-	-	62,334;368,439
+SHOW	PK01	uc04	367	572	525	70	sysPK01
+CONN	PK01	PK01UC04A01	-	-	62,124;368,607
+CONN	PK01	PK01UC04A09	-	-	62,544;368,607
+SHOW	PK01	footPK01	20	852	300	40	-
+BOUNDS	PK01	sysPK01	273	21	777	766
+PKG	viewPK02	Quyền riêng tư
+USEPKG	viewPK02
+ACTOR	PK02A02	Người dùng	-	-
+ACTOR	PK02A04	Quản trị viên	-	-
+DIAG	PK02	UC	PK02 Quyền riêng tư
+LINK	PK02UC05A02	PK02A02	uc05
+LINK	PK02UC06A02	PK02A02	uc06
+LINK	PK02UC07A02	PK02A02	uc07
+LINK	PK02UC08A02	PK02A02	uc08
+LINK	PK02UC08A04	PK02A04	uc08
+NOTE	footPK02	Tastoria | PK02
+SYS	PK02	sysPK02	Tastoria / Quyền riêng tư	273	21	777	766
+SHOW	PK02	PK02A02	31	94	30	60	-
+SHOW	PK02	PK02A04	31	409	30	60	-
+SHOW	PK02	uc05	367	68	525	70	sysPK02
+FIT	PK02
+CONN	PK02	PK02UC05A02	-	-	62,124;368,103
+SHOW	PK02	uc06	367	236	525	70	sysPK02
+CONN	PK02	PK02UC06A02	-	-	62,124;368,271
+SHOW	PK02	uc07	367	404	525	70	sysPK02
+CONN	PK02	PK02UC07A02	-	-	62,124;368,439
+SHOW	PK02	uc08	367	572	525	70	sysPK02
+CONN	PK02	PK02UC08A02	-	-	62,124;368,607
+CONN	PK02	PK02UC08A04	-	-	62,440;368,607
+SHOW	PK02	footPK02	20	852	300	40	-
+BOUNDS	PK02	sysPK02	273	21	777	766
+PKG	viewPK03	Hồ sơ & mục tiêu
+USEPKG	viewPK03
+ACTOR	PK03A02	Người dùng	-	-
+DIAG	PK03	UC	PK03 Hồ sơ & mục tiêu
+LINK	PK03UC09A02	PK03A02	uc09
+LINK	PK03UC10A02	PK03A02	uc10
+LINK	PK03UC11A02	PK03A02	uc11
+NOTE	footPK03	Tastoria | PK03
+SYS	PK03	sysPK03	Tastoria / Hồ sơ & mục tiêu	273	21	777	598
+SHOW	PK03	PK03A02	31	94	30	60	-
+SHOW	PK03	uc09	367	68	525	70	sysPK03
+FIT	PK03
+CONN	PK03	PK03UC09A02	-	-	62,124;368,103
+SHOW	PK03	uc10	367	236	525	70	sysPK03
+CONN	PK03	PK03UC10A02	-	-	62,124;368,271
+SHOW	PK03	uc11	367	404	525	70	sysPK03
+CONN	PK03	PK03UC11A02	-	-	62,124;368,439
+SHOW	PK03	footPK03	20	684	300	40	-
+BOUNDS	PK03	sysPK03	273	21	777	598
+PKG	viewPK04	Kho & quét
+USEPKG	viewPK04
+ACTOR	PK04A02	Người dùng	-	-
+DIAG	PK04	UC	PK04 Kho & quét
+LINK	PK04UC12A02	PK04A02	uc12
+LINK	PK04UC13A02	PK04A02	uc13
+LINK	PK04UC14A02	PK04A02	uc14
+NOTE	footPK04	Tastoria | PK04
+SYS	PK04	sysPK04	Tastoria / Kho & quét	273	21	777	598
+SHOW	PK04	PK04A02	31	94	30	60	-
+SHOW	PK04	uc12	367	68	525	70	sysPK04
+FIT	PK04
+CONN	PK04	PK04UC12A02	-	-	62,124;368,103
+SHOW	PK04	uc13	367	236	525	70	sysPK04
+CONN	PK04	PK04UC13A02	-	-	62,124;368,271
+SHOW	PK04	uc14	367	404	525	70	sysPK04
+CONN	PK04	PK04UC14A02	-	-	62,124;368,439
+SHOW	PK04	footPK04	20	684	300	40	-
+BOUNDS	PK04	sysPK04	273	21	777	598
+PKG	viewPK05	Mâm cơm
+USEPKG	viewPK05
+ACTOR	PK05A02	Người dùng	-	-
+DIAG	PK05	UC	PK05 Mâm cơm
+LINK	PK05UC15A02	PK05A02	uc15
+LINK	PK05UC16A02	PK05A02	uc16
+LINK	PK05UC17A02	PK05A02	uc17
+LINK	PK05UC18A02	PK05A02	uc18
+NOTE	footPK05	Tastoria | PK05
+SYS	PK05	sysPK05	Tastoria / Mâm cơm	273	21	777	766
+SHOW	PK05	PK05A02	31	94	30	60	-
+SHOW	PK05	uc15	367	68	525	150	sysPK05
+FIT	PK05
+CONN	PK05	PK05UC15A02	-	-	62,124;368,143
+SHOW	PK05	uc16	367	236	525	70	sysPK05
+CONN	PK05	PK05UC16A02	-	-	62,124;368,271
+SHOW	PK05	uc17	367	404	525	70	sysPK05
+CONN	PK05	PK05UC17A02	-	-	62,124;368,439
+SHOW	PK05	uc18	367	572	525	70	sysPK05
+CONN	PK05	PK05UC18A02	-	-	62,124;368,607
+SHOW	PK05	footPK05	20	852	300	40	-
+BOUNDS	PK05	sysPK05	273	21	777	766
+PKG	viewPK06	Nấu & nhật ký
+USEPKG	viewPK06
+ACTOR	PK06A02	Người dùng	-	-
+DIAG	PK06	UC	PK06 Nấu & nhật ký
+LINK	PK06UC19A02	PK06A02	uc19
+LINK	PK06UC20A02	PK06A02	uc20
+LINK	PK06UC21A02	PK06A02	uc21
+LINK	PK06UC22A02	PK06A02	uc22
+NOTE	footPK06	Tastoria | PK06
+SYS	PK06	sysPK06	Tastoria / Nấu & nhật ký	273	21	777	766
+SHOW	PK06	PK06A02	31	94	30	60	-
+SHOW	PK06	uc19	367	68	525	70	sysPK06
+FIT	PK06
+CONN	PK06	PK06UC19A02	-	-	62,124;368,103
+SHOW	PK06	uc20	367	236	525	70	sysPK06
+CONN	PK06	PK06UC20A02	-	-	62,124;368,271
+SHOW	PK06	uc21	367	404	525	70	sysPK06
+CONN	PK06	PK06UC21A02	-	-	62,124;368,439
+SHOW	PK06	uc22	367	572	525	70	sysPK06
+CONN	PK06	PK06UC22A02	-	-	62,124;368,607
+SHOW	PK06	footPK06	20	852	300	40	-
+BOUNDS	PK06	sysPK06	273	21	777	766
+PKG	viewPK07	Khảo sát gu
+USEPKG	viewPK07
+ACTOR	PK07A03	Người tham gia khảo sát	-	-
+ACTOR	PK07A06	Người vận hành mô hình	-	-
+DIAG	PK07	UC	PK07 Khảo sát gu
+LINK	PK07UC23A03	PK07A03	uc23
+LINK	PK07UC24A06	PK07A06	uc24
+NOTE	footPK07	Tastoria | PK07
+SYS	PK07	sysPK07	Tastoria / Khảo sát gu	273	21	777	430
+SHOW	PK07	PK07A03	31	94	30	60	-
+SHOW	PK07	PK07A06	31	283	30	60	-
+SHOW	PK07	uc23	367	68	525	70	sysPK07
+FIT	PK07
+CONN	PK07	PK07UC23A03	-	-	62,124;368,103
+SHOW	PK07	uc24	367	236	525	70	sysPK07
+CONN	PK07	PK07UC24A06	-	-	62,314;368,271
+SHOW	PK07	footPK07	20	516	300	40	-
+BOUNDS	PK07	sysPK07	273	21	777	430
+PKG	viewPK08	Quản trị nội dung & dữ liệu
+USEPKG	viewPK08
+ACTOR	PK08A04	Quản trị viên	-	-
+ACTOR	PK08A05	Người biên soạn công thức	-	-
+DIAG	PK08	UC	PK08 Quản trị nội dung & dữ liệu
+LINK	PK08UC25A05	PK08A05	uc25
+LINK	PK08UC26A05	PK08A05	uc26
+LINK	PK08UC27A04	PK08A04	uc27
+NOTE	footPK08	Tastoria | PK08
+SYS	PK08	sysPK08	Tastoria / Quản trị nội dung & dữ liệu	273	21	777	598
+SHOW	PK08	PK08A04	31	94	30	60	-
+SHOW	PK08	PK08A05	31	330	30	60	-
+SHOW	PK08	uc25	367	68	525	70	sysPK08
+FIT	PK08
+CONN	PK08	PK08UC25A05	-	-	62,361;368,103
+SHOW	PK08	uc26	367	236	525	70	sysPK08
+CONN	PK08	PK08UC26A05	-	-	62,361;368,271
+SHOW	PK08	uc27	367	404	525	70	sysPK08
+CONN	PK08	PK08UC27A04	-	-	62,124;368,439
+SHOW	PK08	footPK08	20	684	300	40	-
+BOUNDS	PK08	sysPK08	273	21	777	598
+PKG	viewPK09	Vận hành mô hình
+USEPKG	viewPK09
+ACTOR	PK09A06	Người vận hành mô hình	-	-
+ACTOR	PK09A07	Người gán nhãn	-	-
+ACTOR	PK09A10	Công cụ gán nhãn	-	-
+DIAG	PK09	UC	PK09 Vận hành mô hình
+LINK	PK09UC28A06	PK09A06	uc28
+LINK	PK09UC29A06	PK09A06	uc29
+LINK	PK09UC30A06	PK09A06	uc30
+LINK	PK09UC31A07	PK09A07	uc31
+LINK	PK09UC31A10	PK09A10	uc31
+NOTE	footPK09	Tastoria | PK09
+SYS	PK09	sysPK09	Tastoria / Vận hành mô hình	273	21	777	766
+SHOW	PK09	PK09A06	31	94	30	60	-
+SHOW	PK09	PK09A07	31	304	30	60	-
+SHOW	PK09	PK09A10	31	514	30	60	-
+SHOW	PK09	uc28	367	68	525	70	sysPK09
+FIT	PK09
+CONN	PK09	PK09UC28A06	-	-	62,124;368,103
+SHOW	PK09	uc29	367	236	525	70	sysPK09
+CONN	PK09	PK09UC29A06	-	-	62,124;368,271
+SHOW	PK09	uc30	367	404	525	70	sysPK09
+CONN	PK09	PK09UC30A06	-	-	62,124;368,439
+SHOW	PK09	uc31	367	572	525	70	sysPK09
+CONN	PK09	PK09UC31A07	-	-	62,334;368,607
+CONN	PK09	PK09UC31A10	-	-	62,544;368,607
+SHOW	PK09	footPK09	20	852	300	40	-
+BOUNDS	PK09	sysPK09	273	21	777	766
+PKG	viewPK10	Tác vụ định kỳ
+USEPKG	viewPK10
+ACTOR	PK10A08	Bộ lập lịch	-	-
+DIAG	PK10	UC	PK10 Tác vụ định kỳ
+LINK	PK10UC32A08	PK10A08	uc32
+LINK	PK10UC33A08	PK10A08	uc33
+LINK	PK10UC34A08	PK10A08	uc34
+NOTE	footPK10	Tastoria | PK10
+SYS	PK10	sysPK10	Tastoria / Tác vụ định kỳ	273	21	777	598
+SHOW	PK10	PK10A08	31	94	30	60	-
+SHOW	PK10	uc32	367	68	525	70	sysPK10
+FIT	PK10
+CONN	PK10	PK10UC32A08	-	-	62,124;368,103
+SHOW	PK10	uc33	367	236	525	70	sysPK10
+CONN	PK10	PK10UC33A08	-	-	62,124;368,271
+SHOW	PK10	uc34	367	404	525	70	sysPK10
+CONN	PK10	PK10UC34A08	-	-	62,124;368,439
+SHOW	PK10	footPK10	20	684	300	40	-
+BOUNDS	PK10	sysPK10	273	21	777	598
+PKG	pDM	Mô hình miền – phân tích
+USEPKG	pDM
+CLASS	nguoi	Người dùng	-	-
+ATTR	nguoi	-	mãNgườiDùng	Định danh	-	-
+CLASS	lo	Lô nguyên liệu	-	-
+ATTR	lo	-	ngàyNhập	Ngày	-	-
+ATTR	lo	-	lượngMin	Gam	-	-
+ATTR	lo	-	lượngMax	Gam	-	-
+CLASS	nl	Nguyên liệu	-	-
+ATTR	nl	-	tên	Tên nguyên liệu	-	-
+CLASS	gd	Giao dịch kho	-	-
+ATTR	gd	-	thayĐổiMin	Gam	-	-
+ATTR	gd	-	thayĐổiMax	Gam	-	-
+ATTR	gd	-	lýDo	Loại giao dịch	-	-
+CLASS	mam	Mâm cơm	-	-
+ATTR	mam	-	sốNgười	Số nguyên	-	-
+ATTR	mam	-	trạngThái	Trạng thái mâm	-	-
+CLASS	mm	Món trong mâm	-	-
+ATTR	mm	-	hệSốKhẩuPhần	Số thực	-	-
+CLASS	mon	Công thức món	-	-
+ATTR	mon	-	tên	Tên món	-	-
+ATTR	mon	-	khẩuPhầnGốc	Số nguyên	-	-
+CLASS	tp	Thành phần công thức	-	-
+ATTR	tp	-	lượng	Gam	-	-
+CLASS	phien	Phiên nấu	-	-
+ATTR	phien	-	giờDọn	Thời điểm	-	-
+ATTR	phien	-	trạngThái	Trạng thái phiên	-	-
+ASSOC	d1	nguoi	lo	-	1	0..*	-	-	-	-	-	-
+ASSOC	d2	nl	lo	-	1	0..*	-	-	-	-	-	-
+ASSOC	d3	lo	gd	-	1	0..*	-	-	-	-	-	-
+ASSOC	d4	nguoi	mam	-	1	0..*	-	-	-	-	-	-
+ASSOC	d5	mam	mm	-	1	2..3	composite	-	-	-	-	-
+ASSOC	d6	mon	mm	-	1	0..*	-	-	-	-	-	-
+ASSOC	d7	mon	tp	-	1	1..*	composite	-	-	-	-	-
+ASSOC	d8	nl	tp	-	1	0..*	-	-	-	-	-	-
+ASSOC	d9	mam	phien	-	1	0..*	-	-	-	-	-	-
+DIAG	DM01	CLASS	DM01 Miền kho nguyên liệu
+NOTE	footDM01	Tastoria | DM01
+SHOW	DM01	nguoi	31	31	220	46	-
+SHOW	DM01	nl	682	31	179	46	-
+SHOW	DM01	lo	357	294	151	82	-
+SHOW	DM01	gd	357	577	173	82	-
+FIT	DM01
+CONN	DM01	d1	-	-	-
+CONN	DM01	d2	-	-	-
+CONN	DM01	d3	-	-	-
+SHOW	DM01	footDM01	20	724	300	40	-
+DIAG	DM02	CLASS	DM02 Miền mâm cơm và phiên nấu
+NOTE	footDM02	Tastoria | DM02
+SHOW	DM02	nguoi	31	31	220	46	-
+SHOW	DM02	mam	31	273	226	64	-
+SHOW	DM02	mm	493	273	205	46	-
+SHOW	DM02	mon	945	273	218	64	-
+SHOW	DM02	phien	31	567	229	64	-
+SHOW	DM02	tp	945	567	204	46	-
+SHOW	DM02	nl	493	567	179	46	-
+FIT	DM02
+CONN	DM02	d4	-	-	-
+CONN	DM02	d5	-	-	-
+CONN	DM02	d6	-	-	-
+CONN	DM02	d7	-	-	-
+CONN	DM02	d8	-	-	-
+CONN	DM02	d9	-	-	-
+SHOW	DM02	footDM02	20	696	300	40	-
+PKG	pAR	Thiết kế kiến trúc
+USEPKG	pAR
+CLASS	ui	Expo Android / Web	-	presentation
+CLASS	api	FastAPI routers	-	controller
+CLASS	svc	Nghiệp vụ theo module	-	service
+CLASS	orm	SQLAlchemy + Unit of Work	-	persistence
+CLASS	db	PostgreSQL + pgvector	-	database
+CLASS	queue	Valkey / RQ	-	queue
+CLASS	worker	Worker / ONNX Runtime	-	worker
+CLASS	files	Tệp riêng + nginx	-	storage
+DEP	ar1	ui	api	use	-
+DEP	ar2	api	svc	use	-
+DEP	ar3	svc	orm	use	-
+DEP	ar4	orm	db	use	-
+DEP	ar5	svc	queue	use	-
+DEP	ar6	worker	queue	use	-
+DEP	ar7	worker	db	use	-
+DEP	ar8	worker	files	use	-
+DIAG	AR01	CLASS	AR01 Các tầng và phụ thuộc triển khai
+NOTE	footAR01	Tastoria | AR01
+SHOW	AR01	ui	31	31	181	64	-
+SHOW	AR01	api	31	241	147	64	-
+SHOW	AR01	svc	31	451	213	64	-
+SHOW	AR01	orm	31	661	250	64	-
+SHOW	AR01	db	31	871	213	64	-
+SHOW	AR01	queue	682	451	113	64	-
+SHOW	AR01	worker	682	661	218	64	-
+SHOW	AR01	files	682	871	166	64	-
+FIT	AR01
+CONN	AR01	ar1	-	-	-
+CONN	AR01	ar2	-	-	-
+CONN	AR01	ar3	-	-	-
+CONN	AR01	ar4	-	-	-
+CONN	AR01	ar5	-	-	-
+CONN	AR01	ar6	-	-	-
+CONN	AR01	ar8	-	-	-
+CONN	AR01	ar7	-	-	682,694;500,694;500,904;244,904
+SHOW	AR01	footAR01	20	1000	300	40	-
+PKG	pDB	Cấu trúc bảng và khóa ngoại
+USEPKG	pDB
+CLASS	tusers	users	-	table
+ATTR	tusers	-	id	uuid {PK}	-	-
+ATTR	tusers	-	email	text {UQ}	-	-
+CLASS	tingredients	ingredients	-	table
+ATTR	tingredients	-	id	uuid {PK}	-	-
+ATTR	tingredients	-	name_vi	text	-	-
+CLASS	tpantry_lots	pantry_lots	-	table
+ATTR	tpantry_lots	-	id	uuid {PK}	-	-
+ATTR	tpantry_lots	-	user_id	uuid {FK}	-	-
+ATTR	tpantry_lots	-	ingredient_id	uuid {FK}	-	-
+ATTR	tpantry_lots	-	initial_g_min	numeric	-	-
+ATTR	tpantry_lots	-	initial_g_max	numeric	-	-
+ATTR	tpantry_lots	-	status	lot_status_t	-	-
+CLASS	tpantry_transactions	pantry_transactions	-	table
+ATTR	tpantry_transactions	-	id	bigint {PK}	-	-
+ATTR	tpantry_transactions	-	lot_id	uuid {FK}	-	-
+ATTR	tpantry_transactions	-	delta_g_min	numeric	-	-
+ATTR	tpantry_transactions	-	delta_g_max	numeric	-	-
+ATTR	tpantry_transactions	-	reverses_id	bigint {FK UQ nullable}	-	-
+CLASS	trecipes	recipes	-	table
+ATTR	trecipes	-	id	uuid {PK}	-	-
+ATTR	trecipes	-	name_vi	text	-	-
+CLASS	trecipe_ingredients	recipe_ingredients	-	table
+ATTR	trecipe_ingredients	-	recipe_id	uuid {PK FK}	-	-
+ATTR	trecipe_ingredients	-	ingredient_id	uuid {PK FK}	-	-
+ATTR	trecipe_ingredients	-	grams	numeric	-	-
+CLASS	tmeal_plans	meal_plans	-	table
+ATTR	tmeal_plans	-	id	uuid {PK}	-	-
+ATTR	tmeal_plans	-	user_id	uuid {FK}	-	-
+ATTR	tmeal_plans	-	status	meal_plan_status_t	-	-
+CLASS	tmeal_plan_items	meal_plan_items	-	table
+ATTR	tmeal_plan_items	-	id	uuid {PK}	-	-
+ATTR	tmeal_plan_items	-	meal_plan_id	uuid {FK}	-	-
+ATTR	tmeal_plan_items	-	recipe_id	uuid {FK}	-	-
+ATTR	tmeal_plan_items	-	servings_scale	numeric	-	-
+CLASS	tcook_sessions	cook_sessions	-	table
+ATTR	tcook_sessions	-	id	uuid {PK}	-	-
+ATTR	tcook_sessions	-	meal_plan_id	uuid {FK}	-	-
+ATTR	tcook_sessions	-	status	cook_status_t	-	-
+ATTR	tcook_sessions	-	completed_at	timestamptz	-	-
+CLASS	tscans	scans	-	table
+ATTR	tscans	-	id	uuid {PK}	-	-
+ATTR	tscans	-	user_id	uuid {FK}	-	-
+ATTR	tscans	-	status	scan_status_t	-	-
+CLASS	tscan_images	scan_images	-	table
+ATTR	tscan_images	-	id	uuid {PK}	-	-
+ATTR	tscan_images	-	scan_id	uuid {FK}	-	-
+ATTR	tscan_images	-	storage_key	text	-	-
+CLASS	tscan_items	scan_items	-	table
+ATTR	tscan_items	-	id	uuid {PK}	-	-
+ATTR	tscan_items	-	scan_id	uuid {FK}	-	-
+ATTR	tscan_items	-	ingredient_id	uuid {FK}	-	-
+ASSOC	fkuserspantry_lots	tusers	tpantry_lots	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkingredientspantry_lots	tingredients	tpantry_lots	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkpantry_lotspantry_transactions	tpantry_lots	tpantry_transactions	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkrecipesrecipe_ingredients	trecipes	trecipe_ingredients	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkingredientsrecipe_ingredients	tingredients	trecipe_ingredients	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkusersmeal_plans	tusers	tmeal_plans	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkmeal_plansmeal_plan_items	tmeal_plans	tmeal_plan_items	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkrecipesmeal_plan_items	trecipes	tmeal_plan_items	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkmeal_planscook_sessions	tmeal_plans	tcook_sessions	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkusersscans	tusers	tscans	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkscansscan_images	tscans	tscan_images	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkscansscan_items	tscans	tscan_items	-	1	0..*	-	-	-	-	-	-
+ASSOC	fkingredientsscan_items	tingredients	tscan_items	-	1	0..*	-	-	-	-	-	-
+DIAG	DB01	CLASS	DB01 Kho và lịch sử giao dịch
+NOTE	footDB01	Tastoria | DB01
+SHOW	DB01	tusers	31	31	153	82	-
+SHOW	DB01	tingredients	840	31	128	82	-
+SHOW	DB01	tpantry_lots	441	304	208	154	-
+SHOW	DB01	tpantry_transactions	441	682	298	136	-
+FIT	DB01
+CONN	DB01	fkuserspantry_lots	-	-	-
+CONN	DB01	fkingredientspantry_lots	-	-	-
+CONN	DB01	fkpantry_lotspantry_transactions	-	-	-
+SHOW	DB01	footDB01	20	883	300	40	-
+DIAG	DB02	CLASS	DB02 Công thức, mâm và phiên nấu
+NOTE	footDB02	Tastoria | DB02
+SHOW	DB02	tusers	31	31	153	82	-
+SHOW	DB02	tmeal_plans	31	273	226	100	-
+SHOW	DB02	tcook_sessions	31	588	232	118	-
+SHOW	DB02	tmeal_plan_items	514	273	209	118	-
+SHOW	DB02	trecipes	1018	273	128	82	-
+SHOW	DB02	trecipe_ingredients	1018	588	232	100	-
+SHOW	DB02	tingredients	514	588	128	82	-
+FIT	DB02
+CONN	DB02	fkrecipesrecipe_ingredients	-	-	-
+CONN	DB02	fkingredientsrecipe_ingredients	-	-	-
+CONN	DB02	fkusersmeal_plans	-	-	-
+CONN	DB02	fkmeal_plansmeal_plan_items	-	-	-
+CONN	DB02	fkrecipesmeal_plan_items	-	-	-
+CONN	DB02	fkmeal_planscook_sessions	-	-	-
+SHOW	DB02	footDB02	20	771	300	40	-
+DIAG	DB03	CLASS	DB03 Quét ảnh và kết quả
+NOTE	footDB03	Tastoria | DB03
+SHOW	DB03	tusers	31	31	153	82	-
+SHOW	DB03	tscans	31	273	183	100	-
+SHOW	DB03	tscan_images	31	577	166	100	-
+SHOW	DB03	tscan_items	682	273	208	100	-
+SHOW	DB03	tingredients	682	31	128	82	-
+FIT	DB03
+CONN	DB03	fkusersscans	-	-	-
+CONN	DB03	fkscansscan_images	-	-	-
+CONN	DB03	fkscansscan_items	-	-	-
+CONN	DB03	fkingredientsscan_items	-	-	-
+SHOW	DB03	footDB03	20	742	300	40	-
+PKG	pAD	Hoạt động nghiệp vụ
+USEPKG	pAD
+DIAG	AD01	ACT	AD01 Quét và xác nhận nguyên liệu
+NEW	AD01sw	ActivitySwimlane2	 	-
+NEW	AD01u	ActivityPartition	Người dùng	-
+CALL	AD01sw	addVerticalPartition	@AD01u
+NEW	AD01h	ActivityPartition	Tastoria	-
+CALL	AD01sw	addVerticalPartition	@AD01h
+NEW	AD01sw_h	ActivityPartition	 	-
+CALL	AD01sw	addHorizontalPartition	@AD01sw_h
+SHOW	AD01	AD01sw	20	20	1060	885	-
+SHOW	AD01	AD01u	20	50	460	855	AD01sw
+SHOW	AD01	AD01h	480	50	600	855	AD01sw
+NEW	AD01start	InitialNode	-	-
+SHOW	AD01	AD01start	235	75	30	30	AD01u
+NEW	AD01n0	ActivityAction	Chọn ảnh và chế độ quét	-
+SHOW	AD01	AD01n0	138	167	222	46	AD01u
+NEWREL	AD01f0	ControlFlow	AD01start	AD01n0	-
+CONN	AD01	AD01f0	-	-	250,105;250,167
+NEW	AD01n1	ActivityAction	Kiểm tra ảnh, tạo yêu cầu quét	-
+SHOW	AD01	AD01n1	646	272	267	46	AD01h
+NEWREL	AD01f1	ControlFlow	AD01n0	AD01n1	-
+CONN	AD01	AD01f1	-	-	250,213;250,295;646,295
+CSTYLE	AD01	AD01f1	0
+NEW	AD01n2	ActivityAction	Nhận diện và tạo kết quả đề xuất	-
+SHOW	AD01	AD01n2	637	377	285	46	AD01h
+NEWREL	AD01f2	ControlFlow	AD01n1	AD01n2	-
+CONN	AD01	AD01f2	-	-	780,318;780,377
+NEW	AD01n3	ActivityAction	Sửa tên, số lượng và cách ghép lô	-
+SHOW	AD01	AD01n3	105	482	288	46	AD01u
+NEWREL	AD01f3	ControlFlow	AD01n2	AD01n3	-
+CONN	AD01	AD01f3	-	-	780,423;780,505;394,505
+CSTYLE	AD01	AD01f3	0
+NEW	AD01n4	ActivityAction	Xác nhận danh sách nguyên liệu	-
+SHOW	AD01	AD01n4	110	587	278	46	AD01u
+NEWREL	AD01f4	ControlFlow	AD01n3	AD01n4	-
+CONN	AD01	AD01f4	-	-	250,528;250,587
+NEW	AD01n5	ActivityAction	Ghi kho và xác nhận quét cùng giao dịch	-
+SHOW	AD01	AD01n5	609	692	341	46	AD01h
+NEWREL	AD01f5	ControlFlow	AD01n4	AD01n5	-
+CONN	AD01	AD01f5	-	-	250,633;250,715;609,715
+CSTYLE	AD01	AD01f5	0
+NEW	AD01n6	ActivityAction	Trả về kho đã cập nhật	-
+SHOW	AD01	AD01n6	677	797	205	46	AD01h
+NEWREL	AD01f6	ControlFlow	AD01n5	AD01n6	-
+CONN	AD01	AD01f6	-	-	780,738;780,797
+NEW	AD01end	ActivityFinalNode	-	-
+SHOW	AD01	AD01end	765	910	30	30	AD01h
+NEWREL	AD01last	ControlFlow	AD01n6	AD01end	-
+CONN	AD01	AD01last	-	-	780,843;780,910
+DIAG	AD02	ACT	AD02 Nhận và sử dụng mâm cơm
+NEW	AD02sw	ActivitySwimlane2	 	-
+NEW	AD02u	ActivityPartition	Người dùng	-
+CALL	AD02sw	addVerticalPartition	@AD02u
+NEW	AD02h	ActivityPartition	Tastoria	-
+CALL	AD02sw	addVerticalPartition	@AD02h
+NEW	AD02sw_h	ActivityPartition	 	-
+CALL	AD02sw	addHorizontalPartition	@AD02sw_h
+SHOW	AD02	AD02sw	20	20	1060	990	-
+SHOW	AD02	AD02u	20	50	460	960	AD02sw
+SHOW	AD02	AD02h	480	50	600	960	AD02sw
+NEW	AD02start	InitialNode	-	-
+SHOW	AD02	AD02start	235	75	30	30	AD02u
+NEW	AD02n0	ActivityAction	Chọn số người, thời gian và dị ứng	-
+SHOW	AD02	AD02n0	104	167	290	46	AD02u
+NEWREL	AD02f0	ControlFlow	AD02start	AD02n0	-
+CONN	AD02	AD02f0	-	-	250,105;250,167
+NEW	AD02n1	ActivityAction	Lọc món theo ràng buộc bắt buộc	-
+SHOW	AD02	AD02n1	636	272	287	46	AD02h
+NEWREL	AD02f1	ControlFlow	AD02n0	AD02n1	-
+CONN	AD02	AD02f1	-	-	250,213;250,295;636,295
+CSTYLE	AD02	AD02f1	0
+NEW	AD02n2	ActivityAction	Ghép mâm và kiểm tra tổng lượng kho	-
+SHOW	AD02	AD02n2	617	377	324	46	AD02h
+NEWREL	AD02f2	ControlFlow	AD02n1	AD02n2	-
+CONN	AD02	AD02f2	-	-	780,318;780,377
+NEW	AD02n3	ActivityAction	Tính lịch nấu, xếp hạng mâm hợp lệ	-
+SHOW	AD02	AD02n3	627	482	304	46	AD02h
+NEWREL	AD02f3	ControlFlow	AD02n2	AD02n3	-
+CONN	AD02	AD02f3	-	-	780,423;780,482
+NEW	AD02n4	ActivityAction	Xem lý do gợi ý và chấp nhận mâm	-
+SHOW	AD02	AD02n4	100	587	299	46	AD02u
+NEWREL	AD02f4	ControlFlow	AD02n3	AD02n4	-
+CONN	AD02	AD02f4	-	-	780,528;780,610;400,610
+CSTYLE	AD02	AD02f4	0
+NEW	AD02n5	ActivityAction	Tạo phiên nấu và lịch các bước	-
+SHOW	AD02	AD02n5	646	692	266	46	AD02h
+NEWREL	AD02f5	ControlFlow	AD02n4	AD02n5	-
+CONN	AD02	AD02f5	-	-	250,633;250,715;647,715
+CSTYLE	AD02	AD02f5	0
+NEW	AD02n6	ActivityAction	Nấu theo lịch, xác nhận hoàn thành	-
+SHOW	AD02	AD02n6	98	797	302	46	AD02u
+NEWREL	AD02f6	ControlFlow	AD02n5	AD02n6	-
+CONN	AD02	AD02f6	-	-	780,738;780,820;401,820
+CSTYLE	AD02	AD02f6	0
+NEW	AD02n7	ActivityAction	Trừ kho và ghi nhận kết quả	-
+SHOW	AD02	AD02n7	658	902	243	46	AD02h
+NEWREL	AD02f7	ControlFlow	AD02n6	AD02n7	-
+CONN	AD02	AD02f7	-	-	250,843;250,925;658,925
+CSTYLE	AD02	AD02f7	0
+NEW	AD02end	ActivityFinalNode	-	-
+SHOW	AD02	AD02end	765	1015	30	30	AD02h
+NEWREL	AD02last	ControlFlow	AD02n7	AD02end	-
+CONN	AD02	AD02last	-	-	780,948;780,1015
+PKG	pEX	Luồng ngoại lệ
+USEPKG	pEX
+DIAG	AD03	ACT	AD03 Hoàn tác – quyết định nghiệp vụ
+NEW	exi	InitialNode	-	-
+SHOW	AD03	exi	345	35	30	30	-
+NEW	ex1	ActivityAction	Yêu cầu hoàn tác phiên đã hoàn tất	-
+SHOW	AD03	ex1	210	112	299	46	-
+NEW	ex2	ActivityAction	Kiểm tra sở hữu và khóa phiên	-
+SHOW	AD03	ex2	228	212	263	46	-
+NEW	exd	DecisionNode	 	-
+SHOW	AD03	exd	342	322	36	36	-
+NEW	exok	ActivityAction	Ghi giao dịch đảo, cập nhật mâm và phiên	-
+SHOW	AD03	exok	183	442	352	46	-
+NEW	exno	ActivityAction	Từ chối: đã hết thời hạn	-
+SHOW	AD03	exno	833	317	212	46	-
+NEW	exend1	ActivityFinalNode	-	-
+SHOW	AD03	exend1	345	560	30	30	-
+NEW	exend2	ActivityFinalNode	-	-
+SHOW	AD03	exend2	925	450	30	30	-
+NEWREL	exf1	ControlFlow	exi	ex1	-
+CONN	AD03	exf1	-	-	360,65;360,112
+NEWREL	exf2	ControlFlow	ex1	ex2	-
+CONN	AD03	exf2	-	-	360,158;360,212
+NEWREL	exf3	ControlFlow	ex2	exd	-
+CONN	AD03	exf3	-	-	360,258;360,322
+NEWREL	exf4	ControlFlow	exd	exok	[trong 10 phút]
+CONN	AD03	exf4	-	-	360,358;360,442
+CAPTION	AD03	exf4	380	380	126	22
+NEWREL	exf5	ControlFlow	exd	exno	[quá 10 phút]
+CONN	AD03	exf5	-	-	378,340;834,340
+CAPTION	AD03	exf5	540	305	114	22
+NEWREL	exf6	ControlFlow	exok	exend1	-
+CONN	AD03	exf6	-	-	360,488;360,560
+NEWREL	exf7	ControlFlow	exno	exend2	-
+CONN	AD03	exf7	-	-	940,363;940,450
+PKG	pDS	Phân bổ trách nhiệm thiết kế
+USEPKG	pDS
+CLASS	dsrouter	cooking.router	-	module
+OPER	dsrouter	+	complete_session	-	JSONResponse
+CLASS	dsservice	cooking.service	-	module
+OPER	dsservice	+	complete_session	-	CookCompletion
+OPER	dsservice	+	undo_session	-	CookSessionOut
+CLASS	dspantry	pantry.service	-	module
+OPER	dspantry	+	deduct	-	DeductionResult
+CLASS	dsuow	UnitOfWork	-	class
+ATTR	dsuow	-	session	Session	-	-
+OPER	dsuow	+	after_commit	fn:Callable	-
+CLASS	dsentity	CookSession	-	ORM entity
+ATTR	dsentity	-	id	UUID	-	-
+ATTR	dsentity	-	status	cook_status_t	-	-
+DEP	ds1	dsrouter	dsservice	use	-
+DEP	ds2	dsrouter	dsuow	use	-
+DEP	ds3	dsservice	dspantry	use	-
+DEP	ds4	dsservice	dsentity	use	-
+DIAG	DS01	CLASS	DS01 Thiết kế chức năng hoàn tất nấu
+NOTE	footDS01	Tastoria | DS01
+SHOW	DS01	dsrouter	31	31	296	86	-
+SHOW	DS01	dsservice	31	315	311	104	-
+SHOW	DS01	dspantry	682	315	229	86	-
+SHOW	DS01	dsuow	682	31	229	86	-
+SHOW	DS01	dsentity	31	609	184	82	-
+FIT	DS01
+CONN	DS01	ds1	-	-	-
+CONN	DS01	ds2	-	-	-
+CONN	DS01	ds3	-	-	-
+CONN	DS01	ds4	-	-	-
+SHOW	DS01	footDS01	20	756	300	40	-
+PKG	pSQ	Tương tác thiết kế
+USEPKG	pSQ
+DIAG	SQ01	SEQ	SQ01 Hoàn tất nấu – chống ghi lặp
+NEW	sqA	InteractionLifeLine	App	-
+CALL	sqA	addStereotype	boundary
+NEW	sqR	InteractionLifeLine	cooking.router	-
+CALL	sqR	addStereotype	control
+NEW	sqS	InteractionLifeLine	cooking.service	-
+CALL	sqS	addStereotype	control
+NEW	sqD	InteractionLifeLine	PostgreSQL	-
+CALL	sqD	addStereotype	entity
+NEWREL	sqm0	Message	sqA	sqR	POST complete + Idempotency-Key
+NEWREL	sqm1	Message	sqR	sqD	begin: khóa và tra khóa yêu cầu
+NEWREL	sqm2	Message	sqD	sqR	chưa có phản hồi đã lưu
+NEW	sqm2_rt	ActionTypeReturn	-	-
+CALL	sqm2	setActionType	@sqm2_rt
+NEWREL	sqm3	Message	sqR	sqS	complete_session(...)
+NEWREL	sqm4	Message	sqS	sqD	khóa phiên, kiểm tra chủ sở hữu
+NEWREL	sqm5	Message	sqD	sqS	phiên đang nấu
+NEW	sqm5_rt	ActionTypeReturn	-	-
+CALL	sqm5	setActionType	@sqm5_rt
+NEWREL	sqm6	Message	sqS	sqD	ghi giao dịch kho; cập nhật phiên, mâm
+NEWREL	sqm7	Message	sqS	sqR	CookCompletion
+NEW	sqm7_rt	ActionTypeReturn	-	-
+CALL	sqm7	setActionType	@sqm7_rt
+NEWREL	sqm8	Message	sqR	sqD	lưu phản hồi lũy đẳng; COMMIT
+NEWREL	sqm9	Message	sqR	sqA	200 + lượng trừ và hạn hoàn tác
+NEW	sqm9_rt	ActionTypeReturn	-	-
+CALL	sqm9	setActionType	@sqm9_rt
+NEW	sqR_act0	Activation	-	sqR
+NEW	sqS_act0	Activation	-	sqS
+CALL	sqm0	setToActivation	@sqR_act0
+CALL	sqm1	setFromActivation	@sqR_act0
+CALL	sqm2	setToActivation	@sqR_act0
+CALL	sqm3	setFromActivation	@sqR_act0
+CALL	sqm3	setToActivation	@sqS_act0
+CALL	sqm4	setFromActivation	@sqS_act0
+CALL	sqm5	setToActivation	@sqS_act0
+CALL	sqm6	setFromActivation	@sqS_act0
+CALL	sqm7	setFromActivation	@sqS_act0
+CALL	sqm7	setToActivation	@sqR_act0
+CALL	sqm8	setFromActivation	@sqR_act0
+CALL	sqm9	setFromActivation	@sqR_act0
+SHOW	SQ01	sqA	25	30	150	970	-
+SHOW	SQ01	sqR	340	30	200	970	-
+SHOW	SQ01	sqS	690	30	220	970	-
+SHOW	SQ01	sqD	1110	30	180	970	-
+SHOW	SQ01	sqR_act0	433	140	14	710	sqR
+SHOW	SQ01	sqS_act0	793	365	14	300	sqS
+CONN	SQ01	sqm0	sqA	sqR_act0	100,140;433,140
+CONN	SQ01	sqm1	sqR_act0	sqD	447,215;1200,215
+CONN	SQ01	sqm2	sqD	sqR_act0	1200,290;447,290
+CONN	SQ01	sqm3	sqR_act0	sqS_act0	447,365;793,365
+CONN	SQ01	sqm4	sqS_act0	sqD	807,440;1200,440
+CONN	SQ01	sqm5	sqD	sqS_act0	1200,515;807,515
+CONN	SQ01	sqm6	sqS_act0	sqD	807,590;1200,590
+CONN	SQ01	sqm7	sqS_act0	sqR_act0	793,665;447,665
+CONN	SQ01	sqm8	sqR_act0	sqD	447,740;1200,740
+CONN	SQ01	sqm9	sqR_act0	sqA	433,815;100,815
+DIAG	SQ02	SEQ	SQ02 Hoàn tác trong thời hạn
+NEW	uqA	InteractionLifeLine	App	-
+CALL	uqA	addStereotype	boundary
+NEW	uqS	InteractionLifeLine	cooking.service	-
+CALL	uqS	addStereotype	control
+NEW	uqD	InteractionLifeLine	PostgreSQL	-
+CALL	uqD	addStereotype	entity
+NEWREL	uqm0	Message	uqA	uqS	POST /cook-sessions/{id}/undo
+NEWREL	uqm1	Message	uqS	uqD	khóa phiên; đọc completed_at
+NEWREL	uqm2	Message	uqD	uqS	trạng thái và thời điểm máy chủ
+NEW	uqm2_rt	ActionTypeReturn	-	-
+CALL	uqm2	setActionType	@uqm2_rt
+NEWREL	uqm3	Message	uqS	uqD	ghi giao dịch đảo; phiên reverted
+NEWREL	uqm4	Message	uqS	uqD	mâm accepted; COMMIT
+NEWREL	uqm5	Message	uqS	uqA	200 phiên đã hoàn tác
+NEW	uqm5_rt	ActionTypeReturn	-	-
+CALL	uqm5	setActionType	@uqm5_rt
+NEWREL	uqm6	Message	uqS	uqA	409 undo_window_expired
+NEW	uqm6_rt	ActionTypeReturn	-	-
+CALL	uqm6	setActionType	@uqm6_rt
+NEW	uqalt	CombinedFragment	alt	-
+CALL	uqalt	setInteractionOperator	alt
+CALL	uqalt	addCoveredLifeLine	@uqA
+CALL	uqalt	addCoveredLifeLine	@uqS
+CALL	uqalt	addCoveredLifeLine	@uqD
+NEW	uqalt_op0	InteractionOperand	-	-
+CALL	uqalt	addOperand	@uqalt_op0
+NEW	uqalt_op0_g	InteractionConstraint	-	-
+CALL	uqalt_op0_g	setConstraint	completed và còn trong 10 phút
+CALL	uqalt_op0	setGuard	@uqalt_op0_g
+NEW	uqalt_op1	InteractionOperand	-	-
+CALL	uqalt	addOperand	@uqalt_op1
+NEW	uqalt_op1_g	InteractionConstraint	-	-
+CALL	uqalt_op1_g	setConstraint	completed và đã quá 10 phút
+CALL	uqalt_op1	setGuard	@uqalt_op1_g
+NEW	uqS_act0	Activation	-	uqS
+CALL	uqm0	setToActivation	@uqS_act0
+CALL	uqm1	setFromActivation	@uqS_act0
+CALL	uqm2	setToActivation	@uqS_act0
+CALL	uqm3	setFromActivation	@uqS_act0
+CALL	uqm4	setFromActivation	@uqS_act0
+CALL	uqm5	setFromActivation	@uqS_act0
+CALL	uqm6	setFromActivation	@uqS_act0
+SHOW	SQ02	uqA	25	30	150	860	-
+SHOW	SQ02	uqS	390	30	220	860	-
+SHOW	SQ02	uqD	910	30	180	860	-
+SHOW	SQ02	uqS_act0	493	130	14	630	uqS
+SHOW	SQ02	uqalt	30	320	1100	480	-
+SHOW	SQ02	uqalt_op0	30	320	1100	310	uqalt
+SHOW	SQ02	uqalt_op1	30	630	1100	170	uqalt
+CONN	SQ02	uqm0	uqA	uqS_act0	100,130;493,130
+CONN	SQ02	uqm1	uqS_act0	uqD	507,210;1000,210
+CONN	SQ02	uqm2	uqD	uqS_act0	1000,270;507,270
+CONN	SQ02	uqm3	uqS_act0	uqD	507,400;1000,400
+CONN	SQ02	uqm4	uqS_act0	uqD	507,480;1000,480
+CONN	SQ02	uqm5	uqS_act0	uqA	493,550;100,550
+CONN	SQ02	uqm6	uqS_act0	uqA	493,720;100,720
+PKG	pCLV2	Phân tích trách nhiệm theo use case
+USEPKG	pCLV2
+CLASS	CL09b	Màn hình hồ sơ	-	boundary
+CLASS	CL09c	Điều phối hồ sơ	-	control
+CLASS	CL09e0	Hồ sơ	-	entity
+ATTR	CL09e0	-	mụcTiêu	Năng lượng	-	-
+CLASS	CL09e1	Đồng ý	-	entity
+ATTR	CL09e1	-	mụcĐích	Chuỗi	-	-
+ATTR	CL09e1	-	hiệuLực	Boolean	-	-
+CLASS	CL09e2	Dị ứng	-	entity
+ATTR	CL09e2	-	nhóm	Định danh	-	-
+DEP	CL09bc	CL09b	CL09c	use	-
+DEP	CL09ce0	CL09c	CL09e0	use	-
+DEP	CL09ce1	CL09c	CL09e1	use	-
+DEP	CL09ce2	CL09c	CL09e2	use	-
+DIAG	CL09	CLASS	CL09 UC09–10 Hồ sơ và đồng ý
+NOTE	footCL09	Tastoria | CL09
+SHOW	CL09	CL09b	42	241	144	64	-
+SHOW	CL09	CL09c	493	241	147	64	-
+SHOW	CL09	CL09e0	1050	31	185	64	-
+SHOW	CL09	CL09e1	1050	273	155	82	-
+SHOW	CL09	CL09e2	1050	514	156	64	-
+FIT	CL09
+CONN	CL09	CL09bc	-	-	-
+CONN	CL09	CL09ce0	-	-	640,258;1050,64
+CONN	CL09	CL09ce1	-	-	640,274;1050,314
+CONN	CL09	CL09ce2	-	-	640,290;1050,546
+SHOW	CL09	footCL09	20	643	300	40	-
+SCALL	CL09	CL09b	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL09	CL09c	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL09	CL09e0	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL09	CL09e1	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL09	CL09e2	setDisplayAsRobustnessAnalysisIcon	b:false
+CLASS	CL13b	Màn hình kết quả quét	-	boundary
+CLASS	CL13c	Xác nhận nhập kho	-	control
+CLASS	CL13e0	Lần quét	-	entity
+ATTR	CL13e0	-	trạngThái	Trạng thái	-	-
+CLASS	CL13e1	Kết quả nguyên liệu	-	entity
+ATTR	CL13e1	-	lượng	Khoảng gam	-	-
+CLASS	CL13e2	Lô nguyên liệu	-	entity
+ATTR	CL13e2	-	ngàyNhập	Thời điểm	-	-
+DEP	CL13bc	CL13b	CL13c	use	-
+DEP	CL13ce0	CL13c	CL13e0	use	-
+DEP	CL13ce1	CL13c	CL13e1	use	-
+DEP	CL13ce2	CL13c	CL13e2	use	-
+DIAG	CL13	CLASS	CL13 UC13 Xác nhận kết quả quét
+NOTE	footCL13	Tastoria | CL13
+SHOW	CL13	CL13b	42	241	207	64	-
+SHOW	CL13	CL13c	493	241	177	64	-
+SHOW	CL13	CL13e0	1050	31	183	64	-
+SHOW	CL13	CL13e1	1050	273	185	64	-
+SHOW	CL13	CL13e2	1050	514	186	64	-
+FIT	CL13
+CONN	CL13	CL13bc	-	-	-
+CONN	CL13	CL13ce0	-	-	670,258;1050,64
+CONN	CL13	CL13ce1	-	-	670,274;1050,305
+CONN	CL13	CL13ce2	-	-	670,290;1050,546
+SHOW	CL13	footCL13	20	643	300	40	-
+SCALL	CL13	CL13b	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL13	CL13c	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL13	CL13e0	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL13	CL13e1	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL13	CL13e2	setDisplayAsRobustnessAnalysisIcon	b:false
+CLASS	CL15b	Màn hình chọn mâm	-	boundary
+CLASS	CL15c	Điều phối ghép mâm	-	control
+CLASS	CL15e0	Hồ sơ ràng buộc	-	entity
+ATTR	CL15e0	-	sốNgười	Số nguyên	-	-
+CLASS	CL15e1	Tồn kho	-	entity
+ATTR	CL15e1	-	lượngCòn	Khoảng gam	-	-
+CLASS	CL15e2	Mâm đề xuất	-	entity
+ATTR	CL15e2	-	điểmXếpHạng	Số thực	-	-
+DEP	CL15bc	CL15b	CL15c	use	-
+DEP	CL15ce0	CL15c	CL15e0	use	-
+DEP	CL15ce1	CL15c	CL15e1	use	-
+DEP	CL15ce2	CL15c	CL15e2	use	-
+DIAG	CL15	CLASS	CL15 UC15 Đề xuất mâm cơm
+NOTE	footCL15	Tastoria | CL15
+SHOW	CL15	CL15b	42	241	186	64	-
+SHOW	CL15	CL15c	493	241	190	64	-
+SHOW	CL15	CL15e0	1050	31	176	64	-
+SHOW	CL15	CL15e1	1050	273	201	64	-
+SHOW	CL15	CL15e2	1050	514	198	64	-
+FIT	CL15
+CONN	CL15	CL15bc	-	-	-
+CONN	CL15	CL15ce0	-	-	684,258;1050,64
+CONN	CL15	CL15ce1	-	-	684,274;1050,305
+CONN	CL15	CL15ce2	-	-	684,290;1050,546
+SHOW	CL15	footCL15	20	643	300	40	-
+SCALL	CL15	CL15b	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL15	CL15c	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL15	CL15e0	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL15	CL15e1	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL15	CL15e2	setDisplayAsRobustnessAnalysisIcon	b:false
+CLASS	CL20b	Màn hình hoàn tất	-	boundary
+CLASS	CL20c	Xử lý hoàn tất	-	control
+CLASS	CL20e0	Phiên nấu	-	entity
+ATTR	CL20e0	-	trạngThái	Trạng thái	-	-
+CLASS	CL20e1	Giao dịch kho	-	entity
+ATTR	CL20e1	-	lượngTrừ	Khoảng gam	-	-
+CLASS	CL20e2	Mâm cơm	-	entity
+ATTR	CL20e2	-	trạngThái	Trạng thái	-	-
+DEP	CL20bc	CL20b	CL20c	use	-
+DEP	CL20ce0	CL20c	CL20e0	use	-
+DEP	CL20ce1	CL20c	CL20e1	use	-
+DEP	CL20ce2	CL20c	CL20e2	use	-
+DIAG	CL20	CLASS	CL20 UC20 Hoàn tất nấu
+NOTE	footCL20	Tastoria | CL20
+SHOW	CL20	CL20b	42	241	170	64	-
+SHOW	CL20	CL20c	493	241	135	64	-
+SHOW	CL20	CL20e0	1050	31	183	64	-
+SHOW	CL20	CL20e1	1050	273	195	64	-
+SHOW	CL20	CL20e2	1050	514	183	64	-
+FIT	CL20
+CONN	CL20	CL20bc	-	-	-
+CONN	CL20	CL20ce0	-	-	628,258;1050,64
+CONN	CL20	CL20ce1	-	-	628,274;1050,305
+CONN	CL20	CL20ce2	-	-	628,290;1050,546
+SHOW	CL20	footCL20	20	643	300	40	-
+SCALL	CL20	CL20b	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL20	CL20c	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL20	CL20e0	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL20	CL20e1	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL20	CL20e2	setDisplayAsRobustnessAnalysisIcon	b:false
+CLASS	CL30b	Lệnh triển khai	-	boundary
+CLASS	CL30c	Điều phối triển khai	-	control
+CLASS	CL30e0	Phiên bản mô hình	-	entity
+ATTR	CL30e0	-	mãBăm	Chuỗi	-	-
+CLASS	CL30e1	Kết quả kiểm định	-	entity
+ATTR	CL30e1	-	đạt	Boolean	-	-
+CLASS	CL30e2	Bản triển khai	-	entity
+ATTR	CL30e2	-	đangHoạtĐộng	Boolean	-	-
+DEP	CL30bc	CL30b	CL30c	use	-
+DEP	CL30ce0	CL30c	CL30e0	use	-
+DEP	CL30ce1	CL30c	CL30e1	use	-
+DEP	CL30ce2	CL30c	CL30e2	use	-
+DIAG	CL30	CLASS	CL30 UC30 Triển khai mô hình
+NOTE	footCL30	Tastoria | CL30
+SHOW	CL30	CL30b	42	241	143	64	-
+SHOW	CL30	CL30c	493	241	183	64	-
+SHOW	CL30	CL30e0	1050	31	173	64	-
+SHOW	CL30	CL30e1	1050	273	170	64	-
+SHOW	CL30	CL30e2	1050	514	209	64	-
+FIT	CL30
+CONN	CL30	CL30bc	-	-	-
+CONN	CL30	CL30ce0	-	-	676,258;1050,64
+CONN	CL30	CL30ce1	-	-	676,274;1050,305
+CONN	CL30	CL30ce2	-	-	676,290;1050,546
+SHOW	CL30	footCL30	20	643	300	40	-
+SCALL	CL30	CL30b	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL30	CL30c	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL30	CL30e0	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL30	CL30e1	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL30	CL30e2	setDisplayAsRobustnessAnalysisIcon	b:false
+PKG	pDSV2	Thiết kế module quét và ghép mâm
+USEPKG	pDSV2
+CLASS	DS020	scan.router	-	module
+OPER	DS020	+	confirm	-	ScanConfirmResult
+CLASS	DS021	scan.service	-	module
+OPER	DS021	+	confirm	-	ScanConfirmResult
+CLASS	DS022	pantry.service	-	module
+OPER	DS022	+	apply_scan	-	ScanApplyResult
+CLASS	DS023	Scan	-	ORM entity
+ATTR	DS023	-	status	scan_status_t	-	-
+DEP	DS0201	DS020	DS021	use	-
+DEP	DS0212	DS021	DS022	use	-
+DEP	DS0213	DS021	DS023	use	-
+DIAG	DS02	CLASS	DS02 UC13 Thiết kế xác nhận quét
+NOTE	footDS02	Tastoria | DS02
+SHOW	DS02	DS020	31	31	253	86	-
+SHOW	DS02	DS021	31	294	253	86	-
+SHOW	DS02	DS022	682	294	263	86	-
+SHOW	DS02	DS023	31	577	183	64	-
+FIT	DS02
+CONN	DS02	DS0201	-	-	-
+CONN	DS02	DS0212	-	-	-
+CONN	DS02	DS0213	-	-	-
+SHOW	DS02	footDS02	20	706	300	40	-
+CLASS	DS030	meal.router	-	module
+OPER	DS030	+	create_plan	-	JSONResponse
+CLASS	DS031	meal.service	-	module
+OPER	DS031	+	create_plan	-	Created
+CLASS	DS032	meal.composer	-	module
+OPER	DS032	+	compose	-	List[Tray]
+CLASS	DS033	meal.schedule	-	module
+OPER	DS033	+	solve	-	Schedule
+DEP	DS0301	DS030	DS031	use	-
+DEP	DS0312	DS031	DS032	use	-
+DEP	DS0313	DS031	DS033	use	-
+DIAG	DS03	CLASS	DS03 UC15 Thiết kế tạo mâm
+NOTE	footDS03	Tastoria | DS03
+SHOW	DS03	DS030	31	31	251	86	-
+SHOW	DS03	DS031	31	294	201	86	-
+SHOW	DS03	DS032	682	294	203	86	-
+SHOW	DS03	DS033	31	577	163	86	-
+FIT	DS03
+CONN	DS03	DS0301	-	-	-
+CONN	DS03	DS0312	-	-	-
+CONN	DS03	DS0313	-	-	-
+SHOW	DS03	footDS03	20	728	300	40	-
+PKG	pSQV2	Xác nhận quét và nhất quán kho
+USEPKG	pSQV2
+DIAG	SQ03	SEQ	SQ03 Xác nhận quét – ghi kho một lần
+NEW	cqA	InteractionLifeLine	App	-
+CALL	cqA	addStereotype	boundary
+NEW	cqR	InteractionLifeLine	scan.router	-
+CALL	cqR	addStereotype	control
+NEW	cqS	InteractionLifeLine	scan.service	-
+CALL	cqS	addStereotype	control
+NEW	cqD	InteractionLifeLine	PostgreSQL	-
+CALL	cqD	addStereotype	entity
+NEWREL	cqm0	Message	cqA	cqR	POST /scans/{id}/confirm
+NEWREL	cqm1	Message	cqR	cqS	confirm(session, user, id, body)
+NEWREL	cqm2	Message	cqS	cqD	khóa lần quét; kiểm tra sở hữu
+NEWREL	cqm3	Message	cqD	cqS	done + các mục chưa xóa
+NEW	cqm3_rt	ActionTypeReturn	-	-
+CALL	cqm3	setActionType	@cqm3_rt
+NEWREL	cqm4	Message	cqS	cqD	kiểm tra lượng; ghi lô qua pantry
+NEWREL	cqm5	Message	cqS	cqD	scan.status = confirmed
+NEWREL	cqm6	Message	cqS	cqR	ScanConfirmResult
+NEW	cqm6_rt	ActionTypeReturn	-	-
+CALL	cqm6	setActionType	@cqm6_rt
+NEWREL	cqm7	Message	cqR	cqD	COMMIT qua UnitOfWork
+NEWREL	cqm8	Message	cqR	cqA	200 + các mã lô
+NEW	cqm8_rt	ActionTypeReturn	-	-
+CALL	cqm8	setActionType	@cqm8_rt
+NEW	cqR_act0	Activation	-	cqR
+NEW	cqS_act0	Activation	-	cqS
+CALL	cqm0	setToActivation	@cqR_act0
+CALL	cqm1	setFromActivation	@cqR_act0
+CALL	cqm1	setToActivation	@cqS_act0
+CALL	cqm2	setFromActivation	@cqS_act0
+CALL	cqm3	setToActivation	@cqS_act0
+CALL	cqm4	setFromActivation	@cqS_act0
+CALL	cqm5	setFromActivation	@cqS_act0
+CALL	cqm6	setFromActivation	@cqS_act0
+CALL	cqm6	setToActivation	@cqR_act0
+CALL	cqm7	setFromActivation	@cqR_act0
+CALL	cqm8	setFromActivation	@cqR_act0
+SHOW	SQ03	cqA	20	30	120	950	-
+SHOW	SQ03	cqR	290	30	180	950	-
+SHOW	SQ03	cqS	660	30	180	950	-
+SHOW	SQ03	cqD	1060	30	180	950	-
+SHOW	SQ03	cqR_act0	373	150	14	700	cqR
+SHOW	SQ03	cqS_act0	743	235	14	425	cqS
+CONN	SQ03	cqm0	cqA	cqR_act0	80,150;373,150
+CONN	SQ03	cqm1	cqR_act0	cqS_act0	387,235;743,235
+CONN	SQ03	cqm2	cqS_act0	cqD	757,320;1150,320
+CONN	SQ03	cqm3	cqD	cqS_act0	1150,405;757,405
+CONN	SQ03	cqm4	cqS_act0	cqD	757,490;1150,490
+CONN	SQ03	cqm5	cqS_act0	cqD	757,575;1150,575
+CONN	SQ03	cqm6	cqS_act0	cqR_act0	743,660;387,660
+CONN	SQ03	cqm7	cqR_act0	cqD	387,745;1150,745
+CONN	SQ03	cqm8	cqR_act0	cqA	373,830;80,830
+ELEMFONT	15
+FIT	AD01
+FIT	AD02
+FIT	AD03
+FIT	AR01
+FIT	CL09
+FIT	CL13
+FIT	CL15
+FIT	CL20
+FIT	CL30
+FIT	DB01
+FIT	DB02
+FIT	DB03
+FIT	DM01
+FIT	DM02
+FIT	DS01
+FIT	DS02
+FIT	DS03
+FIT	PK01
+FIT	PK02
+FIT	PK03
+FIT	PK04
+FIT	PK05
+FIT	PK06
+FIT	PK07
+FIT	PK08
+FIT	PK09
+FIT	PK10
+FIT	SQ01
+FIT	SQ02
+FIT	SQ03
+FIT	UC00
+FIT	UC01
+FIT	UC02
+FIT	UC03
+FIT	UC04
+FIT	UC05
+FIT	UC06
+FIT	UC07
+FIT	UC08
+REPOINT
+SANITIZE	Tastoria – Phân tích và thiết kế	Nhóm Tastoria
+SAVEAS	/home/namnx/NamBuw/PTTKHT/Tastoria/vp/Tastoria.vpp

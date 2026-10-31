@@ -1,0 +1,95 @@
+\chapter{KHẢO SÁT HIỆN TRẠNG VÀ XÁC ĐỊNH BÀI TOÁN}
+Pha khảo sát làm rõ bối cảnh sử dụng, vấn đề cần giải quyết, bên liên quan và mục tiêu. Đầu ra là phạm vi bài toán và nhu cầu làm cơ sở cho yêu cầu ở Chương 2.
+
+\section{Lý do lựa chọn và bài toán}
+Bài toán không chỉ là tìm một công thức. Người nấu cần quyết định nhiều món cùng lúc, chia số nguyên liệu hữu hạn cho cả mâm, sử dụng đồ mua trước và sắp xếp thao tác để bữa ăn hoàn thành trong thời gian cho phép. Nếu hai món cùng cần 200 g thịt nhưng trong tủ chỉ có 300 g, việc kiểm tra riêng từng món đều ``đủ'' vẫn tạo ra một mâm không khả thi.
+
+Tastoria đặt kho nguyên liệu của người dùng ở trung tâm. Ảnh giúp giảm thao tác nhập, nhưng kết quả nhận diện phải được người dùng xác nhận. Kho lưu theo lô vì hai lần mua cùng một nguyên liệu có ngày nhập, lượng và mức ưu tiên sử dụng khác nhau. Gợi ý mâm xem xét ràng buộc chung; nấu xong mới ghi giảm kho và cho phép hoàn tác khi bấm nhầm.
+
+Đề tài phù hợp bài tập nhóm vì kết hợp giao diện đa nền tảng, nghiệp vụ có trạng thái, cơ sở dữ liệu quan hệ, xử lý ảnh bất đồng bộ, bài toán tối ưu và quản lý dữ liệu cá nhân. Các phần có thể phân công độc lập nhưng phải thống nhất mã nguyên liệu, trạng thái và hợp đồng API.
+
+\section{Bối cảnh và quy trình hiện tại}
+Đơn vị phân tích là một người quản lý kho và tổ chức bữa ăn, không phải cửa hàng bán thực phẩm. Người đó có thể nấu cho nhiều người, nhưng quyền sở hữu dữ liệu trong phiên bản hiện tại gắn với tài khoản cá nhân. Vì vậy, yêu cầu khai số người và dị ứng người ăn cùng không đồng nghĩa hệ thống đã hỗ trợ nhiều thành viên đồng quản trị một hộ.
+
+Trước khi có ứng dụng, người nấu thường kiểm tra nguyên liệu bằng trí nhớ hoặc quan sát trực tiếp, tìm công thức riêng lẻ, tự ước lượng khẩu phần rồi sắp thứ tự nấu. Đây là tình huống phân tích của đề tài, chưa phải kết quả phỏng vấn hay thống kê hành vi. Sau khi có Tastoria, quyết định cuối vẫn thuộc người dùng; hệ thống hỗ trợ ghi nhận kho, kiểm tra tính khả thi của mâm và cập nhật kết quả sau nấu.
+
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{}}
+\caption{Bối cảnh và quy trình hiện tại}\\
+\toprule
+\textbf{Mã quy trình} & \textbf{Đầu vào và người thực hiện} & \textbf{Xử lý chính} & \textbf{Đầu ra và điểm kiểm soát} \\
+\midrule\endfirsthead
+\multicolumn{4}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Mã quy trình} & \textbf{Đầu vào và người thực hiện} & \textbf{Xử lý chính} & \textbf{Đầu ra và điểm kiểm soát} \\
+\midrule\endhead
+\bottomrule\endfoot
+BP01 Ghi nhận nguyên liệu & Người dùng nhập tay hoặc gửi ảnh & Đề xuất tên, sửa lượng, xác nhận lô & Kho được cập nhật sau xác nhận; nhận diện ảnh chưa làm thay đổi kho \\ \addlinespace[3pt]
+BP02 Chuẩn bị bữa ăn & Kho, số người, thời gian, dị ứng & Lọc món, ghép mâm, kiểm tài nguyên dùng chung & Mâm hợp lệ hoặc thông báo nguyên nhân không có lời giải \\ \addlinespace[3pt]
+BP03 Điều chỉnh và nấu & Mâm đề xuất, lựa chọn người dùng & Đổi món/\allowbreak{}thay nguyên liệu, chấp nhận, lập lịch & Phiên nấu; đổi món phải kiểm lại toàn mâm \\ \addlinespace[3pt]
+BP04 Đóng phiên và rà soát & Xác nhận hoàn tất, đánh giá tùy chọn & Trừ kho, ghi trạng thái, cho phép hoàn tác & Lịch sử có thể truy vết; gửi lại không ghi giảm lần hai \\ \addlinespace[3pt]
+BP05 Quản trị dữ liệu & Yêu cầu quyền dữ liệu, nguồn công thức, phiên bản mô hình & Kiểm quyền, kiểm dữ liệu, kiểm định, triển khai & Dữ liệu có nguồn và phiên bản; thao tác vận hành có dấu vết \\ \addlinespace[3pt]
+\end{longtable}}
+Ranh giới giữa BP01 và BP02 là kho đã được xác nhận. Ranh giới giữa BP03 và BP04 là sự kiện người dùng báo đã nấu xong, không phải thời điểm mở màn hình lịch. Cách xác định này tránh hai sai sót: tự nhập nguyên liệu từ dự đoán chưa được duyệt và tự trừ kho khi người dùng chỉ xem thử một mâm.
+
+\section{Bên liên quan, vấn đề và mục tiêu}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{}}
+\caption{Bên liên quan, vấn đề và mục tiêu}\\
+\toprule
+\textbf{Bên liên quan} & \textbf{Nhu cầu} & \textbf{Xung đột cần xử lý} \\
+\midrule\endfirsthead
+\multicolumn{3}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Bên liên quan} & \textbf{Nhu cầu} & \textbf{Xung đột cần xử lý} \\
+\midrule\endhead
+\bottomrule\endfoot
+Người nấu & Ít nhập liệu, mâm phù hợp nguyên liệu và thời gian & Tự động hóa nhanh có thể giảm khả năng kiểm tra kết quả nhận diện \\ \addlinespace[3pt]
+Người ăn cùng & Bữa ăn đáp ứng các ràng buộc được khai báo & Không trực tiếp dùng app; thông tin do người nấu cung cấp có thể thiếu \\ \addlinespace[3pt]
+Người quản trị dữ liệu & Công thức và đơn vị nhất quán & Dữ liệu phong phú nhưng thiếu cấu trúc làm giảm khả năng tính toán \\ \addlinespace[3pt]
+Người vận hành mô hình & Triển khai đúng artifact, có thể quay lui & Tăng dữ liệu huấn luyện phải tuân theo phạm vi được phép sử dụng \\ \addlinespace[3pt]
+Nhóm phát triển & Chức năng dễ phân công, có thể kiểm thử và bảo trì & Tách module phải giữ nhất quán giao dịch xuyên kho--mâm--phiên nấu \\ \addlinespace[3pt]
+\end{longtable}}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{}}
+\caption{Bên liên quan, vấn đề và mục tiêu}\\
+\toprule
+\textbf{Vấn đề} & \textbf{Nguyên nhân và tác động} & \textbf{Nhu cầu} & \textbf{Mục tiêu thiết kế} \\
+\midrule\endfirsthead
+\multicolumn{4}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Vấn đề} & \textbf{Nguyên nhân và tác động} & \textbf{Nhu cầu} & \textbf{Mục tiêu thiết kế} \\
+\midrule\endhead
+\bottomrule\endfoot
+P01 Khó biết còn bao nhiêu nguyên liệu & Mỗi lần mua khác lượng/\allowbreak{}ngày; cộng gộp làm mất thông tin lô & SN01 Theo dõi lượng và lịch sử theo lô & BO01 Giảm thao tác nhập nhưng giữ quyền xác nhận \\ \addlinespace[3pt]
+P02 Món riêng lẻ phù hợp nhưng cả mâm thiếu nguyên liệu & Nhiều món cùng sử dụng một nguyên liệu & SN02 Kiểm lượng trên tổng tổ hợp & BO02 Chỉ đề xuất mâm thỏa ràng buộc cứng \\ \addlinespace[3pt]
+P03 Nấu không kịp dù tổng thời gian công thức có vẻ đủ & Tranh chấp bếp, phụ thuộc bước và thao tác chủ động & SN03 Lập lịch theo tài nguyên & BO03 Đưa ra lịch có giải thích và phương án dự phòng \\ \addlinespace[3pt]
+P04 Mất mạng hoặc bấm lại làm sai kho & Request có thể đến máy chủ nhiều lần & SN04 Ghi nhận hoàn tất một lần và có hoàn tác & BO04 Giữ nhất quán phiên nấu, mâm và kho \\ \addlinespace[3pt]
+P05 Dữ liệu cá nhân được dùng vượt mục đích & Đồng ý bị gộp với đăng ký hoặc không có lịch sử & SN05 Chọn và rút đồng ý theo mục đích & BO05 Tách quyền dùng app khỏi quyền đóng góp dữ liệu \\ \addlinespace[3pt]
+\end{longtable}}
+Các mục tiêu BO là định hướng thiết kế. Chưa có đo lường trước--sau thì không kết luận đã giảm bao nhiêu phần trăm thời gian hoặc lãng phí thực phẩm.
+
+\section{Khảo sát ứng dụng tương tự}
+Khảo sát bàn giấy trên trang chính thức ngày 31/\allowbreak{}10/\allowbreak{}2026. ``Chưa có bằng chứng'' dưới đây là giới hạn khảo sát, không phải kết luận sản phẩm đối thủ hoàn toàn không có tính năng.
+
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{}}
+\caption{Khảo sát ứng dụng tương tự}\\
+\toprule
+\textbf{Sản phẩm} & \textbf{Điểm mạnh có nguồn} & \textbf{Hạn chế đối với bài toán của nhóm} & \textbf{Hướng riêng của Tastoria} \\
+\midrule\endfirsthead
+\multicolumn{4}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Sản phẩm} & \textbf{Điểm mạnh có nguồn} & \textbf{Hạn chế đối với bài toán của nhóm} & \textbf{Hướng riêng của Tastoria} \\
+\midrule\endhead
+\bottomrule\endfoot
+Samsung Food /\allowbreak{} Food+ & Lưu công thức, lập kế hoạch ăn, danh sách mua sắm; Food+ có cá nhân hóa và theo dõi dinh dưỡng [W1--W2] & Tài liệu khảo sát chưa chứng minh cơ chế chia tồn kho theo lô cho cấu trúc mặn--rau--canh Việt Nam; một số tính năng thuộc gói trả phí & Gợi ý một mâm cụ thể theo lượng nguyên liệu chung và số người \\ \addlinespace[3pt]
+SuperCook & Tìm công thức dựa trên nguyên liệu người dùng khai báo [W3] & Trang công khai tập trung tìm công thức; chưa có bằng chứng trong nguồn về giao dịch kho và hoàn tác sau nấu & Khép kín nhập kho \ensuremath{\rightarrow} ghép mâm \ensuremath{\rightarrow} nấu \ensuremath{\rightarrow} trừ kho \\ \addlinespace[3pt]
+Cookpad Việt Nam & Cộng đồng công thức và chia sẻ kinh nghiệm nấu; có hỗ trợ viết công thức [W4] & Trọng tâm nguồn khảo sát là tạo/\allowbreak{}chia sẻ công thức, không phải điều phối một phiên nấu theo tồn kho của hộ & Dùng công thức có cấu trúc để kiểm ràng buộc và lập lịch \\ \addlinespace[3pt]
+\end{longtable}}
+Nhóm không tuyên bố ``đầu tiên'', ``duy nhất'' hoặc tốt hơn mọi đối thủ. Điểm khác biệt đề xuất là tích hợp chuỗi nghiệp vụ phù hợp bữa cơm Việt, với khả năng giải thích mâm được chọn và giữ nhất quán dữ liệu kho.
+
+\section{Phương pháp thu thập và xác minh}
+Nguồn yêu cầu gồm bộ đặc tả Tastoria, tài liệu môn học và khảo sát bàn giấy sản phẩm tương tự. Mã nguồn cùng DDL dùng để kiểm chứng phạm vi hiện thực, không thay thế việc hỏi người dùng. Phương pháp trong báo cáo là đọc tài liệu, phân tích tình huống, lần theo luồng dữ liệu và đối chiếu quy tắc với các điểm ghi trạng thái. Nhóm chưa cung cấp biên bản phỏng vấn hay phiếu khảo sát sử dụng nên báo cáo không mô tả các hoạt động đó như đã thực hiện.
+
+Khi có mâu thuẫn, cần ghi rõ ba lớp thông tin: yêu cầu mong muốn, quyết định mô hình hóa của báo cáo và hành vi mã hiện tại. Ví dụ, mong muốn chống trừ lặp được thực hiện bằng cả khóa yêu cầu tại router và kiểm trạng thái tại service; vì vậy đặc tả ``mọi lần gọi sau hoàn tất đều lỗi'' phải sửa, thay vì ép mã theo một sơ đồ cũ.

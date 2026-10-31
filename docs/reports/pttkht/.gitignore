@@ -1,0 +1,4 @@
+latex/build/
+__pycache__/
+*.bak*
+*.log

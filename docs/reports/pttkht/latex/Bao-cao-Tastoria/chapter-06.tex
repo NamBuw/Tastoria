@@ -1,0 +1,53 @@
+\chapter{ĐÁNH GIÁ VÀ HƯỚNG PHÁT TRIỂN}
+Phần đánh giá tổng hợp quyết định của các pha trước, chỉ rõ nội dung mới, khó và các giới hạn còn cần kiểm chứng.
+
+\section{Nội dung mới của đề tài}
+\begin{itemize}
+\item Quyết định ở cấp mâm với kho dùng chung giữa các món, thay vì trả danh sách món độc lập.
+\item Đưa người dùng vào bước xác nhận nhận diện, kết hợp quét ảnh với kho theo lô.
+\item Kết nối lịch nấu và biến động kho bằng giao dịch có hoàn tác.
+\item Xếp hạng có thể cá nhân hóa nhưng luôn đứng sau lọc ràng buộc bắt buộc.
+\item Một nguồn giao diện Android/\allowbreak{}web, nội dung giới thiệu công khai tách khỏi vùng dữ liệu cá nhân.
+\end{itemize}
+Các điểm trên là đóng góp tích hợp của bài tập, không được tuyên bố là phát minh thuật toán mới trên thế giới.
+
+\section{Nội dung khó và cách giải quyết}
+{\footnotesize\setlength{\tabcolsep}{0pt}
+\begin{longtable}{@{}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{}}
+\caption{Nội dung khó và cách giải quyết}\\
+\toprule
+\textbf{Khó khăn} & \textbf{Nguyên nhân} & \textbf{Giải pháp và giới hạn} \\
+\midrule\endfirsthead
+\multicolumn{3}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
+\toprule
+\textbf{Khó khăn} & \textbf{Nguyên nhân} & \textbf{Giải pháp và giới hạn} \\
+\midrule\endhead
+\bottomrule\endfoot
+Ảnh tủ lạnh khó nhận diện & Che khuất, nhiều lớp, ánh sáng và bao bì & Mô hình nhận diện + bước sửa kết quả; cần test ảnh thực tế của miền triển khai \\ \addlinespace[3pt]
+Lượng nguyên liệu không chắc chắn & Ảnh không đo chính xác khối lượng & Kho lưu khoảng, kiểm khả thi bằng cận dưới; người dùng hiệu chỉnh \\ \addlinespace[3pt]
+Tổ hợp mâm tăng nhanh & Nhiều ứng viên, ràng buộc chéo & Lọc trước, thu hẹp ứng viên và kiểm ràng buộc toàn mâm; cần đánh giá trade-\allowbreak{}off \\ \addlinespace[3pt]
+Lịch nấu nhiều nguồn lực & Một người, nhiều bếp, bước chờ/\allowbreak{}đảo/\allowbreak{}xào & CP-\allowbreak{}SAT; báo relaxed/\allowbreak{}fallback thay vì che việc nới điều kiện \\ \addlinespace[3pt]
+Request lặp và hai thiết bị & Mất phản hồi, retry đồng thời & Idempotency, khóa phiên, UnitOfWork, giao dịch đảo \\ \addlinespace[3pt]
+Dữ liệu riêng tư qua nhiều quy trình & Ảnh, hồ sơ, tương tác và tập huấn luyện liên quan & Đồng ý theo mục đích, tách quyền tải tệp, xuất/\allowbreak{}xóa và kiểm toán \\ \addlinespace[3pt]
+Đồng bộ phân tích với mã nguồn & Đặc tả và triển khai thay đổi khác thời điểm & Ma trận truy vết, bảng khác biệt, phiên bản nguồn \\ \addlinespace[3pt]
+\end{longtable}}
+\section{Hướng phát triển chung}
+Ưu tiên trước mắt là thu thập bộ ảnh thực tế có đồng ý, đánh giá nhận diện theo từng lớp và sai sót ảnh hưởng nhập kho; kiểm thử tải đúng môi trường SRS; thử tác vụ với người dùng; diễn tập khôi phục dữ liệu. Sau khi có số đo mới cân nhắc phân loại độ tươi, quản lý hộ nhiều người, thực đơn tuần, thông báo, tối ưu nhiều mục tiêu và phát hành nền tảng khác. Không gộp các mục này vào kết quả đã hoàn thành.
+
+\section{Hướng phát triển theo chức năng}
+Các định hướng dưới đây là công việc tương lai, không gộp vào kết quả đã đạt.
+
+\subsection{Tài khoản, hồ sơ và quyền dữ liệu}
+Kiểm thử đồng thời xoay refresh token, nghiên cứu khả dụng của luồng đồng ý, hỗ trợ khôi phục tài khoản và quản lý thiết bị rõ hơn. Cần xác nhận yêu cầu pháp lý riêng trước khi khẳng định tuân thủ đầy đủ.
+
+\subsection{Quét ảnh và quản lý kho theo lô}
+Đánh giá đếm trùng qua nhiều ảnh, bổ sung lớp nguyên liệu Việt còn thiếu, dữ liệu bao bì/\allowbreak{}che khuất và trải nghiệm sửa nhanh; chỉ bật mô hình mới sau đánh giá độc lập.
+
+\subsection{Gợi ý mâm, đổi món và đi chợ}
+Đánh giá chất lượng mâm với người nấu thực, độ đa dạng qua nhiều ngày, tác động của thu hẹp ứng viên, mô hình gu khi dữ liệu ít và giải thích rõ nguyên nhân không có lời giải.
+
+\subsection{Lịch nấu, hoàn tất, hoàn tác và nhật ký}
+Đánh giá lịch với người thật, đồng hồ nấu nền và thông báo, giải quyết xung đột nhiều thiết bị. Tăng độ tin cậy cần test lỗi giữa giao dịch, không chỉ luồng thành công.
+
+\subsection{Dữ liệu, mô hình và vận hành}
+Tự động kiểm chất lượng dữ liệu, đánh giá drift, cảnh báo job, thử restore và quy trình duyệt mô hình trước triển khai. Chốt benchmark riêng cho mỗi mô hình và tập dữ liệu, không dùng độ chính xác của bộ khác để điền báo cáo.

@@ -1,0 +1,47 @@
+{
+  "pdf": {
+    "Bao-cao-Tastoria.pdf": {
+      "pages": 73,
+      "out_of_bounds": []
+    },
+    "Ma-tran-truy-vet.pdf": {
+      "pages": 8,
+      "out_of_bounds": []
+    },
+    "Phu-luc-A-Use-Cases.pdf": {
+      "pages": 142,
+      "out_of_bounds": []
+    },
+    "Phu-luc-B-Co-so-du-lieu.pdf": {
+      "pages": 51,
+      "out_of_bounds": []
+    }
+  },
+  "html": {
+    "Bao-cao-Tastoria.html": {
+      "internal_references": "valid",
+      "images": "present"
+    },
+    "Ma-tran-truy-vet.html": {
+      "internal_references": "valid",
+      "images": "present"
+    },
+    "Phu-luc-A-Use-Cases.html": {
+      "internal_references": "valid",
+      "images": "present"
+    },
+    "Phu-luc-B-Co-so-du-lieu.html": {
+      "internal_references": "valid",
+      "images": "present"
+    }
+  },
+  "diagrams": {
+    "png": 39,
+    "svg": 39
+  },
+  "use_cases": 34,
+  "chapters": 6,
+  "truncated_svg_labels": [],
+  "layout_warnings": 0,
+  "trace_rows": 34
+}
