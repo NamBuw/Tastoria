@@ -99,7 +99,7 @@ Tài liệu này là mục 1.3 của [SRS](01-SRS.md). Mọi tài liệu phân t
 | Phiên bản mô hình | Một bản mô hình đã đăng ký (detector, freshness, ranker, substitution) có sha256, bản đồ lớp, chỉ số và trạng thái. | `model_versions` |
 | Con trỏ triển khai | Dòng duy nhất cho mỗi loại mô hình trỏ tới bản đang chạy và bản trước; triển khai và quay lui = đổi con trỏ. | `model_deployments` |
 | Cổng kiểm định (gate) | Bước so chỉ số của bản ứng viên với ngưỡng và với bản đang chạy trước khi cho phép triển khai. | `tastoria mlops gate <name> <version>`; UC29 |
-| Lớp thị giác | Một lớp mà bộ phát hiện nhận ra (~20 lớp), ánh xạ nhiều–nhiều tới nguyên liệu, có định nghĩa "một thể hiện" (quả, bó/túi, gói). | `vision_classes`, `vision_class_ingredients` |
+| Lớp thị giác | Một lớp của bộ phát hiện (37 lớp trong bảng (22 lớp phân tích + 15 lớp thêm 30/10/2026, nguồn `data/kb/vision_classes.yaml`); mô hình đang chạy nhận 13), ánh xạ nhiều–nhiều tới nguyên liệu, có định nghĩa "một thể hiện" (quả, bó/túi, gói). | `vision_classes`, `vision_class_ingredients` |
 | Hiệu chỉnh nhiệt độ | Kỹ thuật chia logit cho một hằng số học trên tập validation để xác suất đầu ra của bộ phân loại độ tươi sát tần suất thật. | BR-FRESH-02 |
 | ONNX | Định dạng mô hình trung lập; worker suy luận bằng `onnxruntime`, không cài `ultralytics` trong image phục vụ. | ADR 0011 |
 | CP-SAT | Bộ giải ràng buộc của OR-Tools dùng lập lịch nấu. | ADR 0009 |

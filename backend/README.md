@@ -232,8 +232,8 @@ Meal (UC15–UC17):
 - Substitute candidates come from `substitution_pairs` only (exact context, slot-only, method-only, generic; then
   score), filtered by food group, activity and the allergens / diet of the user and the co-eaters. Embedding and
   nutrition-vector neighbours are not served: there is no deployed substitution model, and the DB enum
-  `substitution_origin_t` has no value for a nutrition neighbour. `data/kb` has no curated pairs yet, so "Thiếu gì?"
-  lists the missing ingredients with empty candidate lists until `tastoria catalog substitutes import` (UC26) exists.
+  `substitution_origin_t` has no value for a nutrition neighbour. The curated pairs (`data/kb/substitution_pairs.yaml`,
+  197 pairs) are loaded with `tastoria catalog substitutes import` (UC26).
 
 Cooking (UC19–UC21):
 - `POST /cook-sessions` with a schedule longer than the plan's `max_minutes` answers 409 `conflict_state` with
@@ -335,9 +335,17 @@ mlops (`modules/mlops`, CLI side with audit in `modules/admin/mlops.py`):
   differs (hashed once per process, then size-checked); no deployment at all is not a readiness failure — POST /scans
   answers 503 `model_unavailable` instead.
 
-vision classes: the catalog import now loads `data/kb/vision_classes.yaml` into `vision_classes` (ids assigned once per
-code, never reused or deleted) and `vision_class_ingredients` (the first listed ingredient is the chip default, the
-others are the alternatives).
+vision classes: the catalog import loads `data/kb/vision_classes.yaml` — both `classes` (22 from the analysis) and
+`proposed_classes` (15 added 30/10/2026), 37 rows today — into `vision_classes` (ids assigned once per code, never
+reused or deleted) and `vision_class_ingredients` (the first listed ingredient is the chip default, the others are the
+alternatives). The table lists every class a model may output; what the deployed detector actually outputs is its own
+class map (`model_version_classes`): `yolo26n_640_none` knows 13 classes (ca, tom, trung, ca_chua, ca_rot, khoai_tay,
+bap_cai, sup_lo, bi_do, bi_dao, muop_dang, dau_que, nam).
+
+Non-meal food group: `do_an_vat` (snacks, sweets, soft drinks; `data/kb/ref/food_groups.yaml`) can be scanned and kept
+in the pantry but never reaches a tray. `catalog.NON_MEAL_FOOD_GROUPS` is part of `excluded_food_groups` for every diet
+(and none), and `recipe_allowed` / `ingredient_allowed` apply it even when a caller passes no groups, so the composer,
+the hard filter and the substitute picker all skip it (`tests/integration/test_non_meal_group.py`).
 
 scan (`modules/scan`):
 - Upload: ≤ 2 photos, each ≤ 3 145 728 bytes (413), magic bytes JPEG/PNG/WebP (415), pixel count from the header
@@ -392,12 +400,12 @@ scan (`modules/scan`):
 
 ## Next steps
 
-- `tastoria catalog substitutes import` (UC26) and a curated `data/kb/substitutions.yaml`; then UC17 has candidates.
 - Serve a trained ranker through the `Ranker` protocol via mlops and record `ranker_version_id`.
 - A freshness classifier trained on the team's lots (4 levels, temperature-calibrated), exported to ONNX and run on
   crops in the worker; `/admin/models` (read-only endpoint).
 - Calibrate: objective weights (§6.2 rule), qty_levels, made-ahead yields, shelf lives of the made-ahead products.
-- Refresh the derived documents for migration 0003 (`docs/sad/05-tu-dien-du-lieu.md`, `db/schema_vp.sql`, ERD).
+- Refresh `db/schema_vp.sql` and the Visual Paradigm ERD for migration 0003 (the data dictionary and the PlantUML ERDs
+  were regenerated on 05/11/2026).
 - A role for the CLI actor in `audit_log` (UC25 open question 1); `Idempotency-Key` on `POST /pantry/lots` (UC14 open
   question 2).
 

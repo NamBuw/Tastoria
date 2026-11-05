@@ -7,7 +7,7 @@
 
 ## Bối cảnh
 
-Bộ phát hiện nhận ~20 lớp nguyên liệu trong ảnh tủ lạnh, chạy ONNX trên CPU của máy chủ (`--cpus=2 --memory=4g`), mục tiêu p95 ≤ 3 s cho cả lần quét (NFR-PERF-01). Tủ lạnh có nhiều vật nhỏ (ớt, tỏi, chanh).
+Bộ phát hiện nhận ~20 lớp nguyên liệu trong ảnh tủ lạnh (cập nhật 05/11/2026: bảng `vision_classes` có 37 lớp, mô hình `yolo26n_640_none` đang chạy nhận 13), chạy ONNX trên CPU của máy chủ (`--cpus=2 --memory=4g`), mục tiêu p95 ≤ 3 s cho cả lần quét (NFR-PERF-01). Tủ lạnh có nhiều vật nhỏ (ớt, tỏi, chanh).
 
 Đến 10/2026, Ultralytics đã lên 8.4.x, mô hình mặc định là YOLO26. Trên bảng COCO của Ultralytics: YOLO26n 2,4 triệu tham số, 40,9 mAP50-95 (40,1 end-to-end), 38,9 ms CPU ONNX, không cần NMS; YOLO11n 2,6 triệu, 39,5 mAP, 56,1 ms; YOLOv8n 3,2 triệu, 37,3 mAP, 80,4 ms (R1 §3, review:cv#11).
 

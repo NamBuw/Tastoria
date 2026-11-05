@@ -9,7 +9,7 @@ trong tủ lạnh Việt Nam. Số dùng cho báo cáo môn học phải đo l�
 
 | Bước | Mã | Đầu ra |
 |---|---|---|
-| Bảng lớp thị giác (22 lớp) | `ml/src/tastoria_ml/cv/classes.py` | `data/kb/vision_classes.yaml` |
+| Bảng lớp thị giác (22 lớp phân tích; nay 37 với `proposed_classes`) | `ml/src/tastoria_ml/cv/classes.py` | `data/kb/vision_classes.yaml` |
 | Tải Open Images V7 (lọc theo lớp, không cần tài khoản) | `cv/openimages.py` | `data/raw/images/openimages_v7/` (SOURCE.md) |
 | Tải bộ rau Bangladesh (Mendeley, CC BY 4.0) | tải tay bằng URL công khai | `data/raw/images/mendeley_bd_vegetables/` (SOURCE.md) |
 | Ánh xạ nhãn, khử trùng lặp pHash, dựng bộ YOLO | `cv/build_yolo.py`, `cv/phash.py`, `cv/yolo_format.py` | `data/processed/cv/manifest.csv`, `dataset_stats.json`, `yolo/` |
@@ -32,6 +32,11 @@ MLflow: `sqlite:///ml/mlruns/mlflow.db`, artifact ở `ml/mlruns/artifacts` (đ�
 vòng gán thử. Mỗi lớp ghi tên Việt/Anh, danh sách nguyên liệu ánh xạ (nhiều–nhiều), đếm được hay không,
 định nghĩa một thể hiện, có mô hình độ tươi hay không, nguồn dữ liệu công khai và nhãn cha dự phòng.
 Số món ở cột `dish_main_count` được test đếm lại từ `dish_list.yaml`.
+
+> Cập nhật 05/11/2026: tệp có thêm 15 lớp `proposed_classes` (mì tôm, xúc xích, đồ hộp, sữa, sữa chua, hành lá,
+> tỏi, ớt, chanh, bim bim, bánh ngọt, bánh quy, kẹo, nước ngọt, bánh mì), nên bảng `vision_classes` có 37 lớp. Mô hình
+> trong báo cáo này (và bản đang chạy) vẫn chỉ biết 13 lớp dưới đây. Bộ `yolo_v2` có ảnh cho 30/37 lớp, xem
+> `bao-cao-xu-ly-anh.md` mục 4.2. Đồ ăn vặt thuộc nhóm thực phẩm `do_an_vat`, backend không đưa vào mâm.
 
 - **13 lớp có dữ liệu công khai** nên có trong baseline: cá, tôm, trứng, cà chua, cà rốt, khoai tây, bắp cải,
   súp lơ, bí đỏ, bí đao (gồm bầu), mướp đắng, đậu que, nấm.
@@ -318,7 +323,8 @@ xuất ONNX, chỉ có 3 mức (không có mức "kiểm tra") và chưa hiệu 
 
 ### 11.2 Độ trễ quét phía server
 
-Đo qua địa chỉ công khai `https://safework.ctslab.net/api/v1` (Cloudflare Tunnel → nginx → api → Valkey → worker),
+Đo ngày 18/10/2026 qua địa chỉ công khai khi đó, `https://safework.ctslab.net/api/v1` (nay bản live ở
+`https://tastoria.ctslab.net`; safework.ctslab.net không còn phục vụ Tastoria) (Cloudflare Tunnel → nginx → api → Valkey → worker),
 mỗi lần quét một ảnh thật lấy ngẫu nhiên từ tập test công khai (`data/processed/cv/yolo/images/test`), bằng
 `backend/scripts/scan_e2e.py`. Mốc thời gian lấy từ chính lần quét trong CSDL:
 `hàng đợi → xong` = `finished_at − enqueued_at` (cách đo của NFR-PERF-01), `tạo → xong` = `finished_at − created_at`,

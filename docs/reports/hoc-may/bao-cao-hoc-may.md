@@ -60,7 +60,9 @@ Số người dùng được đánh giá: 6.206 ở pha validation, 4.834 ở ph
 
 ### 2.2 Kho món Việt
 
-Kho do nhóm biên soạn ở `data/kb/`: 180 món (75 món mặn, 55 món rau, 50 món canh), 225 nguyên liệu, gam lúc mua,
+Kho do nhóm biên soạn ở `data/kb/`: 180 món (75 món mặn, 55 món rau, 50 món canh), 225 nguyên liệu lúc chạy thí nghiệm (223 trong
+`ingredients.yaml` + 2 đồ làm sẵn; ngày 30/10/2026 thêm 7 nguyên liệu đồ đóng gói/ăn vặt cho bộ phát hiện, không
+dùng trong món nào nên không đổi kết quả dưới đây), gam lúc mua,
 bước nấu có nhãn chủ động/thụ động/chiếm bếp, nguồn ghi theo từng món. Bảng tra thay thế
 `data/kb/substitution_pairs.yaml` có 197 cặp cho 107 nguyên liệu, mỗi cặp có ngữ cảnh (slot, cách nấu) và nguồn.
 Bộ truy vấn đánh giá thay thế `data/kb/substitution_eval/queries.yaml` có 90 truy vấn (món, nguyên liệu thiếu);

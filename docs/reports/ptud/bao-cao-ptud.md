@@ -1,7 +1,8 @@
 # Báo cáo môn Phát triển ứng dụng thông minh — Tastoria: gợi ý một mâm cơm Việt từ ảnh tủ lạnh
 
 Tác giả: Nguyễn Xuân Nam. Ngày viết: 18/10/2026. Mã nguồn: repo `Tastoria` (backend `backend/`, app `app/`, học máy
-`ml/`, triển khai `deploy/`, trang giới thiệu `landing/`). Hệ thống chạy thật tại `https://safework.ctslab.net`.
+`ml/`, triển khai `deploy/`, trang giới thiệu `landing/`). Hệ thống chạy thật tại `https://tastoria.ctslab.net` (các phép đo ngày 18/10/2026 trong báo cáo chạy qua địa chỉ khi
+đó là `safework.ctslab.net`; địa chỉ này nay không còn phục vụ Tastoria). Cập nhật số liệu ngày 05/11/2026: `docs/KHOP-TAI-LIEU.md`.
 
 > **Quy ước về số liệu.** Mọi con số trong báo cáo lấy từ một tệp trong repo hoặc từ một lần chạy ghi rõ ngày, đường
 > dẫn tệp nguồn ghi cạnh số. Số kiểm thử ở mục 6 là lần chạy ngày 18/10/2026 trong lúc viết báo cáo. Những gì chưa
@@ -60,12 +61,12 @@ và Học máy; báo cáo này chỉ dùng kết quả của chúng ở chỗ h�
 
 | Hạng mục | Nội dung | Nguồn |
 |---|---|---|
-| Phân tích thiết kế | 34 UC, 446 FR, 39 BR, 10 NFR (31 điều khoản), 62 bảng, 70 endpoint, 56 sơ đồ PlantUML; ma trận truy vết 0 ô trống | [`docs/sad/BaoCao_PhanTichThietKe.md`](../../sad/BaoCao_PhanTichThietKe.md) |
+| Phân tích thiết kế | 34 UC, 446 FR, 39 BR, 10 NFR (31 điều khoản), 63 bảng, 70 endpoint, 56 sơ đồ PlantUML; ma trận truy vết 0 ô trống | [`docs/sad/BaoCao_PhanTichThietKe.md`](../../sad/BaoCao_PhanTichThietKe.md) |
 | Backend | FastAPI modular monolith, 14 module nghiệp vụ + `core`, `jobs`; ranh giới module kiểm bằng import-linter | `backend/` |
 | Worker quét ảnh | RQ + ONNX Runtime trên CPU, YOLO26n tự huấn luyện, hậu xử lý đối chiếu với ultralytics | `backend/src/tastoria/modules/scan/` |
 | Ghép mâm | Tìm tổ hợp có ràng buộc kho gộp, thời gian và dị ứng; lịch nấu bằng CP-SAT | `modules/meal/composer.py`, `modules/meal/schedule.py` |
 | App | Expo SDK 58, một mã nguồn Android + web, 33 màn hình chụp ở chế độ sáng và tối | `app/`, `app/docs/screenshots/` |
-| Dữ liệu | 180 công thức, 223 nguyên liệu, dinh dưỡng theo EuroFIR, so 45 món với Viện Dinh dưỡng | `data/kb/`, `data/processed/kb/` |
+| Dữ liệu | 180 công thức, 230 nguyên liệu, dinh dưỡng theo EuroFIR, so 45 món với Viện Dinh dưỡng | `data/kb/`, `data/processed/kb/` |
 | Triển khai | Docker Compose 7 dịch vụ, Cloudflare Tunnel, sao lưu mã hoá, quay lui theo tag, APK ký riêng | `deploy/` |
 
 Repo có 52 commit trong hai ngày 17/10/2026 (31) và 18/10/2026 (21) (`git log`, đếm lúc viết báo cáo; không tính
@@ -313,7 +314,7 @@ qua cloudflared; máy GPU lab cho huấn luyện tách riêng.*
 
 ### 4.2. Thiết kế cơ sở dữ liệu
 
-PostgreSQL 18 + pgvector 0.8, **62 bảng, 3 view** (`v_current_consents`, `v_pantry_lot_balance`, `v_journal_days`).
+PostgreSQL 18 + pgvector 0.8, **63 bảng, 3 view** (62 trong `db/schema.sql`, `recipe_make_ahead` thêm ở migration 0003) (`v_current_consents`, `v_pantry_lot_balance`, `v_journal_days`).
 DDL ở [`db/schema.sql`](../../../db/schema.sql); migration Alembic 0001 chạy đúng tệp này (bản sao byte-identical,
 có kiểm thử), 0002 thêm mục đích đồng ý, 0003 thêm `recipe_make_ahead`. Từ điển dữ liệu sinh từ catalog PostgreSQL:
 [`docs/sad/05-tu-dien-du-lieu.md`](../../sad/05-tu-dien-du-lieu.md).
@@ -555,7 +556,7 @@ ADR 0010; [`app/README.md`](../../../app/README.md). Expo SDK 58 (React Native 0
 - **Màn hình**: đăng nhập, đăng ký, quên/đặt lại mật khẩu; đồng ý + hồ sơ 4 bước; 5 tab (trang chủ, kho, mâm, đi chợ,
   nhật ký); quét và xác nhận; chi tiết món; nấu cả mâm; nấu xong; cài đặt; khảo sát (công khai, không cần tài khoản).
 - **APK**: dựng tại máy (không dùng EAS), ký bằng khoá upload riêng để ngoài repo (`~/.config/tastoria/`), chỉ ABI
-  arm64-v8a + armeabi-v7a. Bản 0.1.1 (versionCode 2) chặn các quyền Android do thư viện kéo vào mà app không dùng
+  arm64-v8a + armeabi-v7a. Từ bản 0.1.1 (versionCode 2), APK chặn các quyền Android do thư viện kéo vào mà app không dùng
   (RECORD_AUDIO, SYSTEM_ALERT_WINDOW, sinh trắc, đọc/ghi bộ nhớ ngoài); còn INTERNET, CAMERA, VIBRATE,
   ACCESS_NETWORK_STATE (commit `bb9f978`).
 
@@ -572,8 +573,10 @@ ADR 0010; [`app/README.md`](../../../app/README.md). Expo SDK 58 (React Native 0
   `data/processed/kb/recipe_nutrition.csv`), gam lúc mua, bước chủ động/thụ động/chiếm bếp, mỗi món ghi ≥ 2 nguồn và
   viết lại bằng lời của nhóm. Lệnh nhập catalog xuất bản món khi có ≥ 2 nguồn và mọi nguyên liệu chính có dữ liệu
   thành phần: **171 món xuất bản, 9 món nháp** (5 món một nguồn, 4 món thiếu thành phần nguyên liệu chính;
-  backend/README.md). 223 nguyên liệu: 181 theo Bảng thành phần thực phẩm Việt Nam 2007, 30 theo USDA FoodData
-  Central, 12 chưa có nguồn (gia vị có lý do ghi trong `ingredients.yaml`).
+  backend/README.md). 230 nguyên liệu: 184 theo Bảng thành phần thực phẩm Việt Nam 2007, 30 theo USDA FoodData
+  Central, 16 chưa có nguồn (gia vị và đồ ăn vặt, có lý do ghi trong `ingredients.yaml`). 7 nguyên liệu thêm ngày
+  30/10/2026 cho các lớp thị giác đồ đóng gói: mì tôm, cá hộp, và 5 món thuộc nhóm `do_an_vat` (bim bim, bánh ngọt,
+  bánh quy, kẹo, nước ngọt) mà bộ lọc cứng luôn loại khỏi mâm.
 - **Kiểm tra khi nhập**: nhập là đồng bộ toàn bộ, chạy trong một giao dịch; sau khi ghi, lệnh kiểm lại bộ lọc dị ứng
   bằng SQL thô trên mọi món xuất bản × mọi nhóm dị ứng và chế độ ăn, có vi phạm thì huỷ toàn bộ. Sửa nội dung một món
   đã xuất bản tạo phiên bản mới và chuyển bản cũ sang `retired` (BR-CATALOG-01). Nhập lại bộ dữ liệu không đổi báo
@@ -605,15 +608,15 @@ Kiểm thử tích hợp chạy trên container thật (`pgvector/pgvector:pg18`
 cổng ngẫu nhiên (`docker run -p 127.0.0.1::<port>`), gắn nhãn `tastoria-test=1` và xoá khi kết thúc. Ca cần kho món
 thật chạy trên CSDL thứ hai đã nhập `data/kb`.
 
-### 6.2. Số kiểm thử hiện tại (chạy ngày 18/10/2026)
+### 6.2. Số kiểm thử hiện tại (chạy lại ngày 05/11/2026)
 
 | Phần | Lệnh | Kết quả | Thời gian |
 |---|---|---|---|
-| Backend | `TASTORIA_REQUIRE_DOCKER=1 uv run --package tastoria-backend pytest backend/tests -q` | **346 passed**, 0 failed, 0 skipped | 229 s |
-| Học máy, dữ liệu | `CUDA_VISIBLE_DEVICES= uv run --package tastoria-ml pytest ml/tests -q` | **252 passed, 1 skipped** (`test_preprocess.py:120` cần `cv2`, không có trong môi trường dự án) | 57 s |
+| Backend | `TASTORIA_REQUIRE_DOCKER=1 uv run --package tastoria-backend pytest backend/tests -q` | **347 passed**, 0 failed, 0 skipped | 177 s |
+| Học máy, dữ liệu | `CUDA_VISIBLE_DEVICES= uv run --package tastoria-ml pytest ml/tests -q` | **254 passed, 1 skipped** (`test_preprocess.py:120` cần `cv2`, không có trong môi trường dự án) | 47 s |
 | App | `cd app && npx tsc --noEmit` | 0 lỗi kiểu | — |
 
-`TASTORIA_REQUIRE_DOCKER=1` biến việc thiếu Docker thành lỗi thay vì bỏ qua, nên 346 ca trên gồm cả ca tích hợp. Sau
+`TASTORIA_REQUIRE_DOCKER=1` biến việc thiếu Docker thành lỗi thay vì bỏ qua, nên 347 ca trên gồm cả ca tích hợp. Sau
 lần chạy không còn container `tastoria-test=1` nào. Ghi chú: lúc chạy, cây làm việc có thay đổi chưa commit của việc
 khác ở `ml/src/tastoria_ml/cv/counting.py`; số của phần học máy tính cả thay đổi đó.
 
@@ -674,7 +677,8 @@ catalog cũng chạy lại kiểm tra BR-ALG-01 mỗi lần nhập (mục 5.6).
 
 ### 6.6. Độ trễ quét đo thật
 
-Đo ngày 18/10/2026 qua địa chỉ công khai `https://safework.ctslab.net/api/v1` (Cloudflare Tunnel → nginx → api →
+Đo ngày 18/10/2026 qua địa chỉ công khai khi đó, `https://safework.ctslab.net/api/v1` (nay là
+`https://tastoria.ctslab.net/api/v1`, cùng máy chủ và mô hình) (Cloudflare Tunnel → nginx → api →
 Valkey → worker), mỗi lần quét một ảnh thật lấy ngẫu nhiên từ tập test công khai, bằng `backend/scripts/scan_e2e.py`.
 Mốc thời gian lấy từ chính dòng `scans` trong CSDL. Nguồn: [`docs/reports/xu-ly-anh/ket-qua-so-bo.md`](../xu-ly-anh/ket-qua-so-bo.md)
 §11.2, tệp `data/processed/cv/detector/scan_latency_live_c1.json`, `scan_latency_live_c5.json`.
@@ -718,12 +722,12 @@ Bí mật sinh bằng `scripts/init-env.sh` vào `deploy/.env` (quyền 600, kh�
 
 ### 7.2. Cloudflare Tunnel
 
-Máy chủ không mở cổng ra Internet; cloudflared có sẵn trên máy chuyển `safework.ctslab.net` tới `127.0.0.1:6880`.
+Máy chủ không mở cổng ra Internet; cloudflared có sẵn trên máy chuyển `tastoria.ctslab.net` tới `127.0.0.1:6880`.
 Cloudflare kết thúc TLS; nginx lấy IP thật từ `CF-Connecting-IP` (chỉ tin khi request đến từ loopback hoặc mạng
 Docker) để khoá đăng nhập theo (email, IP) đếm đúng từng người. App web và API cùng origin (app gọi `/api/v1`) nên
 không cần CORS. Bộ đệm: tệp có hash trong tên `max-age=31536000, immutable`; `index.html` `no-cache`; `/api/*`
-`no-store`; sau khi triển khai không cần xoá cache Cloudflare. Thiết kế v2 đề xuất tên `tastoria.ctslab.net`; bản chạy
-thật dùng `safework.ctslab.net`.
+`no-store`; sau khi triển khai không cần xoá cache Cloudflare. Bản chạy thật dùng `tastoria.ctslab.net` như thiết kế v2
+đề xuất (đến cuối tháng 10/2026 tạm chạy ở `safework.ctslab.net`; địa chỉ đó nay trả 404 cho Tastoria).
 
 Kiểm tra lúc viết báo cáo (18/10/2026, `curl` từ máy chủ qua Cloudflare):
 
@@ -732,7 +736,7 @@ Kiểm tra lúc viết báo cáo (18/10/2026, `curl` từ máy chủ qua Cloudfl
 | `/healthz` | 200 | `{"status":"ok"}` |
 | `/readyz` | 200 | `{"status":"ready","checks":{"database":"ok","valkey":"ok","models":"ok"}}` |
 | `/gioi-thieu/` | 200 | trang tĩnh 11.391 byte |
-| `/tai-ve/tastoria-0.1.1.apk` | 200 | 51.408.936 byte, `application/vnd.android.package-archive`; sha256 tệp gốc `f30664d6…853c665` |
+| `/tai-ve/tastoria-0.1.4.apk` | 200 | 51.516.716 byte, `application/vnd.android.package-archive`; sha256 `fa7fb439…3e51b314` (kiểm lại 05/11/2026) |
 | `/khao-sat` | 200 | app web, màn khảo sát |
 | `/api/v1/reference` | 200 | dữ liệu tham chiếu công khai |
 
@@ -766,8 +770,8 @@ trên trang là số đo thật kèm giới hạn (commit `d5f1986`).
 ### 7.4. APK ký riêng
 
 APK dựng tại máy bằng `npx expo prebuild` + `./gradlew assembleRelease`, ký bằng khoá upload riêng nằm ngoài repo;
-`EXPO_PUBLIC_API_URL=https://safework.ctslab.net/api/v1` được nhúng lúc dựng. Bản 0.1.1 (versionCode 2) phát ở
-`/tai-ve/tastoria-0.1.1.apk`; nginx chỉ phục vụ tệp `.apk` trong `dist/` (các tệp khác như bộ nhập Visual Paradigm trả
+`EXPO_PUBLIC_API_URL=https://tastoria.ctslab.net/api/v1` được nhúng lúc dựng (`deploy/scripts/deploy-frontend.sh`). Bản
+0.1.4 (versionCode 5) phát ở `/tai-ve/tastoria-0.1.4.apk` (trang giới thiệu trỏ tới bản này; các APK cũ đã gỡ khỏi `dist/`); nginx chỉ phục vụ tệp `.apk` trong `dist/` (các tệp khác như bộ nhập Visual Paradigm trả
 404). Bản Android chưa có trên cửa hàng ứng dụng; người dùng phải cho phép cài từ nguồn ngoài.
 
 ---
@@ -801,8 +805,9 @@ Luồng chính quét → xác nhận → kho → mâm → đổi món → thiế
 qua Cloudflare cho chip "tôm" từ 8 khung, xác nhận tạo lô 250–500 g, xác nhận lần hai trả cùng kết quả,
 ket-qua-so-bo.md §11.2). Chất lượng của các thành phần thông minh không được đánh giá trong báo cáo này:
 
-- Bộ phát hiện: mAP50 0,424 / mAP50-95 0,278 trên tập test **công khai** (Open Images + rau Bangladesh, 13 trong 22 lớp
-  có dữ liệu); chưa có ảnh tủ lạnh của nhóm nên chưa biết chất lượng trên tủ lạnh Việt Nam (báo cáo Xử lý ảnh).
+- Bộ phát hiện: mAP50 0,424 / mAP50-95 0,278 trên tập test **công khai** (Open Images + rau Bangladesh). Mô hình đang
+  chạy nhận 13 lớp; bảng `vision_classes` có 37 (22 lớp phân tích + 15 lớp thêm 30/10/2026), 24 lớp còn lại người dùng
+  thêm tay trên chip; chưa có ảnh tủ lạnh của nhóm nên chưa biết chất lượng trên tủ lạnh Việt Nam (báo cáo Xử lý ảnh).
 - Xếp hạng gu và trọng số ghép mâm: mới đo trên Food.com và kịch bản tổng hợp (báo cáo Học máy); bản phục vụ dùng bộ
   xếp hạng baseline và trọng số tạm.
 - Calo: sai số so với Viện Dinh dưỡng đã đo (mục 5.6) và được hiển thị dưới dạng khoảng.
@@ -828,17 +833,18 @@ ket-qua-so-bo.md §11.2). Chất lượng của các thành phần thông minh k
   số về chất lượng mô hình là trên dữ liệu công khai hoặc mô phỏng; hệ thống đã có công cụ thu (trang khảo sát
   `/khao-sat`, chế độ góp ảnh có đồng ý) nhưng chưa thu.
 - Không có mô hình độ tươi nào đang chạy; độ gấp của lô chỉ dựa vào số ngày từ lúc mua và thời hạn bảo quản.
-- 9/22 lớp thị giác chưa có dữ liệu huấn luyện, trong đó có thịt lợn (47 món), đậu phụ (16) và thịt bò (10), những
-  nguyên liệu chính của kho món. Người dùng phải thêm tay qua chip.
+- Mô hình đang chạy chỉ được huấn luyện cho 13/37 lớp của bảng; 9/22 lớp phân tích không có ảnh huấn luyện, trong đó có
+  thịt lợn (47 món), đậu phụ (16) và thịt bò (10), những nguyên liệu chính của kho món. Bộ `yolo_v2` đã dựng (LVIS, RPC)
+  có ảnh cho 30/37 lớp, gồm thịt bò và đậu phụ, nhưng chưa huấn luyện. Người dùng phải thêm tay qua chip.
 - Thư đặt lại mật khẩu chưa gửi được: chưa có tài khoản SMTP, bản chạy thật đặt `TASTORIA_MAILER=log`.
 - Hồ sơ đánh giá tác động là bản nháp chưa rà soát pháp lý; căn cứ xử lý cho dịch vụ cốt lõi chưa xác định; các luồng
   dữ liệu ra nước ngoài (Gemini, Google Drive, Cloudflare, SMTP) cần quyết định; chưa có thoả thuận với bên xử lý.
 - YOLO26n theo AGPL-3.0: khi mở cho người ngoài phải công bố mã nguồn phần dịch vụ (ADR 0011), hoặc đổi sang mô hình
   Apache-2.0.
 - Máy chủ lab dùng chung, không có cam kết sẵn sàng (SRS GD-06).
-- Một số tài liệu chưa cập nhật theo mã: `app/README.md` còn ghi endpoint quét và khảo sát "chưa có trong backend";
-  mục "Next steps" của `backend/README.md` còn ghi chưa có lệnh nhập bảng tra thay thế; `deploy/README.md` còn ghi
-  sao lưu chưa đặt lịch.
+- `app/README.md` còn ghi endpoint quét và khảo sát "chưa có trong backend" (thuộc phần app, sửa riêng). Mục "Next
+  steps" của `backend/README.md` và lịch sao lưu trong `deploy/README.md` đã sửa ngày 05/11/2026 (cron 03:15 giờ VN
+  đang chạy).
 
 **Hướng phát triển**
 
@@ -975,7 +981,7 @@ dùng điện thoại Android không; đã dùng app nấu ăn nào chưa.
 
 - 8–10 người không thuộc nhóm, đã đồng ý tham gia bằng văn bản (mục đích, dữ liệu ghi, thời gian lưu). Không quay mặt;
   chỉ ghi màn hình nếu người thử đồng ý riêng.
-- Điện thoại Android tầm trung có cài APK 0.1.1, Wi-Fi; một tủ lạnh thật hoặc một túi đồ chợ gồm ít nhất 5 loại thuộc
+- Điện thoại Android tầm trung có cài APK 0.1.4, Wi-Fi; một tủ lạnh thật hoặc một túi đồ chợ gồm ít nhất 5 loại thuộc
   13 lớp có dữ liệu (ví dụ trứng, cà chua, cà rốt, khoai tây, bắp cải) và một loại thịt (lớp chưa có dữ liệu, để quan
   sát việc thêm tay).
 - Tài khoản do người thử tự tạo trên máy thử; xoá tài khoản (UC07) sau phiên.

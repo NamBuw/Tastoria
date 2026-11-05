@@ -905,7 +905,7 @@ Nền tảng chạy app có ngưỡng đo được ở ràng buộc RB-06 (§2.4
 
 ### 3.5 Yêu cầu dữ liệu logic
 
-- **Mô hình dữ liệu**: 62 bảng và 3 view (`v_current_consents`, `v_pantry_lot_balance`, `v_journal_days`) chia theo 13 module có dữ liệu, định nghĩa trong `model.yaml` (`tables`, `views`). ERD khái niệm Chen `docs/erd/ERD00-khai-niem-chen.puml`; ERD chân quạ theo nhóm `ERD01-dinh-danh-quyen-rieng-tu` … `ERD07-khao-sat-mo-hinh` và tổng quan `ERD08-tong-quan`.
+- **Mô hình dữ liệu**: 63 bảng (62 trong `db/schema.sql`, `recipe_make_ahead` thêm ở migration 0003) và 3 view (`v_current_consents`, `v_pantry_lot_balance`, `v_journal_days`) chia theo 13 module có dữ liệu, định nghĩa trong `model.yaml` (`tables`, `views`). ERD khái niệm Chen `docs/erd/ERD00-khai-niem-chen.puml`; ERD chân quạ theo nhóm `ERD01-dinh-danh-quyen-rieng-tu` … `ERD07-khao-sat-mo-hinh` và tổng quan `ERD08-tong-quan`.
 - **Chuẩn hoá**: mọi quan hệ đạt BCNF, có phân tích khoá ứng viên và phụ thuộc hàm từng bảng trong `docs/sad/04-chuan-hoa.md`. Phi chuẩn hoá có kiểm soát (mỗi trường hợp có mục riêng ở 04-chuan-hoa): `recipe_nutrition` (giá trị dẫn xuất, tính lại bằng job, có `data_version`); ảnh chụp lịch sử `meal_plans.e_target_kcal`, `kcal_low`, `kcal_high`, `meal_plan_items.kcal_per_person`, `cook_sessions.burners`.
 - **Từ điển dữ liệu**: [05-tu-dien-du-lieu.md](05-tu-dien-du-lieu.md), sinh từ catalog PostgreSQL sau khi áp `db/schema.sql`.
 - **Toàn vẹn**: PK/FK/UNIQUE/CHECK theo `model.yaml`; FK ghép bảo đảm cùng chủ sở hữu (`interactions` → `meal_plans(id, user_id)`) và cùng slot (`meal_plan_items` → `recipes(id, slot)`); unique một phần "một món `active` mỗi slot".
@@ -913,7 +913,7 @@ Nền tảng chạy app có ngưỡng đo được ở ràng buộc RB-06 (§2.4
 - **Giá trị tính lúc đọc, không lưu**: lượng hiện tại của lô, độ gấp u (BR-FRESH-05), tổng thời gian món.
 - **Dữ liệu nhạy cảm**: `profiles.*_enc` (AES-GCM, `enc_key_id`); `interactions` chỉ ghi khi có đồng ý `personalization`; `dsr_requests.subject_ref` là HMAC-SHA256.
 - **Lưu giữ và xoá**: xoá tài khoản xoá cứng mọi bảng có `user_id` (ON DELETE CASCADE), giữ `dsr_requests` và `audit_log` với `user_id` = NULL; ảnh theo BR-RETAIN-01; `idempotency_keys` 48 giờ, token hết hạn dọn ở UC34.
-- **Tần suất và khối lượng ước tính** (dùng để chọn chỉ mục): ≤ 200 món; ~20 lớp thị giác; mỗi người dùng ~30 lô đang có, 1–2 mâm và 1 lần quét mỗi ngày.
+- **Tần suất và khối lượng ước tính** (dùng để chọn chỉ mục): ≤ 200 món; 37 lớp thị giác trong bảng (mô hình đang chạy nhận 13); mỗi người dùng ~30 lô đang có, 1–2 mâm và 1 lần quét mỗi ngày.
 
 ### 3.6 Ràng buộc thiết kế
 

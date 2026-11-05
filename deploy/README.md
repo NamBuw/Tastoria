@@ -61,7 +61,10 @@ Image backend cài cả gói `tastoria-ml` để lệnh nhập catalog tính din
 Chưa có tài khoản SMTP nên `TASTORIA_MAILER=log`: thư đặt lại mật khẩu không được gửi, log api chỉ ghi tiêu đề.
 Muốn gửi thật: đặt `TASTORIA_MAILER=smtp`, điền `TASTORIA_SMTP_HOST/PORT/USER/PASSWORD`, `TASTORIA_SMTP_STARTTLS=true`
 (cổng 587), sửa `TASTORIA_MAIL_FROM` cho khớp tên miền gửi, rồi `docker compose up -d api`.
-Link trong thư lấy từ `TASTORIA_RESET_URL_BASE` (đang là `https://safework.ctslab.net/dat-lai-mat-khau`).
+Link trong thư lấy từ `TASTORIA_RESET_URL_BASE`; giá trị đúng là `https://tastoria.ctslab.net/dat-lai-mat-khau`
+(`.env.example`). `deploy/.env` trên máy chủ còn giá trị cũ `https://safework.ctslab.net/...` và `TASTORIA_MAIL_FROM`
+`@safework.ctslab.net` từ khi bản live chạy ở địa chỉ đó; vô hại khi `MAILER=log`, nhưng phải sửa cả hai trước khi bật SMTP
+(rồi `docker compose up -d api`).
 
 ## Triển khai / cập nhật
 
@@ -134,7 +137,7 @@ Mỗi bản là một tệp `tastoria_<giờ UTC>_<nhãn>.tar.gpg` (gpg AES-256,
 Giữ `BACKUP_KEEP_DAYS` ngày (mặc định 14) ở cả máy và Drive. Đích Drive mặc định: `gdrive-cts:Backups/tastoria`
 (Drive của xuannamservice@gmail.com).
 
-Chưa đặt lịch tự động. Muốn chạy hằng ngày lúc 03:15 giờ VN (máy chủ chạy giờ UTC), thêm vào `crontab -e`:
+Đã đặt lịch hằng ngày lúc 03:15 giờ VN (máy chủ chạy giờ UTC) trong crontab của người dùng `namnx`:
 
 ```
 15 20 * * * /home/namnx/NamBuw/Tastoria/deploy/scripts/backup.sh >> /home/namnx/backups/tastoria/backup.log 2>&1

@@ -4,7 +4,7 @@
 |---|---|
 | Hệ thống | Tastoria — gợi ý một mâm cơm Việt từ ảnh tủ lạnh |
 | Phiên bản báo cáo | 1.0, 17/10/2026 |
-| Nguồn sự thật | [`model.yaml`](model.yaml): 10 tác nhân, 10 gói, 34 use case, 16 module, 62 bảng, 3 view, 70 endpoint, 13 lệnh CLI, 8 máy trạng thái, 39 BR, 10 NFR |
+| Nguồn sự thật | [`model.yaml`](model.yaml): 10 tác nhân, 10 gói, 34 use case, 16 module, 63 bảng, 3 view, 70 endpoint, 13 lệnh CLI, 8 máy trạng thái, 39 BR, 10 NFR |
 | Thiết kế gốc | [Thiết kế v2](../superpowers/specs/2026-10-17-tastoria-thiet-ke-v2.md) (BR ở §4, NFR ở §11, danh mục sản phẩm ở §12) |
 | Chuẩn áp dụng | ISO/IEC/IEEE 29148:2018 (SRS), A. Cockburn (đặc tả use case), OMG UML 2.5.1 (sơ đồ), chuẩn hoá đến BCNF (CSDL), OpenAPI 3.1 và RFC 9457 (API) |
 
@@ -44,7 +44,7 @@ Ngoài luồng chính, hệ thống có trang khảo sát gu món cho người n
 | API | FastAPI, modular monolith 16 module M01–M16, tiền tố `/api/v1` | 70 endpoint |
 | Worker | Valkey + RQ, ONNX Runtime trên CPU | Suy luận ảnh, xuất dữ liệu cá nhân, xoá tài khoản |
 | Scheduler | Container cron | UC32–UC34 |
-| CSDL | PostgreSQL 18 + pgvector 0.8 | 62 bảng, 3 view |
+| CSDL | PostgreSQL 18 + pgvector 0.8 | 63 bảng, 3 view |
 | Lưu tệp | Ổ đĩa, nginx `X-Accel-Redirect` | Ảnh quét, bản xuất, tệp mô hình |
 | CLI | `tastoria …` trong container api | Thao tác của A05, A06 |
 
@@ -545,9 +545,9 @@ Chi tiết: [04-chuan-hoa.md](04-chuan-hoa.md) (chuẩn hoá), [05-tu-dien-du-li
 
 ### 7.2. Mô hình logic/vật lý (chân quạ)
 
-![ERD08 — Tổng quan 62 bảng](../uml/out/erd/ERD08-tong-quan.svg)
+![ERD08 — Tổng quan 63 bảng](../uml/out/erd/ERD08-tong-quan.svg)
 
-*Hình 41. ERD08 — Tổng quan 62 bảng và mọi khoá ngoại; cột chi tiết ở ERD01–ERD07.*
+*Hình 41. ERD08 — Tổng quan 63 bảng và mọi khoá ngoại; cột chi tiết ở ERD01–ERD07.*
 
 | ERD | Nhóm | Số bảng |
 |---|---|---|

@@ -1,6 +1,6 @@
 # PHỤ LỤC B — CẤU TRÚC BẢNG VÀ RÀNG BUỘC
 
-Nguồn: `Tastoria/db/schema.sql`, SHA-256 `d626650dcfb6c604d4707ea16b8af486e1ef9575cfd6bbe5c6e9b2d219638252`. Có 62 bảng trong tệp nguồn. Các migration bổ sung phải đọc cùng khi mô tả DB đã triển khai; phụ lục này không giả định đã truy vấn schema production.
+Nguồn: `Tastoria/db/schema.sql`, SHA-256 `d626650dcfb6c604d4707ea16b8af486e1ef9575cfd6bbe5c6e9b2d219638252`. Có 62 bảng trong tệp nguồn. Các migration bổ sung phải đọc cùng khi mô tả DB đã triển khai; phụ lục này không giả định đã truy vấn schema production. DB đã triển khai có 63 bảng: migration 0003 thêm `recipe_make_ahead` (món làm sẵn; cột và ràng buộc ở `docs/sad/05-tu-dien-du-lieu.md`); migration 0002 chỉ thêm dữ liệu tham chiếu.
 
 
 ## idempotency_keys
