@@ -6,7 +6,7 @@ import { Pressable, useWindowDimensions, View } from 'react-native';
 import { api, ApiError, call, isCode, type Schemas } from '@/api/client';
 import { errorText } from '@/api/errors';
 import { fmtBowls, FreshBadge, KcalBar, SLOT_LABEL, Tray } from '@/components/domain';
-import { Button, Card, Chip, ErrorBox, Loading, Notice, Radio, Row, Screen, Section, Sheet, Stepper, T } from '@/components/ui';
+import { Button, Card, Chip, ErrorBox, Loading, Notice, Row, Screen, Section, Segmented, Sheet, Stepper, T } from '@/components/ui';
 import { useIdempotencyKey } from '@/lib/idempotency';
 import { currentMeal, MEAL_LABEL, qk, useLatestPlan, useLots, useReference, useSettings } from '@/lib/queries';
 import { radius, space, useTheme } from '@/theme';
@@ -127,14 +127,7 @@ function Composer({
         Ghép mâm {MEAL_LABEL[meal].toLowerCase()}
       </T>
       <Stepper label="Số người ăn" value={n} onChange={setPersons} min={1} max={6} testID="persons" />
-      <View style={{ gap: space.xs }}>
-        <T v="label">Thời gian nấu tối đa</T>
-        <Row>
-          {[30, 45, 60, 90, 120].map((m) => (
-            <Radio key={m} label={`${m} phút`} selected={minutes === m} onPress={() => setMinutes(m)} />
-          ))}
-        </Row>
-      </View>
+      <Segmented label="Thời gian nấu tối đa" options={[30, 45, 60, 90, 120].map((m) => [m, `${m} phút`] as const)} value={minutes} onChange={setMinutes} />
       <Section title="Người ăn cùng dị ứng (bữa này)">
         <T v="small" tone="muted">
           Dị ứng của bạn đã được tính sẵn. Chọn thêm nhóm dị ứng của người ăn cùng, nếu có.
@@ -403,15 +396,7 @@ function PlanView({ plan, onNew }: { plan: Plan; onNew: () => void }) {
       {swappedOut.length ? <T v="small" tone="muted">Đã đổi ra: {swappedOut.map((i) => i.recipe_name_vi).join(', ')}</T> : null}
 
       <Section title="Giờ dọn mâm">
-        <Row>
-          {[
-            { v: 0, l: 'Sớm nhất' },
-            { v: 30, l: 'Sau 30 phút' },
-            { v: 60, l: 'Sau 1 giờ' },
-          ].map((o) => (
-            <Radio key={o.v} label={o.l} selected={serveIn === o.v} onPress={() => setServeIn(o.v)} />
-          ))}
-        </Row>
+        <Segmented options={[[0, 'Sớm nhất'], [30, 'Sau 30 phút'], [60, 'Sau 1 giờ']]} value={serveIn} onChange={setServeIn} />
       </Section>
       {overTime ? (
         <Notice tone="warn">

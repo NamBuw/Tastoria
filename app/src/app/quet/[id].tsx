@@ -8,10 +8,12 @@ import { goTab } from '@/lib/nav';
 import { codeText, errorText } from '@/api/errors';
 import { FRESH_LABEL, FreshBadge, type Freshness } from '@/components/domain';
 import { IngredientSearch, LEVEL_LABEL } from '@/components/pantryForms';
-import { Button, Chip, ErrorBox, Loading, Notice, Radio, Row, Screen, Section, Sheet, Stepper, T } from '@/components/ui';
+import { Button, Chip, ErrorBox, Loading, Notice, Row, Screen, Section, Segmented, Sheet, Stepper, T } from '@/components/ui';
 import { useCatalog } from '@/lib/catalog';
 import { useLots, useReference } from '@/lib/queries';
 import { space } from '@/theme';
+
+const LEVELS = (['it', 'vua', 'nhieu'] as const).map((l) => [l, LEVEL_LABEL[l]] as const);
 
 type Item = Schemas['ScanItem'];
 const MERGE = { headers: { 'Content-Type': 'application/merge-patch+json' } };
@@ -210,21 +212,15 @@ function EditChip({
       {countable ? (
         <Stepper label="Số lượng" value={count} onChange={setCount} min={0} max={99} />
       ) : (
-        <View style={{ gap: space.xs }}>
-          <T v="label">Lượng</T>
-          <Row>
-            {(['it', 'vua', 'nhieu'] as const).map((l) => (
-              <Radio key={l} label={LEVEL_LABEL[l]} selected={level === l} onPress={() => setLevel(l)} />
-            ))}
-          </Row>
-        </View>
+        <Segmented label="Lượng" options={LEVELS} value={level} onChange={setLevel} />
       )}
-      <View style={{ gap: space.xs }}>
-        <T v="label">Độ tươi</T>
-        {(['tuoi', 'dung_som', 'dung_ngay', 'kiem_tra'] as const).map((f) => (
-          <Radio key={f} label={FRESH_LABEL[f]} selected={freshness === f} onPress={() => setFreshness(f)} />
-        ))}
-      </View>
+      <Segmented
+        label="Độ tươi"
+        column={space.xs}
+        options={(['tuoi', 'dung_som', 'dung_ngay', 'kiem_tra'] as const).map((f) => [f, FRESH_LABEL[f]] as const)}
+        value={freshness}
+        onChange={setFreshness}
+      />
       {patch.error || del.error ? <ErrorBox message={errorText(patch.error ?? del.error)} /> : null}
       <Button label="Lưu" onPress={save} loading={patch.isPending} disabled={!countable && !level} />
       <Button label="Xoá (nhận nhầm)" kind="danger" onPress={() => del.mutate()} loading={del.isPending} />
@@ -257,11 +253,7 @@ function AddChip({ scanId, visible, onClose, reload }: { scanId: string; visible
         ing.countable ? (
           <Stepper label="Số lượng" value={count} onChange={setCount} min={1} max={99} />
         ) : (
-          <Row>
-            {(['it', 'vua', 'nhieu'] as const).map((l) => (
-              <Radio key={l} label={LEVEL_LABEL[l]} selected={level === l} onPress={() => setLevel(l)} />
-            ))}
-          </Row>
+          <Segmented options={LEVELS} value={level} onChange={setLevel} />
         )
       ) : null}
       {add.error ? <ErrorBox message={errorText(add.error)} /> : null}

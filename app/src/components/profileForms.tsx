@@ -8,7 +8,7 @@ import { useReference } from '@/lib/queries';
 import { space } from '@/theme';
 
 import { SLOT_LABEL } from './domain';
-import { Button, Card, Chip, ErrorBox, Field, Loading, Notice, Radio, Row, Section, T } from './ui';
+import { Button, Card, Chip, ErrorBox, Field, Loading, Notice, Row, Section, Segmented, T } from './ui';
 
 // ---- body metrics -------------------------------------------------------------------------------
 
@@ -57,14 +57,9 @@ export function BodyFields({
 }) {
   return (
     <View style={{ gap: space.md }}>
-      <View style={{ gap: space.xs }}>
-        <T v="label">Giới</T>
-        <Row>
-          <Radio label="Nữ" selected={d.sex === 'female'} onPress={() => set({ sex: 'female' })} />
-          <Radio label="Nam" selected={d.sex === 'male'} onPress={() => set({ sex: 'male' })} />
-        </Row>
+      <Segmented label="Giới" options={[['female', 'Nữ'], ['male', 'Nam']]} value={d.sex} onChange={(sex) => set({ sex })}>
         {errors.sex ? <T tone="danger" v="small">{errors.sex}</T> : null}
-      </View>
+      </Segmented>
       <Field
         label="Năm sinh"
         testID="body-birth-year"
@@ -107,26 +102,28 @@ export function BodyFields({
 export function ActivityGoalFields({ d, set }: { d: BodyDraft; set: (p: Partial<BodyDraft>) => void }) {
   return (
     <View style={{ gap: space.lg }}>
-      <View style={{ gap: space.xs }}>
-        <T v="label">Mức vận động</T>
-        <View style={{ gap: space.sm }}>
-          <Radio label="Nhẹ: ngồi nhiều, ít đi lại" selected={d.activity_level === 'light'} onPress={() => set({ activity_level: 'light' })} />
-          <Radio
-            label="Trung bình: đi lại, đứng nhiều"
-            selected={d.activity_level === 'moderate'}
-            onPress={() => set({ activity_level: 'moderate' })}
-          />
-          <Radio label="Nặng: lao động chân tay, tập nhiều" selected={d.activity_level === 'heavy'} onPress={() => set({ activity_level: 'heavy' })} />
-        </View>
-      </View>
-      <View style={{ gap: space.xs }}>
-        <T v="label">Mục tiêu</T>
-        <View style={{ gap: space.sm }}>
-          <Radio label="Giữ cân" selected={d.goal === 'maintain'} onPress={() => set({ goal: 'maintain' })} />
-          <Radio label="Giảm cân" selected={d.goal === 'lose'} onPress={() => set({ goal: 'lose' })} />
-          <Radio label="Do chuyên gia dinh dưỡng đặt" selected={d.goal === 'expert'} onPress={() => set({ goal: 'expert' })} />
-        </View>
-      </View>
+      <Segmented
+        label="Mức vận động"
+        column={space.sm}
+        options={[
+          ['light', 'Nhẹ: ngồi nhiều, ít đi lại'],
+          ['moderate', 'Trung bình: đi lại, đứng nhiều'],
+          ['heavy', 'Nặng: lao động chân tay, tập nhiều'],
+        ]}
+        value={d.activity_level}
+        onChange={(activity_level) => set({ activity_level })}
+      />
+      <Segmented
+        label="Mục tiêu"
+        column={space.sm}
+        options={[
+          ['maintain', 'Giữ cân'],
+          ['lose', 'Giảm cân'],
+          ['expert', 'Do chuyên gia dinh dưỡng đặt'],
+        ]}
+        value={d.goal}
+        onChange={(goal) => set({ goal })}
+      />
     </View>
   );
 }
@@ -294,12 +291,12 @@ export function AllergenDietFields({
       </Section>
       {showDiet ? (
         <Section title="Chế độ ăn">
-          <View style={{ gap: space.sm }}>
-            <Radio label="Không theo chế độ nào" selected={diet === null} onPress={() => onDiet(null)} />
-            {(ref.data?.diets ?? []).map((d) => (
-              <Radio key={d.code} label={d.name_vi} selected={diet === d.code} onPress={() => onDiet(d.code)} />
-            ))}
-          </View>
+          <Segmented
+            column={space.sm}
+            options={[[null, 'Không theo chế độ nào'], ...(ref.data?.diets ?? []).map((d) => [d.code, d.name_vi] as const)]}
+            value={diet}
+            onChange={onDiet}
+          />
         </Section>
       ) : null}
     </View>

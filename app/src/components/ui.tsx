@@ -224,25 +224,28 @@ export function Chip({
   );
 }
 
-export function Segmented<V extends string | number>({
+/** A labelled group of radios: a wrapping row, or a column with the given gap. */
+export function Segmented<V extends string | number | boolean | null>({
   options,
   value,
   onChange,
   label,
+  column,
+  children,
 }: {
-  options: { value: V; label: string }[];
-  value: V | null | undefined;
+  options: readonly (readonly [V, string])[];
+  value: V | undefined;
   onChange: (v: V) => void;
   label?: string;
+  column?: number;
+  children?: ReactNode;
 }) {
+  const radios = options.map(([v, l]) => <Radio key={String(v)} label={l} selected={value === v} onPress={() => onChange(v)} />);
   return (
     <View style={{ gap: space.xs }} accessibilityRole="radiogroup" accessibilityLabel={label}>
       {label ? <T v="label">{label}</T> : null}
-      <Row>
-        {options.map((o) => (
-          <Radio key={String(o.value)} label={o.label} selected={value === o.value} onPress={() => onChange(o.value)} />
-        ))}
-      </Row>
+      {column === undefined ? <Row>{radios}</Row> : <View style={{ gap: column }}>{radios}</View>}
+      {children}
     </View>
   );
 }

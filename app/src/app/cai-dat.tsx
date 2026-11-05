@@ -1,4 +1,4 @@
-import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueries, useQuery, useQueryClient, type UseMutationResult } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { Platform, Pressable, View } from 'react-native';
@@ -26,31 +26,14 @@ export default function Settings() {
   const { user, signOut } = useSession();
   const router = useRouter();
   const [open, setOpen] = useState<string | null>(null);
-  const toggle = (k: string) => setOpen(open === k ? null : k);
   return (
     <Screen testID="screen-settings">
       <T tone="muted">Đăng nhập bằng {user?.email}</T>
-      <Group k="profile" title="Hồ sơ và mục tiêu năng lượng" open={open} toggle={toggle}>
-        <ProfileSection />
-      </Group>
-      <Group k="allergen" title="Dị ứng và chế độ ăn" open={open} toggle={toggle}>
-        <AllergenSection />
-      </Group>
-      <Group k="favs" title="5 món hay ăn" open={open} toggle={toggle}>
-        <FavsSection />
-      </Group>
-      <Group k="kitchen" title="Bếp" open={open} toggle={toggle}>
-        <KitchenSection />
-      </Group>
-      <Group k="consent" title="Đồng ý sử dụng dữ liệu" open={open} toggle={toggle}>
-        <ConsentSection />
-      </Group>
-      <Group k="export" title="Tải dữ liệu của tôi" open={open} toggle={toggle}>
-        <ExportSection />
-      </Group>
-      <Group k="delete" title="Xoá tài khoản" open={open} toggle={toggle}>
-        <DeleteSection />
-      </Group>
+      {GROUPS.map(([k, title, Body]) => (
+        <Group key={k} k={k} title={title} open={open === k} toggle={() => setOpen(open === k ? null : k)}>
+          <Body />
+        </Group>
+      ))}
       <Button label="Làm khảo sát gu món ăn" kind="secondary" onPress={() => router.push('/khao-sat')} />
       <Button label="Đăng xuất" kind="secondary" testID="sign-out" onPress={() => signOut(false)} />
       <Button label="Đăng xuất mọi thiết bị" kind="ghost" onPress={() => signOut(true)} />
@@ -58,16 +41,15 @@ export default function Settings() {
   );
 }
 
-function Group({ k, title, open, toggle, children }: { k: string; title: string; open: string | null; toggle: (k: string) => void; children: ReactNode }) {
+function Group({ k, title, open: isOpen, toggle, children }: { k: string; title: string; open: boolean; toggle: () => void; children: ReactNode }) {
   const { c } = useTheme();
-  const isOpen = open === k;
   return (
     <Card style={{ padding: 0, gap: 0 }}>
       <Pressable
         accessibilityRole="button"
         accessibilityState={{ expanded: isOpen }}
         testID={`settings-${k}`}
-        onPress={() => toggle(k)}
+        onPress={toggle}
         style={{ minHeight: TOUCH + 8, paddingHorizontal: space.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <T v="title">{title}</T>
         <T v="title" style={{ color: c.accent }}>
@@ -170,9 +152,7 @@ function AllergenSection() {
   return (
     <View style={{ gap: space.md }}>
       <AllergenDietFields allergens={a} none={none} diet={diet} onAllergens={setA} onNone={setNone} onDiet={setDiet} />
-      {save.error ? <ErrorBox message={errorText(save.error)} /> : null}
-      {save.isSuccess ? <T tone="muted">Đã lưu.</T> : null}
-      <Button label="Lưu" onPress={() => save.mutate()} loading={save.isPending} disabled={!none && !a.length} />
+      <SaveButton m={save} disabled={!none && !a.length} />
     </View>
   );
 }
@@ -190,9 +170,7 @@ function FavsSection() {
   return (
     <View style={{ gap: space.md }}>
       <FavoritesPicker selected={ids} onChange={setIds} />
-      {save.error ? <ErrorBox message={errorText(save.error)} /> : null}
-      {save.isSuccess ? <T tone="muted">Đã lưu.</T> : null}
-      <Button label="Lưu" onPress={() => save.mutate()} loading={save.isPending} />
+      <SaveButton m={save} />
     </View>
   );
 }
@@ -215,10 +193,19 @@ function KitchenSection() {
       <T v="small" tone="muted">
         Múi giờ: {s.timezone}
       </T>
-      {save.error ? <ErrorBox message={errorText(save.error)} /> : null}
-      {save.isSuccess ? <T tone="muted">Đã lưu.</T> : null}
-      <Button label="Lưu" onPress={() => save.mutate()} loading={save.isPending} />
+      <SaveButton m={save} />
     </View>
+  );
+}
+
+/** Error, "Đã lưu." and the Lưu button under an editable settings section. */
+function SaveButton({ m, disabled }: { m: UseMutationResult<unknown, Error, void>; disabled?: boolean }) {
+  return (
+    <>
+      {m.error ? <ErrorBox message={errorText(m.error)} /> : null}
+      {m.isSuccess ? <T tone="muted">Đã lưu.</T> : null}
+      <Button label="Lưu" onPress={() => m.mutate()} loading={m.isPending} disabled={disabled} />
+    </>
   );
 }
 
@@ -355,3 +342,13 @@ function DeleteSection() {
     </View>
   );
 }
+
+const GROUPS: [string, string, () => ReactNode][] = [
+  ['profile', 'Hồ sơ và mục tiêu năng lượng', ProfileSection],
+  ['allergen', 'Dị ứng và chế độ ăn', AllergenSection],
+  ['favs', '5 món hay ăn', FavsSection],
+  ['kitchen', 'Bếp', KitchenSection],
+  ['consent', 'Đồng ý sử dụng dữ liệu', ConsentSection],
+  ['export', 'Tải dữ liệu của tôi', ExportSection],
+  ['delete', 'Xoá tài khoản', DeleteSection],
+];

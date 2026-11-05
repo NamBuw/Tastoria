@@ -8,7 +8,7 @@ import { api, call, isCode, type Schemas } from '@/api/client';
 import { goTab } from '@/lib/nav';
 import { errorText } from '@/api/errors';
 import { Icon } from '@/components/domain';
-import { Button, Checkbox, ErrorBox, Notice, Radio, Row, Screen, T } from '@/components/ui';
+import { Button, Checkbox, ErrorBox, Notice, Row, Screen, Segmented, T } from '@/components/ui';
 import { useIdempotencyKey } from '@/lib/idempotency';
 import { imagePart, prepareImage, type PreparedImage } from '@/lib/image';
 import { useHasConsent } from '@/lib/queries';
@@ -101,10 +101,7 @@ export default function Scan() {
     <Screen
       testID="screen-scan"
       footer={<Button label="Gửi ảnh để nhận diện" testID="scan-send" onPress={send} loading={busy} disabled={!images.length} />}>
-      <Row>
-        <Radio label="Toàn tủ lạnh" selected={mode === 'fridge'} onPress={() => setMode('fridge')} />
-        <Radio label="Đồ vừa mua" selected={mode === 'haul'} onPress={() => setMode('haul')} />
-      </Row>
+      <Segmented options={[['fridge', 'Toàn tủ lạnh'], ['haul', 'Đồ vừa mua']]} value={mode} onChange={setMode} />
       <T tone="muted">
         {mode === 'fridge'
           ? 'Mở cửa tủ, chụp thẳng từng ngăn, đủ sáng. Tối đa 2 ảnh.'
