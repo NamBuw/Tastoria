@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, Ellipse, G, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import type { Schemas } from '@/api/client';
-import { font, radius, space, useTheme, type Palette } from '@/theme';
+import { font, space, useTheme, type Palette } from '@/theme';
 
 import { T } from './ui';
 
@@ -328,5 +328,4 @@ const styles = StyleSheet.create({
   dot: { width: 10, height: 10, borderRadius: 5 },
   hit: { position: 'absolute', alignItems: 'center', justifyContent: 'flex-end' },
   tag: { position: 'absolute', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 999, alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.25)' },
-  pill: { borderRadius: radius.pill },
 });

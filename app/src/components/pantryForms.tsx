@@ -9,7 +9,7 @@ import { space } from '@/theme';
 
 import { Chip, ErrorBox, Field, Loading, Radio, Row, Stepper, T } from './ui';
 
-export const UNIT_LABEL: Record<string, string> = {
+const UNIT_LABEL: Record<string, string> = {
   qua: 'quả',
   bo: 'bó',
   cu: 'củ',

@@ -7,12 +7,12 @@ import { loadRefresh, saveRefresh } from '@/auth/tokenStore';
 import type { components, paths } from './schema';
 
 export type Schemas = components['schemas'];
-export type Problem = Schemas['Problem'] & Record<string, unknown>;
+type Problem = Schemas['Problem'] & Record<string, unknown>;
 export type AuthSession = Schemas['AuthSession'];
 
 /** Base URL of the API (`/api/v1` on the same origin when the web app is served by nginx). */
 export const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? (Platform.OS === 'web' ? '/api/v1' : '')).replace(/\/$/, '');
-export const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
+const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
 
 // ---- tokens -------------------------------------------------------------------------------------
 

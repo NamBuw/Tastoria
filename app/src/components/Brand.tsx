@@ -1,10 +1,10 @@
 import { Image } from 'expo-image';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { radius, space, useTheme } from '@/theme';
 
-import { LinkButton, T } from './ui';
+import { T } from './ui';
 
 export const SLOGAN = 'Taste and write your story';
 
@@ -53,8 +53,3 @@ export function FoodStory({ compact = false }: { compact?: boolean }) {
   );
 }
 
-/** Leave the app entirely so the public website never starts an auth redirect. */
-export function PublicHomeLink() {
-  if (Platform.OS !== 'web') return null;
-  return <LinkButton label="← Về trang giới thiệu Tastoria" onPress={() => window.location.assign('/')} />;
-}

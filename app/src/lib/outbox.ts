@@ -58,10 +58,6 @@ function notify() {
   listeners.forEach((fn) => fn());
 }
 
-export async function pendingCount(): Promise<number> {
-  return (await read()).length;
-}
-
 /** Queue "nấu xong" once per session; a second tap reuses the queued entry and its key. */
 export async function enqueueComplete(sessionId: string, body: Schemas['CookCompleteRequest']): Promise<void> {
   const entries = await read();

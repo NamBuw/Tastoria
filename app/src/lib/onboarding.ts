@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * Onboarding progress per user (FR-09-12: reopen at the first step the server has not confirmed).
  * Only steps that got a 2xx are recorded here.
  */
-export type OnboardingProgress = { consent: boolean; step: number; done: boolean };
+type OnboardingProgress = { consent: boolean; step: number; done: boolean };
 
 const key = (userId: string) => `tastoria.onboarding.${userId}`;
 

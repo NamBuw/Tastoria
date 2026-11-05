@@ -31,7 +31,6 @@ export type Palette = {
   shadow: string;
   fresh: { tuoi: string; dung_som: string; dung_ngay: string; kiem_tra: string; chua_ro: string };
   freshSoft: { tuoi: string; dung_som: string; dung_ngay: string; kiem_tra: string; chua_ro: string };
-  focus: string;
   overlay: string;
 };
 
@@ -61,7 +60,6 @@ export const light: Palette = {
   shadow: 'rgba(40,30,20,0.10)',
   fresh: { tuoi: '#2D6A3E', dung_som: '#8A5A00', dung_ngay: '#B3261E', kiem_tra: '#5E6660', chua_ro: '#5E6660' },
   freshSoft: { tuoi: '#DCEBDD', dung_som: '#F7EACB', dung_ngay: '#F8DCD7', kiem_tra: '#EFE7D8', chua_ro: '#EFE7D8' },
-  focus: '#1D5FA8',
   overlay: 'rgba(20,24,20,0.5)',
 };
 
@@ -91,7 +89,6 @@ export const dark: Palette = {
   shadow: 'rgba(0,0,0,0.35)',
   fresh: { tuoi: '#7CC68C', dung_som: '#E3B14E', dung_ngay: '#F2948A', kiem_tra: '#C7BBAA', chua_ro: '#C7BBAA' },
   freshSoft: { tuoi: '#21382A', dung_som: '#3E3218', dung_ngay: '#4A2522', kiem_tra: '#342D24', chua_ro: '#342D24' },
-  focus: '#8AB8F0',
   overlay: 'rgba(0,0,0,0.65)',
 };
 
@@ -109,4 +106,4 @@ export const font = {
 } as const;
 
 /** Modular scale ≈ 1.2 from 15. */
-export const size = { xs: 13, sm: 15, md: 17, lg: 20, xl: 25, xxl: 30, huge: 36 } as const;
+export const size = { xs: 13, sm: 15, md: 17, lg: 20, xl: 25, huge: 36 } as const;
