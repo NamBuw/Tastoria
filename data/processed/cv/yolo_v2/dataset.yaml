@@ -1,0 +1,35 @@
+path: /home/namnx/NamBuw/Tastoria/data/processed/cv/yolo_v2
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: thit_bo
+  1: ca
+  2: tom
+  3: trung
+  4: dau_phu
+  5: ca_chua
+  6: ca_rot
+  7: khoai_tay
+  8: bap_cai
+  9: sup_lo
+  10: bi_do
+  11: bi_dao
+  12: muop_dang
+  13: dau_que
+  14: nam
+  15: mi_tom
+  16: xuc_xich
+  17: do_hop
+  18: sua
+  19: sua_chua
+  20: hanh_la
+  21: toi
+  22: ot
+  23: chanh
+  24: bim_bim
+  25: banh_ngot
+  26: banh_quy
+  27: keo
+  28: nuoc_ngot
+  29: banh_mi

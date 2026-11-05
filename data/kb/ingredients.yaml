@@ -5357,3 +5357,177 @@ ingredients:
     days: null
     basis: not_tracked
     note: Lọ đã lên men, không tính độ gấp.
+- name_vi: mì tôm
+  food_group: ngu_coc
+  comp_source:
+    source: null
+    reason: FCT 2007 không có mì ăn liền; chưa chọn mục USDA.
+  is_staple: false
+  countable: true
+  units: 
+  - unit_code: goi
+    grams_per_unit: 75
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: 
+    - mì gói
+    - mì ăn liền
+    en: 
+    - instant noodles
+    - ramen noodles
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô đóng gói để tủ bếp; không tính độ gấp.
+- name_vi: cá hộp
+  food_group: ca
+  comp_source:
+    source: fct2007
+    code: '11015'
+    source_name: Cá thu hộp
+    match: close
+  is_staple: false
+  countable: true
+  units: 
+  - unit_code: hop
+    grams_per_unit: 155
+    source: uoc_luong_nhom
+  allergens: [ca]
+  synonyms:
+    vi: 
+    - cá mòi hộp
+    - cá thu hộp
+    en: 
+    - canned fish
+    - canned sardines
+    - canned mackerel
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Hộp kín để tủ bếp; mở rồi mới cho ngăn mát.
+- name_vi: bim bim
+  food_group: do_an_vat
+  comp_source:
+    source: null
+    reason: Đồ ăn vặt, không ghép mâm; không cần thành phần cho composer.
+  is_staple: false
+  countable: true
+  units: 
+  - unit_code: goi
+    grams_per_unit: 40
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: 
+    - snack
+    - khoai tây chiên gói
+    en: 
+    - potato chips
+    - crisps
+    - snack chips
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ ăn vặt đóng gói; không tính độ gấp.
+- name_vi: bánh ngọt
+  food_group: do_an_vat
+  comp_source:
+    source: null
+    reason: Đồ ăn vặt, không ghép mâm; không cần thành phần cho composer.
+  is_staple: false
+  countable: true
+  units: 
+  - unit_code: mieng
+    grams_per_unit: 60
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: 
+    - bánh kem
+    - bánh bông lan
+    - bánh su
+    en: 
+    - cake
+    - pastry
+    - cupcake
+    - doughnut
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ ăn vặt; không tính độ gấp (bánh kem để ngăn mát vài ngày).
+- name_vi: bánh quy
+  food_group: do_an_vat
+  comp_source:
+    source: null
+    reason: Đồ ăn vặt, không ghép mâm; không cần thành phần cho composer.
+  is_staple: false
+  countable: true
+  units: 
+  - unit_code: goi
+    grams_per_unit: 150
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: 
+    - bánh quy giòn
+    en: 
+    - cookies
+    - biscuits
+    - crackers
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô đóng gói; không tính độ gấp.
+- name_vi: kẹo
+  food_group: do_an_vat
+  comp_source:
+    source: fct2007
+    code: '12023'
+    source_name: Kẹo sữa
+    match: proxy
+  is_staple: false
+  countable: true
+  units: 
+  - unit_code: goi
+    grams_per_unit: 100
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: 
+    - kẹo sô cô la
+    - sô cô la
+    en: 
+    - candy
+    - sweets
+    - chocolate bar
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ khô; không tính độ gấp.
+- name_vi: nước ngọt
+  food_group: do_an_vat
+  comp_source:
+    source: fct2007
+    code: '14004'
+    source_name: Coca cola
+    match: close
+  is_staple: false
+  countable: true
+  units: 
+  - unit_code: hop
+    grams_per_unit: 330
+    source: uoc_luong_nhom
+  allergens: []
+  synonyms:
+    vi: 
+    - nước có ga
+    - lon nước ngọt
+    en: 
+    - soda
+    - soft drink
+    - pop
+  shelf_life:
+    days: null
+    basis: not_tracked
+    note: Đồ uống đóng chai/lon; không tính độ gấp.

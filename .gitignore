@@ -38,3 +38,9 @@ ml/mlruns/
 __pycache__/
 dist/
 data/processed/foodcom/
+
+# Large binaries never go into git (models: deploy/models/ and ml/runs/; caches: *.npy; builds: dist/, *.apk)
+*.npy
+*.apk
+*.aab
+/weights/

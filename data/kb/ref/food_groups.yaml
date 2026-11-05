@@ -24,3 +24,6 @@ food_groups:
   - {code: dau_mo, name_vi: "Dầu thực vật", animal_origin: false, fct2007_groups: [6]}
   - {code: gia_vi, name_vi: "Gia vị khô, nước chấm và chất tạo ngọt nguồn thực vật hoặc khoáng", animal_origin: false, fct2007_groups: [12, 13, 14]}
   - {code: gia_vi_dong_vat, name_vi: "Gia vị, nước chấm nguồn động vật (nước mắm, mắm tôm, mắm tép, dầu hào, hạt nêm thường)", animal_origin: true, fct2007_groups: [13]}
+  # Đồ ăn vặt / đồ đóng gói không dùng nấu mâm cơm. Bộ phát hiện vẫn nhận ra (hiện trong kho),
+  # nhưng backend và bộ ghép mâm (composer) PHẢI loại nhóm này khỏi gợi ý món (meal_ingredient: false).
+  - {code: do_an_vat, name_vi: "Đồ ăn vặt, bánh kẹo, nước ngọt (không dùng ghép mâm)", animal_origin: false, fct2007_groups: [12, 14]}

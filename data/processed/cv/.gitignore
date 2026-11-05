@@ -1,5 +1,5 @@
 # Large binary outputs stay out of git (the repo .gitignore only covers data/raw/ and ml/runs/).
-# Committed here: manifest.csv, dataset_stats.json, yolo/dataset.yaml, detector/*.json, freshness/*.json.
+# Committed here: manifest{,_v2}.csv, dataset_stats{,_v2}.json, yolo{,_v2}/dataset*.yaml, yolo_v2/heldout/*.txt, detector/*.json, freshness/*.json.
 yolo/images/
 yolo/labels/
 yolo/**/*.cache
@@ -7,3 +7,6 @@ ablation/
 *.npy
 *.onnx
 *.pt
+yolo_v2/images/
+yolo_v2/labels/
+yolo_v2/**/*.cache

@@ -25,3 +25,4 @@ qty_levels:
   dau_mo:         {it: [50, 200], vua: [200, 500], nhieu: [500, 1000]}
   gia_vi:         {it: [20, 100], vua: [100, 300], nhieu: [300, 800]}
   gia_vi_dong_vat: {it: [20, 100], vua: [100, 300], nhieu: [300, 800]}
+  do_an_vat:      {it: [50, 200], vua: [200, 500], nhieu: [500, 1500]}

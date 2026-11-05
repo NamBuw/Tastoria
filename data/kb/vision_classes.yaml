@@ -1,5 +1,9 @@
 # Bảng lớp thị giác của bộ phát hiện nguyên liệu Tastoria (thiết kế v2 §7, review:cv#4).
 #
+# Hiện trạng (05/11/2026): 22 lớp `classes` + 15 lớp `proposed_classes` = 37 dòng của bảng vision_classes.
+# Mô hình đang chạy (deploy/models/detector, yolo26n_640_none, bộ v1) chỉ nhận 13 lớp: ca, tom, trung, ca_chua,
+# ca_rot, khoai_tay, bap_cai, sup_lo, bi_do, bi_dao, muop_dang, dau_que, nam. Bộ yolo_v2 có khung cho 30/37 lớp.
+#
 # Tiêu chí chọn lớp (thiết kế v2 §7):
 #   (a) là nguyên liệu chính (trường `main`) của món mặn / rau / canh trong data/kb/dish_list.yaml;
 #       gia vị và rau thơm bị loại;
@@ -10,7 +14,9 @@
 #   Mục tiêu dữ liệu: mỗi lớp ≥ 300 vật thể train, ≥ 30–50 vật thể test (ảnh tủ lạnh của nhóm).
 #
 # Trường của mỗi lớp:
-#   id                  mã lớp (ASCII, cố định; thứ tự trong danh sách = chỉ số lớp YOLO).
+#   id                  mã lớp (ASCII, cố định). Thứ tự trong tệp KHÔNG phải chỉ số lớp YOLO: chỉ số của một bộ dữ
+#                       liệu là vị trí trong `names` của dataset.yaml (chỉ gồm lớp có khung), còn chỉ số của một mô
+#                       hình đã triển khai nằm ở model_version_classes (CSDL), đọc từ metadata `names` của ONNX.
 #   name_vi, name_en    tên hiển thị trên chip.
 #   ingredients         tên name_vi trong data/kb/ingredients.yaml (nhiều–nhiều: một lớp ứng với nhiều
 #                       nguyên liệu, người dùng chọn loại cụ thể trên chip; một nguyên liệu có thể nằm ở
@@ -31,6 +37,10 @@
 #
 # Nguồn dữ liệu công khai (chi tiết giấy phép ở data/raw/images/<nguồn>/SOURCE.md):
 #   openimages_v7       Open Images V7, tập boxable (nhãn CC BY 4.0, ảnh CC BY 2.0 theo từng ảnh).
+#   lvis_v1             LVIS v1 (Gupta et al. 2019), nhãn CC BY 4.0, ảnh COCO 2017 (Flickr, giấy phép từng ảnh,
+#                       nhiều ảnh CC BY-NC*). Nhãn federated: chỉ dùng cho yolo_v2 (build_yolo_v2.py).
+#   omorros_kitchen     Morros 2026, Kitchen Fruit & Vegetable Detection (HF, CC BY 4.0), 120 ảnh bếp; chỉ dùng held-out.
+#   rpc_checkout        RPC (Wei et al. 2019), CC BY-NC-SA 4.0; chỉ dùng cho proposed_classes (đồ đóng gói).
 #   mendeley_bd         Jahan et al. 2025, Vegetable Object Detection Dataset from Bangladesh, Mendeley
 #                       gnc4s3z2mf v3 (CC BY 4.0). 3.534 khung hình cắt từ 10 video quầy rau.
 # Bộ Roboflow (cần API key, xem docs/reports/xu-ly-anh/ket-qua-so-bo.md): viet_hoang (Viet Hoang Food
@@ -64,7 +74,8 @@ classes:
   instance_note: Như thit_lon.
   has_freshness_model: false
   fridge: ngăn mát
-  public_data: {}
+  public_data:
+    lvis_v1: [beef_(food)]
   pending_public: [aicook (beef), viet_hoang]
   fallback_parent: thit_dong_goi
   reason: Món xào/mặn phổ biến. Màu đỏ sẫm khác thịt lợn nhưng trong túi có thể lẫn; nếu κ thấp thì gộp nhãn cha.
@@ -95,6 +106,7 @@ classes:
   fridge: ngăn mát hoặc ngăn đá (cá mua về nấu trong 1–2 ngày để ngăn mát)
   public_data:
     openimages_v7: [Fish]
+    lvis_v1: [fish_(food)]
   pending_public: [viet_hoang (fish)]
   fallback_parent: null
   reason: 14 món mặn/canh. Lớp Fish của Open Images chủ yếu là cá sống dưới nước hoặc cá cảnh, lệch miền rất xa
@@ -126,6 +138,7 @@ classes:
   fridge: ngăn mát (cửa tủ)
   public_data:
     openimages_v7: [Egg]
+    lvis_v1: [egg]
   pending_public: [aicook (eggs), viet_hoang (egg)]
   fallback_parent: null
   reason: Món mặn hằng ngày, đếm được, dễ tách. Lớp Egg của Open Images có cả trứng Phục sinh tô màu và trứng đã
@@ -140,7 +153,8 @@ classes:
   instance_note: Từng bìa đậu; hộp đậu non một hộp là một khung.
   has_freshness_model: false
   fridge: ngăn mát
-  public_data: {}
+  public_data:
+    lvis_v1: [bean_curd]
   pending_public: [smartpantry (tofu), phcs (tofu)]
   fallback_parent: null
   reason: 16 món (thứ ba theo tần suất). Open Images không có; LVIS có bean_curd nhưng LVIS cần tải ảnh COCO 20 GB.
@@ -157,6 +171,8 @@ classes:
   public_data:
     openimages_v7: [Tomato]
     mendeley_bd: [Tomato]
+    lvis_v1: [tomato]
+    omorros_kitchen: [tomato]
   pending_public: []
   fallback_parent: null
   reason: 20 món, thời hạn ngắn (5 ngày), có dữ liệu độ tươi AgriFreshNET.
@@ -173,6 +189,8 @@ classes:
   public_data:
     openimages_v7: [Carrot]
     mendeley_bd: [Carrots]
+    lvis_v1: [carrot]
+    omorros_kitchen: [carrot]
   pending_public: []
   fallback_parent: null
   reason: Nhiều món nhất (23). Thời hạn dài (21 ngày) nên không làm mô hình độ tươi.
@@ -189,6 +207,8 @@ classes:
   public_data:
     openimages_v7: [Potato]
     mendeley_bd: [Potato]
+    lvis_v1: [potato]
+    omorros_kitchen: [potato]
   pending_public: []
   fallback_parent: null
   reason: 4 món canh/rau, dễ tách, nhiều dữ liệu công khai. Giữ có điều kiện vì (b) không chắc.
@@ -221,6 +241,7 @@ classes:
   public_data:
     openimages_v7: [Broccoli]
     mendeley_bd: [Cauliflower]
+    lvis_v1: [cauliflower, broccoli]
   pending_public: []
   fallback_parent: null
   reason: 4 món rau. Gộp xanh và trắng thành một lớp, người dùng chọn trên chip; vàng nhanh (5 ngày).
@@ -237,6 +258,7 @@ classes:
   public_data:
     openimages_v7: [Pumpkin]
     mendeley_bd: [Pumpkin]
+    lvis_v1: [pumpkin]
   pending_public: []
   fallback_parent: null
   reason: 3 món canh/rau. Open Images Pumpkin phần lớn là bí Halloween khắc mặt, lệch miền.
@@ -313,6 +335,7 @@ classes:
   fridge: ngăn mát
   public_data:
     mendeley_bd: [Green Beans]
+    lvis_v1: [green_bean]
   pending_public: []
   fallback_parent: null
   reason: 3 món rau (đậu que, đậu đũa); bộ Bangladesh có 7.468 khung. Thời hạn 5 ngày.
@@ -370,9 +393,217 @@ classes:
   fridge: ngăn mát
   public_data:
     openimages_v7: [Mushroom]
+    lvis_v1: [mushroom]
   pending_public: [aicook (mushrooms)]
   fallback_parent: null
   reason: 14 món ở cả ba slot. Open Images Mushroom có nhiều nấm mọc ngoài rừng.
+# Lớp ĐỀ XUẤT (30/10/2026), tách khỏi `classes` vì không qua tiêu chí (a)–(c) của phân tích (đồ đóng gói, gia vị,
+# đồ ăn vặt) và để bộ v1 / mô hình đang chạy giữ nguyên. `tastoria catalog import` nạp CẢ `classes` và
+# `proposed_classes` vào bảng vision_classes (37 dòng); bộ yolo_v2 (ml/src/tastoria_ml/cv/build_yolo_v2.py) dùng cả
+# hai. meal_ingredient: false = không vào mâm. Với đồ ăn vặt điều đó do nhóm thực phẩm do_an_vat bảo đảm (backend
+# luôn loại nhóm này: catalog.NON_MEAL_FOOD_GROUPS); bánh mì thuộc nhóm ngu_coc nên chỉ được bảo đảm vì không món
+# nào dùng nó (ml/tests/cv/test_classes.py kiểm cả hai điều).
+proposed_classes:
+- id: mi_tom
+  name_vi: mì tôm
+  name_en: instant noodles (pack/cup)
+  ingredients: [mì tôm]
+  dish_main_count: 0
+  countable: true
+  instance_def: item
+  instance_note: "Một gói hoặc một cốc mì."
+  has_freshness_model: false
+  meal_ingredient: true
+  public_data:
+    rpc_checkout: [instant_noodles]
+  reason: "Đồ khô hay có trong bếp/tủ; RPC là ảnh quầy thanh toán chụp từ trên xuống, nền trắng — lệch miền xa ảnh tủ lạnh."
+- id: xuc_xich
+  name_vi: xúc xích
+  name_en: sausage
+  ingredients: [xúc xích]
+  dish_main_count: 0
+  countable: false
+  instance_def: group_of
+  instance_note: "Một gói/vỉ hoặc một nhóm cây xúc xích; ≤ 5 cây rời thì gán từng cây."
+  has_freshness_model: false
+  meal_ingredient: true
+  public_data:
+    lvis_v1: [sausage]
+  reason: "LVIS sausage phần lớn là xúc xích đã nấu trên đĩa/bánh."
+- id: do_hop
+  name_vi: đồ hộp (cá hộp)
+  name_en: canned food
+  ingredients: [cá hộp]
+  dish_main_count: 0
+  countable: true
+  instance_def: item
+  instance_note: "Một hộp/lon kín."
+  has_freshness_model: false
+  meal_ingredient: true
+  public_data:
+    rpc_checkout: [canned_food]
+  reason: "RPC canned_food gồm nhiều loại đồ hộp (không chỉ cá); LVIS can bị bỏ vì lẫn lon nước/sơn."
+- id: sua
+  name_vi: sữa (hộp/chai)
+  name_en: milk carton/bottle
+  ingredients: [sữa tươi]
+  dish_main_count: 0
+  countable: true
+  instance_def: item
+  instance_note: "Một hộp/chai/lốc là một vật."
+  has_freshness_model: false
+  meal_ingredient: true
+  public_data:
+    rpc_checkout: [milk]
+  reason: "LVIS milk bị bỏ: chủ yếu là sữa rót trong cốc."
+- id: sua_chua
+  name_vi: sữa chua
+  name_en: yogurt
+  ingredients: [sữa chua]
+  dish_main_count: 0
+  countable: true
+  instance_def: item
+  instance_note: "Một hũ/cốc."
+  has_freshness_model: false
+  meal_ingredient: true
+  public_data:
+    lvis_v1: [yogurt]
+  reason: "Rất ít dữ liệu (LVIS 52 ảnh)."
+- id: hanh_la
+  name_vi: hành lá
+  name_en: spring onion
+  ingredients: [hành lá]
+  dish_main_count: 0
+  countable: false
+  instance_def: group_of
+  instance_note: "Một bó/nắm."
+  has_freshness_model: false
+  meal_ingredient: true
+  public_data:
+    lvis_v1: [green_onion]
+  reason: "Trước bị loại theo (a) (rau thơm); thêm theo yêu cầu người dùng để kho ghi nhận. LVIS chủ yếu là hành thái rắc trên món."
+- id: toi
+  name_vi: tỏi
+  name_en: garlic
+  ingredients: [tỏi]
+  dish_main_count: 0
+  countable: false
+  instance_def: group_of
+  instance_note: "Một củ hoặc một túi; tép rời ≤ 5 gán từng tép."
+  has_freshness_model: false
+  meal_ingredient: true
+  public_data:
+    lvis_v1: [garlic]
+  reason: "Gia vị tươi."
+- id: ot
+  name_vi: ớt
+  name_en: chili pepper
+  ingredients: [ớt]
+  dish_main_count: 0
+  countable: false
+  instance_def: group_of
+  instance_note: "Một chùm/túi; quả rời ≤ 5 gán từng quả."
+  has_freshness_model: false
+  meal_ingredient: true
+  public_data:
+    lvis_v1: [chili_(vegetable)]
+  reason: "Rất ít dữ liệu (LVIS 18 ảnh)."
+- id: chanh
+  name_vi: chanh
+  name_en: lime/lemon
+  ingredients: [chanh]
+  dish_main_count: 0
+  countable: true
+  instance_def: item
+  instance_note: "Từng quả."
+  has_freshness_model: false
+  meal_ingredient: true
+  public_data:
+    lvis_v1: [lime, lemon]
+    omorros_kitchen: [lemon]
+  reason: "Gộp lime và lemon (ở VN đều gọi chanh)."
+- id: bim_bim
+  name_vi: bim bim
+  name_en: snack bag / potato chips
+  ingredients: [bim bim]
+  dish_main_count: 0
+  countable: true
+  instance_def: item
+  instance_note: "Một gói."
+  has_freshness_model: false
+  meal_ingredient: false
+  public_data:
+    lvis_v1: [crisp_(potato_chip)]
+    rpc_checkout: [puffed_food]
+  reason: "Đồ ăn vặt. LVIS là lát khoai rời; RPC là gói snack."
+- id: banh_ngot
+  name_vi: bánh ngọt
+  name_en: cake/pastry
+  ingredients: [bánh ngọt]
+  dish_main_count: 0
+  countable: false
+  instance_def: group_of
+  instance_note: "Một chiếc bánh/hộp bánh; bánh nhỏ rời ≤ 5 gán từng chiếc."
+  has_freshness_model: false
+  meal_ingredient: false
+  public_data:
+    lvis_v1: [cake, cupcake, birthday_cake, wedding_cake, pastry, muffin, doughnut, brownie]
+  reason: "Đồ ăn vặt."
+- id: banh_quy
+  name_vi: bánh quy
+  name_en: cookies/crackers
+  ingredients: [bánh quy]
+  dish_main_count: 0
+  countable: false
+  instance_def: group_of
+  instance_note: "Một gói/hộp; chiếc rời ≤ 5 gán từng chiếc."
+  has_freshness_model: false
+  meal_ingredient: false
+  public_data:
+    lvis_v1: [cookie, cracker]
+  reason: "Đồ ăn vặt."
+- id: keo
+  name_vi: kẹo
+  name_en: candy/chocolate
+  ingredients: [kẹo]
+  dish_main_count: 0
+  countable: false
+  instance_def: package
+  instance_note: "Một gói/thanh/hộp."
+  has_freshness_model: false
+  meal_ingredient: false
+  public_data:
+    lvis_v1: [lollipop, chocolate_bar, candy_bar]
+    rpc_checkout: [candy, chocolate, gum]
+  reason: "Đồ ăn vặt."
+- id: nuoc_ngot
+  name_vi: nước ngọt
+  name_en: soft drink can/bottle
+  ingredients: [nước ngọt]
+  dish_main_count: 0
+  countable: true
+  instance_def: item
+  instance_note: "Một lon/chai."
+  has_freshness_model: false
+  meal_ingredient: false
+  public_data:
+    lvis_v1: [pop_(soda)]
+    rpc_checkout: [drink]
+  reason: "Đồ ăn vặt/đồ uống. RPC drink gồm cả trà, nước trái cây đóng chai."
+- id: banh_mi
+  name_vi: bánh mì
+  name_en: bread
+  ingredients: [bánh mì]
+  dish_main_count: 0
+  countable: false
+  instance_def: group_of
+  instance_note: "Một ổ/túi bánh."
+  has_freshness_model: false
+  meal_ingredient: false
+  public_data:
+    lvis_v1: [bread, bun, bagel]
+  reason: "Theo yêu cầu người dùng xếp vào đồ ăn vặt (meal_ingredient false) dù ingredient bánh mì thuộc nhóm ngu_coc;
+    không món nào dùng bánh mì nên bộ ghép mâm không bao giờ chọn nó."
 # Ứng viên đã cân nhắc nhưng chưa đưa vào (có thể thêm khi đủ ảnh tự chụp).
 rejected:
 - {name_vi: mực, reason: "3 món; thường để ngăn đá, vi phạm điều kiện (b)."}
