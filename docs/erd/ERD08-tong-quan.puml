@@ -1,5 +1,5 @@
 @startuml
-title ERD08 — Tổng quan 62 bảng và mọi khoá ngoại (chi tiết cột ở ERD01–ERD07)
+title ERD08 — Tổng quan 63 bảng và mọi khoá ngoại (chi tiết cột ở ERD01–ERD07)
 hide circle
 hide empty members
 left to right direction
@@ -43,6 +43,7 @@ package "catalog" {
   entity "recipe_tags" as recipe_tags
   entity "recipe_sources" as recipe_sources
   entity "recipe_nutrition" as recipe_nutrition
+  entity "recipe_make_ahead" as recipe_make_ahead
 }
 package "profile" {
   entity "profiles" as profiles
@@ -190,5 +191,8 @@ recipes ||--o{ survey_assignments : recipe_id
 survey_assignments ||--o| survey_ratings : respondent_id, recipe_id (cascade)
 survey_respondents ||--o{ survey_favorites : respondent_id (cascade)
 recipes ||--o{ survey_favorites : recipe_id
+recipes ||--o| recipe_make_ahead : recipe_id
+recipe_steps ||--o| recipe_make_ahead : recipe_id, through_step_no
+ingredients ||--o{ recipe_make_ahead : item_ingredient_id
 
 @enduml

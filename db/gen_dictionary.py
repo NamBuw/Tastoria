@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Sinh từ điển dữ liệu docs/sad/05-tu-dien-du-lieu.md từ catalog của một CSDL PostgreSQL đang chạy.
 
-CSDL phải đã áp db/schema.sql. Script đọc catalog qua `docker exec <container> psql -At`, nhóm bảng
+CSDL phải đã chạy `tastoria db upgrade` (db/schema.sql + mọi migration), rồi DROP TABLE alembic_version. Script đọc catalog qua `docker exec <container> psql -At`, nhóm bảng
 theo module trong docs/sad/model.yaml, và ghi mỗi bảng một mục: mô tả (COMMENT ON TABLE) rồi bảng
 Cột | Kiểu | NULL | Mặc định | Ràng buộc | Phân loại | Ý nghĩa, kèm ràng buộc nhiều cột (có chú thích), chỉ mục,
 trigger, thời hạn lưu/xoá, quy mô ước lượng và luật chỉ kiểm ở service. Phân loại dữ liệu, thời hạn lưu và luật
@@ -166,8 +166,9 @@ def main() -> None:
     w = out.append
     ncol = sum(len(by_rel[t["name"]]) for t in tables)
     w("# Từ điển dữ liệu Tastoria\n")
-    w("> Tệp sinh tự động bởi `db/gen_dictionary.py` từ catalog PostgreSQL sau khi áp `db/schema.sql`. "
-      "Không sửa tay: sửa `COMMENT ON` hoặc DDL trong `db/schema.sql`, hoặc phân loại, thời hạn lưu, "
+    w("> Tệp sinh tự động bởi `db/gen_dictionary.py` từ catalog PostgreSQL sau khi chạy "
+      "`tastoria db upgrade` (`db/schema.sql` + migration 0002, 0003; bỏ bảng `alembic_version` trước khi chạy). "
+      "Không sửa tay: sửa `COMMENT ON` hoặc DDL trong `db/schema.sql` hoặc migration, hoặc phân loại, thời hạn lưu, "
       "luật service trong `db/dictionary_meta.py`, rồi chạy lại script.\n")
     w(f"- Máy chủ: PostgreSQL {server}; extension: "
       + ", ".join(f"{e} {v}" for e, v in exts) + ".")

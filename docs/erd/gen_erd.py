@@ -1,4 +1,4 @@
-"""Sinh ERD chân quạ ERD01–08 từ db/schema.sql.
+"""Sinh ERD chân quạ ERD01–08 từ db/schema.sql và các migration tạo bảng sau 0001 (0003 recipe_make_ahead).
 
 Dùng: python3 docs/erd/gen_erd.py [thư mục đích] [tệp schema.json]
 Mặc định ghi vào docs/erd; ERD00 (Chen) viết tay, không sinh."""
@@ -6,6 +6,11 @@ import re, sys, pathlib, json
 
 ROOT = pathlib.Path("/home/namnx/NamBuw/Tastoria")
 SQL = (ROOT / "db/schema.sql").read_text()
+_MIG = ROOT / "backend/src/tastoria/migrations/versions"
+for _f in sorted(_MIG.glob("0*.py")):
+    _m = re.search(r'UPGRADE = """(.*?)"""', _f.read_text(), re.S)
+    if _m and "CREATE TABLE" in _m.group(1):
+        SQL += "\n" + re.sub(r"\n\s+REFERENCES", " REFERENCES", _m.group(1))
 
 def parse(sql):
     tables = {}
@@ -56,7 +61,7 @@ def parse(sql):
     return tables
 
 T = parse(SQL)
-assert len(T) == 62, len(T)
+assert len(T) == 63, len(T)
 
 GROUPS = {
     "ERD01-dinh-danh-quyen-rieng-tu": ("ERD01 — Lõi, định danh và quyền riêng tư (core, identity, privacy)",
@@ -70,7 +75,7 @@ GROUPS = {
          "qty_levels", "vision_classes", "vision_class_ingredients"]),
     "ERD04-mon-an": ("ERD04 — Món ăn: công thức, bước, thẻ, nguồn, dinh dưỡng món",
         ["cooking_methods", "tags", "recipes", "recipe_ingredients", "recipe_steps", "recipe_tags", "recipe_sources",
-         "recipe_nutrition"]),
+         "recipe_nutrition", "recipe_make_ahead"]),
     "ERD05-kho-quet": ("ERD05 — Kho (pantry) và quét ảnh (scan)",
         ["pantry_lots", "pantry_transactions", "scans", "scan_images", "scan_items", "detections"]),
     "ERD06-mam-nau": ("ERD06 — Mâm cơm, thay thế, phiên nấu và tương tác (meal, substitute, cooking, events)",
@@ -83,7 +88,7 @@ GROUPS = {
 }
 HOME = {t: g for g, (_, ts) in GROUPS.items() for t in ts}
 allg = [t for _, ts in GROUPS.values() for t in ts]
-assert sorted(allg) == sorted(T) and len(allg) == 62, set(T) ^ set(allg)
+assert sorted(allg) == sorted(T) and len(allg) == 63, set(T) ^ set(allg)
 
 def is_unique(t, cols):
     """Khoá ngoại là duy nhất khi tập cột của nó chứa một khoá (PK hoặc UNIQUE)."""
@@ -205,7 +210,7 @@ MODS = [
     ("survey", GROUPS["ERD07-khao-sat-mo-hinh"][1][3:]),
 ]
 assert sorted(x for _, l in MODS for x in l) == sorted(T)
-b = ["@startuml", "title ERD08 — Tổng quan 62 bảng và mọi khoá ngoại (chi tiết cột ở ERD01–ERD07)",
+b = ["@startuml", f"title ERD08 — Tổng quan {len(T)} bảng và mọi khoá ngoại (chi tiết cột ở ERD01–ERD07)",
      "hide circle", "hide empty members", "left to right direction", ""]
 for mname, ts in MODS:
     b.append(f'package "{mname}" {{')

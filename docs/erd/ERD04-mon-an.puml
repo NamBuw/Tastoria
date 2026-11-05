@@ -64,6 +64,12 @@ entity "recipe_nutrition" as recipe_nutrition {
   * computed_at : timestamptz
   * data_version : text
 }
+entity "recipe_make_ahead" as recipe_make_ahead {
+  * recipe_id : uuid <<PK, FK>>
+  --
+  * item_ingredient_id : uuid <<FK>>
+  * through_step_no : smallint <<FK>>
+}
 entity "ingredients" as ingredients #EEEEEE {
   * id : uuid <<PK>>
   .. chi tiết ở ERD03 ..
@@ -82,6 +88,9 @@ tags ||--o{ recipe_tags : tag_code
 recipes ||--o{ recipe_sources : recipe_id
 recipes ||--o{ recipe_nutrition : recipe_id
 nutrients ||--o{ recipe_nutrition : nutrient_code
+recipes ||--o| recipe_make_ahead : recipe_id
+recipe_steps ||--o| recipe_make_ahead : recipe_id, through_step_no
+ingredients ||--o{ recipe_make_ahead : item_ingredient_id
 
 legend right
   * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất

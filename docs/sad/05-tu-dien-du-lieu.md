@@ -1,9 +1,9 @@
 # Từ điển dữ liệu Tastoria
 
-> Tệp sinh tự động bởi `db/gen_dictionary.py` từ catalog PostgreSQL sau khi áp `db/schema.sql`. Không sửa tay: sửa `COMMENT ON` hoặc DDL trong `db/schema.sql`, hoặc phân loại, thời hạn lưu, luật service trong `db/dictionary_meta.py`, rồi chạy lại script.
+> Tệp sinh tự động bởi `db/gen_dictionary.py` từ catalog PostgreSQL sau khi chạy `tastoria db upgrade` (`db/schema.sql` + migration 0002, 0003; bỏ bảng `alembic_version` trước khi chạy). Không sửa tay: sửa `COMMENT ON` hoặc DDL trong `db/schema.sql` hoặc migration, hoặc phân loại, thời hạn lưu, luật service trong `db/dictionary_meta.py`, rồi chạy lại script.
 
 - Máy chủ: PostgreSQL 18.6 (Debian 18.6-1.pgdg12+2); extension: citext 1.8, pgcrypto 1.4, vector 0.8.7.
-- Quy mô: 62 bảng, 393 cột, 3 view, 38 kiểu liệt kê; 62 khoá chính, 97 khoá ngoại, 21 ràng buộc UNIQUE, 79 ràng buộc CHECK, 38 chỉ mục bổ sung (trong đó 7 chỉ mục một phần), 27 trigger.
+- Quy mô: 63 bảng, 396 cột, 3 view, 38 kiểu liệt kê; 63 khoá chính, 100 khoá ngoại, 21 ràng buộc UNIQUE, 80 ràng buộc CHECK, 39 chỉ mục bổ sung (trong đó 7 chỉ mục một phần), 28 trigger.
 - Cột **NULL**: `NOT NULL` là bắt buộc; `NULL` là được phép trống. Cột **Ràng buộc** ghi PK, UNIQUE, FK (kèm hành động ON DELETE; không ghi là NO ACTION) và CHECK một cột; ràng buộc nhiều cột ghi dưới bảng.
 - Cột **Phân loại** theo NĐ 356/2025: Không phải DLCN; DLCN cơ bản; DLCN nhạy cảm; Bí danh (vẫn là DLCN); Bí mật xác thực; Ẩn danh trong hệ thống. Định nghĩa ở `db/dictionary_meta.py`; thời hạn lưu theo `07-danh-gia-tac-dong-du-lieu-ca-nhan.md` mục 9.
 - Cột `numeric` không khai precision/scale: đơn vị và miền ghi ở cột Ý nghĩa và ở CHECK. Quy mô ước lượng là giả định thiết kế cho bản thử 1.000 người dùng trong 1 năm, kho 200 món; dùng để chọn chỉ mục, không phải số đo.
@@ -14,7 +14,7 @@
 - **M01 core**: `idempotency_keys`
 - **M02 identity**: `users`, `refresh_tokens`, `password_resets`
 - **M03 privacy**: `consent_purposes`, `policy_versions`, `consent_events`, `dsr_requests`, `audit_log`, `v_current_consents`
-- **M04 catalog**: `food_groups`, `nutrient_sources`, `food_items`, `nutrients`, `food_nutrients`, `allergen_groups`, `diets`, `diet_exclusions`, `ingredients`, `ingredient_synonyms`, `ingredient_allergens`, `ingredient_units`, `qty_levels`, `cooking_methods`, `tags`, `recipes`, `recipe_ingredients`, `recipe_steps`, `recipe_tags`, `recipe_sources`, `recipe_nutrition`, `vision_classes`, `vision_class_ingredients`
+- **M04 catalog**: `food_groups`, `nutrient_sources`, `food_items`, `nutrients`, `food_nutrients`, `allergen_groups`, `diets`, `diet_exclusions`, `ingredients`, `ingredient_synonyms`, `ingredient_allergens`, `ingredient_units`, `qty_levels`, `cooking_methods`, `tags`, `recipes`, `recipe_ingredients`, `recipe_steps`, `recipe_tags`, `recipe_sources`, `recipe_nutrition`, `recipe_make_ahead`, `vision_classes`, `vision_class_ingredients`
 - **M05 profile**: `profiles`, `user_allergens`, `user_favorite_recipes`, `user_settings`
 - **M06 pantry**: `pantry_lots`, `pantry_transactions`, `v_pantry_lot_balance`
 - **M07 mlops**: `model_versions`, `model_version_classes`, `model_deployments`
@@ -673,6 +673,30 @@ Lưu/Xoá: Tính lại bởi UC25. Quy mô ước lượng: ~1.400.
 
 Ghi chú thiết kế: PHI CHUẨN HOÁ CÓ KIỂM SOÁT: giá trị dẫn xuất từ recipe_ingredients × food_nutrients × EP; tính lại bằng job khi kho món hoặc bảng thành phần đổi; data_version ghi phiên bản dữ liệu nguồn.
 
+### `recipe_make_ahead`
+
+Món làm sẵn (bước chờ > 2 giờ): bước 1..through_step_no làm từ trước, không xếp vào lịch nấu; món chỉ được đề xuất khi kho có đồ làm sẵn item_ingredient_id. Bất biến khi món published.
+
+| Cột | Kiểu | NULL | Mặc định | Ràng buộc | Phân loại | Ý nghĩa |
+|---|---|---|---|---|---|---|
+| `recipe_id` | `uuid` | NOT NULL |  | `FK → recipes(id); FK (recipe_id, through_step_no) → recipe_steps(recipe_id, step_no); PK` | Không phải DLCN |  |
+| `item_ingredient_id` | `uuid` | NOT NULL |  | `FK → ingredients(id)` | Không phải DLCN | Đồ làm sẵn phải có trong kho (ví dụ dưa cải chua) |
+| `through_step_no` | `smallint` | NOT NULL |  | `CHECK ((through_step_no > 0)); FK (recipe_id, through_step_no) → recipe_steps(recipe_id, step_no)` | Không phải DLCN | Bước cuối cùng làm từ trước (bước chờ dài cuối cùng) |
+
+Chỉ mục:
+
+- `ix_recipe_make_ahead_item_ingredient_id`: `btree (item_ingredient_id)`
+
+Trigger:
+
+- `trg_recipe_make_ahead_guard` (before insert or delete or update): `trg_recipe_children_guard()`
+
+Lưu/Xoá: Theo món. Quy mô ước lượng: ~10.
+
+Ràng buộc chỉ kiểm ở service: Món chỉ được đề xuất khi kho có item (migration 0003).
+
+Ghi chú thiết kế: migration 0003 (slice 2, ngoài db/schema.sql đã đóng băng ở 0001): món có bước chờ > 120 phút; bước 1..through_step_no làm từ trước, không vào lịch nấu; món chỉ được đề xuất khi kho có item; bất biến khi món published (trg_recipe_children_guard). Nguồn: data/kb/make_ahead.yaml.
+
 ### `vision_classes`
 
 Lớp nhận dạng của mô hình phát hiện nguyên liệu trong ảnh.
@@ -688,6 +712,8 @@ Lớp nhận dạng của mô hình phát hiện nguyên liệu trong ảnh.
 | `has_freshness_model` | `boolean` | NOT NULL | `false` |  | Không phải DLCN | true nếu lớp có bộ phân loại độ tươi. |
 
 Lưu/Xoá: Dữ liệu tham chiếu. Quy mô ước lượng: ~60.
+
+Ràng buộc chỉ kiểm ở service: Nạp từ data/kb/vision_classes.yaml (classes + proposed_classes, hiện 37 lớp).
 
 ### `vision_class_ingredients`
 
