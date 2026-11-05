@@ -41,7 +41,7 @@ export function FoodStory({ compact = false }: { compact?: boolean }) {
   const { c } = useTheme();
   return (
     <View style={{ borderRadius: radius.lg, overflow: 'hidden', backgroundColor: c.surface, borderWidth: 1, borderColor: c.hairline }}>
-      <Image source={require('../../assets/food/vietnamese-table.jpg')} contentFit="cover"
+      <Image source={require('../../assets/food/vietnamese-table.webp')} contentFit="cover"
         accessibilityLabel="Bữa ăn Việt quây quần với bún, nem, thịt nướng và rau thơm"
         style={{ width: '100%', height: compact ? 150 : 210 }} />
       <View style={{ padding: space.lg, gap: space.sm }}>

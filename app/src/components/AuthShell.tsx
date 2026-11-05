@@ -22,7 +22,7 @@ export function AuthShell({ children, title, subtitle, testID }: { children: Rea
                 <T accessibilityRole="header" style={styles.headline}>Bữa ngon,{'\n'}chuyện còn dài.</T>
                 <T style={styles.caption}>Từ căn bếp nhỏ đến những điều đáng nhớ.</T>
               </View>
-              <Image source={require('../../assets/food/vietnamese-table.jpg')} contentFit="cover" style={styles.photo}
+              <Image source={require('../../assets/food/vietnamese-table.webp')} contentFit="cover" style={styles.photo}
                 accessibilityLabel="Mâm cơm Việt với bún, nem và rau thơm, ảnh chụp của Jakub Kapusnak" />
               <View style={styles.photoNote}><T style={{ color: '#26291E', fontSize: 12 }}>{SLOGAN}</T><T style={{ color: '#26291E' }}>↗</T></View>
             </View> : null}
