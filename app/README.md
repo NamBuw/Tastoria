@@ -64,3 +64,19 @@ Scan (`/scans`) and survey (`/survey/*`) endpoints are in the contract but not i
 ## Public website and releases
 
 The website root `/` serves the public landing; `/bep` opens the authenticated app. CI/CD and signed Android releases are documented in [deploy/FRONTEND-CD.md](../deploy/FRONTEND-CD.md).
+
+## Size (slimming pass, 2026-11-05)
+
+| | before | after |
+|---|---|---|
+| `src/` lines (without generated `api/schema.d.ts`) | 6155 | 6113 |
+| npm dependencies | 31 | 27 (dropped expo-device, react-native-reanimated, react-native-worklets, react-native-gesture-handler: nothing imports them; expo-router treats them as optional) |
+| web export JS (`expo export -p web`) | 1 646 951 B (449 kB gzip) | 1 641 852 B (448 kB gzip) |
+| web export assets | 925 kB | 803 kB |
+| web export total | 2.61 MB | 2.48 MB |
+| Android Hermes bundle | 3 637 919 B | 3 631 161 B |
+| `assets/` (food photo + icons) | 424 kB | 272 kB (photo JPEG → WebP q78, icons re-encoded losslessly) |
+
+All four Be Vietnam Pro weights are in use (500 only for the freshness badge). `api/schema.d.ts` stays generated
+from the contract (types only, no bundle cost). Visual check: `scripts/e2e_flow.py` screenshots before/after differ
+only in data (dish order, times, e-mail).

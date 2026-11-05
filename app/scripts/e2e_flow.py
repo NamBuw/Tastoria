@@ -135,7 +135,7 @@ def run():
     pg.goto(BASE+'/mam'); tid('start-cooking').click(); tid('screen-cooking').wait_for()
     tid('cook-finish').click(); tid('finish-submit').click(); tid('screen-finished').wait_for(timeout=20000)
     pg.goto(BASE+'/nhat-ky'); tid('screen-journal').wait_for(); pg.wait_for_timeout(800); shot('27-nhat-ky')
-    pg.goto(BASE+'/'); tid('screen-home').wait_for(); pg.wait_for_timeout(800); shot('28-trang-chu')
+    pg.goto(BASE+'/bep'); tid('screen-home').wait_for(); pg.wait_for_timeout(800); shot('28-trang-chu')
     pg.goto(BASE+'/cai-dat'); tid('screen-settings').wait_for(); shot('29-cai-dat')
     tid('settings-consent').click(); pg.wait_for_timeout(800); shot('30-cai-dat-dong-y')
     pg.goto(BASE+'/quet?mode=fridge'); tid('screen-scan').wait_for(); shot('31-quet')
