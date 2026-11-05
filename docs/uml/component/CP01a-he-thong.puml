@@ -1,0 +1,30 @@
+@startuml
+title CP01a — Thành phần: các khối chạy của hệ thống
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam componentStyle rectangle
+
+component "App Tastoria (Expo)" as App <<client>>
+component "nginx" as Nginx <<reverse proxy>>
+component "API (FastAPI, modular monolith)" as Api <<process>>
+component "Worker (RQ + ONNX)" as Worker <<process>>
+component "Scheduler (cron)" as Sched <<process>>
+database "PostgreSQL + pgvector" as Pg <<database>>
+queue "Valkey" as Vk <<queue>>
+component "Kho tệp" as Fs <<storage>>
+
+App ..> Nginx : HTTPS
+Nginx ..> Api : HTTP
+Nginx ..> Fs : đọc tệp
+Api ..> Pg : SQL
+Api ..> Vk : job
+Api ..> Fs : ghi ảnh
+Worker ..> Vk : nhận job
+Worker ..> Pg : SQL
+Worker ..> Fs : đọc ảnh, mô hình
+Sched ..> Pg : SQL
+@enduml

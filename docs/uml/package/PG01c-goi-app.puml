@@ -1,0 +1,22 @@
+@startuml
+title PG01c — Gói: ứng dụng Expo
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam componentStyle rectangle
+
+package "app" as A {
+  file "app/app (expo-router)" as Routes
+  file "src/api" as Api
+  file "src/offline" as Off
+  file "src/ui" as Ui
+}
+
+Routes ..> Api
+Routes ..> Off
+Routes ..> Ui
+Off ..> Api : outbox
+@enduml

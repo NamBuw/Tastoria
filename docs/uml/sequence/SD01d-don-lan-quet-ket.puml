@@ -1,0 +1,28 @@
+@startuml
+title SD01d — Dọn lần quét bị kẹt (UC34)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Bộ lập lịch" as CRON
+control "Tác vụ dọn (jobs)" as JOB
+entity "CSDL" as DB
+entity "Hàng đợi (Valkey)" as Q
+
+CRON -> JOB : chạy mỗi phút
+JOB -> DB : tìm lần quét chưa vào hàng đợi
+DB --> JOB : danh sách lần quét
+loop mỗi lần quét đó
+  JOB -> Q : đưa lại job nhận diện
+  JOB -> DB : ghi thời điểm vào hàng đợi
+end
+JOB -> DB : kẹt quá 60 s → «expired»
+JOB -> Q : thông báo «expired»
+@enduml

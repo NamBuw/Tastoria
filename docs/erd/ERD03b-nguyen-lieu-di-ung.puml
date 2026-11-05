@@ -1,0 +1,75 @@
+@startuml
+title ERD03b — Danh mục: nguyên liệu, dị ứng và chế độ ăn
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "ingredients" as ingredients {
+  * id : uuid <<PK>>
+  --
+  * name_vi : text
+  * food_group_code : text <<FK>>
+    comp_source_id : smallint <<FK>>
+    comp_source_code : text <<FK>>
+  * is_staple : boolean
+  * countable : boolean
+    shelf_life_days : numeric
+    shelf_life_basis : text
+  * is_active : boolean
+  * created_at : timestamptz
+  * updated_at : timestamptz
+  .. UNIQUE(name_vi) WHERE is_active ..
+}
+entity "ingredient_synonyms" as ingredient_synonyms {
+  * ingredient_id : uuid <<PK, FK>>
+  * synonym : text <<PK>>
+  * lang : lang_t <<PK>>
+  --
+    source : text
+}
+entity "ingredient_allergens" as ingredient_allergens {
+  * ingredient_id : uuid <<PK, FK>>
+  * allergen_code : text <<PK, FK>>
+  --
+}
+entity "allergen_groups" as allergen_groups {
+  * code : text <<PK>>
+  --
+  * name_vi : text
+  * name_en : text
+  * basis : allergen_basis_t
+}
+entity "diets" as diets {
+  * code : text <<PK>>
+  --
+  * name_vi : text
+}
+entity "diet_exclusions" as diet_exclusions {
+  * diet_code : text <<PK, FK>>
+  * food_group_code : text <<PK, FK>>
+  --
+}
+entity "food_groups" as food_groups #EEEEEE {
+  * code : text <<PK>>
+  .. chi tiết ở ERD03a ..
+}
+entity "food_items" as food_items #EEEEEE {
+  * source_id : smallint <<PK>>
+  * source_code : text <<PK>>
+  .. chi tiết ở ERD03a ..
+}
+
+food_groups ||--o{ ingredients : food_group_code
+food_items |o--o{ ingredients : comp_source_id, comp_source_code
+ingredients ||--o{ ingredient_synonyms : ingredient_id
+ingredients ||--o{ ingredient_allergens : ingredient_id
+allergen_groups ||--o{ ingredient_allergens : allergen_code
+diets ||--o{ diet_exclusions : diet_code
+food_groups ||--o{ diet_exclusions : food_group_code
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

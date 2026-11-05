@@ -1,0 +1,53 @@
+@startuml
+title ERD04b — Món ăn: thẻ, nguồn và dinh dưỡng món
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "tags" as tags {
+  * code : text <<PK>>
+  --
+  * kind : tag_kind_t
+  * name_vi : text
+}
+entity "recipe_tags" as recipe_tags {
+  * recipe_id : uuid <<PK, FK>>
+  * tag_code : text <<PK, FK>>
+  --
+}
+entity "recipe_sources" as recipe_sources {
+  * recipe_id : uuid <<PK, FK>>
+  * url : text <<PK>>
+  --
+  * title : text
+  * accessed_on : date
+}
+entity "recipe_nutrition" as recipe_nutrition {
+  * recipe_id : uuid <<PK, FK>>
+  * nutrient_code : text <<PK, FK>>
+  --
+  * per_serving : numeric
+  * computed_at : timestamptz
+  * data_version : text
+}
+entity "recipes" as recipes #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD04a ..
+}
+entity "nutrients" as nutrients #EEEEEE {
+  * code : text <<PK>>
+  .. chi tiết ở ERD03a ..
+}
+
+recipes ||--o{ recipe_tags : recipe_id
+tags ||--o{ recipe_tags : tag_code
+recipes ||--o{ recipe_sources : recipe_id
+recipes ||--o{ recipe_nutrition : recipe_id
+nutrients ||--o{ recipe_nutrition : nutrient_code
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

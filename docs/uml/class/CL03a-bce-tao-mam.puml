@@ -1,0 +1,46 @@
+@startuml
+title CL03a — Lớp phân tích BCE: UC15 Tạo mâm cơm
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Màn hình Mâm cơm" as BM <<boundary>> {
+  -bữa
+  -sốNgười
+  +yêuCầuMâm()
+}
+class "Tạo mâm" as CT <<control>> {
+  +tạoMâm()
+}
+class "Ghép mâm" as CG <<control>> {
+  +lọcCứng()
+  +xếpHạng()
+  +ghép()
+}
+class "Hồ sơ" as EHS <<entity>> {
+  -dịỨng
+  -chếĐộĂn
+  -kcalMụcTiêu
+}
+class "Lô kho" as ELO <<entity>> {
+  -khoảngGam
+  -độGấp
+}
+class "Mâm cơm" as EM <<entity>> {
+  -trạngThái
+  -kcalMụcTiêu
+}
+
+BM -- CT
+CT -- CG
+CT -- EM
+CG -- EHS
+CG -- ELO
+@enduml

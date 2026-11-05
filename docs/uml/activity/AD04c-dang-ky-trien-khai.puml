@@ -1,0 +1,37 @@
+@startuml
+title AD04c — Đăng ký, kiểm định và triển khai mô hình (UC29, UC30)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam ActivityBackgroundColor White
+
+|Người vận hành mô hình|
+|Hệ thống|
+|Worker|
+|Người vận hành mô hình|
+start
+:Đăng ký phiên bản;
+|Hệ thống|
+:So với bản đang chạy trên tập test khoá;
+if (Đạt cổng?) then (không)
+  :Đánh dấu «rejected»;
+  stop
+else (đạt)
+endif
+:Đánh dấu «validated»;
+|Người vận hành mô hình|
+:Triển khai;
+|Hệ thống|
+:Đổi con trỏ, khởi động lại;
+|Worker|
+:Nạp ONNX, kiểm sha256;
+|Người vận hành mô hình|
+if (Bản mới có sự cố?) then (có)
+  :Quay lui về bản trước;
+else (không)
+endif
+stop
+@enduml

@@ -1,0 +1,25 @@
+@startuml
+title PG01b — Gói: cấu trúc một module (ví dụ meal)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam componentStyle rectangle
+
+package "tastoria.modules.meal" as M <<M11>> {
+  file "router.py" as Router
+  file "service.py" as Service <<public>>
+  file "repository.py" as Repo
+  file "domain.py" as Domain
+  file "schemas.py" as Schemas
+  file "tables.py" as Tables
+}
+
+Router ..> Service
+Router ..> Schemas
+Service ..> Repo
+Service ..> Domain
+Repo ..> Tables
+@enduml

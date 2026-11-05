@@ -1,0 +1,40 @@
+@startuml
+title CL04b — Lớp phân tích BCE: UC20 Nấu xong – mâm và tương tác
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Hoàn tất phiên nấu" as CH <<control>> {
+  +hoànTất()
+}
+class "Chuyển trạng thái mâm" as CM <<control>> {
+  +đánhDấuĐãNấu()
+}
+class "Ghi tương tác" as CSK <<control>> {
+  +ghi()
+}
+class "Mâm cơm" as EM <<entity>> {
+  -trạngThái
+}
+class "Tương tác" as ETT <<entity>> {
+  -loại
+  -thờiĐiểm
+}
+class "Đồng ý hiện hành" as EDY <<entity>> {
+  -mụcĐích
+  -hiệuLực
+}
+
+CH -- CM
+CH -- CSK
+CM -- EM
+CSK -- ETT
+CSK -- EDY
+@enduml

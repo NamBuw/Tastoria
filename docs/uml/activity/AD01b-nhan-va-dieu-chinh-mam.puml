@@ -1,0 +1,40 @@
+@startuml
+title AD01b — Nhận và điều chỉnh mâm cơm (UC15–UC18)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam ActivityBackgroundColor White
+
+|Người dùng|
+|App|
+|Hệ thống|
+|Người dùng|
+start
+:Chọn bữa, số người, thời gian tối đa;
+|Hệ thống|
+:Ghép mâm từ kho và hồ sơ (AD02a, AD02b);
+if (Có mâm khả thi?) then (không)
+  |App|
+  :Hiện nguyên liệu còn thiếu;
+  |Người dùng|
+  :Thêm vào danh sách đi chợ;
+  stop
+else (có)
+endif
+|App|
+:Hiện mâm và dòng lý do;
+|Người dùng|
+while (Muốn điều chỉnh mâm?) is (có)
+  :Đổi món hoặc chọn thay thế;
+  |Hệ thống|
+  :Cập nhật mâm;
+|Người dùng|
+endwhile (không)
+:Nhận mâm;
+|Hệ thống|
+:Mâm chuyển sang «accepted»;
+stop
+@enduml

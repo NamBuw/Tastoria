@@ -1,0 +1,21 @@
+@startuml
+title CTX01b — Ngữ cảnh: tác nhân thời gian và hệ thống ngoài
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+skinparam actorStyle stick
+
+actor "Bộ lập lịch" as A08
+rectangle "Hệ thống Tastoria" as SYS #EEF6FB
+actor "Dịch vụ email" as A09 <<system>>
+actor "Công cụ gán nhãn" as A10 <<system>>
+rectangle "Kho sao lưu ngoài (Google Drive)" as DRIVE
+A08 -- SYS : kích hoạt tác vụ định kỳ
+SYS -- A09 : thư đặt lại mật khẩu
+SYS -- A10 : ảnh cần gán nhãn / nhãn
+SYS -- DRIVE : bản sao lưu (rclone)
+@enduml

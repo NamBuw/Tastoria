@@ -148,9 +148,11 @@ NFR chính (ngưỡng chấp nhận của SRS 1.1) được liệt kê cùng s�
 
 ### 3.1. Mô hình use case
 
-![UCD00 — Tổng quan use case](../../uml/out/usecase/UCD00-tong-quan.svg)
+![UCD00a — Tổng quan: chức năng chính của khách và người dùng](../../uml/out/usecase/UCD00a-tong-quan-nguoi-dung.svg)
 
-*Hình 1. UCD00 — 34 use case trong 10 gói và 10 tác nhân (PlantUML, `docs/uml/usecase/UCD00-tong-quan.puml`).*
+![UCD00b — Tổng quan: chức năng của nhân sự và tác nhân hệ thống](../../uml/out/usecase/UCD00b-tong-quan-nhan-su.svg)
+
+*Hình 1. UCD00a–UCD00b — 34 use case trong 10 gói và 10 tác nhân (PlantUML, `docs/uml/usecase/UCD00a-tong-quan-nguoi-dung.puml … docs/uml/usecase/UCD00b-tong-quan-nhan-su.puml`).*
 
 ![UCD05 — Gói mâm cơm, bản xuất từ Visual Paradigm](fig/vp-UCD05-mam-com.png)
 
@@ -248,29 +250,47 @@ Màn hình tương ứng trên app (ảnh chụp bởi `app/scripts/e2e_flow.py`
 
 ### 3.3. Sơ đồ hoạt động và tuần tự chính
 
-![AD01 — Từ quét đến nấu xong](../../uml/out/activity/AD01-quet-den-nau.svg)
+![AD01a — Quét và xác nhận nguyên liệu (UC12, UC13)](../../uml/out/activity/AD01a-quet-va-xac-nhan.svg)
 
-*Hình 3. AD01 — Luồng chính từ quét tủ lạnh tới nấu xong, ba làn Người dùng, App, api; gồm nhánh đổi món, thay
+![AD01b — Nhận và điều chỉnh mâm cơm (UC15–UC18)](../../uml/out/activity/AD01b-nhan-va-dieu-chinh-mam.svg)
+
+![AD01c — Nấu cả mâm và hoàn tất bữa (UC19–UC21)](../../uml/out/activity/AD01c-nau-va-hoan-tat.svg)
+
+*Hình 3. AD01a–AD01c — Luồng chính từ quét tủ lạnh tới nấu xong, ba làn Người dùng, App, api; gồm nhánh đổi món, thay
 nguyên liệu và hoàn tác.*
 
-![AD02 — Ghép mâm](../../uml/out/activity/AD02-ghep-mam.svg)
+![AD02a — Ghép mâm: lọc món và chuẩn bị kho (UC15)](../../uml/out/activity/AD02a-loc-mon-va-chuan-bi-kho.svg)
 
-*Hình 4. AD02 — Ghép mâm bên trong `POST /meal-plans`: làn `profile` cấp ràng buộc, `pantry` cấp lượng và độ gấp,
+![AD02b — Ghép mâm: duyệt tổ hợp và chọn mâm (UC15)](../../uml/out/activity/AD02b-ghep-va-chon-mam.svg)
+
+*Hình 4. AD02a–AD02b — Ghép mâm bên trong `POST /meal-plans`: làn `profile` cấp ràng buộc, `pantry` cấp lượng và độ gấp,
 `meal` lọc cứng, xếp hạng và chọn tổ hợp.*
 
-![SD01 — Quét ảnh bất đồng bộ](../../uml/out/sequence/SD01-quet-anh-bat-dong-bo.svg)
+![SD01a — Gửi ảnh quét (UC12)](../../uml/out/sequence/SD01a-gui-anh-quet.svg)
 
-*Hình 5. SD01 — `POST /scans` trả 202, worker suy luận bất đồng bộ, app chờ bằng long-poll; sweeper (UC34) xử lý job
+![SD01b — Worker nhận diện nguyên liệu (UC12)](../../uml/out/sequence/SD01b-worker-nhan-dien.svg)
+
+![SD01c — App chờ kết quả quét (UC12)](../../uml/out/sequence/SD01c-cho-ket-qua-quet.svg)
+
+![SD01d — Dọn lần quét bị kẹt (UC34)](../../uml/out/sequence/SD01d-don-lan-quet-ket.svg)
+
+*Hình 5. SD01a–SD01d — `POST /scans` trả 202, worker suy luận bất đồng bộ, app chờ bằng long-poll; sweeper (UC34) xử lý job
 kẹt.*
 
-![SD03 — Tạo mâm](../../uml/out/sequence/SD03-tao-mam.svg)
+![SD03a — Tạo mâm cơm hôm nay (UC15)](../../uml/out/sequence/SD03a-tao-mam.svg)
 
-*Hình 6. SD03 — `meal` gọi `profile.get_meal_constraints()`, `pantry`, `privacy` và bộ xếp hạng; ghi mâm, sự kiện và
+![SD03b — Nhận mâm cơm (UC15)](../../uml/out/sequence/SD03b-nhan-mam.svg)
+
+*Hình 6. SD03a–SD03b — `meal` gọi `profile.get_meal_constraints()`, `pantry`, `privacy` và bộ xếp hạng; ghi mâm, sự kiện và
 khoá lũy đẳng trong một Unit of Work.*
 
-![SD06 — Nấu xong và hoàn tác](../../uml/out/sequence/SD06-nau-xong-va-hoan-tac.svg)
+![SD06a — Mở phiên nấu và lập lịch (UC19)](../../uml/out/sequence/SD06a-mo-phien-nau.svg)
 
-*Hình 7. SD06 — Tạo phiên nấu với lịch CP-SAT, nấu xong trong một Unit of Work, hoàn tác trong 10 phút bằng giao dịch
+![SD06b — Nấu xong một chạm (UC20)](../../uml/out/sequence/SD06b-nau-xong.svg)
+
+![SD06c — Hoàn tác trừ kho (UC21)](../../uml/out/sequence/SD06c-hoan-tac.svg)
+
+*Hình 7. SD06a–SD06c — Tạo phiên nấu với lịch CP-SAT, nấu xong trong một Unit of Work, hoàn tác trong 10 phút bằng giao dịch
 đảo.*
 
 Các sơ đồ còn lại (6 hoạt động, 10 tuần tự, 8 máy trạng thái, 8 lớp) ở báo cáo phân tích thiết kế §5–§6.
@@ -301,15 +321,15 @@ Module (thư mục `backend/src/tastoria/modules/`): `identity`, `privacy`, `pro
 Unit of Work, lỗi RFC 9457, Idempotency-Key, xác thực) và `jobs` (điểm vào cho việc định kỳ). `model.yaml` đánh số
 M01–M16.
 
-![CP01 — Sơ đồ thành phần, bản Visual Paradigm](fig/vp-CP01-thanh-phan.png)
+![CP01a–CP01e — Sơ đồ thành phần, bản Visual Paradigm](fig/vp-CP01a-he-thong.png … CP01e-module-nhan-su-tac-vu.png)
 
-*Hình 8. CP01 — 16 module, giao diện `service` mỗi module và phụ thuộc được phép; bên ngoài là worker, scheduler,
+*Hình 8. CP01a–CP01e — 16 module, giao diện `service` mỗi module và phụ thuộc được phép; bên ngoài là worker, scheduler,
 nginx, app, SMTP, Label Studio. Ảnh do Visual Paradigm xuất; bản PlantUML gốc dễ đọc hơn ở
-[`docs/uml/out/component/CP01-thanh-phan.svg`](../../uml/out/component/CP01-thanh-phan.svg).*
+[CP01a](../../uml/out/component/CP01a-he-thong.svg), [CP01b](../../uml/out/component/CP01b-ket-noi-ngoai.svg), [CP01c](../../uml/out/component/CP01c-module-loi.svg), [CP01d](../../uml/out/component/CP01d-module-bep.svg), [CP01e](../../uml/out/component/CP01e-module-nhan-su-tac-vu.svg).*
 
-![DP01 — Sơ đồ triển khai, bản Visual Paradigm](fig/vp-DP01-trien-khai.png)
+![DP01a–DP01c — Sơ đồ triển khai, bản Visual Paradigm](fig/vp-DP01a-thiet-bi-ket-noi.png … DP01c-huan-luyen-mo-hinh.png)
 
-*Hình 9. DP01 — Docker Compose trên máy chủ lab (nginx, api, migrate, worker, scheduler, postgres, valkey), ra Internet
+*Hình 9. DP01a–DP01c — Docker Compose trên máy chủ lab (nginx, api, migrate, worker, scheduler, postgres, valkey), ra Internet
 qua cloudflared; máy GPU lab cho huấn luyện tách riêng.*
 
 ### 4.2. Thiết kế cơ sở dữ liệu
@@ -319,18 +339,18 @@ DDL ở [`db/schema.sql`](../../../db/schema.sql); migration Alembic 0001 chạy
 có kiểm thử), 0002 thêm mục đích đồng ý, 0003 thêm `recipe_make_ahead`. Từ điển dữ liệu sinh từ catalog PostgreSQL:
 [`docs/sad/05-tu-dien-du-lieu.md`](../../sad/05-tu-dien-du-lieu.md).
 
-ERD có hai mức: mô hình khái niệm Chen ([ERD00](../../uml/out/erd/ERD00-khai-niem-chen.svg), 29 thực thể) và mô hình
-logic/vật lý chân quạ chia 7 nhóm + 1 tổng quan (ERD01–ERD08). Hai nhóm của luồng chính, bản do Visual Paradigm xuất
+ERD có hai mức: mô hình khái niệm Chen ([ERD00a](../../uml/out/erd/ERD00a-chen-nguoi-dung-ho-so.svg), [ERD00b](../../uml/out/erd/ERD00b-chen-nguyen-lieu-mon.svg), [ERD00c](../../uml/out/erd/ERD00c-chen-kho.svg), [ERD00d](../../uml/out/erd/ERD00d-chen-quet.svg), [ERD00e](../../uml/out/erd/ERD00e-chen-mam-nau.svg), [ERD00f](../../uml/out/erd/ERD00f-chen-tuong-tac-mo-hinh.svg), [ERD00g](../../uml/out/erd/ERD00g-chen-dong-y.svg), [ERD00h](../../uml/out/erd/ERD00h-chen-khao-sat.svg), 29 thực thể) và mô hình
+logic/vật lý chân quạ chia 7 nhóm + 1 tổng quan (ERD01a–ERD01b–ERD08). Hai nhóm của luồng chính, bản do Visual Paradigm xuất
 từ `Tastoria-ERD.vpp` (62 bảng, 393 cột, 97 khoá ngoại; [`docs/vp-import-kit/TU-DONG.md`](../../vp-import-kit/TU-DONG.md)):
 
-![ERD05 — Kho và quét](fig/vp-ERD05-kho-quet.png)
+![ERD05a–ERD05b — Kho và quét](fig/vp-ERD05a-kho.png … ERD05b-quet.png)
 
-*Hình 10. ERD05 — `scans`, `scan_images`, `detections`, `scan_items`, `pantry_lots`, `pantry_transactions` và các
+*Hình 10. ERD05a–ERD05b — `scans`, `scan_images`, `detections`, `scan_items`, `pantry_lots`, `pantry_transactions` và các
 bảng cha `users`, `ingredients`, `vision_classes`, `model_versions`.*
 
-![ERD06 — Mâm và nấu](fig/vp-ERD06-mam-nau.png)
+![ERD06a–ERD06e — Mâm và nấu](fig/vp-ERD06a-mam.png … ERD06e-tuong-tac.png)
 
-*Hình 11. ERD06 — `meal_plans`, `meal_plan_items`, phiên nấu, thay thế, đi chợ, tương tác.*
+*Hình 11. ERD06a–ERD06e — `meal_plans`, `meal_plan_items`, phiên nấu, thay thế, đi chợ, tương tác.*
 
 **Chuẩn hoá.** [`docs/sad/04-chuan-hoa.md`](../../sad/04-chuan-hoa.md) xét từng bảng: khoá ứng viên, phụ thuộc hàm
 không tầm thường, lần lượt 1NF, 2NF, 3NF, BCNF. Hai quy ước áp chung: N1 (phụ thuộc hàm có vế trái chứa cột cho phép
@@ -434,7 +454,7 @@ fragment lồng, đổi tên phần tử trùng, cạnh không hợp lệ, hộp
 `ReverseDDL.sh` của bản CE báo "Feature not supported", ERD được dựng bằng một plugin viết trên Open API của VP đọc
 `db/schema_vp.sql` (62 bảng, 393 cột, 97 khoá ngoại, 8 ERD). Ảnh ở mục 3–4 có tiền tố `vp-` là ảnh do VP xuất từ hai
 tệp này. Phần còn phải chỉnh tay trong VP (bố cục sơ đồ tuần tự dồn lifeline về x = 0, làn của sơ đồ hoạt động, 6 lớp
-liên kết ở CL01) được liệt kê ở TU-DONG.md §6. Tệp `.vpp` và ảnh xuất nằm trong `dist/` (không commit); năm ảnh dùng
+liên kết ở CL01a–CL01i) được liệt kê ở TU-DONG.md §6. Tệp `.vpp` và ảnh xuất nằm trong `dist/` (không commit); năm ảnh dùng
 trong báo cáo đã chép vào `docs/reports/ptud/fig/`.
 
 ---
@@ -463,7 +483,7 @@ TypeScript/TSX trong `app/src` (đếm bằng `wc -l`, gồm cả dòng trống 
 
 ### 5.2. Worker quét ảnh ONNX
 
-Luồng (UC12, SD01; [`backend/README.md`](../../../backend/README.md) mục "Slice 3"):
+Luồng (UC12, SD01a–SD01d; [`backend/README.md`](../../../backend/README.md) mục "Slice 3"):
 
 1. `POST /scans` kiểm và lưu ảnh, ghi `scans` ở trạng thái `queued`, commit, rồi mới đưa job vào hàng đợi RQ `scan`
    trên Valkey. Mất job (API chết giữa commit và enqueue) thì sweeper đưa lại sau 60 s.

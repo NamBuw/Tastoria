@@ -1,0 +1,54 @@
+@startuml
+title ERD06e — Tương tác (events)
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "interactions" as interactions {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * recipe_id : uuid <<FK>>
+    meal_plan_id : uuid <<FK>>
+    meal_plan_item_id : uuid <<FK>>
+  * type : interaction_type_t
+    position : smallint
+    swap_reason : swap_reason_t
+    ranker_version_id : uuid <<FK>>
+    propensity : real
+  * occurred_at : timestamptz
+  * received_at : timestamptz
+}
+entity "users" as users #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01a ..
+}
+entity "recipes" as recipes #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD04a ..
+}
+entity "meal_plan_items" as meal_plan_items #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD06a ..
+}
+entity "model_versions" as model_versions #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD07a ..
+}
+entity "meal_plans" as meal_plans #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD06a ..
+}
+
+users ||--o{ interactions : user_id (cascade)
+recipes ||--o{ interactions : recipe_id
+meal_plan_items |o--o{ interactions : meal_plan_item_id, meal_plan_id, recipe_id (set_null)
+model_versions |o--o{ interactions : ranker_version_id
+meal_plans |o--o{ interactions : meal_plan_id, user_id (cascade)
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

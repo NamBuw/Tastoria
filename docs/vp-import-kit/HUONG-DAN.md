@@ -11,16 +11,16 @@ Giải nén `tastoria-vp-kit.zip` ra một thư mục không có dấu cách và
 | Thư mục / tệp | Nội dung | Số tệp |
 |---|---|---|
 | `HUONG-DAN.md` | Tài liệu này | 1 |
-| `docs/uml/usecase/` | UCD00 tổng quan và UCD01–UCD10 theo gói PK1–PK10 | 11 |
-| `docs/uml/activity/` | AD01–AD06 (có làn, cú pháp mới) | 6 |
-| `docs/uml/sequence/` | SD01–SD10 | 10 |
+| `docs/uml/usecase/` | UCD00a–UCD00b tổng quan và UCD01–UCD10 theo gói PK1–PK10 | 11 |
+| `docs/uml/activity/` | AD01a–AD01c–AD06a–AD06b (có làn, cú pháp mới) | 6 |
+| `docs/uml/sequence/` | SD01a–SD01d–SD10a–SD10d | 10 |
 | `docs/uml/state/` | ST01–ST08 | 8 |
-| `docs/uml/class/` | CL01 (miền), CL02–CL04 (BCE), CL05–CL08 (thiết kế) | 8 |
-| `docs/uml/component/` | CP01 | 1 |
-| `docs/uml/package/` | PG01 | 1 |
-| `docs/uml/deployment/` | DP01 | 1 |
-| `docs/uml/context/` | CTX01 (sơ đồ ngữ cảnh) | 1 |
-| `docs/erd/` | ERD00 (Chen), ERD01–ERD07 (chân quạ theo nhóm module), ERD08 (tổng quan 62 bảng) | 9 |
+| `docs/uml/class/` | CL01a–CL01i (miền), CL02a–CL02b–CL04a–CL04b (BCE), CL05a–CL05b–CL08a–CL08b (thiết kế) | 8 |
+| `docs/uml/component/` | CP01a–CP01e | 1 |
+| `docs/uml/package/` | PG01a–PG01c | 1 |
+| `docs/uml/deployment/` | DP01a–DP01c | 1 |
+| `docs/uml/context/` | CTX01a–CTX01b (sơ đồ ngữ cảnh) | 1 |
+| `docs/erd/` | ERD00a–ERD00h (Chen), ERD01a–ERD01b–ERD07a–ERD07b (chân quạ theo nhóm module), ERD08 (tổng quan 62 bảng) | 9 |
 | `db/schema_vp.sql` | DDL PostgreSQL đã giản lược cho parser của VP (62 bảng) | 1 |
 | `docs/uml/out/<loai>/` | Ảnh SVG và PNG render sẵn của mọi sơ đồ trên, không watermark | 56 + 56 |
 
@@ -83,7 +83,7 @@ Nhập lần lượt từng thư mục, kiểm từng thư mục xong mới sang
 4. `docs/uml/sequence/` (10 tệp)
 5. `docs/uml/class/` (8 tệp)
 6. `docs/uml/component/`, `docs/uml/package/`, `docs/uml/deployment/` (mỗi thư mục 1 tệp)
-7. `docs/uml/context/CTX01-ngu-canh.puml`: sơ đồ ngữ cảnh viết bằng ký pháp use case/thành phần; nếu plugin không nhận thì vẽ lại tay theo ảnh hoặc chỉ dùng ảnh SVG trong báo cáo.
+7. `docs/uml/context/CTX01a-ngu-canh-con-nguoi.puml … docs/uml/context/CTX01b-ngu-canh-he-thong-ngoai.puml`: sơ đồ ngữ cảnh viết bằng ký pháp use case/thành phần; nếu plugin không nhận thì vẽ lại tay theo ảnh hoặc chỉ dùng ảnh SVG trong báo cáo.
 
 Không nhập `docs/erd/*.puml` bằng plugin: plugin không hỗ trợ ERD. Các tệp này chỉ để render ảnh cho báo cáo; ERD trong VP dựng ở mục 5.
 
@@ -100,7 +100,7 @@ Plugin đặt phần tử theo bố cục tự động của VP nên thường c
 
 ### 4.4. Khi plugin không chạy
 
-Vẽ lại tay trong CE theo ảnh PNG trong `docs/uml/out/`. Ưu tiên theo thứ tự: UCD00, UCD04, UCD05, UCD06; AD01, AD02; SD01, SD03, SD06; ST01–ST03; CL01; CP01; DP01. Các sơ đồ còn lại dùng ảnh SVG trong báo cáo.
+Vẽ lại tay trong CE theo ảnh PNG trong `docs/uml/out/`. Ưu tiên theo thứ tự: UCD00a–UCD00b, UCD04, UCD05, UCD06; AD01a–AD01c, AD02a–AD02b; SD01a–SD01d, SD03a–SD03b, SD06a–SD06c; ST01–ST03; CL01a–CL01i; CP01a–CP01e; DP01a–DP01c. Các sơ đồ còn lại dùng ảnh SVG trong báo cáo.
 
 ## 5. ERD: Reverse DDL từ `db/schema_vp.sql`
 
@@ -115,21 +115,21 @@ Reverse DDL có trong Standard trở lên hoặc bản dùng thử 30 ngày; CE 
    - Đủ 62 bảng (Model Explorer hoặc đếm thực thể).
    - Khoá chính, khoá ngoại, khoá ghép (ví dụ `food_nutrients (source_id, source_code) → food_items`) có trên sơ đồ; so với `docs/uml/out/erd/ERD08-tong-quan.svg`.
    - Kiểu cột: `schema_vp.sql` đã đổi enum thành `text` + CHECK, `vector(100)` thành `bytea`, `citext` thành `text`, identity thành `bigserial`; bỏ view, extension, trigger, chỉ mục một phần. Bản đầy đủ ở `db/schema.sql` trong repo, phần khác biệt ghi ở đầu `schema_vp.sql`.
-7. ERD 62 bảng trên một trang rất rộng. Tách thành các ERD con giống ERD01–ERD07: tạo ERD mới, kéo các thực thể của nhóm module từ Model Explorer vào (xem nhóm bảng trong tiêu đề từng ảnh `docs/uml/out/erd/ERD0x-*.svg`).
+7. ERD 62 bảng trên một trang rất rộng. Tách thành các ERD con giống ERD01a–ERD01b–ERD07a–ERD07b: tạo ERD mới, kéo các thực thể của nhóm module từ Model Explorer vào (xem nhóm bảng trong tiêu đề từng ảnh `docs/uml/out/erd/ERD0x-*.svg`).
 8. Lưu dự án.
 
 **Nếu không có Standard hoặc bản dùng thử:**
 
 - Cách 1 (cần Standard): Tools > DB > Reverse Database qua JDBC tới một PostgreSQL cục bộ đã nạp `schema_vp.sql`.
-- Cách 2 (CE): vẽ ERD bằng công cụ Entity Relationship Diagram của CE theo ảnh `docs/uml/out/erd/ERD01`–`ERD07`. Vẽ ít nhất ERD tổng quan với tên bảng, PK, FK; cột chi tiết để ở từ điển dữ liệu (`docs/sad/05-tu-dien-du-lieu.md`).
-- ERD Chen (ERD00) không có trong VP; dùng ảnh `docs/uml/out/erd/ERD00-khai-niem-chen.svg`.
+- Cách 2 (CE): vẽ ERD bằng công cụ Entity Relationship Diagram của CE theo ảnh `docs/uml/out/erd/ERD01`–`ERD07a–ERD07b`. Vẽ ít nhất ERD tổng quan với tên bảng, PK, FK; cột chi tiết để ở từ điển dữ liệu (`docs/sad/05-tu-dien-du-lieu.md`).
+- ERD Chen (ERD00a–ERD00h) không có trong VP; dùng ảnh `docs/uml/out/erd/ERD00a-chen-nguoi-dung-ho-so.svg … docs/uml/out/erd/ERD00h-chen-khao-sat.svg`.
 
 ## 6. Giới hạn đã biết
 
 | Giới hạn | Hệ quả | Cách xử lý |
 |---|---|---|
 | Plugin PlantUML-VP v1.0.0 chưa được thử trên VP 18.1 | Có thể không cài được hoặc nhập thiếu | Thử một tệp trước (mục 4.1); không được thì vẽ tay (mục 4.4) |
-| Plugin chỉ đọc sơ đồ hoạt động viết bằng cú pháp mới | Sơ đồ hoạt động cú pháp cũ không nhập được | AD01–AD06 đã viết bằng cú pháp mới; nếu tự sửa tệp thì giữ cú pháp mới (`start`, `:hành động;`, `if (...) then`, `|Làn|`) |
+| Plugin chỉ đọc sơ đồ hoạt động viết bằng cú pháp mới | Sơ đồ hoạt động cú pháp cũ không nhập được | AD01a–AD01c–AD06a–AD06b đã viết bằng cú pháp mới; nếu tự sửa tệp thì giữ cú pháp mới (`start`, `:hành động;`, `if (...) then`, `|Làn|`) |
 | Plugin không hỗ trợ ERD | `docs/erd/*.puml` không nhập được | ERD dựng bằng Reverse DDL (mục 5) |
 | Một số ký pháp mất khi nhập (ghi chú, ràng buộc trong ngoặc nhọn, stereotype lạ) | Sơ đồ VP thiếu chi tiết so với ảnh | Thêm tay theo ảnh render |
 | CE thêm watermark một dòng vào ảnh xuất và bản in | Ảnh xuất từ VP CE có dòng chữ của VP | Dùng ảnh SVG trong `docs/uml/out/` cho báo cáo (không watermark); hỏi giảng viên có chấp nhận ảnh có watermark không |
@@ -141,7 +141,7 @@ Reverse DDL có trong Standard trở lên hoặc bản dùng thử 30 ngày; CE 
 
 - Một sơ đồ: mở sơ đồ, chuột phải nền > Export > Export as Image (hoặc File/Project > Export > Active Diagram as Image), chọn PNG hoặc SVG.
 - Cả dự án: **Project > Export > Diagrams to Images...**, chọn các sơ đồ, định dạng PNG (độ phân giải 150–200 DPI) hoặc SVG, chọn thư mục đích.
-- Đặt tên ảnh theo mã sơ đồ (`UCD00.png`, `SD03.png`, …) để khớp với báo cáo.
+- Đặt tên ảnh theo mã sơ đồ (`UCD00a–UCD00b.png`, `SD03a–SD03b.png`, …) để khớp với báo cáo.
 
 ## 8. Nộp những gì
 

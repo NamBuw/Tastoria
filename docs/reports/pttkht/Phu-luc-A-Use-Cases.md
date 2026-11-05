@@ -984,7 +984,7 @@ A02 bấm "Chụp tủ lạnh" hoặc "Đồ vừa mua" ở Trang chủ.
 
 ### 8. Kịch bản chính
 
-Kịch bản viết ở mức tác nhân ↔ hệ thống (hộp đen). Phân công giữa API, worker và các module (`scan`, `mlops`, `catalog`, `pantry`, `privacy`) cùng các bảng được đọc, ghi ở từng bước nằm ở `docs/uml/sequence/SD01-quet-anh-bat-dong-bo.puml` và mục 13 (Dữ liệu).
+Kịch bản viết ở mức tác nhân ↔ hệ thống (hộp đen). Phân công giữa API, worker và các module (`scan`, `mlops`, `catalog`, `pantry`, `privacy`) cùng các bảng được đọc, ghi ở từng bước nằm ở `docs/uml/sequence/SD01a-gui-anh-quet.puml … docs/uml/sequence/SD01d-don-lan-quet-ket.puml` và mục 13 (Dữ liệu).
 
 1. **A02** chọn chế độ (toàn tủ / đồ vừa mua) và chụp ảnh thứ nhất; tuỳ chọn chụp ảnh thứ hai và đánh dấu "ngăn khác" nếu ảnh 2 chụp ngăn khác.
 2. **App** nén ảnh về cạnh dài 1.280 px JPEG, sinh `Idempotency-Key` (UUID) cho lần gửi này và gửi `POST /scans` (multipart: `mode`, 1–2 ảnh, `shelf_group` mỗi ảnh).
@@ -1080,7 +1080,7 @@ Sau khi UC12 trả danh sách chip, người dùng (A02) sửa những gì mô h
 
 ### 8. Kịch bản chính
 
-Kịch bản viết ở mức tác nhân ↔ hệ thống (hộp đen). Lời gọi giữa module `scan`, `pantry`, `catalog` và Unit of Work ở bước 12–13 nằm ở `docs/uml/sequence/SD02-xac-nhan-quet.puml`.
+Kịch bản viết ở mức tác nhân ↔ hệ thống (hộp đen). Lời gọi giữa module `scan`, `pantry`, `catalog` và Unit of Work ở bước 12–13 nằm ở `docs/uml/sequence/SD02a-sua-chip.puml … docs/uml/sequence/SD02c-bo-lan-quet.puml`.
 
 1. **App** hiện màn Xác nhận nguyên liệu từ dữ liệu `GET /scans/{id}`: chip theo nhóm thực phẩm, mỗi chip có tên, số đếm hoặc mức lượng, nhãn độ tươi (chữ kèm chấm màu); chip độ tin cậy thấp hiện nhạt hơn; nhóm "Cần kiểm tra" đặt trên cùng.
 2. **A02** chạm một chip bị nhận sai tên, tìm nguyên liệu đúng.
@@ -1275,7 +1275,7 @@ A02 bấm "Ra mâm cơm" ở màn Xác nhận nguyên liệu (sau UC13) hoặc n
 
 ### 8. Kịch bản chính
 
-Kịch bản viết ở mức tác nhân ↔ hệ thống (hộp đen). Lời gọi giữa các module, bảng và view được đọc ở từng bước nằm ở sơ đồ tuần tự `docs/uml/sequence/SD03-tao-mam.puml` và mục 13 (Dữ liệu); chúng là thiết kế, không phải yêu cầu.
+Kịch bản viết ở mức tác nhân ↔ hệ thống (hộp đen). Lời gọi giữa các module, bảng và view được đọc ở từng bước nằm ở sơ đồ tuần tự `docs/uml/sequence/SD03a-tao-mam.puml … docs/uml/sequence/SD03b-nhan-mam.puml` và mục 13 (Dữ liệu); chúng là thiết kế, không phải yêu cầu.
 
 1. A02 mở màn Mâm cơm hôm nay. App hiện danh mục nhóm dị ứng, các lô đang có trong kho và điền sẵn số người mặc định của A02.
 2. A02 chọn bữa (trưa/tối), số người n, thời gian nấu tối đa, (tuỳ chọn) nhóm dị ứng của người ăn cùng và tối đa 2 lô "phải dùng", rồi bấm "Ra mâm".
@@ -1464,7 +1464,7 @@ A02 chạm một món trên mâm và bấm "Thiếu gì?".
 
 ### 8. Kịch bản chính
 
-Kịch bản viết ở mức tác nhân ↔ hệ thống (hộp đen); lời gọi giữa module ở `docs/uml/sequence/SD05-chon-thay-the.puml`.
+Kịch bản viết ở mức tác nhân ↔ hệ thống (hộp đen); lời gọi giữa module ở `docs/uml/sequence/SD05a-xem-goi-y-thay-the.puml … docs/uml/sequence/SD05c-them-di-cho.puml`.
 
 1. A02 bấm "Thiếu gì?" trên một món.
 2. App gửi `GET /meal-plans/{id}/items/{itemId}/substitutes`.
@@ -1740,7 +1740,7 @@ A02 chạm "Nấu xong" trên màn hình Nấu cả mâm hoặc Nấu xong (cu�
 
 ### 8. Kịch bản chính
 
-Kịch bản viết ở mức tác nhân ↔ hệ thống (hộp đen). Phân công giữa module `core`, `cooking`, `meal`, `pantry`, `events`, `privacy` trong Unit of Work nằm ở `docs/uml/sequence/SD06-nau-xong-va-hoan-tac.puml`.
+Kịch bản viết ở mức tác nhân ↔ hệ thống (hộp đen). Phân công giữa module `core`, `cooking`, `meal`, `pantry`, `events`, `privacy` trong Unit of Work nằm ở `docs/uml/sequence/SD06a-mo-phien-nau.puml … docs/uml/sequence/SD06c-hoan-tac.puml`.
 
 1. App hiện màn hình Nấu xong: danh sách món của mâm, mỗi món có hai nút tuỳ chọn thích / không thích.
 2. A02 chấm (tuỳ chọn) từng món rồi chạm "Nấu xong".

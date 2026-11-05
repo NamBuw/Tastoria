@@ -1,0 +1,58 @@
+@startuml
+title ERD07a — Vận hành mô hình (mlops)
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "model_versions" as model_versions {
+  * id : uuid <<PK>>
+  --
+  * name : model_name_t
+  * version : text
+  * artifact_key : text
+  * sha256 : bytea
+    preprocess_version : text
+  * metrics : jsonb
+    gate_report_key : text
+    mlflow_run_id : text
+  * status : model_status_t
+  * created_at : timestamptz
+  .. UNIQUE(name, version) ..
+  .. UNIQUE(id, name) ..
+}
+entity "model_version_classes" as model_version_classes {
+  * model_version_id : uuid <<PK, FK>>
+  * class_index : smallint <<PK>>
+  --
+  * vision_class_id : smallint <<FK>>
+  .. UNIQUE(model_version_id, vision_class_id) ..
+}
+entity "model_deployments" as model_deployments {
+  * name : model_name_t <<PK, FK>>
+  --
+  * active_version_id : uuid <<FK, UQ>>
+    previous_version_id : uuid <<FK>>
+  * switched_at : timestamptz
+    switched_by : uuid <<FK>>
+}
+entity "vision_classes" as vision_classes #EEEEEE {
+  * id : smallint <<PK>>
+  .. chi tiết ở ERD03c ..
+}
+entity "users" as users #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01a ..
+}
+
+model_versions ||--o{ model_version_classes : model_version_id
+vision_classes ||--o{ model_version_classes : vision_class_id
+model_versions ||--o| model_deployments : active_version_id, name
+model_versions |o--o| model_deployments : previous_version_id, name
+users |o--o{ model_deployments : switched_by (set_null)
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

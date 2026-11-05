@@ -1,0 +1,33 @@
+@startuml
+title AD04a — Thu thập và xuất dữ liệu huấn luyện (UC12, UC28)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam ActivityBackgroundColor White
+
+|Người dùng|
+|Hệ thống|
+|Người vận hành mô hình|
+|Người dùng|
+start
+:Gửi ảnh quét;
+|Hệ thống|
+if (Đồng ý góp ảnh?) then (không)
+  :Chỉ lưu ảnh tạm (30 ngày);
+else (có)
+  :Chép ảnh sang kho góp;
+endif
+|Người dùng|
+:Sửa chip khi xác nhận;
+|Hệ thống|
+:Ghi thao tác sửa làm nhãn yếu;
+|Người vận hành mô hình|
+:Chạy xuất dữ liệu huấn luyện;
+|Hệ thống|
+:Lọc theo đồng ý hiện hành;
+:Bí danh hoá mã người dùng;
+stop
+@enduml

@@ -1,6 +1,9 @@
 @startuml
-title ERD02 — Hồ sơ người dùng (profile) và danh mục được tham chiếu
+title ERD02 — Hồ sơ người dùng (profile)
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
 hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
 
 entity "profiles" as profiles {
   * user_id : uuid <<PK, FK>>
@@ -38,19 +41,19 @@ entity "user_settings" as user_settings {
 }
 entity "users" as users #EEEEEE {
   * id : uuid <<PK>>
-  .. chi tiết ở ERD01 ..
+  .. chi tiết ở ERD01a ..
 }
 entity "diets" as diets #EEEEEE {
   * code : text <<PK>>
-  .. chi tiết ở ERD03 ..
+  .. chi tiết ở ERD03b ..
 }
 entity "allergen_groups" as allergen_groups #EEEEEE {
   * code : text <<PK>>
-  .. chi tiết ở ERD03 ..
+  .. chi tiết ở ERD03b ..
 }
 entity "recipes" as recipes #EEEEEE {
   * id : uuid <<PK>>
-  .. chi tiết ở ERD04 ..
+  .. chi tiết ở ERD04a ..
 }
 
 users ||--o| profiles : user_id (cascade)
@@ -63,11 +66,6 @@ users ||--o| user_settings : user_id (cascade)
 
 legend right
   * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
-  UNIQUE(...) WHERE ...: chỉ mục duy nhất một phần (không phải khoá của cả bảng)
-  ||  đúng một; |o  không hoặc một
-  o{  không hoặc nhiều; o|  không hoặc một
-  (cascade), (set_null): hành vi ON DELETE; không ghi = NO ACTION
-  Thực thể nền xám: bảng thuộc sơ đồ khác (chỉ ghi khoá chính)
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
 endlegend
-
 @enduml

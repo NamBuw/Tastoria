@@ -1,0 +1,45 @@
+@startuml
+title CL01h — Miền: tương tác và phiên bản mô hình
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Tài khoản" as TK {
+  -email: Email
+  -vaiTrò: VaiTrò
+  -trạngThái: TrạngTháiTK
+}
+class "Tương tác" as TT {
+  -loại: LoạiTươngTác
+  -thờiĐiểm: Thời điểm
+}
+class "Món" as MON {
+  -tên: Chuỗi
+}
+class "Mâm cơm" as MAM {
+  -trạngThái: TrạngTháiMâm
+}
+class "Phiên bản mô hình" as PBMH {
+  -tên: TênMôHình
+  -phiênBản: Chuỗi
+  -sha256: Băm
+  -trạngThái: TrạngTháiPB
+}
+class "Triển khai mô hình" as TKMH {
+  -tên: TênMôHình
+  -chuyểnLúc: Thời điểm
+}
+
+TK "1" -- "0..*" TT : ghi nhận
+TT "0..*" -- "1" MON : về
+TT "0..*" -- "0..1" MAM : trong
+MAM "0..*" -- "0..1" PBMH : xếp hạng bởi
+TKMH "0..*" -- "1..2" PBMH : đang chạy / bản trước
+@enduml

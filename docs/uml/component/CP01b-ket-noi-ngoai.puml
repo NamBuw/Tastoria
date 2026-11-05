@@ -1,0 +1,24 @@
+@startuml
+title CP01b — Thành phần: kết nối với hệ thống ngoài
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam componentStyle rectangle
+
+component "App Tastoria (Expo)" as App <<client>>
+component "Cloudflare Tunnel" as CF <<external>>
+component "API (FastAPI)" as Api <<process>>
+component "Scheduler (cron)" as Sched <<process>>
+component "Dịch vụ email (SMTP)" as Smtp <<external>>
+component "Công cụ gán nhãn (Label Studio)" as Ls <<external>>
+component "Google Drive (rclone)" as Drive <<external>>
+
+App ..> CF : HTTPS
+CF ..> Api : tunnel
+Api ..> Smtp : SMTP
+Api ..> Ls : REST
+Sched ..> Drive : sao lưu
+@enduml

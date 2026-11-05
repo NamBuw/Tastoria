@@ -1,6 +1,11 @@
 @startuml
 title UCD07 — Gói PK7 Khảo sát gu
-' Sinh từ docs/sad/model.yaml (actors, use_cases, rels). Không sửa tay mã định danh.
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
 left to right direction
 skinparam packageStyle rectangle
 skinparam actorStyle stick
@@ -9,17 +14,13 @@ skinparam usecase {
   BorderColor Black
 }
 
-actor "Người tham gia\nkhảo sát\n(A03)" as A03
-actor "Người vận hành mô\nhình\n(A06)" as A06
-
+actor "Người tham gia khảo sát\n(A03)" as A03
+actor "Người vận hành mô hình\n(A06)" as A06
 rectangle "Tastoria" {
-  package "PK7 Khảo sát gu" as PK7 {
-    usecase "UC23 Tham gia khảo sát gu món\năn" as UC23
-    usecase "UC24 Quản lý đợt khảo sát (tạo\nphiếu, xuất kết quả)" as UC24
-  }
+  usecase "UC23\nTham gia khảo sát gu món ăn" as UC23
+  usecase "UC24\nQuản lý đợt khảo sát" as UC24
 }
 
 A03 -- UC23
 A06 -- UC24
-
 @enduml

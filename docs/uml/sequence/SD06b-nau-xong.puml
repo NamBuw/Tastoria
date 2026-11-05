@@ -1,0 +1,33 @@
+@startuml
+title SD06b — Nấu xong một chạm (UC20)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Người dùng" as U
+boundary "App" as APP
+control "API (cooking)" as API
+control "pantry" as PAN
+entity "CSDL" as DB
+
+U -> APP : bấm «Nấu xong», đánh giá món
+APP -> API : hoàn tất phiên (khóa lũy đẳng)
+API -> DB : tra phản hồi đã lưu theo khóa
+alt khóa đã dùng (gửi lại)
+  API --> APP : phản hồi đã lưu, không trừ kho lần hai
+else khóa mới, phiên «in_progress»
+  API -> PAN : trừ kho, lô gấp nhất trước
+  PAN -> DB : ghi giao dịch trừ kho
+  API -> DB : phiên «completed», mâm «cooked», ghi tương tác
+  API -> DB : lưu phản hồi lũy đẳng; commit
+  API --> APP : 200 lượng đã trừ, hạn hoàn tác
+end
+APP --> U : hiện kết quả và nút Hoàn tác
+@enduml

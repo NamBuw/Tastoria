@@ -1,0 +1,52 @@
+@startuml
+title ERD03a — Danh mục: thành phần thực phẩm và dinh dưỡng
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "food_groups" as food_groups {
+  * code : text <<PK>>
+  --
+  * name_vi : text
+}
+entity "nutrient_sources" as nutrient_sources {
+  * id : smallint <<PK>>
+  --
+  * code : text <<UQ>>
+  * name : text
+  * version : text
+  * license : text
+  * url : text
+}
+entity "food_items" as food_items {
+  * source_id : smallint <<PK, FK>>
+  * source_code : text <<PK>>
+  --
+  * name : text
+    name_en : text
+    refuse_pct : numeric
+}
+entity "nutrients" as nutrients {
+  * code : text <<PK>>
+  --
+  * name_vi : text
+  * unit : text
+}
+entity "food_nutrients" as food_nutrients {
+  * source_id : smallint <<PK, FK>>
+  * source_code : text <<PK, FK>>
+  * nutrient_code : text <<PK, FK>>
+  --
+  * per_100g : numeric
+}
+
+nutrient_sources ||--o{ food_items : source_id
+nutrients ||--o{ food_nutrients : nutrient_code
+food_items ||--o{ food_nutrients : source_id, source_code
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

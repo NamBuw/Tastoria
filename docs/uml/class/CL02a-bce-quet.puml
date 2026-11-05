@@ -1,0 +1,46 @@
+@startuml
+title CL02a — Lớp phân tích BCE: UC12 Quét nguyên liệu
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Màn hình Quét" as BQ <<boundary>> {
+  -chếĐộ
+  -ảnh[1..2]
+  +gửiẢnh()
+}
+class "Tạo lần quét" as CT <<control>> {
+  +kiểmTraẢnh()
+  +tạoLầnQuét()
+}
+class "Nhận diện ảnh" as CS <<control>> {
+  +nhậnDiện()
+  +gộpChip()
+}
+class "Lần quét" as ELQ <<entity>> {
+  -chếĐộ
+  -trạngThái
+}
+class "Ảnh quét" as EAQ <<entity>> {
+  -thứTự
+  -nhómNgăn
+  -đãGóp
+}
+class "Chip nguyên liệu" as ECH <<entity>> {
+  -sốĐếm
+  -mứcLượng
+}
+
+BQ -- CT
+CT -- ELQ
+CT -- EAQ
+CS -- EAQ
+CS -- ECH
+@enduml

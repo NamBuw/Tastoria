@@ -1,0 +1,28 @@
+@startuml
+title SD01c — App chờ kết quả quét (UC12)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Người dùng" as U
+boundary "App" as APP
+control "API (scan)" as API
+entity "Hàng đợi (Valkey)" as Q
+entity "CSDL" as DB
+
+loop đến khi done, failed hoặc expired
+  APP -> API : hỏi trạng thái (chờ tối đa 10 s)
+  API -> DB : đọc lần quét của người gọi
+  API -> Q : chờ thông báo của lần quét
+  Q --> API : thông báo hoặc hết 10 s
+  API --> APP : trạng thái, chip khi đã xong
+end
+APP --> U : hiện chip để xác nhận (UC13)
+@enduml

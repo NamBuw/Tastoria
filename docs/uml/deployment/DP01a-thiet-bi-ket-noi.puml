@@ -1,0 +1,23 @@
+@startuml
+title DP01a — Triển khai: thiết bị và kết nối
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam componentStyle rectangle
+
+node "Điện thoại Android\n(App APK)" as Phone <<device>>
+node "Trình duyệt\n(web app, landing)" as Browser <<device>>
+cloud "Cloudflare edge" as CF <<cloud>>
+node "Máy chủ lab\n(Docker Compose)" as Lab <<device>>
+node "Máy GPU lab (L40S)" as Gpu <<device>>
+cloud "Google Drive" as Drive <<cloud>>
+
+Phone ..> CF : HTTPS
+Browser ..> CF : HTTPS
+CF ..> Lab : Cloudflare Tunnel
+Lab ..> Drive : rclone sao lưu
+Gpu ..> Lab : chép ONNX
+@enduml

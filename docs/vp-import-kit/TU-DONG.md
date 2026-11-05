@@ -7,7 +7,7 @@ Kết quả nằm ở `dist/vpp/` (đã gitignore, không commit):
 | Tệp | Nội dung |
 |---|---|
 | `Tastoria-UML.vpp` | 47 sơ đồ UML nhập từ `docs/uml/**/*.puml` |
-| `Tastoria-ERD.vpp` | 62 bảng, 393 cột, 97 khoá ngoại; 8 ERD (ERD01–ERD07 theo nhóm, ERD08 tổng quan) |
+| `Tastoria-ERD.vpp` | 62 bảng, 393 cột, 97 khoá ngoại; 8 ERD (ERD01a–ERD01b–ERD07a–ERD07b theo nhóm, ERD08 tổng quan) |
 | `png/uml/`, `png/erd/` | Ảnh do chính VP xuất từ hai tệp trên |
 
 ## 1. Môi trường
@@ -41,19 +41,19 @@ Plugin cài bằng cách chép thư mục đã giải nén vào `~/.config/Visua
 | `CombinedFragment.nestedCombinedFragments` null, fragment lồng nhau làm NPE | SD | khởi tạo danh sách (fragment lồng vẫn không được vẽ, plugin bỏ qua) |
 | Trùng tên actor tương tác: plugin đổi tên phần tử cũ thành `..._renamed_on_import_<giờ>` và mở hộp thoại | SD | bỏ việc đổi tên |
 | VP giữ tên duy nhất trong cùng cha; actor, system, package ở gốc trùng tên với sơ đồ trước bị để tên mặc định `ActorNN`, `SystemN` | UCD, CTX | mỗi sơ đồ nhập vào một model riêng mang tên sơ đồ |
-| Nhánh rẽ/fork rỗng, vòng lặp không có hành động lùi, luồng đi vào nút khởi đầu | AD01, AD03, AD04 | bỏ qua cạnh không hợp lệ thay vì dừng |
-| Lớp liên kết `(A, B) .. C` thành Anchor giữa hai lớp, VP từ chối | CL01, PG01 | bỏ qua cạnh đó, ghi cảnh báo |
+| Nhánh rẽ/fork rỗng, vòng lặp không có hành động lùi, luồng đi vào nút khởi đầu | AD01a–AD01c, AD03a–AD03b, AD04a–AD04c | bỏ qua cạnh không hợp lệ thay vì dừng |
+| Lớp liên kết `(A, B) .. C` thành Anchor giữa hai lớp, VP từ chối | CL01a–CL01i, PG01a–PG01c | bỏ qua cạnh đó, ghi cảnh báo |
 | Hộp thoại cảnh báo modal làm treo tiến trình dòng lệnh | nhiều | in cảnh báo ra stdout |
 
 Lỗi không cần vá plugin: trình kiểm cú pháp của plugin báo "No @startuml/@enduml found" khi dòng đầu là `@startuml <tên>`. Script dựng chép các tệp `.puml` sang `~/opt/vp/stage-puml/` và đổi dòng đầu thành `@startuml`; tệp trong repo giữ nguyên. Tên sơ đồ trong VP lấy từ tên tệp.
 
-Plugin để JVM sống sau khi gặp ngoại lệ, nên mỗi tệp chạy một tiến trình riêng: `~/opt/vp/tools/vp_import_one.sh` chạy plugin, chờ dòng `Saved project`, giết tiến trình khi gặp ngoại lệ hoặc quá 10 phút. `~/opt/vp/tools/import_all.sh` gọi nó lần lượt theo thứ tự lớp, thành phần, gói, triển khai, ngữ cảnh, use case, trạng thái, hoạt động, tuần tự (tuần tự sau cùng để lifeline gắn được vào lớp/thành phần cùng tên). 47 tệp mất khoảng 25 phút. Một lần CL08 lỗi NPE trong Swing khi VP mở sơ đồ (`openDiagram`), chạy lại riêng tệp đó thì qua; nếu tệp nào báo `FAIL`, chạy lại `vp_import_one.sh` cho tệp đó trên cùng dự án.
+Plugin để JVM sống sau khi gặp ngoại lệ, nên mỗi tệp chạy một tiến trình riêng: `~/opt/vp/tools/vp_import_one.sh` chạy plugin, chờ dòng `Saved project`, giết tiến trình khi gặp ngoại lệ hoặc quá 10 phút. `~/opt/vp/tools/import_all.sh` gọi nó lần lượt theo thứ tự lớp, thành phần, gói, triển khai, ngữ cảnh, use case, trạng thái, hoạt động, tuần tự (tuần tự sau cùng để lifeline gắn được vào lớp/thành phần cùng tên). 47 tệp mất khoảng 25 phút. Một lần CL08a–CL08b lỗi NPE trong Swing khi VP mở sơ đồ (`openDiagram`), chạy lại riêng tệp đó thì qua; nếu tệp nào báo `FAIL`, chạy lại `vp_import_one.sh` cho tệp đó trên cùng dự án.
 
 ## 4. ERD: plugin riêng thay cho Reverse DDL
 
 `ReverseDDL.sh` của CE trả `Feature not supported by current edition`. Thay vì chuyển sang bản dùng thử, ERD dựng bằng một plugin nhỏ viết trên Open API của VP (CE chạy được):
 
-1. `python3 ~/opt/vp/tools/ddl_to_spec.py db/schema_vp.sql docs/erd/gen_erd.py ~/opt/vp/erd-spec.tsv` đọc DDL (bảng, cột, kiểu, NOT NULL, DEFAULT, PK, UNIQUE một cột, FK kể cả FK ghép và 4 FK ở `ALTER TABLE`, chú thích bảng/cột) và lấy nhóm bảng ERD01–ERD07 từ `GROUPS` trong `gen_erd.py`.
+1. `python3 ~/opt/vp/tools/ddl_to_spec.py db/schema_vp.sql docs/erd/gen_erd.py ~/opt/vp/erd-spec.tsv` đọc DDL (bảng, cột, kiểu, NOT NULL, DEFAULT, PK, UNIQUE một cột, FK kể cả FK ghép và 4 FK ở `ALTER TABLE`, chú thích bảng/cột) và lấy nhóm bảng ERD01a–ERD01b–ERD07a–ERD07b từ `GROUPS` trong `gen_erd.py`.
 2. Plugin `tastoria.erd` (mã ở `~/opt/vp/tools/tastoria-erd-plugin`, cài bằng `build.sh`):
 
    ```
@@ -74,8 +74,8 @@ Truyền `*` không kèm ngoặc kép bên trong. Khi `-diagram` chỉ có một
 
 ## 6. Việc còn phải làm tay trong VP
 
-- Bố cục: plugin dùng bố cục tự động của VP. Sơ đồ tuần tự bị dồn mọi lifeline về x = 0; cần kéo lifeline ra trong VP (kéo trong giao diện thì thông điệp đi theo; dời bằng API thì không). UCD00 và các sơ đồ lớn cần chỉnh để use case không nằm chồng.
-- Phần bị bỏ khi nhập (xem cột Vá ở mục 3): fragment lồng trong SD, 6 lớp liên kết ở CL01, các cạnh không hợp lệ ở AD04, PG01; vài quan hệ ở CP01, DP01, CTX01 có đầu mút không nhập được. Đối chiếu với ảnh trong `docs/uml/out/`.
+- Bố cục: plugin dùng bố cục tự động của VP. Sơ đồ tuần tự bị dồn mọi lifeline về x = 0; cần kéo lifeline ra trong VP (kéo trong giao diện thì thông điệp đi theo; dời bằng API thì không). UCD00a–UCD00b và các sơ đồ lớn cần chỉnh để use case không nằm chồng.
+- Phần bị bỏ khi nhập (xem cột Vá ở mục 3): fragment lồng trong SD, 6 lớp liên kết ở CL01a–CL01i, các cạnh không hợp lệ ở AD04a–AD04c, PG01a–PG01c; vài quan hệ ở CP01a–CP01e, DP01a–DP01c, CTX01a–CTX01b có đầu mút không nhập được. Đối chiếu với ảnh trong `docs/uml/out/`.
 - Làn (swimlane) của sơ đồ hoạt động không lên được: VP 18.1 chỉ hiện một đầu làn tên mặc định `PartitionN`, các hành động nằm chung một cột. Cần dựng lại làn trong VP theo ảnh mẫu.
 - Tên actor đa dòng thành `Người dùng, (A02)` (dấu phẩy thay xuống dòng).
 - Hai cột `jsonb` (`idempotency_keys.response_body`, `model_versions.metrics`) hiện kiểu `int4` vì danh sách kiểu PostgreSQL của VP không có `jsonb`; kiểu gốc ghi ở Documentation của cột. `bigserial` thành `int8`, ghi chú ở Documentation.

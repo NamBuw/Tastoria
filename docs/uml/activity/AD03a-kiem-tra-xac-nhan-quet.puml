@@ -1,0 +1,40 @@
+@startuml
+title AD03a — Xác nhận quét: kiểm tra điều kiện (UC13)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam ActivityBackgroundColor White
+
+|App|
+|scan|
+|App|
+start
+:Gửi xác nhận lần quét;
+|scan|
+:Khoá lần quét của người gọi;
+if (Tìm thấy?) then (không)
+  :Trả 404;
+  stop
+else (có)
+endif
+if (Đã xác nhận?) then (rồi)
+  :Trả lại kết quả cũ;
+  stop
+else (chưa)
+endif
+if (Ở trạng thái done?) then (không)
+  :Trả 409;
+  stop
+else (có)
+endif
+if (Còn chip cần kiểm tra?) then (còn)
+  :Trả 422;
+  stop
+else (không)
+endif
+:Ghi kho từ chip (AD03b);
+stop
+@enduml

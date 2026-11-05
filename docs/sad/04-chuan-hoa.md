@@ -6,21 +6,21 @@ Tài liệu này phân tích chuẩn hoá cho 62 bảng của lược đồ vậ
 
 | Tệp | Nội dung | Ký pháp |
 |---|---|---|
-| `docs/erd/ERD00-khai-niem-chen.puml` | Mô hình khái niệm: 29 thực thể, quan hệ đặt tên bằng động từ | Chen |
-| `docs/erd/ERD01-dinh-danh-quyen-rieng-tu.puml` | core, identity, privacy (9 bảng) | Chân quạ |
+| `docs/erd/ERD00a-chen-nguoi-dung-ho-so.puml … docs/erd/ERD00h-chen-khao-sat.puml` | Mô hình khái niệm: 29 thực thể, quan hệ đặt tên bằng động từ | Chen |
+| `docs/erd/ERD01a-dinh-danh.puml … docs/erd/ERD01b-quyen-rieng-tu.puml` | core, identity, privacy (9 bảng) | Chân quạ |
 | `docs/erd/ERD02-ho-so.puml` | profile (4 bảng) và danh mục được tham chiếu | Chân quạ |
-| `docs/erd/ERD03-danh-muc-thanh-phan.puml` | Thành phần thực phẩm, nguyên liệu, dị ứng, chế độ ăn, đơn vị, mức lượng, lớp thị giác (15 bảng) | Chân quạ |
-| `docs/erd/ERD04-mon-an.puml` | Món, bước, thẻ, nguồn, dinh dưỡng món (8 bảng) | Chân quạ |
-| `docs/erd/ERD05-kho-quet.puml` | pantry, scan (6 bảng) | Chân quạ |
-| `docs/erd/ERD06-mam-nau.puml` | meal, substitute, cooking, events (11 bảng) | Chân quạ |
-| `docs/erd/ERD07-khao-sat-mo-hinh.puml` | survey, mlops (9 bảng) | Chân quạ |
+| `docs/erd/ERD03a-thanh-phan-dinh-duong.puml … docs/erd/ERD03c-don-vi-lop-thi-giac.puml` | Thành phần thực phẩm, nguyên liệu, dị ứng, chế độ ăn, đơn vị, mức lượng, lớp thị giác (15 bảng) | Chân quạ |
+| `docs/erd/ERD04a-cong-thuc.puml … docs/erd/ERD04b-the-nguon-dinh-duong.puml` | Món, bước, thẻ, nguồn, dinh dưỡng món (8 bảng) | Chân quạ |
+| `docs/erd/ERD05a-kho.puml … docs/erd/ERD05b-quet.puml` | pantry, scan (6 bảng) | Chân quạ |
+| `docs/erd/ERD06a-mam.puml … docs/erd/ERD06e-tuong-tac.puml` | meal, substitute, cooking, events (11 bảng) | Chân quạ |
+| `docs/erd/ERD07a-mo-hinh.puml … docs/erd/ERD07b-khao-sat.puml` | survey, mlops (9 bảng) | Chân quạ |
 | `docs/erd/ERD08-tong-quan.puml` | Cả 62 bảng (chỉ tên) và 97 khoá ngoại, gom theo module | Chân quạ |
 
 Ảnh SVG ở `docs/uml/out/erd/`.
 
-**Quy ước ERD00 (Chen, theo Elmasri–Navathe).** Hình chữ nhật là thực thể, chữ nhật viền đôi là thực thể yếu (Hồ sơ, Bước nấu, Ảnh quét, Phân công khảo sát, Điểm khảo sát); hình thoi là quan hệ, thoi viền đôi là quan hệ định danh; elip gạch chân là thuộc tính khoá. Với thực thể yếu, `<<key>>` là khoá bộ phận (Số bước, Thứ tự ảnh); chuẩn Chen vẽ khoá bộ phận bằng gạch chân nét đứt nhưng PlantUML chỉ vẽ nét liền, nên chú giải trên sơ đồ ghi rõ điều này. Hồ sơ (1:1 với Người dùng), Phân công khảo sát (định danh bởi Người tham gia và Món) và Điểm khảo sát (1:1 với Phân công) không có khoá bộ phận: chúng định danh hoàn toàn qua thực thể chủ. Elip viền đôi là thuộc tính đa trị, elip nét đứt là thuộc tính dẫn xuất (Tổng thời gian, Lượng hiện tại, Độ gấp u), elip có nhánh con là thuộc tính phức hợp. Số 1/N/M trên cạnh là tỉ số lực lượng; cạnh nét đôi là tham gia toàn phần (mọi thể hiện của thực thể phải tham gia quan hệ), nét đơn là tham gia bộ phận. **ERD00 thể hiện ràng buộc nghiệp vụ, ERD01–07 thể hiện đúng những gì DDL ép được.** Vì vậy ở ERD00, Mâm cơm tham gia toàn phần trong "gồm món" (mâm 2–3 món, BR-TRAY-01), Lần quét trong "chụp" (1–2 ảnh), Món trong "gồm bước" và "dùng" (món nào cũng có bước và nguyên liệu, FR-25-08), dù ở chân quạ các đầu bảng con đều có cận dưới 0. Nhật ký đồng ý là thực thể Sự kiện đồng ý (một người có thể đồng ý rồi rút nhiều lần trên cùng một phiên bản điều khoản, nên không vẽ được bằng tập quan hệ M:N giữa Người dùng và Phiên bản điều khoản, vốn chỉ có một thể hiện cho mỗi cặp). Các quan hệ M:N còn lại có thuộc tính (có hàm lượng, dùng, có lớp đầu ra, xếp lịch, ánh xạ tới) đều chỉ có một giá trị cho mỗi cặp, đúng với khoá chính hai cột của bảng tương ứng. Mô hình khái niệm cố ý bỏ các bảng kỹ thuật (token, khoá lũy đẳng, nhật ký kiểm toán, triển khai mô hình, thẻ, nguồn món, danh sách đi chợ…); chúng có đầy đủ ở ERD01–07.
+**Quy ước ERD00a–ERD00h (Chen, theo Elmasri–Navathe).** Hình chữ nhật là thực thể, chữ nhật viền đôi là thực thể yếu (Hồ sơ, Bước nấu, Ảnh quét, Phân công khảo sát, Điểm khảo sát); hình thoi là quan hệ, thoi viền đôi là quan hệ định danh; elip gạch chân là thuộc tính khoá. Với thực thể yếu, `<<key>>` là khoá bộ phận (Số bước, Thứ tự ảnh); chuẩn Chen vẽ khoá bộ phận bằng gạch chân nét đứt nhưng PlantUML chỉ vẽ nét liền, nên chú giải trên sơ đồ ghi rõ điều này. Hồ sơ (1:1 với Người dùng), Phân công khảo sát (định danh bởi Người tham gia và Món) và Điểm khảo sát (1:1 với Phân công) không có khoá bộ phận: chúng định danh hoàn toàn qua thực thể chủ. Elip viền đôi là thuộc tính đa trị, elip nét đứt là thuộc tính dẫn xuất (Tổng thời gian, Lượng hiện tại, Độ gấp u), elip có nhánh con là thuộc tính phức hợp. Số 1/N/M trên cạnh là tỉ số lực lượng; cạnh nét đôi là tham gia toàn phần (mọi thể hiện của thực thể phải tham gia quan hệ), nét đơn là tham gia bộ phận. **ERD00a–ERD00h thể hiện ràng buộc nghiệp vụ, ERD01a–ERD01b–07 thể hiện đúng những gì DDL ép được.** Vì vậy ở ERD00a–ERD00h, Mâm cơm tham gia toàn phần trong "gồm món" (mâm 2–3 món, BR-TRAY-01), Lần quét trong "chụp" (1–2 ảnh), Món trong "gồm bước" và "dùng" (món nào cũng có bước và nguyên liệu, FR-25-08), dù ở chân quạ các đầu bảng con đều có cận dưới 0. Nhật ký đồng ý là thực thể Sự kiện đồng ý (một người có thể đồng ý rồi rút nhiều lần trên cùng một phiên bản điều khoản, nên không vẽ được bằng tập quan hệ M:N giữa Người dùng và Phiên bản điều khoản, vốn chỉ có một thể hiện cho mỗi cặp). Các quan hệ M:N còn lại có thuộc tính (có hàm lượng, dùng, có lớp đầu ra, xếp lịch, ánh xạ tới) đều chỉ có một giá trị cho mỗi cặp, đúng với khoá chính hai cột của bảng tương ứng. Mô hình khái niệm cố ý bỏ các bảng kỹ thuật (token, khoá lũy đẳng, nhật ký kiểm toán, triển khai mô hình, thẻ, nguồn món, danh sách đi chợ…); chúng có đầy đủ ở ERD01a–ERD01b–07.
 
-**Quy ước ERD01–08 (chân quạ).** ERD01–08 sinh tự động từ `db/schema.sql`. Mỗi bảng xuất hiện đầy đủ cột ở đúng một sơ đồ trong ERD01–07; bảng của nhóm khác hiện dạng rút gọn nền xám (chỉ khoá chính, ghi sơ đồ chứa chi tiết). `*` là NOT NULL; `<<PK>>`, `<<FK>>`, `<<UQ>>` đánh dấu khoá chính, khoá ngoại, cột duy nhất; ràng buộc duy nhất nhiều cột và chỉ mục duy nhất một phần (`UNIQUE(...) WHERE ...`, không phải khoá của cả bảng) ghi ở cuối thực thể. Bội số hai đầu suy trực tiếp từ DDL:
+**Quy ước ERD01a–ERD01b–08 (chân quạ).** ERD01a–ERD01b–08 sinh tự động từ `db/schema.sql`. Mỗi bảng xuất hiện đầy đủ cột ở đúng một sơ đồ trong ERD01a–ERD01b–07; bảng của nhóm khác hiện dạng rút gọn nền xám (chỉ khoá chính, ghi sơ đồ chứa chi tiết). `*` là NOT NULL; `<<PK>>`, `<<FK>>`, `<<UQ>>` đánh dấu khoá chính, khoá ngoại, cột duy nhất; ràng buộc duy nhất nhiều cột và chỉ mục duy nhất một phần (`UNIQUE(...) WHERE ...`, không phải khoá của cả bảng) ghi ở cuối thực thể. Bội số hai đầu suy trực tiếp từ DDL:
 
 | Khoá ngoại ở bảng con | Đầu bảng cha | Đầu bảng con | Ví dụ |
 |---|---|---|---|
@@ -56,72 +56,72 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 
 | # | Bảng | Module | ERD | Dạng chuẩn đạt |
 |---|---|---|---|---|
-| 1 | `idempotency_keys` | core | ERD01 | BCNF |
-| 2 | `users` | identity | ERD01 | BCNF |
-| 3 | `refresh_tokens` | identity | ERD01 | 2NF |
-| 4 | `password_resets` | identity | ERD01 | BCNF |
-| 5 | `consent_purposes` | privacy | ERD01 | BCNF |
-| 6 | `policy_versions` | privacy | ERD01 | BCNF |
-| 7 | `consent_events` | privacy | ERD01 | BCNF |
-| 8 | `dsr_requests` | privacy | ERD01 | 2NF |
-| 9 | `audit_log` | privacy | ERD01 | BCNF |
-| 10 | `food_groups` | catalog | ERD03 | BCNF |
-| 11 | `nutrient_sources` | catalog | ERD03 | BCNF |
-| 12 | `food_items` | catalog | ERD03 | BCNF |
-| 13 | `nutrients` | catalog | ERD03 | BCNF |
-| 14 | `food_nutrients` | catalog | ERD03 | BCNF |
-| 15 | `allergen_groups` | catalog | ERD03 | BCNF |
-| 16 | `diets` | catalog | ERD03 | BCNF |
-| 17 | `diet_exclusions` | catalog | ERD03 | BCNF |
-| 18 | `ingredients` | catalog | ERD03 | BCNF |
-| 19 | `ingredient_synonyms` | catalog | ERD03 | BCNF |
-| 20 | `ingredient_allergens` | catalog | ERD03 | BCNF |
-| 21 | `ingredient_units` | catalog | ERD03 | BCNF |
-| 22 | `qty_levels` | catalog | ERD03 | BCNF |
-| 23 | `vision_classes` | catalog | ERD03 | BCNF |
-| 24 | `vision_class_ingredients` | catalog | ERD03 | BCNF |
-| 25 | `cooking_methods` | catalog | ERD04 | BCNF |
-| 26 | `tags` | catalog | ERD04 | BCNF |
-| 27 | `recipes` | catalog | ERD04 | BCNF |
-| 28 | `recipe_ingredients` | catalog | ERD04 | BCNF |
-| 29 | `recipe_steps` | catalog | ERD04 | BCNF |
-| 30 | `recipe_tags` | catalog | ERD04 | BCNF |
-| 31 | `recipe_sources` | catalog | ERD04 | BCNF |
-| 32 | `recipe_nutrition` | catalog | ERD04 | 1NF |
+| 1 | `idempotency_keys` | core | ERD01a–ERD01b | BCNF |
+| 2 | `users` | identity | ERD01a–ERD01b | BCNF |
+| 3 | `refresh_tokens` | identity | ERD01a–ERD01b | 2NF |
+| 4 | `password_resets` | identity | ERD01a–ERD01b | BCNF |
+| 5 | `consent_purposes` | privacy | ERD01a–ERD01b | BCNF |
+| 6 | `policy_versions` | privacy | ERD01a–ERD01b | BCNF |
+| 7 | `consent_events` | privacy | ERD01a–ERD01b | BCNF |
+| 8 | `dsr_requests` | privacy | ERD01a–ERD01b | 2NF |
+| 9 | `audit_log` | privacy | ERD01a–ERD01b | BCNF |
+| 10 | `food_groups` | catalog | ERD03a–ERD03c | BCNF |
+| 11 | `nutrient_sources` | catalog | ERD03a–ERD03c | BCNF |
+| 12 | `food_items` | catalog | ERD03a–ERD03c | BCNF |
+| 13 | `nutrients` | catalog | ERD03a–ERD03c | BCNF |
+| 14 | `food_nutrients` | catalog | ERD03a–ERD03c | BCNF |
+| 15 | `allergen_groups` | catalog | ERD03a–ERD03c | BCNF |
+| 16 | `diets` | catalog | ERD03a–ERD03c | BCNF |
+| 17 | `diet_exclusions` | catalog | ERD03a–ERD03c | BCNF |
+| 18 | `ingredients` | catalog | ERD03a–ERD03c | BCNF |
+| 19 | `ingredient_synonyms` | catalog | ERD03a–ERD03c | BCNF |
+| 20 | `ingredient_allergens` | catalog | ERD03a–ERD03c | BCNF |
+| 21 | `ingredient_units` | catalog | ERD03a–ERD03c | BCNF |
+| 22 | `qty_levels` | catalog | ERD03a–ERD03c | BCNF |
+| 23 | `vision_classes` | catalog | ERD03a–ERD03c | BCNF |
+| 24 | `vision_class_ingredients` | catalog | ERD03a–ERD03c | BCNF |
+| 25 | `cooking_methods` | catalog | ERD04a–ERD04b | BCNF |
+| 26 | `tags` | catalog | ERD04a–ERD04b | BCNF |
+| 27 | `recipes` | catalog | ERD04a–ERD04b | BCNF |
+| 28 | `recipe_ingredients` | catalog | ERD04a–ERD04b | BCNF |
+| 29 | `recipe_steps` | catalog | ERD04a–ERD04b | BCNF |
+| 30 | `recipe_tags` | catalog | ERD04a–ERD04b | BCNF |
+| 31 | `recipe_sources` | catalog | ERD04a–ERD04b | BCNF |
+| 32 | `recipe_nutrition` | catalog | ERD04a–ERD04b | 1NF |
 | 33 | `profiles` | profile | ERD02 | BCNF |
 | 34 | `user_allergens` | profile | ERD02 | BCNF |
 | 35 | `user_favorite_recipes` | profile | ERD02 | BCNF |
 | 36 | `user_settings` | profile | ERD02 | BCNF |
-| 37 | `pantry_lots` | pantry | ERD05 | 2NF |
-| 38 | `pantry_transactions` | pantry | ERD05 | BCNF |
-| 39 | `scans` | scan | ERD05 | BCNF |
-| 40 | `scan_images` | scan | ERD05 | BCNF |
-| 41 | `scan_items` | scan | ERD05 | BCNF |
-| 42 | `detections` | scan | ERD05 | BCNF |
-| 43 | `model_versions` | mlops | ERD07 | BCNF |
-| 44 | `model_version_classes` | mlops | ERD07 | BCNF |
-| 45 | `model_deployments` | mlops | ERD07 | BCNF |
-| 46 | `substitution_pairs` | substitute | ERD06 | BCNF |
-| 47 | `ingredient_embeddings` | substitute | ERD06 | BCNF |
-| 48 | `shopping_items` | substitute | ERD06 | 2NF |
-| 49 | `meal_plans` | meal | ERD06 | BCNF |
-| 50 | `meal_plan_coeater_allergens` | meal | ERD06 | BCNF |
-| 51 | `meal_plan_pins` | meal | ERD06 | BCNF |
-| 52 | `meal_plan_items` | meal | ERD06 | 2NF |
-| 53 | `meal_plan_item_substitutions` | meal | ERD06 | BCNF |
-| 54 | `cook_sessions` | cooking | ERD06 | BCNF |
-| 55 | `cook_schedule_entries` | cooking | ERD06 | BCNF |
-| 56 | `interactions` | events | ERD06 | 2NF |
-| 57 | `survey_forms` | survey | ERD07 | BCNF |
-| 58 | `survey_form_anchors` | survey | ERD07 | BCNF |
-| 59 | `survey_respondents` | survey | ERD07 | BCNF |
-| 60 | `survey_assignments` | survey | ERD07 | BCNF |
-| 61 | `survey_ratings` | survey | ERD07 | BCNF |
-| 62 | `survey_favorites` | survey | ERD07 | BCNF |
+| 37 | `pantry_lots` | pantry | ERD05a–ERD05b | 2NF |
+| 38 | `pantry_transactions` | pantry | ERD05a–ERD05b | BCNF |
+| 39 | `scans` | scan | ERD05a–ERD05b | BCNF |
+| 40 | `scan_images` | scan | ERD05a–ERD05b | BCNF |
+| 41 | `scan_items` | scan | ERD05a–ERD05b | BCNF |
+| 42 | `detections` | scan | ERD05a–ERD05b | BCNF |
+| 43 | `model_versions` | mlops | ERD07a–ERD07b | BCNF |
+| 44 | `model_version_classes` | mlops | ERD07a–ERD07b | BCNF |
+| 45 | `model_deployments` | mlops | ERD07a–ERD07b | BCNF |
+| 46 | `substitution_pairs` | substitute | ERD06a–ERD06e | BCNF |
+| 47 | `ingredient_embeddings` | substitute | ERD06a–ERD06e | BCNF |
+| 48 | `shopping_items` | substitute | ERD06a–ERD06e | 2NF |
+| 49 | `meal_plans` | meal | ERD06a–ERD06e | BCNF |
+| 50 | `meal_plan_coeater_allergens` | meal | ERD06a–ERD06e | BCNF |
+| 51 | `meal_plan_pins` | meal | ERD06a–ERD06e | BCNF |
+| 52 | `meal_plan_items` | meal | ERD06a–ERD06e | 2NF |
+| 53 | `meal_plan_item_substitutions` | meal | ERD06a–ERD06e | BCNF |
+| 54 | `cook_sessions` | cooking | ERD06a–ERD06e | BCNF |
+| 55 | `cook_schedule_entries` | cooking | ERD06a–ERD06e | BCNF |
+| 56 | `interactions` | events | ERD06a–ERD06e | 2NF |
+| 57 | `survey_forms` | survey | ERD07a–ERD07b | BCNF |
+| 58 | `survey_form_anchors` | survey | ERD07a–ERD07b | BCNF |
+| 59 | `survey_respondents` | survey | ERD07a–ERD07b | BCNF |
+| 60 | `survey_assignments` | survey | ERD07a–ERD07b | BCNF |
+| 61 | `survey_ratings` | survey | ERD07a–ERD07b | BCNF |
+| 62 | `survey_favorites` | survey | ERD07a–ERD07b | BCNF |
 
 ## 3. Phân tích từng bảng
 
-### Nhóm core (ERD01)
+### Nhóm core (ERD01a–ERD01b)
 
 #### `idempotency_keys`
 
@@ -133,7 +133,7 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **BCNF:** Đạt. Vế trái của mọi PTH không tầm thường là siêu khoá.
 - **Kết luận:** BCNF.
 
-### Nhóm identity (ERD01)
+### Nhóm identity (ERD01a–ERD01b)
 
 #### `users`
 
@@ -174,7 +174,7 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **BCNF:** Đạt. Vế trái của mọi PTH không tầm thường là siêu khoá.
 - **Kết luận:** BCNF.
 
-### Nhóm privacy (ERD01)
+### Nhóm privacy (ERD01a–ERD01b)
 
 #### `consent_purposes`
 
@@ -233,7 +233,7 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **Ghi chú:** `actor_role` là vai trò tại thời điểm thao tác. Vai trò của một người có thể đổi, nên không có PTH `actor_user_id → actor_role` trên toàn bảng; đây là thuộc tính của sự kiện, không phải bản chép của `users.role`. Bảng chỉ ghi thêm (`trg_audit_log_append_only`); việc bí danh hoá `entity_id` khi xoá tài khoản ở D8.
 - **Kết luận:** BCNF.
 
-### Nhóm catalog — thành phần, nguyên liệu, lớp thị giác (ERD03)
+### Nhóm catalog — thành phần, nguyên liệu, lớp thị giác (ERD03a–ERD03c)
 
 #### `food_groups`
 
@@ -393,7 +393,7 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **Ghi chú:** Ràng buộc "mỗi lớp tối đa một nguyên liệu mặc định" không phải PTH mà là ràng buộc duy nhất trên tập con, ép bằng `ux_vision_class_ingredients_default ... WHERE is_default`.
 - **Kết luận:** BCNF.
 
-### Nhóm catalog — món ăn (ERD04)
+### Nhóm catalog — món ăn (ERD04a–ERD04b)
 
 #### `cooking_methods`
 
@@ -524,7 +524,7 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **BCNF:** Đạt. Vế trái của mọi PTH không tầm thường là siêu khoá.
 - **Kết luận:** BCNF.
 
-### Nhóm pantry (ERD05)
+### Nhóm pantry (ERD05a–ERD05b)
 
 #### `pantry_lots`
 
@@ -550,7 +550,7 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **Ghi chú:** Chỉ ghi thêm (`trg_pantry_transactions_append_only`); hoàn tác là một bản ghi đảo trỏ `reverses_id`. Theo BR-PANTRY-02 mỗi giao dịch bị đảo tối đa một lần, và DDL khai `UNIQUE (reverses_id)`, nên `reverses_id` là siêu khoá trên các bộ khác NULL (N1). Nhờ đó các PTH `reverses_id → lot_id` và `reverses_id → delta_*` (bản đảo cùng lô, đổi dấu) có vế trái là siêu khoá và không phá BCNF; trigger `trg_pantry_transactions_ref` kiểm bản đảo cùng lô. `reason = undo` khi và chỉ khi có `reverses_id` là ràng buộc mẫu hằng (N2, `ck_pantry_transactions_undo`). Ở v2 mỗi `reason` thường đi với một `ref_type`, nhưng thiết kế không ép cặp này (`manual_edit` và `discard` có thể do người dùng hoặc job), nên không ghi PTH `reason → ref_type`. `urgency_at_event` là ảnh chụp độ gấp lúc trừ kho (D2). `(ref_type, ref_id)` là tham chiếu đa hình, kiểm bằng trigger thay cho khoá ngoại (D13).
 - **Kết luận:** BCNF.
 
-### Nhóm scan (ERD05)
+### Nhóm scan (ERD05a–ERD05b)
 
 #### `scans`
 
@@ -598,7 +598,7 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **Ghi chú:** `confidence` và bốn xác suất độ tươi trong [0, 1]; bốn xác suất cùng NULL hoặc cùng có giá trị và có tổng 1 (`ck_detections_p_*`, BR-FRESH-02).
 - **Kết luận:** BCNF.
 
-### Nhóm mlops (ERD07)
+### Nhóm mlops (ERD07a–ERD07b)
 
 #### `model_versions`
 
@@ -636,10 +636,10 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **2NF:** Đạt. Mọi khoá ứng viên chỉ có một cột nên không thể có phụ thuộc bộ phận.
 - **3NF:** Đạt. Không có thuộc tính không khoá nào phụ thuộc vào một tập cột không phải siêu khoá.
 - **BCNF:** Đạt. Vế trái của mọi PTH không tầm thường là siêu khoá.
-- **Ghi chú:** Hai khoá ứng viên đều khai trong DDL: khoá chính `name` và `UNIQUE (active_version_id)`. PTH `active_version_id → name` vốn là PTH liên quan hệ (tên lấy từ `model_versions.name`); nó được ép bằng khoá ngoại ghép `(active_version_id, name) → model_versions (id, name)` (đích là siêu khoá `UNIQUE (id, name)`), và `(previous_version_id, name)` cũng vậy, nên con trỏ không thể trỏ phiên bản của loại mô hình khác. Ở ERD07 hai cạnh tới `model_versions` là 0..1 phía con.
+- **Ghi chú:** Hai khoá ứng viên đều khai trong DDL: khoá chính `name` và `UNIQUE (active_version_id)`. PTH `active_version_id → name` vốn là PTH liên quan hệ (tên lấy từ `model_versions.name`); nó được ép bằng khoá ngoại ghép `(active_version_id, name) → model_versions (id, name)` (đích là siêu khoá `UNIQUE (id, name)`), và `(previous_version_id, name)` cũng vậy, nên con trỏ không thể trỏ phiên bản của loại mô hình khác. Ở ERD07a–ERD07b hai cạnh tới `model_versions` là 0..1 phía con.
 - **Kết luận:** BCNF.
 
-### Nhóm substitute (ERD06)
+### Nhóm substitute (ERD06a–ERD06e)
 
 #### `substitution_pairs`
 
@@ -676,7 +676,7 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **BCNF:** Không đạt (hệ quả của 3NF).
 - **Kết luận:** 2NF; dư thừa có kiểm soát (D9).
 
-### Nhóm meal (ERD06)
+### Nhóm meal (ERD06a–ERD06e)
 
 #### `meal_plans`
 
@@ -734,7 +734,7 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **BCNF:** Đạt. Vế trái của mọi PTH không tầm thường là siêu khoá.
 - **Kết luận:** BCNF.
 
-### Nhóm cooking (ERD06)
+### Nhóm cooking (ERD06a–ERD06e)
 
 #### `cook_sessions`
 
@@ -758,7 +758,7 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **Ghi chú:** `(cook_session_id, start_offset_s)` không phải khoá vì các bước thụ động chạy song song có thể bắt đầu cùng lúc.
 - **Kết luận:** BCNF.
 
-### Nhóm events (ERD06)
+### Nhóm events (ERD06a–ERD06e)
 
 #### `interactions`
 
@@ -774,7 +774,7 @@ PTH xuyên bảng (giá trị một cột suy ra được qua đường khoá ng
 - **Ghi chú:** `id` là `event_id` do app sinh để chống ghi trùng. Cả hai PTH bắc cầu đều được CSDL ép bằng khoá ngoại ghép (D4). Bảng chỉ ghi thêm (`trg_interactions_append_only`).
 - **Kết luận:** 2NF; dư thừa có kiểm soát (D4). `ranker_version_id`, `propensity` là ảnh chụp ghi log chính sách (D2).
 
-### Nhóm survey (ERD07)
+### Nhóm survey (ERD07a–ERD07b)
 
 #### `survey_forms`
 
@@ -873,7 +873,7 @@ Có hai loại cột cần tách bạch.
 
 Ảnh chụp ghi một sự thật khác với cột nguồn ("giá trị tại t" chứ không phải "giá trị hiện tại"). Hai sự thật này được phép khác nhau, nên giữa chúng không có PTH; ví dụ cùng một người dùng có nhiều mâm với `e_target_kcal` khác nhau. Vì trigger từ chối mọi UPDATE đổi các cột này, không có đường làm lệch ảnh chụp với chính nó.
 
-**(b) Giá trị dẫn xuất, tính lại có kiểm soát.** Các cột sau không phải ảnh chụp ghi một lần. UC17 (FR-17-12) và SD05 cập nhật chúng sau khi tạo mâm, khi người dùng chọn thay nguyên liệu:
+**(b) Giá trị dẫn xuất, tính lại có kiểm soát.** Các cột sau không phải ảnh chụp ghi một lần. UC17 (FR-17-12) và SD05a–SD05c cập nhật chúng sau khi tạo mâm, khi người dùng chọn thay nguyên liệu:
 
 | Cột | Dẫn xuất từ | Khi nào được tính lại |
 |---|---|---|
@@ -969,7 +969,7 @@ Các ràng buộc dưới đây chỉ liên quan tới cột của cùng một d
 
 ### D13. `pantry_transactions (ref_type, ref_id)` — tham chiếu đa hình
 
-- **Phi chuẩn hoá.** `ref_id` trỏ tới `scans.id`, `cook_sessions.id` hoặc `users.id` tuỳ `ref_type`, nên không khai được khoá ngoại. CSDL vì vậy không tự bảo đảm `ref_id` trỏ bản ghi có thật hay đúng chủ, dù nghiệp vụ dựa trực tiếp vào cặp này: hoàn tác (UC21, SD06) tìm giao dịch theo `(ref_type = 'cook_session', ref_id)`, và `v_journal_days` nối `ref_id` với phiên nấu.
+- **Phi chuẩn hoá.** `ref_id` trỏ tới `scans.id`, `cook_sessions.id` hoặc `users.id` tuỳ `ref_type`, nên không khai được khoá ngoại. CSDL vì vậy không tự bảo đảm `ref_id` trỏ bản ghi có thật hay đúng chủ, dù nghiệp vụ dựa trực tiếp vào cặp này: hoàn tác (UC21, SD06a–SD06c) tìm giao dịch theo `(ref_type = 'cook_session', ref_id)`, và `v_journal_days` nối `ref_id` với phiên nấu.
 - **Vì sao chưa tách.** Dạng chuẩn là các cột khoá ngoại tường minh (`cook_session_id`, `scan_id`, có thể NULL) kèm `CHECK (num_nonnulls(...) <= 1)`. `model.yaml` chưa có các cột đó (mục 6, đề xuất 4); `ref_type = user` cũng không cần cột riêng vì `users.id` chính là chủ lô.
 - **Giữ nhất quán (đến khi tách).** `ck_pantry_transactions_ref_pair` buộc hai cột cùng có hoặc cùng trống. `trg_pantry_transactions_ref` (BEFORE INSERT) kiểm `ref_id` tồn tại trong bảng đúng loại và thuộc chủ lô: `scans.user_id`, `meal_plans.user_id` qua phiên nấu, hoặc chính `pantry_lots.user_id` với `ref_type = user`. Trigger này cũng kiểm giao dịch đảo cùng lô với giao dịch bị đảo. Vì bảng chỉ ghi thêm, kiểm lúc INSERT là đủ. Đối tượng được trỏ chỉ bị xoá khi xoá tài khoản (dây chuyền từ `users`), lúc đó các giao dịch của lô cũng bị xoá theo, nên không còn tham chiếu treo trong dữ liệu đang dùng. Chỉ mục `ix_pantry_transactions_ref (ref_type, ref_id)` phục vụ hoàn tác và nhật ký (không quét toàn bảng).
 
@@ -1059,5 +1059,5 @@ Các thay đổi dưới đây cần sửa `model.yaml` (thêm cột hoặc bả
 - Kiểm hành vi trên CSDL tạm (kịch bản SQL, không nằm trong repo): mỗi ràng buộc và trigger ở mục 4 được thử một lần vi phạm (bị từ chối) và một lần hợp lệ (chạy được). Gồm: sửa nguyên liệu/bước của món `published`, xoá món đã công bố, tạo bản mới cùng tên sau khi chuyển `retired`; nửa khoá thành phần; `kcal_source = expert` với `goal = lose`; múi giờ không hợp lệ; nhóm `p_*` thiếu hoặc tổng khác 1; đổi chủ lô; `ref_id` sai chủ hoặc không tồn tại; giao dịch đảo hai lần; phiên nấu thứ hai khi đã có phiên đang nấu; tính lại kcal khi mâm đã `cooked`; sửa/xoá bảng chỉ ghi thêm; xoá tài khoản khi chưa bật `tastoria.erasure` (bị chặn) và khi đã bật (xoá dây chuyền, `audit_log.actor_user_id` thành NULL). Hai sự kiện đồng ý trong cùng giao dịch cho `v_current_consents` đúng sự kiện sau. `v_journal_days` gán phiên hoàn tất lúc 2026-10-12T17:30Z vào ngày 2026-10-13 theo `Asia/Ho_Chi_Minh` (FR-22-02).
 - `EXPLAIN` của `v_journal_days WHERE user_id = $1` và `v_pantry_lot_balance WHERE user_id = $1`: mọi bảng truy qua chỉ mục, không có `Seq Scan` trên `pantry_transactions` hay `cook_sessions`.
 - Mọi tệp `docs/erd/*.puml` render bằng `docs/sad/tools/render.sh` (mã thoát 0, SVG không chứa "Syntax Error").
-- ERD01–08 sinh từ `db/schema.sql` bằng script: 62/62 bảng xuất hiện đầy đủ cột đúng một lần; tên cột, kiểu, NOT NULL, PK, UNIQUE, chỉ mục duy nhất một phần khớp DDL; 97/97 khoá ngoại có mặt ở ERD01–07 và ở ERD08.
+- ERD01a–ERD01b–08 sinh từ `db/schema.sql` bằng script: 62/62 bảng xuất hiện đầy đủ cột đúng một lần; tên cột, kiểu, NOT NULL, PK, UNIQUE, chỉ mục duy nhất một phần khớp DDL; 97/97 khoá ngoại có mặt ở ERD01a–ERD01b–07 và ở ERD08.
 - Khoá chính trong mục 3 được đối chiếu tự động với `PRIMARY KEY` của DDL; vế phải của PTH "khoá → các cột còn lại" sinh từ danh sách cột của DDL. `db/schema_vp.sql` sinh lại từ `db/schema.sql` và áp được trên PostgreSQL thuần.

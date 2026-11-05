@@ -1,0 +1,52 @@
+@startchen
+title ERD00c — Khái niệm (Chen): kho nguyên liệu
+' Tách từ docs/erd/src/khai-niem-day-du.chen bằng gen_puml.py.
+
+entity "Người dùng" as NGUOIDUNG {
+  Mã người dùng <<key>>
+  Email
+  Vai trò
+}
+entity "Lô kho" as LOKHO {
+  Mã lô <<key>>
+  Lượng ban đầu
+  Ngày nhập
+}
+entity "Giao dịch kho" as GIAODICH {
+  Mã giao dịch <<key>>
+  Lượng thay đổi
+  Lý do
+}
+entity "Nguyên liệu" as NGUYENLIEU {
+  Mã nguyên liệu <<key>>
+  Tên tiếng Việt
+  Tên đồng nghĩa <<multi>>
+}
+entity "Chip nguyên liệu" as CHIP {
+  Mã chip <<key>>
+  Nguồn gốc
+  Số đếm của mô hình
+}
+relationship "sở hữu" as R_SOHUU {
+}
+relationship "là nguyên liệu" as R_LANL {
+}
+relationship "phát sinh" as R_PHATSINH {
+}
+relationship "nhận diện là" as R_NHANDIEN {
+}
+relationship "tạo lô" as R_TAOLO {
+}
+
+NGUOIDUNG -1- R_SOHUU
+R_SOHUU =N= LOKHO
+LOKHO =N= R_LANL
+R_LANL -1- NGUYENLIEU
+LOKHO -1- R_PHATSINH
+R_PHATSINH =N= GIAODICH
+CHIP =N= R_NHANDIEN
+R_NHANDIEN -1- NGUYENLIEU
+CHIP -1- R_TAOLO
+R_TAOLO -N- LOKHO
+
+@endchen

@@ -1,0 +1,62 @@
+@startchen
+title ERD00f — Khái niệm (Chen): tương tác và mô hình
+' Tách từ docs/erd/src/khai-niem-day-du.chen bằng gen_puml.py.
+
+entity "Người dùng" as NGUOIDUNG {
+  Mã người dùng <<key>>
+  Email
+  Vai trò
+}
+entity "Tương tác" as TUONGTAC {
+  Mã sự kiện <<key>>
+  Loại
+  Vị trí hiển thị
+}
+entity "Món" as MON {
+  Mã món <<key>>
+  Tên món
+  Vị trí trong mâm
+}
+entity "Mâm cơm" as MAM {
+  Mã mâm <<key>>
+  Bữa
+  Số người
+}
+entity "Phiên bản mô hình" as MOHINH {
+  Mã phiên bản <<key>>
+  Tên mô hình
+  Số phiên bản
+}
+entity "Lớp thị giác" as LOPTG {
+  Mã lớp <<key>>
+  Tên lớp
+  Cách đếm cá thể
+}
+relationship "nhận mâm" as R_NHANMAM {
+}
+relationship "ghi nhận" as R_GHINHAN {
+}
+relationship "về món" as R_VEMON {
+}
+relationship "xảy ra trong" as R_TRONGMAM {
+}
+relationship "xếp hạng bởi" as R_XEPHANG {
+}
+relationship "có lớp đầu ra" as R_LOPDAURA {
+  Chỉ số lớp
+}
+
+NGUOIDUNG -1- R_NHANMAM
+R_NHANMAM =N= MAM
+NGUOIDUNG -1- R_GHINHAN
+R_GHINHAN =N= TUONGTAC
+TUONGTAC =N= R_VEMON
+R_VEMON -1- MON
+TUONGTAC -N- R_TRONGMAM
+R_TRONGMAM -1- MAM
+MAM -N- R_XEPHANG
+R_XEPHANG -1- MOHINH
+MOHINH -M- R_LOPDAURA
+R_LOPDAURA -N- LOPTG
+
+@endchen

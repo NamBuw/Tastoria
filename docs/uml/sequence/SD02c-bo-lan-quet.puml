@@ -1,0 +1,28 @@
+@startuml
+title SD02c — Bỏ kết quả quét (UC13)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Người dùng" as U
+boundary "App" as APP
+control "API (scan)" as API
+entity "CSDL" as DB
+
+U -> APP : bỏ kết quả quét
+APP -> API : bỏ lần quét
+API -> DB : «done» → «discarded»
+alt đã chuyển, hoặc đã bỏ từ trước
+  API --> APP : 200 đã bỏ
+else đã xác nhận hoặc chưa xong
+  API --> APP : 409 sai trạng thái
+end
+APP --> U : về màn hình kho
+@enduml

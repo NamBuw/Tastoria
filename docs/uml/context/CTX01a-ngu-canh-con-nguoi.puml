@@ -1,0 +1,27 @@
+@startuml
+title CTX01a — Ngữ cảnh: người dùng và nhân sự
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+skinparam actorStyle stick
+
+actor "Khách" as A01
+actor "Người dùng" as A02
+actor "Người tham gia khảo sát" as A03
+rectangle "Hệ thống Tastoria" as SYS #EEF6FB
+actor "Quản trị viên" as A04
+actor "Người biên soạn công thức" as A05
+actor "Người vận hành mô hình" as A06
+actor "Người gán nhãn" as A07
+A01 -- SYS : xem landing, đăng ký, đăng nhập
+A02 -- SYS : ảnh tủ lạnh, hồ sơ / mâm, lịch nấu
+A03 -- SYS : điểm gu món (ẩn danh)
+SYS -- A04 : xử lý yêu cầu dữ liệu
+SYS -- A05 : nhập kho món (CLI)
+SYS -- A06 : mô hình, đợt khảo sát (CLI)
+SYS -- A07 : nhãn ảnh góp
+@enduml

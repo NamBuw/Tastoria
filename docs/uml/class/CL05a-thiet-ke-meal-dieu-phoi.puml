@@ -1,0 +1,58 @@
+@startuml
+title CL05a — Thiết kế module meal: điều phối và dữ liệu
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "MealRouter" as R <<router>> {
+  +create_plan()
+  +accept()
+  +swap()
+  +list_substitutes()
+  +choose_substitution()
+}
+class "MealService" as S <<service>> {
+  +create_plan()
+  +accept()
+  +swap_item()
+  +choose_substitution()
+  +get_plan_for_cooking()
+}
+class "MealRepository" as RP <<repository>> {
+  +add_plan()
+  +get_plan()
+  +set_status()
+  +swap_out()
+}
+class "MealPlanRequest" as RQ <<DTO>> {
+  -meal: Meal
+  -persons: int
+  -max_minutes: int
+  -pinned_lot_ids: list
+}
+class "MealPlan" as MP <<domain>> {
+  -meal: Meal
+  -persons: int
+  -status: PlanStatus
+  -e_target_kcal: float
+}
+class "MealPlanItem" as MI <<domain>> {
+  -slot: Slot
+  -recipe_id: UUID
+  -servings_scale: float
+  -status: ItemStatus
+}
+
+R ..> S
+R ..> RQ
+S ..> RP
+RP ..> MP
+MP "1" *-- "2..3" MI
+@enduml

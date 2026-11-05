@@ -1,0 +1,51 @@
+@startuml
+title CL01e — Miền: kho nguyên liệu và đi chợ
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Tài khoản" as TK {
+  -email: Email
+  -vaiTrò: VaiTrò
+  -trạngThái: TrạngTháiTK
+}
+class "Nguyên liệu" as NL {
+  -tên: Chuỗi
+}
+class "Lô kho" as LO {
+  -ngàyNhập: Thời điểm
+  -cănCứNgày: CănCứNgày
+  -gMin: Gam
+  -gMax: Gam
+  -trạngThái: TrạngTháiLô
+}
+class "Giao dịch kho" as GD {
+  -lýDo: LýDoGiaoDịch
+  -deltaMin: Gam
+  -deltaMax: Gam
+  -thờiĐiểm: Thời điểm
+}
+class "Mục đi chợ" as DC {
+  -lượng: Chuỗi
+  -trạngThái: TrạngTháiMục
+}
+class "Cặp thay thế" as CT {
+  -slot: Slot
+  -cáchNấu: Chuỗi
+  -điểm: Số thực
+}
+
+TK "1" -- "0..*" LO : sở hữu
+NL "1" -- "0..*" LO : là
+LO "1" *-- "1..*" GD : phát sinh
+TK "1" -- "0..*" DC
+NL "1" -- "0..*" DC
+NL "2" -- "0..*" CT : gốc / thay
+@enduml

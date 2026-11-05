@@ -1,0 +1,73 @@
+@startuml
+title ERD06c — Thay thế và đi chợ (substitute)
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "substitution_pairs" as substitution_pairs {
+  * id : uuid <<PK>>
+  --
+  * ingredient_id : uuid <<FK>>
+  * substitute_id : uuid <<FK>>
+    context_slot : slot_t
+    context_method_code : text <<FK>>
+  * ratio : numeric
+  * score : real
+  * source : text
+  * curated : boolean
+  .. UNIQUE(ingredient_id, substitute_id, context_slot, context_method_code) ..
+}
+entity "ingredient_embeddings" as ingredient_embeddings {
+  * ingredient_id : uuid <<PK, FK>>
+  * model_version_id : uuid <<PK, FK>>
+  --
+  * vector : vector(100)
+}
+entity "shopping_items" as shopping_items {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * ingredient_id : uuid <<FK>>
+    qty_g : numeric
+    note : text
+  * status : shopping_status_t
+    source_meal_plan_item_id : uuid <<FK>>
+  * created_at : timestamptz
+  * updated_at : timestamptz
+}
+entity "ingredients" as ingredients #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD03b ..
+}
+entity "cooking_methods" as cooking_methods #EEEEEE {
+  * code : text <<PK>>
+  .. chi tiết ở ERD04a ..
+}
+entity "model_versions" as model_versions #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD07a ..
+}
+entity "users" as users #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01a ..
+}
+entity "meal_plan_items" as meal_plan_items #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD06a ..
+}
+
+ingredients ||--o{ substitution_pairs : ingredient_id
+ingredients ||--o{ substitution_pairs : substitute_id
+cooking_methods |o--o{ substitution_pairs : context_method_code
+ingredients ||--o{ ingredient_embeddings : ingredient_id
+model_versions ||--o{ ingredient_embeddings : model_version_id
+users ||--o{ shopping_items : user_id (cascade)
+ingredients ||--o{ shopping_items : ingredient_id
+meal_plan_items |o--o{ shopping_items : source_meal_plan_item_id (set_null)
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

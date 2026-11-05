@@ -1,0 +1,31 @@
+@startuml
+title SD10b — Kiểm định phiên bản mô hình (UC29)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Người vận hành mô hình" as OP
+boundary "CLI tastoria" as CLI
+control "mlops" as ML
+entity "Kho tệp" as FS
+entity "CSDL" as DB
+
+OP -> CLI : mlops gate <tên> <phiên bản>
+CLI -> ML : kiểm định
+ML -> FS : chạy hai bản trên tập test khoá
+ML -> FS : ghi báo cáo kiểm định
+alt không kém hơn biên cho phép
+  ML -> DB : → «validated»
+else kém hơn
+  ML -> DB : → «rejected»
+end
+ML --> CLI : kết quả kiểm định
+CLI --> OP : đạt / không đạt
+@enduml

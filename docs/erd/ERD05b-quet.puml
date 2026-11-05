@@ -1,0 +1,101 @@
+@startuml
+title ERD05b — Quét ảnh (scan)
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "scans" as scans {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * mode : scan_mode_t
+  * status : scan_status_t
+    error_code : text
+  * attempts : smallint
+    detector_version_id : uuid <<FK>>
+    classifier_version_id : uuid <<FK>>
+    preprocess_version : text
+    enqueued_at : timestamptz
+    started_at : timestamptz
+    finished_at : timestamptz
+    confirmed_at : timestamptz
+  * created_at : timestamptz
+}
+entity "scan_images" as scan_images {
+  * id : uuid <<PK>>
+  --
+  * scan_id : uuid <<FK>>
+  * ordinal : smallint
+  * shelf_group : smallint
+  * storage_key : text <<UQ>>
+  * width : integer
+  * height : integer
+  * contributed : boolean
+    purged_at : timestamptz
+  .. UNIQUE(scan_id, ordinal) ..
+}
+entity "scan_items" as scan_items {
+  * id : uuid <<PK>>
+  --
+  * scan_id : uuid <<FK>>
+  * ingredient_id : uuid <<FK>>
+  * origin : scan_item_origin_t
+    model_count : smallint
+    final_count : smallint
+    qty_level : qty_level_t
+  * user_action : scan_user_action_t
+    original_ingredient_id : uuid <<FK>>
+    user_freshness : freshness_t
+  * created_at : timestamptz
+  * updated_at : timestamptz
+}
+entity "detections" as detections {
+  * id : bigint <<PK>>
+  --
+  * scan_image_id : uuid <<FK>>
+    scan_item_id : uuid <<FK>>
+  * vision_class_id : smallint <<FK>>
+  * x1 : real
+  * y1 : real
+  * x2 : real
+  * y2 : real
+  * confidence : real
+    p_tuoi : real
+    p_dung_som : real
+    p_dung_ngay : real
+    p_kiem_tra : real
+}
+entity "users" as users #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01a ..
+}
+entity "model_versions" as model_versions #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD07a ..
+}
+entity "ingredients" as ingredients #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD03b ..
+}
+entity "vision_classes" as vision_classes #EEEEEE {
+  * id : smallint <<PK>>
+  .. chi tiết ở ERD03c ..
+}
+
+users ||--o{ scans : user_id (cascade)
+model_versions |o--o{ scans : detector_version_id
+model_versions |o--o{ scans : classifier_version_id
+scans ||--o{ scan_images : scan_id (cascade)
+scans ||--o{ scan_items : scan_id (cascade)
+ingredients ||--o{ scan_items : ingredient_id
+ingredients |o--o{ scan_items : original_ingredient_id
+scan_images ||--o{ detections : scan_image_id (cascade)
+scan_items |o--o{ detections : scan_item_id (set_null)
+vision_classes ||--o{ detections : vision_class_id
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+title SD09a — Gửi yêu cầu tải dữ liệu cá nhân (UC06)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Người dùng" as U
+boundary "App" as APP
+control "API (privacy)" as API
+entity "CSDL" as DB
+entity "Hàng đợi (Valkey)" as Q
+
+U -> APP : «Tải dữ liệu của tôi»
+APP -> API : tạo yêu cầu export
+API -> DB : tìm yêu cầu export đang mở
+alt đã có yêu cầu đang mở
+  API --> APP : trả yêu cầu đang mở
+else chưa có
+  API -> DB : ghi yêu cầu «received»
+  API -> Q : đưa job xuất dữ liệu
+  API --> APP : 202 mã yêu cầu
+end
+APP --> U : báo đang chuẩn bị tệp
+@enduml

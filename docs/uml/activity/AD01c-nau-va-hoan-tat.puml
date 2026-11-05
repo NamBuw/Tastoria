@@ -1,0 +1,37 @@
+@startuml
+title AD01c — Nấu cả mâm và hoàn tất bữa (UC19–UC21)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam ActivityBackgroundColor White
+
+|Người dùng|
+|App|
+|Hệ thống|
+|Người dùng|
+start
+:Bấm «Nấu cả mâm», chọn giờ dọn;
+|Hệ thống|
+:Lập lịch nấu theo số họng bếp;
+|App|
+:Hiện lịch các bước;
+|Người dùng|
+:Nấu theo lịch;
+:Bấm «Nấu xong», đánh giá món;
+|Hệ thống|
+:Trừ kho, lô gấp nhất trước;
+|App|
+:Hiện lượng đã trừ và nút Hoàn tác;
+|Người dùng|
+if (Hoàn tác trong 10 phút?) then (có)
+  |Hệ thống|
+  :Ghi giao dịch đảo, mâm về «accepted»;
+else (không)
+endif
+|App|
+:Cập nhật kho và nhật ký;
+stop
+@enduml

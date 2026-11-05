@@ -1,0 +1,57 @@
+@startuml
+title CL06a — Thiết kế module pantry: điều phối và dữ liệu
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "PantryRouter" as R <<router>> {
+  +list_lots()
+  +add_lot()
+  +update_lot()
+  +discard_lot()
+}
+class "PantryService" as S <<service>> {
+  +list_available_lots()
+  +add_lots_from_scan()
+  +mark_not_seen()
+  +deduct_for_cooking()
+  +revert_cooking()
+}
+class "PantryRepository" as RP <<repository>> {
+  +add_lot()
+  +get_lot()
+  +balances()
+  +add_transaction()
+  +set_status()
+}
+class "PantryLot" as LO <<domain>> {
+  -ingredient_id: UUID
+  -acquired_at: datetime
+  -initial_g: GramRange
+  -status: LotStatus
+}
+class "PantryTransaction" as TX <<domain>> {
+  -reason: TxReason
+  -delta_g: GramRange
+  -ref_id: UUID
+  -reverses_id: int
+}
+class "GramRange" as GR <<value object>> {
+  -g_min: float
+  -g_max: float
+  +clamp_zero()
+}
+
+R ..> S
+S ..> RP
+RP ..> LO
+LO "1" *-- "1..*" TX
+LO ..> GR
+@enduml

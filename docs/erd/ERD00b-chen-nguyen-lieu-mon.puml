@@ -1,0 +1,69 @@
+@startchen
+title ERD00b — Khái niệm (Chen): nguyên liệu và món
+' Tách từ docs/erd/src/khai-niem-day-du.chen bằng gen_puml.py.
+
+entity "Nguyên liệu" as NGUYENLIEU {
+  Mã nguyên liệu <<key>>
+  Tên tiếng Việt
+  Tên đồng nghĩa <<multi>>
+}
+entity "Nhóm thực phẩm" as NHOMTP {
+  Mã nhóm <<key>>
+  Tên
+}
+entity "Nhóm dị ứng" as DIUNG {
+  Mã nhóm dị ứng <<key>>
+  Tên
+  Căn cứ
+}
+entity "Thực phẩm (bảng thành phần)" as THUCPHAM {
+  Nguồn dữ liệu <<key>>
+  Mã trong nguồn <<key>>
+  Tên
+  Tỉ lệ thải bỏ
+}
+entity "Chất dinh dưỡng" as CHATDD {
+  Mã chất <<key>>
+  Đơn vị
+}
+entity "Món" as MON {
+  Mã món <<key>>
+  Tên món
+  Vị trí trong mâm
+}
+entity "Bước nấu" as BUOCNAU <<weak>> {
+  Số bước <<key>>
+  Nội dung
+  Loại bước
+}
+relationship "thuộc nhóm" as R_THUOCNHOM {
+}
+relationship "chứa chất gây dị ứng" as R_CHUADU {
+}
+relationship "tra thành phần" as R_TRATP {
+}
+relationship "có hàm lượng" as R_HAMLUONG {
+  Lượng trên 100 g
+}
+relationship "dùng" as R_DUNG {
+  Số gam
+  Vai trò
+  Tuỳ chọn
+}
+relationship "gồm bước" as R_GOMBUOC <<identifying>> {
+}
+
+NGUYENLIEU =N= R_THUOCNHOM
+R_THUOCNHOM -1- NHOMTP
+NGUYENLIEU -M- R_CHUADU
+R_CHUADU -N- DIUNG
+NGUYENLIEU -N- R_TRATP
+R_TRATP -1- THUCPHAM
+THUCPHAM -M- R_HAMLUONG
+R_HAMLUONG -N- CHATDD
+MON =M= R_DUNG
+R_DUNG -N- NGUYENLIEU
+MON =1= R_GOMBUOC
+R_GOMBUOC =N= BUOCNAU
+
+@endchen

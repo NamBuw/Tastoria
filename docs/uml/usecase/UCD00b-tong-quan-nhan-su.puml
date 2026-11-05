@@ -1,0 +1,44 @@
+@startuml
+title UCD00b — Tổng quan: chức năng của nhân sự và tác nhân hệ thống
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle stick
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Người tham gia khảo sát\n(A03)" as A03
+actor "Người biên soạn công thức\n(A05)" as A05
+actor "Quản trị viên\n(A04)" as A04
+actor "Người vận hành mô hình\n(A06)" as A06
+actor "Người gán nhãn\n(A07)" as A07
+actor "Bộ lập lịch\n(A08)" as A08
+rectangle "Tastoria" {
+  usecase "UC23\nTham gia khảo sát gu món ăn" as UC23
+  usecase "UC25\nNhập và kiểm tra kho công thức, nguyên liệu" as UC25
+  usecase "UC27\nXử lý yêu cầu dữ liệu và xem nhật ký kiểm toán" as UC27
+  usecase "UC28\nXuất dữ liệu huấn luyện đã bí danh hoá" as UC28
+  usecase "UC29\nĐăng ký và kiểm định phiên bản mô hình" as UC29
+  usecase "UC30\nTriển khai và quay lui phiên bản mô hình" as UC30
+  usecase "UC31\nGán nhãn ảnh góp" as UC31
+  usecase "UC33\nSao lưu cơ sở dữ liệu" as UC33
+}
+actor "Công cụ gán nhãn\n(A10)" as A10 <<system>>
+
+A03 -- UC23
+A05 -- UC25
+A04 -- UC27
+A06 -- UC28
+A06 -- UC29
+A06 -- UC30
+A07 -- UC31
+UC31 -- A10
+A08 -- UC33
+@enduml

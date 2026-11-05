@@ -1,0 +1,61 @@
+@startuml
+title ERD01a — Định danh và khoá lũy đẳng (core, identity)
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "users" as users {
+  * id : uuid <<PK>>
+  --
+  * email : citext <<UQ>>
+  * password_hash : text
+  * role : user_role_t
+  * status : user_status_t
+  * token_version : integer
+  * failed_logins : smallint
+    locked_until : timestamptz
+  * created_at : timestamptz
+  * updated_at : timestamptz
+}
+entity "refresh_tokens" as refresh_tokens {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * family_id : uuid
+  * token_sha256 : bytea <<UQ>>
+  * issued_at : timestamptz
+  * expires_at : timestamptz
+    revoked_at : timestamptz
+    replaced_by_id : uuid <<FK, UQ>>
+    user_agent : text
+}
+entity "password_resets" as password_resets {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * token_sha256 : bytea <<UQ>>
+  * created_at : timestamptz
+  * expires_at : timestamptz
+    used_at : timestamptz
+}
+entity "idempotency_keys" as idempotency_keys {
+  * user_id : uuid <<PK, FK>>
+  * key : text <<PK>>
+  --
+  * request_sha256 : bytea
+  * status_code : smallint
+  * response_body : jsonb
+  * created_at : timestamptz
+}
+
+users ||--o{ refresh_tokens : user_id (cascade)
+refresh_tokens |o--o| refresh_tokens : replaced_by_id
+users ||--o{ password_resets : user_id (cascade)
+users ||--o{ idempotency_keys : user_id (cascade)
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

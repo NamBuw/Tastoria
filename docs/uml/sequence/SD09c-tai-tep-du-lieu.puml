@@ -1,0 +1,29 @@
+@startuml
+title SD09c — Theo dõi và tải tệp dữ liệu (UC06)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Người dùng" as U
+boundary "App" as APP
+control "API (privacy)" as API
+entity "CSDL" as DB
+entity "Kho tệp" as FS
+
+loop đến khi «completed»
+  APP -> API : xem trạng thái yêu cầu
+  API -> DB : đọc yêu cầu của người gọi
+  API --> APP : trạng thái
+end
+U -> APP : bấm Tải về
+APP -> API : tải tệp kết quả
+API -> FS : đọc tệp theo khoá
+API --> APP : tệp ZIP
+@enduml

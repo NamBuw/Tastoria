@@ -1,0 +1,39 @@
+@startchen
+title ERD00g — Khái niệm (Chen): đồng ý theo mục đích
+' Tách từ docs/erd/src/khai-niem-day-du.chen bằng gen_puml.py.
+
+entity "Người dùng" as NGUOIDUNG {
+  Mã người dùng <<key>>
+  Email
+  Vai trò
+}
+entity "Mục đích đồng ý" as MUCDICH {
+  Mã mục đích <<key>>
+  Tên
+  Nhạy cảm
+}
+entity "Phiên bản điều khoản" as DIEUKHOAN {
+  Mã phiên bản điều khoản <<key>>
+  Số phiên bản
+  Hiệu lực từ
+}
+entity "Sự kiện đồng ý" as SUKIENDY {
+  Mã sự kiện <<key>>
+  Hành động
+  Kênh
+}
+relationship "có phiên bản" as R_COPHIENBAN {
+}
+relationship "ghi" as R_GHIDY {
+}
+relationship "theo điều khoản" as R_THEODK {
+}
+
+MUCDICH -1- R_COPHIENBAN
+R_COPHIENBAN =N= DIEUKHOAN
+NGUOIDUNG -1- R_GHIDY
+R_GHIDY =N= SUKIENDY
+SUKIENDY =N= R_THEODK
+R_THEODK -1- DIEUKHOAN
+
+@endchen

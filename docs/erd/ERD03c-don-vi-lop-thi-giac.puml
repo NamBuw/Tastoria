@@ -1,0 +1,57 @@
+@startuml
+title ERD03c — Danh mục: đơn vị, mức lượng và lớp thị giác
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "ingredient_units" as ingredient_units {
+  * ingredient_id : uuid <<PK, FK>>
+  * unit_code : text <<PK>>
+  --
+  * grams_per_unit : numeric
+  * source : text
+}
+entity "qty_levels" as qty_levels {
+  * food_group_code : text <<PK, FK>>
+  * level : qty_level_t <<PK>>
+  --
+  * g_min : numeric
+  * g_max : numeric
+}
+entity "vision_classes" as vision_classes {
+  * id : smallint <<PK>>
+  --
+  * code : text <<UQ>>
+  * name_vi : text
+  * name_en : text
+  * countable : boolean
+  * instance_def : instance_def_t
+  * has_freshness_model : boolean
+}
+entity "vision_class_ingredients" as vision_class_ingredients {
+  * vision_class_id : smallint <<PK, FK>>
+  * ingredient_id : uuid <<PK, FK>>
+  --
+  * is_default : boolean
+  .. UNIQUE(vision_class_id) WHERE is_default ..
+}
+entity "ingredients" as ingredients #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD03b ..
+}
+entity "food_groups" as food_groups #EEEEEE {
+  * code : text <<PK>>
+  .. chi tiết ở ERD03a ..
+}
+
+ingredients ||--o{ ingredient_units : ingredient_id
+food_groups ||--o{ qty_levels : food_group_code
+vision_classes ||--o{ vision_class_ingredients : vision_class_id
+ingredients ||--o{ vision_class_ingredients : ingredient_id
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

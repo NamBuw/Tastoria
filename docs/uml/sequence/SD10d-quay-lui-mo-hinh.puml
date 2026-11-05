@@ -1,0 +1,31 @@
+@startuml
+title SD10d — Quay lui phiên bản mô hình (UC30)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Người vận hành mô hình" as OP
+boundary "CLI tastoria" as CLI
+control "mlops" as ML
+entity "CSDL" as DB
+control "api + worker" as SVC
+
+OP -> CLI : mlops rollback <tên>
+CLI -> ML : quay lui
+ML -> DB : đọc bản trước
+alt không có bản trước
+  ML --> CLI : lỗi: không có đích quay lui
+else có bản trước
+  ML -> DB : đổi chỗ bản đang chạy và bản trước
+  ML -> SVC : khởi động lại api và worker
+  ML --> CLI : đã quay lui (< 5 phút)
+end
+CLI --> OP : kết quả
+@enduml

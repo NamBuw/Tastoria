@@ -1,0 +1,40 @@
+@startuml
+title CL03b — Lớp phân tích BCE: UC15 Xem và nhận mâm
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Màn hình Mâm cơm" as BM <<boundary>> {
+  -dòngLýDo
+  +nhậnMâm()
+}
+class "Nhận mâm" as CN <<control>> {
+  +nhận()
+}
+class "Ghi tương tác" as CSK <<control>> {
+  +ghi()
+}
+class "Mâm cơm" as EM <<entity>> {
+  -trạngThái
+}
+class "Món trong mâm" as EMM <<entity>> {
+  -slot
+  -hệSốKhẩuPhần
+}
+class "Tương tác" as ETT <<entity>> {
+  -loại
+}
+
+BM -- CN
+CN -- EM
+CN -- CSK
+EM "1" -- "2..3" EMM
+CSK -- ETT
+@enduml

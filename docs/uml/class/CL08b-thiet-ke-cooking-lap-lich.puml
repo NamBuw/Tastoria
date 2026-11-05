@@ -1,0 +1,42 @@
+@startuml
+title CL08b — Thiết kế module cooking: lập lịch và hoàn tác
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "CookingService" as S <<service>> {
+  +start()
+  +complete()
+  +undo()
+}
+class "CookScheduler" as SC <<domain service>> {
+  +solve()
+}
+class "NeedCalculator" as NC <<domain service>> {
+  +needs()
+}
+class "UndoPolicy" as UP <<domain service>> {
+  +can_undo()
+}
+class "Schedule" as SH <<value object>> {
+  -entries: list
+  -makespan_s: int
+}
+class "CookSession" as CS <<domain>> {
+  -status: SessionStatus
+  -completed_at: datetime
+}
+
+S ..> SC
+S ..> NC
+S ..> UP
+SC ..> SH
+UP ..> CS
+@enduml

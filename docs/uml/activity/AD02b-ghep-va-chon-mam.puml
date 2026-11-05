@@ -1,0 +1,33 @@
+@startuml
+title AD02b — Ghép mâm: duyệt tổ hợp và chọn mâm (UC15)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam ActivityBackgroundColor White
+
+|meal|
+|events|
+|meal|
+start
+:Chọn K món điểm cao mỗi slot;
+while (Còn tổ hợp?) is (có)
+  :Kiểm tra đủ kho, ước lượng thời gian nấu;
+  :Giữ tổ hợp khả thi kèm điểm;
+endwhile (không)
+if (Có mâm khả thi?) then (không)
+  :Nới ràng buộc; hết bước nới thì trả 422;
+  stop
+else (có)
+endif
+:Chọn mâm điểm cao nhất;
+:Sinh dòng lý do, số bát cơm;
+:Lưu mâm «proposed»;
+|events|
+:Ghi tương tác «served» nếu có đồng ý;
+|meal|
+:Trả mâm cơm;
+stop
+@enduml

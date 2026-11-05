@@ -1,0 +1,23 @@
+@startuml
+title DP01c — Triển khai: huấn luyện và nạp mô hình
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam componentStyle rectangle
+
+node "Máy GPU lab (L40S)" as Gpu <<device>> {
+  artifact "Huấn luyện (ultralytics, PyTorch, LightGBM)" as Train
+  artifact "MLflow" as Mlflow
+}
+node "Máy chủ lab" as Lab <<device>> {
+  artifact "CLI tastoria mlops" as Cli
+  artifact "volume models/" as Models
+}
+
+Train ..> Mlflow : ghi run
+Train ..> Cli : ONNX + số đo
+Cli ..> Models : đăng ký
+@enduml

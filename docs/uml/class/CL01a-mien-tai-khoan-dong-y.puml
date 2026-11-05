@@ -1,0 +1,51 @@
+@startuml
+title CL01a — Miền: tài khoản, hồ sơ và đồng ý
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Tài khoản" as TK {
+  -email: Email
+  -vaiTrò: VaiTrò
+  -trạngThái: TrạngTháiTK
+}
+class "Hồ sơ" as HS {
+  -giớiTính: GiớiTính
+  -nămSinh: Năm
+  -chiềuCao: cm
+  -cânNặng: kg
+  -kcalMụcTiêu: Số thực
+}
+class "Cài đặt bếp" as CD {
+  -sốHọngBếp: Số nguyên
+  -múiGiờ: Chuỗi
+  -ngônNgữ: NgônNgữ
+}
+class "Mục đích đồng ý" as MD {
+  -mã: Chuỗi
+  -nhạyCảm: Boolean
+  -bắtBuộc: Boolean
+}
+class "Phiên bản điều khoản" as PB {
+  -phiênBản: Chuỗi
+  -hiệuLựcTừ: Thời điểm
+}
+class "Sự kiện đồng ý" as SK {
+  -hànhĐộng: HànhĐộngĐồngÝ
+  -kênh: KênhĐồngÝ
+  -thờiĐiểm: Thời điểm
+}
+
+TK "1" *-- "0..1" HS
+TK "1" *-- "1" CD
+TK "1" -- "0..*" SK : ghi
+MD "1" -- "1..*" PB : có
+PB "1" -- "0..*" SK : theo
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+title DP01b — Triển khai: container trên máy chủ lab
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam componentStyle rectangle
+
+node "Máy chủ lab – Docker Compose" as Host <<device>> {
+  node "nginx" as Nginx <<container>>
+  node "api" as Api <<container>>
+  node "worker" as Worker <<container>>
+  node "scheduler" as Sched <<container>>
+  node "migrate (chạy một lần)" as Migrate <<container>>
+  node "postgres" as Pg <<container>>
+  node "valkey" as Vk <<container>>
+}
+
+Nginx ..> Api : HTTP
+Api ..> Pg : SQL
+Api ..> Vk : RESP
+Worker ..> Vk : RESP
+Worker ..> Pg : SQL
+Sched ..> Pg : SQL
+Migrate ..> Pg : alembic
+@enduml

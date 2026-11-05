@@ -83,7 +83,7 @@ Ghi chú: văn bản [S8], [S9] được đọc qua bản đăng lại (chưa đ
 | Kế hoạch kiểm thử | `docs/sad/06-ke-hoach-kiem-thu.md` |
 | Đánh giá tác động xử lý dữ liệu cá nhân | `docs/sad/07-danh-gia-tac-dong-du-lieu-ca-nhan.md` |
 | Ma trận truy vết | `docs/sad/08-ma-tran-truy-vet.md` (sinh bằng `gen_traceability.py`) |
-| ERD | `docs/erd/ERD00-khai-niem-chen.puml` … `ERD08-tong-quan.puml` |
+| ERD | `docs/erd/ERD00a-chen-nguoi-dung-ho-so.puml … docs/erd/ERD00h-chen-khao-sat.puml` … `ERD08-tong-quan.puml` |
 | Sơ đồ UML | `docs/uml/` (use case, hoạt động, tuần tự, lớp, trạng thái, thành phần, gói, triển khai, ngữ cảnh) |
 | Hợp đồng API | `docs/api/openapi-v1.yaml` |
 | Lược đồ CSDL | `db/schema.sql`, `db/schema_vp.sql` |
@@ -108,15 +108,17 @@ Tastoria là hệ thống mới, độc lập, không thay thế hệ thống n�
 - **PostgreSQL 18 + pgvector**, ổ đĩa lưu tệp (ảnh, bản xuất, mô hình) phục vụ qua nginx `X-Accel-Redirect`.
 - **CLI** `tastoria …` trong container api cho nhân sự (A05, A06).
 
-Sơ đồ ngữ cảnh (mức 0) — nguồn `docs/uml/context/CTX01-ngu-canh.puml`:
+Sơ đồ ngữ cảnh (mức 0) — nguồn `docs/uml/context/CTX01a-ngu-canh-con-nguoi.puml … docs/uml/context/CTX01b-ngu-canh-he-thong-ngoai.puml`:
 
-![CTX01 — Sơ đồ ngữ cảnh](../uml/out/context/CTX01-ngu-canh.svg)
+![CTX01a — Ngữ cảnh: người dùng và nhân sự](../uml/out/context/CTX01a-ngu-canh-con-nguoi.svg)
+
+![CTX01b — Ngữ cảnh: tác nhân thời gian và hệ thống ngoài](../uml/out/context/CTX01b-ngu-canh-he-thong-ngoai.svg)
 
 Ranh giới: mọi tác nhân con người tương tác qua app/web (A01–A03), endpoint `/admin/*` (A04, A06) hoặc CLI (A05, A06). Hệ thống ngoài: Dịch vụ email A09 (SMTP; môi trường dev dùng Mailpit), Công cụ gán nhãn A10 (Label Studio tự host, người gán nhãn A07 làm việc trực tiếp trên công cụ này), kho sao lưu ngoài (Google Drive qua rclone; chưa có mã actor, xem đề xuất ở Phụ lục B). Mô hình học máy được huấn luyện ngoài hệ thống trên GPU của lab và nạp vào qua UC29–UC30.
 
 ### 2.2 Chức năng sản phẩm
 
-34 use case chia 10 gói. Đặc tả kiểu Cockburn từng UC ở `docs/sad/use-cases/UCxx.md`; sơ đồ ở `docs/uml/usecase/UCD00-tong-quan.puml` và UCD01–UCD10.
+34 use case chia 10 gói. Đặc tả kiểu Cockburn từng UC ở `docs/sad/use-cases/UCxx.md`; sơ đồ ở `docs/uml/usecase/UCD00a-tong-quan-nguoi-dung.puml … docs/uml/usecase/UCD00b-tong-quan-nhan-su.puml` và UCD01–UCD10.
 
 | Gói | Chức năng | Use case |
 |---|---|---|
@@ -131,7 +133,7 @@ Ranh giới: mọi tác nhân con người tương tác qua app/web (A01–A03),
 | PK9 Vận hành mô hình | Xuất dữ liệu huấn luyện bí danh hoá; đăng ký, kiểm định, triển khai, quay lui mô hình; gán nhãn ảnh góp | UC28, UC29, UC30, UC31 |
 | PK10 Tác vụ định kỳ | Xoá ảnh quá hạn; sao lưu; dọn job kẹt, token, khoá lũy đẳng | UC32, UC33, UC34 |
 
-Luồng chính nối các gói: UC12 → UC13 (kho) → UC15 (mâm, có UC16/UC17 mở rộng) → UC19 → UC20 (trừ kho, ghi tương tác) → UC22. Sơ đồ hoạt động `docs/uml/activity/AD01-quet-den-nau.puml`.
+Luồng chính nối các gói: UC12 → UC13 (kho) → UC15 (mâm, có UC16/UC17 mở rộng) → UC19 → UC20 (trừ kho, ghi tương tác) → UC22. Sơ đồ hoạt động `docs/uml/activity/AD01a-quet-va-xac-nhan.puml … docs/uml/activity/AD01c-nau-va-hoan-tat.puml`.
 
 **Quy tắc viết đặc tả UC** (áp cho mọi tệp UC):
 
@@ -905,7 +907,7 @@ Nền tảng chạy app có ngưỡng đo được ở ràng buộc RB-06 (§2.4
 
 ### 3.5 Yêu cầu dữ liệu logic
 
-- **Mô hình dữ liệu**: 63 bảng (62 trong `db/schema.sql`, `recipe_make_ahead` thêm ở migration 0003) và 3 view (`v_current_consents`, `v_pantry_lot_balance`, `v_journal_days`) chia theo 13 module có dữ liệu, định nghĩa trong `model.yaml` (`tables`, `views`). ERD khái niệm Chen `docs/erd/ERD00-khai-niem-chen.puml`; ERD chân quạ theo nhóm `ERD01-dinh-danh-quyen-rieng-tu` … `ERD07-khao-sat-mo-hinh` và tổng quan `ERD08-tong-quan`.
+- **Mô hình dữ liệu**: 63 bảng (62 trong `db/schema.sql`, `recipe_make_ahead` thêm ở migration 0003) và 3 view (`v_current_consents`, `v_pantry_lot_balance`, `v_journal_days`) chia theo 13 module có dữ liệu, định nghĩa trong `model.yaml` (`tables`, `views`). ERD khái niệm Chen `docs/erd/ERD00a-chen-nguoi-dung-ho-so.puml … docs/erd/ERD00h-chen-khao-sat.puml`; ERD chân quạ theo nhóm `ERD01a–ERD01b` … `ERD07a–ERD07b` và tổng quan `ERD08-tong-quan`.
 - **Chuẩn hoá**: mọi quan hệ đạt BCNF, có phân tích khoá ứng viên và phụ thuộc hàm từng bảng trong `docs/sad/04-chuan-hoa.md`. Phi chuẩn hoá có kiểm soát (mỗi trường hợp có mục riêng ở 04-chuan-hoa): `recipe_nutrition` (giá trị dẫn xuất, tính lại bằng job, có `data_version`); ảnh chụp lịch sử `meal_plans.e_target_kcal`, `kcal_low`, `kcal_high`, `meal_plan_items.kcal_per_person`, `cook_sessions.burners`.
 - **Từ điển dữ liệu**: [05-tu-dien-du-lieu.md](05-tu-dien-du-lieu.md), sinh từ catalog PostgreSQL sau khi áp `db/schema.sql`.
 - **Toàn vẹn**: PK/FK/UNIQUE/CHECK theo `model.yaml`; FK ghép bảo đảm cùng chủ sở hữu (`interactions` → `meal_plans(id, user_id)`) và cùng slot (`meal_plan_items` → `recipes(id, slot)`); unique một phần "một món `active` mỗi slot".
@@ -1015,7 +1017,7 @@ SRS này không tạo mã ngoài `model.yaml`. Những chỗ mô hình chưa có
 | # | Đề xuất | Lý do | Ảnh hưởng nếu nhận |
 |---|---|---|---|
 | B1 | Tách 21 điều khoản con NFR thành mã NFR riêng trong `nfrs` (mỗi điều khoản `.b`–`.e` một mã mới cùng nhóm đặc tính; thêm nhóm tương thích cho ràng buộc nền tảng của RB-06) | Truy vết và báo cáo theo từng mã; thiết kế v2 §11 chỉ có bản rút gọn | Đổi mã ở §3.4, ADR ở §3.6, cột "Tham chiếu" của 06; `check_refs.py` tự nhận mã mới |
-| B2 | Actor cho kho sao lưu ngoài (Google Drive qua rclone) | Là hệ thống ngoài nhận dữ liệu cá nhân đã mã hoá (UC33) | Thêm vào CTX01, UCD10 |
+| B2 | Actor cho kho sao lưu ngoài (Google Drive qua rclone) | Là hệ thống ngoài nhận dữ liệu cá nhân đã mã hoá (UC33) | Thêm vào CTX01a–CTX01b, UCD10 |
 | B3 | Actor "Người ăn cùng" (không tài khoản) nếu muốn giữ đúng thiết kế v2 §12 mục 2 | Độ lệch ở §2.6 | Thêm vào UCD05 dạng bên liên quan, không có UC riêng |
 | B4 | Cột ghi xác nhận đủ 18 tuổi (ví dụ thời điểm xác nhận) hoặc tháng sinh mã hoá trong `profiles` | FR-09-13 hiện chỉ kiểm xác nhận lúc gửi, không lưu bằng chứng | Bỏ được bước xác nhận khi có tháng sinh |
 | B5 | Bỏ giá trị `access` khỏi `dsr_requests.type`, hoặc định nghĩa hành vi riêng cho nó | FR-06-12 từ chối loại này; enum còn giá trị không dùng | Sửa DDL, OpenAPI |

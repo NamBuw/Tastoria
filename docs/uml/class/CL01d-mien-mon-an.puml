@@ -1,0 +1,50 @@
+@startuml
+title CL01d — Miền: món ăn và công thức
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Món" as MON {
+  -tên: Chuỗi
+  -slot: Slot
+  -khẩuPhầnGốc: Số nguyên
+  -trạngThái: TrạngTháiMón
+}
+class "Thành phần món" as TPM {
+  -lượng: Gam
+  -vaiTrò: VaiTròNL
+  -luônCó: Boolean
+}
+class "Bước nấu" as BN {
+  -sốBước: Số nguyên
+  -loại: LoạiBước
+  -phút: Số nguyên
+  -dùngBếp: Boolean
+}
+class "Nguyên liệu" as NL {
+  -tên: Chuỗi
+}
+class "Dinh dưỡng món" as DDM {
+  -kcal: Số thực
+  -đạm: Gam
+  -béo: Gam
+  -bộtĐường: Gam
+}
+class "Thẻ" as THE {
+  -loại: LoạiThẻ
+  -tên: Chuỗi
+}
+
+MON "1" *-- "1..*" TPM
+NL "1" -- "0..*" TPM
+MON "1" *-- "1..*" BN
+MON "1" *-- "0..1" DDM
+MON "0..*" -- "0..*" THE
+@enduml

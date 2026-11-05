@@ -1,0 +1,82 @@
+@startuml
+title ERD06a — Mâm cơm và món trong mâm (meal)
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "meal_plans" as meal_plans {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * meal : meal_t
+  * persons : smallint
+  * max_minutes : smallint
+  * status : meal_plan_status_t
+    e_target_kcal : numeric
+    kcal_low : numeric
+    kcal_high : numeric
+    rice_bowls_per_person : numeric
+  * reason_vi : text
+    ranker_version_id : uuid <<FK>>
+  * params_version : text
+  * created_at : timestamptz
+  * updated_at : timestamptz
+  .. UNIQUE(id, user_id) ..
+}
+entity "meal_plan_items" as meal_plan_items {
+  * id : uuid <<PK>>
+  --
+  * meal_plan_id : uuid <<FK>>
+  * slot : slot_t <<FK>>
+  * recipe_id : uuid <<FK>>
+  * status : plan_item_status_t
+    replaced_item_id : uuid <<FK, UQ>>
+    swap_reason : swap_reason_t
+  * rank_score : real
+  * servings_scale : numeric
+    kcal_per_person : numeric
+  * created_at : timestamptz
+  .. UNIQUE(id, meal_plan_id, recipe_id) ..
+  .. UNIQUE(meal_plan_id, slot) WHERE status = 'active' ..
+}
+entity "meal_plan_item_substitutions" as meal_plan_item_substitutions {
+  * item_id : uuid <<PK, FK>>
+  * original_ingredient_id : uuid <<PK, FK>>
+  --
+  * substitute_ingredient_id : uuid <<FK>>
+  * grams : numeric
+  * origin : substitution_origin_t
+  * created_at : timestamptz
+}
+entity "users" as users #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01a ..
+}
+entity "model_versions" as model_versions #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD07a ..
+}
+entity "recipes" as recipes #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD04a ..
+}
+entity "ingredients" as ingredients #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD03b ..
+}
+
+users ||--o{ meal_plans : user_id (cascade)
+model_versions |o--o{ meal_plans : ranker_version_id
+meal_plans ||--o{ meal_plan_items : meal_plan_id (cascade)
+meal_plan_items |o--o| meal_plan_items : replaced_item_id
+recipes ||--o{ meal_plan_items : recipe_id, slot
+meal_plan_items ||--o{ meal_plan_item_substitutions : item_id (cascade)
+ingredients ||--o{ meal_plan_item_substitutions : original_ingredient_id
+ingredients ||--o{ meal_plan_item_substitutions : substitute_ingredient_id
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

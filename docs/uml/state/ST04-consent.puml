@@ -1,35 +1,24 @@
 @startuml
-title ST04 — Máy trạng thái Consent theo (user, mục đích) (consent_events, v_current_consents; UC05, UC09)
+title ST04 — Trạng thái đồng ý theo mục đích (Consent)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
 hide empty description
+skinparam StateBackgroundColor White
 
-state "none" as none : entry / mục đích chưa được xử lý (không tích sẵn, BR-CONSENT-01)
-state "granted" as granted : entry / cho phép xử lý dữ liệu của mục đích theo\npolicy_version_id hiện hành
-state "withdrawn" as withdrawn : entry / ngừng xử lý ngay; xoá dữ liệu của mục đích ≤ 24 giờ\n(BR-CONSENT-04)
-granted : POST /me/consents [cùng policy_version_id] / lũy đẳng, không ghi sự kiện mới
-state "superseded" as superseded : entry / app hỏi lại đồng ý với phiên bản mới
+state "none" as none
+state "granted" as granted
+state "withdrawn" as withdrawn : entry / xoá dữ liệu ≤ 24 giờ
+state "superseded" as superseded : entry / hỏi lại đồng ý
 
-[*] --> none : / bắt đầu khi POST /auth/register tạo tài khoản\n(mỗi mục đích trong consent_purposes; chưa ghi dòng nào)
-none --> granted : POST /me/consents (purpose, policy_version_id hiện hành)\n/ insert consent_events action = grant,\nchannel = onboarding | settings
-granted --> withdrawn : POST /me/consents/{purpose}/withdraw\n/ insert consent_events action = withdraw;\nusers.token_version += 1; tạo dsr_requests type = withdraw
-withdrawn --> granted : POST /me/consents [policy_version_id hiện hành]\n/ insert consent_events action = grant
-granted --> superseded : when(policy_versions mới của purpose có\neffective_from ≤ now())
-superseded --> granted : POST /me/consents [policy_version_id mới]\n/ insert consent_events action = grant
-superseded --> withdrawn : POST /me/consents/{purpose}/withdraw\n/ như trên
-none --> [*] : xoá tài khoản (CASCADE consent_events)
-granted --> [*] : xoá tài khoản (CASCADE consent_events)
-withdrawn --> [*] : xoá tài khoản (CASCADE consent_events)
-superseded --> [*] : xoá tài khoản (CASCADE consent_events)
-
-note as Nmap
-  <b>Trạng thái ↔ dữ liệu lưu trữ</b> (tất cả derived, không có cột trạng thái)
-  Sự kiện mới nhất e = v_current_consents(user_id, purpose_code); PV = policy_versions
-  có effective_from ≤ now() mới nhất của purpose_code.
-  none: không có consent_events nào cho (user_id, purpose_code)
-  granted: e.action = 'grant' và e.policy_version_id = PV.id
-  withdrawn: e.action = 'withdraw'
-  superseded: e.action = 'grant' và e.policy_version_id ≠ PV.id
-  consent_events chỉ ghi thêm; mỗi lần chuyển = một dòng mới.
-  Mục đích survey của người tham gia khảo sát (A03) không đi qua máy này:
-  survey_respondents.policy_version_id + consented_at ghi đồng ý một lần.
-end note
+[*] --> none : đăng ký tài khoản
+none --> granted : đồng ý
+granted --> withdrawn : rút
+withdrawn --> granted : đồng ý lại
+granted --> superseded : có điều khoản mới
+superseded --> granted : đồng ý bản mới
+superseded --> withdrawn : rút
 @enduml

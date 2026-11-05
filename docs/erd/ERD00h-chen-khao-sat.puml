@@ -1,0 +1,55 @@
+@startchen
+title ERD00h — Khái niệm (Chen): khảo sát gu
+' Tách từ docs/erd/src/khai-niem-day-du.chen bằng gen_puml.py.
+
+entity "Người tham gia khảo sát" as NGUOIKS {
+  Mã người tham gia <<key>>
+  Kênh
+  Thời điểm đồng ý
+}
+entity "Phiếu khảo sát" as PHIEUKS {
+  Mã phiếu <<key>>
+  Phiên bản phiếu
+  Số món neo
+}
+entity "Phiên bản điều khoản" as DIEUKHOAN {
+  Mã phiên bản điều khoản <<key>>
+  Số phiên bản
+  Hiệu lực từ
+}
+entity "Phân công khảo sát" as PHANCONG <<weak>> {
+  Thứ tự hiển thị
+  Là món neo
+}
+entity "Món" as MON {
+  Mã món <<key>>
+  Tên món
+  Vị trí trong mâm
+}
+entity "Điểm khảo sát" as DIEMKS <<weak>> {
+  Điểm
+  Chưa từng ăn
+}
+relationship "điền" as R_DIEN {
+}
+relationship "chấp nhận" as R_CHAPNHAN {
+}
+relationship "được giao" as R_DUOCGIAO <<identifying>> {
+}
+relationship "giao món" as R_GIAOMON <<identifying>> {
+}
+relationship "trả lời" as R_TRALOI <<identifying>> {
+}
+
+NGUOIKS =N= R_DIEN
+R_DIEN -1- PHIEUKS
+NGUOIKS =N= R_CHAPNHAN
+R_CHAPNHAN -1- DIEUKHOAN
+NGUOIKS =1= R_DUOCGIAO
+R_DUOCGIAO =N= PHANCONG
+PHANCONG =N= R_GIAOMON
+R_GIAOMON -1- MON
+PHANCONG -1- R_TRALOI
+R_TRALOI =1= DIEMKS
+
+@endchen

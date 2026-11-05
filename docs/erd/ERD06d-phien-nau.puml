@@ -1,0 +1,47 @@
+@startuml
+title ERD06d — Phiên nấu và lịch nấu (cooking)
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "cook_sessions" as cook_sessions {
+  * id : uuid <<PK>>
+  --
+  * meal_plan_id : uuid <<FK>>
+  * status : cook_status_t
+  * serve_at : timestamptz
+  * burners : smallint
+  * started_at : timestamptz
+    completed_at : timestamptz
+    reverted_at : timestamptz
+  * created_at : timestamptz
+  .. UNIQUE(meal_plan_id) WHERE status IN ('in_progress', 'completed') ..
+}
+entity "cook_schedule_entries" as cook_schedule_entries {
+  * cook_session_id : uuid <<PK, FK>>
+  * recipe_id : uuid <<PK, FK>>
+  * step_no : smallint <<PK, FK>>
+  --
+  * start_offset_s : integer
+  * end_offset_s : integer
+}
+entity "meal_plans" as meal_plans #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD06a ..
+}
+entity "recipe_steps" as recipe_steps #EEEEEE {
+  * recipe_id : uuid <<PK>>
+  * step_no : smallint <<PK>>
+  .. chi tiết ở ERD04a ..
+}
+
+meal_plans ||--o{ cook_sessions : meal_plan_id (cascade)
+cook_sessions ||--o{ cook_schedule_entries : cook_session_id (cascade)
+recipe_steps ||--o{ cook_schedule_entries : recipe_id, step_no
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

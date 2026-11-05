@@ -1,0 +1,67 @@
+@startuml
+title ERD04a — Món ăn: công thức và bước nấu
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "recipes" as recipes {
+  * id : uuid <<PK>>
+  --
+  * name_vi : text
+  * slot : slot_t
+  * servings : smallint
+  * method_code : text <<FK>>
+  * status : recipe_status_t
+    notes : text
+  * created_at : timestamptz
+  * updated_at : timestamptz
+  .. UNIQUE(id, slot) ..
+  .. UNIQUE(name_vi) WHERE status <> 'retired' ..
+}
+entity "recipe_ingredients" as recipe_ingredients {
+  * recipe_id : uuid <<PK, FK>>
+  * ingredient_id : uuid <<PK, FK>>
+  --
+  * grams : numeric
+  * role : ingredient_role_t
+  * is_optional : boolean
+}
+entity "recipe_steps" as recipe_steps {
+  * recipe_id : uuid <<PK, FK>>
+  * step_no : smallint <<PK>>
+  --
+  * text_vi : text
+  * kind : step_kind_t
+  * minutes : smallint
+  * uses_burner : boolean
+}
+entity "cooking_methods" as cooking_methods {
+  * code : text <<PK>>
+  --
+  * name_vi : text
+}
+entity "recipe_make_ahead" as recipe_make_ahead {
+  * recipe_id : uuid <<PK, FK>>
+  --
+  * item_ingredient_id : uuid <<FK>>
+  * through_step_no : smallint <<FK>>
+}
+entity "ingredients" as ingredients #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD03b ..
+}
+
+cooking_methods ||--o{ recipes : method_code
+recipes ||--o{ recipe_ingredients : recipe_id
+ingredients ||--o{ recipe_ingredients : ingredient_id
+recipes ||--o{ recipe_steps : recipe_id
+recipes ||--o| recipe_make_ahead : recipe_id
+recipe_steps ||--o| recipe_make_ahead : recipe_id, through_step_no
+ingredients ||--o{ recipe_make_ahead : item_ingredient_id
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

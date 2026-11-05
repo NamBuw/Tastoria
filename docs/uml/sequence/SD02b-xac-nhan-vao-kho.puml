@@ -1,0 +1,35 @@
+@startuml
+title SD02b — Xác nhận kết quả quét vào kho (UC13)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Người dùng" as U
+boundary "App" as APP
+control "API (scan)" as API
+control "pantry" as PAN
+entity "CSDL" as DB
+
+U -> APP : bấm Xác nhận
+APP -> API : xác nhận lần quét
+API -> DB : khoá lần quét, kiểm tra chủ và trạng thái
+alt đã xác nhận trước đó
+  API --> APP : trả lại kết quả cũ
+else chưa xong hoặc còn chip cần kiểm tra
+  API --> APP : 409 / 422
+else hợp lệ
+  API -> PAN : tạo lô từ chip (mỗi chip một lô)
+  PAN -> DB : ghi lô và giao dịch nhập kho
+  API -> PAN : đánh dấu lô không thấy (chế độ toàn tủ)
+  API -> DB : lần quét → «confirmed»; commit
+  API --> APP : danh sách lô mới
+end
+APP --> U : hiện kho đã cập nhật
+@enduml

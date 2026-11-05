@@ -1,0 +1,75 @@
+@startchen
+title ERD00d — Khái niệm (Chen): quét ảnh và nhận diện
+' Tách từ docs/erd/src/khai-niem-day-du.chen bằng gen_puml.py.
+
+entity "Người dùng" as NGUOIDUNG {
+  Mã người dùng <<key>>
+  Email
+  Vai trò
+}
+entity "Lần quét" as LANQUET {
+  Mã lần quét <<key>>
+  Chế độ quét
+  Trạng thái
+}
+entity "Ảnh quét" as ANHQUET <<weak>> {
+  Thứ tự ảnh <<key>>
+  Ngăn tủ
+  Khoá lưu trữ
+}
+entity "Chip nguyên liệu" as CHIP {
+  Mã chip <<key>>
+  Nguồn gốc
+  Số đếm của mô hình
+}
+entity "Khung phát hiện" as KHUNG {
+  Mã khung <<key>>
+  Toạ độ
+  Độ tin cậy
+}
+entity "Lớp thị giác" as LOPTG {
+  Mã lớp <<key>>
+  Tên lớp
+  Cách đếm cá thể
+}
+entity "Nguyên liệu" as NGUYENLIEU {
+  Mã nguyên liệu <<key>>
+  Tên tiếng Việt
+  Tên đồng nghĩa <<multi>>
+}
+relationship "thực hiện" as R_THUCHIEN {
+}
+relationship "chụp" as R_CHUP <<identifying>> {
+}
+relationship "đề xuất" as R_DEXUAT {
+}
+relationship "nhận diện là" as R_NHANDIEN {
+}
+relationship "chứa khung" as R_CHUAKHUNG {
+}
+relationship "thuộc lớp" as R_THUOCLOP {
+}
+relationship "gộp vào" as R_GOPVAO {
+}
+relationship "ánh xạ tới" as R_ANHXA {
+  Mặc định
+}
+
+NGUOIDUNG -1- R_THUCHIEN
+R_THUCHIEN =N= LANQUET
+LANQUET =1= R_CHUP
+R_CHUP =N= ANHQUET
+LANQUET -1- R_DEXUAT
+R_DEXUAT =N= CHIP
+CHIP =N= R_NHANDIEN
+R_NHANDIEN -1- NGUYENLIEU
+ANHQUET -1- R_CHUAKHUNG
+R_CHUAKHUNG =N= KHUNG
+KHUNG =N= R_THUOCLOP
+R_THUOCLOP -1- LOPTG
+KHUNG -N- R_GOPVAO
+R_GOPVAO -1- CHIP
+LOPTG -M- R_ANHXA
+R_ANHXA -N- NGUYENLIEU
+
+@endchen

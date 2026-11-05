@@ -1,0 +1,40 @@
+@startuml
+title ERD06b — Ràng buộc mâm: dị ứng người ăn cùng, lô ghim (meal)
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "meal_plan_coeater_allergens" as meal_plan_coeater_allergens {
+  * meal_plan_id : uuid <<PK, FK>>
+  * allergen_code : text <<PK, FK>>
+  --
+}
+entity "meal_plan_pins" as meal_plan_pins {
+  * meal_plan_id : uuid <<PK, FK>>
+  * lot_id : uuid <<PK, FK>>
+  --
+}
+entity "meal_plans" as meal_plans #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD06a ..
+}
+entity "allergen_groups" as allergen_groups #EEEEEE {
+  * code : text <<PK>>
+  .. chi tiết ở ERD03b ..
+}
+entity "pantry_lots" as pantry_lots #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD05a ..
+}
+
+meal_plans ||--o{ meal_plan_coeater_allergens : meal_plan_id (cascade)
+allergen_groups ||--o{ meal_plan_coeater_allergens : allergen_code
+meal_plans ||--o{ meal_plan_pins : meal_plan_id (cascade)
+pantry_lots ||--o{ meal_plan_pins : lot_id (cascade)
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

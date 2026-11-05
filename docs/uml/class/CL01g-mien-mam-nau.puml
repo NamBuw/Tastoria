@@ -1,0 +1,48 @@
+@startuml
+title CL01g — Miền: mâm cơm và phiên nấu
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Mâm cơm" as MAM {
+  -bữa: Bữa
+  -sốNgười: Số nguyên
+  -kcalMụcTiêu: Số thực
+  -trạngThái: TrạngTháiMâm
+}
+class "Món trong mâm" as MTM {
+  -slot: Slot
+  -hệSốKhẩuPhần: Số thực
+  -trạngThái: TrạngTháiMónMâm
+}
+class "Thay thế đã chọn" as TTDC {
+  -nguồn: NguồnThayThế
+}
+class "Phiên nấu" as PN {
+  -giờDọn: Thời điểm
+  -sốHọngBếp: Số nguyên
+  -trạngThái: TrạngTháiPhiên
+  -hoànTấtLúc: Thời điểm
+}
+class "Mục lịch nấu" as ML {
+  -sốBước: Số nguyên
+  -bắtĐầu: Giây
+  -kếtThúc: Giây
+}
+class "Món" as MON {
+  -tên: Chuỗi
+}
+
+MAM "1" *-- "2..3" MTM
+MTM "0..*" -- "1" MON
+MTM "1" *-- "0..*" TTDC
+MAM "1" -- "0..*" PN : được nấu
+PN "1" *-- "1..*" ML
+@enduml

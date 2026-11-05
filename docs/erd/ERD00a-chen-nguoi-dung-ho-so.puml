@@ -1,0 +1,45 @@
+@startchen
+title ERD00a — Khái niệm (Chen): người dùng, hồ sơ, dị ứng, chế độ ăn
+' Tách từ docs/erd/src/khai-niem-day-du.chen bằng gen_puml.py.
+
+entity "Người dùng" as NGUOIDUNG {
+  Mã người dùng <<key>>
+  Email
+  Vai trò
+}
+entity "Hồ sơ" as HOSO <<weak>> {
+  Chỉ số cơ thể
+  Mức vận động
+}
+entity "Nhóm dị ứng" as DIUNG {
+  Mã nhóm dị ứng <<key>>
+  Tên
+  Căn cứ
+}
+entity "Chế độ ăn" as CHEDO {
+  Mã chế độ ăn <<key>>
+  Tên
+}
+entity "Nhóm thực phẩm" as NHOMTP {
+  Mã nhóm <<key>>
+  Tên
+}
+relationship "có hồ sơ" as R_COHOSO <<identifying>> {
+}
+relationship "dị ứng với" as R_DIUNG {
+}
+relationship "theo" as R_THEO {
+}
+relationship "loại trừ" as R_LOAITRU {
+}
+
+NGUOIDUNG -1- R_COHOSO
+R_COHOSO =1= HOSO
+NGUOIDUNG -M- R_DIUNG
+R_DIUNG -N- DIUNG
+HOSO -N- R_THEO
+R_THEO -1- CHEDO
+CHEDO -M- R_LOAITRU
+R_LOAITRU -N- NHOMTP
+
+@endchen

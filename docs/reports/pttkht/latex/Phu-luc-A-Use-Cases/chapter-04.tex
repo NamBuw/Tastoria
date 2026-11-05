@@ -54,7 +54,7 @@ Nhóm vận hành & Job không kẹt vô hạn; gửi lại không tạo job tr�
 A02 bấm "Chụp tủ lạnh" hoặc "Đồ vừa mua" ở Trang chủ.
 
 \subsection{Kịch bản chính}
-Kịch bản viết ở mức tác nhân \ensuremath{\leftrightarrow} hệ thống (hộp đen). Phân công giữa API, worker và các module ({\small\texttt{scan}}, {\small\texttt{mlops}}, {\small\texttt{catalog}}, {\small\texttt{pantry}}, {\small\texttt{privacy}}) cùng các bảng được đọc, ghi ở từng bước nằm ở {\small\texttt{docs/\allowbreak{}\allowbreak{}uml/\allowbreak{}\allowbreak{}sequence/\allowbreak{}\allowbreak{}SD01-\allowbreak{}quet-\allowbreak{}anh-\allowbreak{}bat-\allowbreak{}dong-\allowbreak{}bo.\allowbreak{}puml}} và mục 13 (Dữ liệu).
+Kịch bản viết ở mức tác nhân \ensuremath{\leftrightarrow} hệ thống (hộp đen). Phân công giữa API, worker và các module ({\small\texttt{scan}}, {\small\texttt{mlops}}, {\small\texttt{catalog}}, {\small\texttt{pantry}}, {\small\texttt{privacy}}) cùng các bảng được đọc, ghi ở từng bước nằm ở {\small\texttt{docs/\allowbreak{}\allowbreak{}uml/\allowbreak{}\allowbreak{}sequence/\allowbreak{}\allowbreak{}SD01a–SD01d-\allowbreak{}quet-\allowbreak{}anh-\allowbreak{}bat-\allowbreak{}dong-\allowbreak{}bo.\allowbreak{}puml}} và mục 13 (Dữ liệu).
 
 \begin{enumerate}
 \item \textbf{A02} chọn chế độ (toàn tủ /\allowbreak{} đồ vừa mua) và chụp ảnh thứ nhất; tuỳ chọn chụp ảnh thứ hai và đánh dấu "ngăn khác" nếu ảnh 2 chụp ngăn khác.
@@ -153,7 +153,7 @@ Nhóm Học máy /\allowbreak{} Xử lý ảnh & Sửa chip (đổi nhãn, sửa
 \item A02 mở lại một scan {\small\texttt{done}} từ thông báo "Bạn có kết quả quét chưa xác nhận" ở Trang chủ.
 \end{itemize}
 \subsection{Kịch bản chính}
-Kịch bản viết ở mức tác nhân \ensuremath{\leftrightarrow} hệ thống (hộp đen). Lời gọi giữa module {\small\texttt{scan}}, {\small\texttt{pantry}}, {\small\texttt{catalog}} và Unit of Work ở bước 12--13 nằm ở {\small\texttt{docs/\allowbreak{}\allowbreak{}uml/\allowbreak{}\allowbreak{}sequence/\allowbreak{}\allowbreak{}SD02-\allowbreak{}xac-\allowbreak{}nhan-\allowbreak{}quet.\allowbreak{}puml}}.
+Kịch bản viết ở mức tác nhân \ensuremath{\leftrightarrow} hệ thống (hộp đen). Lời gọi giữa module {\small\texttt{scan}}, {\small\texttt{pantry}}, {\small\texttt{catalog}} và Unit of Work ở bước 12--13 nằm ở {\small\texttt{docs/\allowbreak{}\allowbreak{}uml/\allowbreak{}\allowbreak{}sequence/\allowbreak{}\allowbreak{}SD02a–SD02c-\allowbreak{}xac-\allowbreak{}nhan-\allowbreak{}quet.\allowbreak{}puml}}.
 
 \begin{enumerate}
 \item \textbf{App} hiện màn Xác nhận nguyên liệu từ dữ liệu {\small\texttt{GET /\allowbreak{}\allowbreak{}scans/\allowbreak{}\allowbreak{}\{id\}}}: chip theo nhóm thực phẩm, mỗi chip có tên, số đếm hoặc mức lượng, nhãn độ tươi (chữ kèm chấm màu); chip độ tin cậy thấp hiện nhạt hơn; nhóm "Cần kiểm tra" đặt trên cùng.

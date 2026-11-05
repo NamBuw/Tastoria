@@ -1,0 +1,30 @@
+@startuml
+title SD07b — Xoá dữ liệu của mục đích đã rút (UC05)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+entity "Hàng đợi (Valkey)" as Q
+control "Worker (privacy)" as WK
+entity "CSDL" as DB
+entity "Kho tệp" as FS
+
+Q -> WK : giao job xoá (mục đích)
+WK -> DB : yêu cầu → «in_progress»
+alt health_profile
+  WK -> DB : xoá cột sức khoẻ mã hoá
+else personalization
+  WK -> DB : xoá tương tác cá nhân hoá
+else photo_contribution
+  WK -> FS : xoá ảnh đã góp
+  WK -> DB : bỏ cờ góp ảnh
+end
+WK -> DB : yêu cầu → «completed» (≤ 24 giờ)
+@enduml

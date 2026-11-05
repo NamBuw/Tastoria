@@ -1,0 +1,39 @@
+@startuml
+title AD01a — Quét và xác nhận nguyên liệu (UC12, UC13)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam ActivityBackgroundColor White
+
+|Người dùng|
+|App|
+|Hệ thống|
+|Người dùng|
+start
+:Chọn chế độ quét, chụp 1–2 ảnh;
+|App|
+:Nén ảnh, gửi yêu cầu quét;
+|Hệ thống|
+:Kiểm tra ảnh, tạo lần quét;
+:Nhận diện nguyên liệu (worker);
+if (Nhận diện thành công?) then (không)
+  |App|
+  :Báo lỗi, mời quét lại;
+  stop
+else (có)
+endif
+:Hiện chip nguyên liệu;
+|Người dùng|
+while (Còn chip cần sửa?) is (có)
+  :Sửa tên, số lượng hoặc xoá chip;
+endwhile (không)
+:Bấm Xác nhận;
+|Hệ thống|
+:Ghi lô và giao dịch nhập kho;
+|App|
+:Hiện kho đã cập nhật;
+stop
+@enduml

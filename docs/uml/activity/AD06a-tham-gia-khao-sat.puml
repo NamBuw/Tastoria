@@ -1,0 +1,37 @@
+@startuml
+title AD06a — Tham gia khảo sát gu (UC23)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam ActivityBackgroundColor White
+
+|Người tham gia khảo sát|
+|Hệ thống|
+|Người tham gia khảo sát|
+start
+:Mở link khảo sát;
+|Hệ thống|
+:Hiện điều khoản khảo sát;
+|Người tham gia khảo sát|
+if (Đồng ý?) then (không)
+  :Rời trang, không lưu gì;
+  stop
+else (có)
+endif
+|Hệ thống|
+:Tạo người tham gia ẩn danh, giao 45 món;
+|Người tham gia khảo sát|
+while (Còn món?) is (còn)
+  :Chấm món 1–5;
+  |Hệ thống|
+  :Lưu điểm;
+|Người tham gia khảo sát|
+endwhile (hết)
+:Chọn 5 món hay ăn;
+|Hệ thống|
+:Lưu, đánh dấu hoàn tất;
+stop
+@enduml

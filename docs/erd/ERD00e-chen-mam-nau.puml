@@ -1,0 +1,76 @@
+@startchen
+title ERD00e — Khái niệm (Chen): mâm cơm và phiên nấu
+' Tách từ docs/erd/src/khai-niem-day-du.chen bằng gen_puml.py.
+
+entity "Người dùng" as NGUOIDUNG {
+  Mã người dùng <<key>>
+  Email
+  Vai trò
+}
+entity "Mâm cơm" as MAM {
+  Mã mâm <<key>>
+  Bữa
+  Số người
+}
+entity "Món trong mâm" as MONMAM {
+  Mã mục <<key>>
+  Vị trí trong mâm
+  Trạng thái
+}
+entity "Món" as MON {
+  Mã món <<key>>
+  Tên món
+  Vị trí trong mâm
+}
+entity "Lô kho" as LOKHO {
+  Mã lô <<key>>
+  Lượng ban đầu
+  Ngày nhập
+}
+entity "Phiên nấu" as PHIENNAU {
+  Mã phiên <<key>>
+  Giờ dọn
+  Số họng bếp lúc tạo
+}
+entity "Bước nấu" as BUOCNAU <<weak>> {
+  Số bước <<key>>
+  Nội dung
+  Loại bước
+}
+relationship "gồm bước" as R_GOMBUOC <<identifying>> {
+}
+relationship "sở hữu" as R_SOHUU {
+}
+relationship "nhận mâm" as R_NHANMAM {
+}
+relationship "gồm món" as R_GOMMON {
+}
+relationship "chọn món" as R_CHONMON {
+}
+relationship "ghim" as R_GHIM {
+}
+relationship "được nấu trong" as R_DUOCNAU {
+}
+relationship "xếp lịch" as R_XEPLICH {
+  Giây bắt đầu
+  Giây kết thúc
+}
+
+MON =1= R_GOMBUOC
+R_GOMBUOC =N= BUOCNAU
+NGUOIDUNG -1- R_SOHUU
+R_SOHUU =N= LOKHO
+NGUOIDUNG -1- R_NHANMAM
+R_NHANMAM =N= MAM
+MAM =1= R_GOMMON
+R_GOMMON =N= MONMAM
+MONMAM =N= R_CHONMON
+R_CHONMON -1- MON
+MAM -M- R_GHIM
+R_GHIM -N- LOKHO
+MAM -1- R_DUOCNAU
+R_DUOCNAU =N= PHIENNAU
+PHIENNAU -M- R_XEPLICH
+R_XEPLICH -N- BUOCNAU
+
+@endchen

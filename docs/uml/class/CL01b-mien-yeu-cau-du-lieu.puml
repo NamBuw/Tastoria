@@ -1,0 +1,36 @@
+@startuml
+title CL01b — Miền: yêu cầu dữ liệu và kiểm toán
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Tài khoản" as TK {
+  -email: Email
+  -vaiTrò: VaiTrò
+  -trạngThái: TrạngTháiTK
+}
+class "Yêu cầu chủ thể dữ liệu" as YC {
+  -loại: LoạiYêuCầu
+  -trạngThái: TrạngTháiYêuCầu
+  -nhậnLúc: Thời điểm
+  -xongLúc: Thời điểm
+  -subjectRef: Băm
+}
+class "Nhật ký kiểm toán" as KT {
+  -vaiTrò: Chuỗi
+  -hànhĐộng: Chuỗi
+  -đốiTượng: Chuỗi
+  -mụcĐích: Chuỗi
+  -thờiĐiểm: Thời điểm
+}
+
+TK "0..1" -- "0..*" YC : gửi
+TK "0..1" -- "0..*" KT : thực hiện
+@enduml

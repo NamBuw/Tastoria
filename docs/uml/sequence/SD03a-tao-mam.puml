@@ -1,0 +1,34 @@
+@startuml
+title SD03a — Tạo mâm cơm hôm nay (UC15)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Người dùng" as U
+boundary "App" as APP
+control "API (meal)" as API
+control "Hồ sơ & kho" as PRO
+entity "CSDL" as DB
+
+U -> APP : chọn bữa, số người, thời gian
+APP -> API : tạo mâm (khóa lũy đẳng)
+API -> PRO : lấy ràng buộc bữa
+PRO --> API : dị ứng, chế độ ăn, kcal mục tiêu
+API -> PRO : lấy lô khả dụng
+PRO --> API : khoảng gam, độ gấp
+API -> DB : đọc món đã xuất bản
+alt có mâm khả thi
+  API -> DB : lưu mâm «proposed», khóa lũy đẳng
+  API --> APP : mâm, dòng lý do, số bát cơm
+else không có mâm khả thi
+  API --> APP : 422: nguyên liệu còn thiếu
+end
+APP --> U : hiện kết quả
+@enduml

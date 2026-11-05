@@ -1,0 +1,24 @@
+@startuml
+title AD06b — Quản lý đợt khảo sát (UC24)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam ActivityBackgroundColor White
+
+|Người vận hành mô hình|
+|Hệ thống|
+|Người vận hành mô hình|
+start
+:Tạo phiếu: 10 món neo, 35 ngẫu nhiên;
+|Hệ thống|
+:Lưu phiếu, mở phiếu;
+|Người vận hành mô hình|
+:Theo dõi số người tham gia;
+:Xuất kết quả;
+|Hệ thống|
+:Xuất điểm, món hay ăn theo người tham gia;
+stop
+@enduml

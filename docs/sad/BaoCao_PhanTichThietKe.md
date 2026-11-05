@@ -61,9 +61,11 @@ Ngoài phạm vi v2: tính calo từ ảnh món đã nấu, mã vạch, thực �
 
 Sơ đồ ngữ cảnh (mức 0) cho thấy ranh giới hệ thống và các tác nhân:
 
-![CTX01 — Sơ đồ ngữ cảnh](../uml/out/context/CTX01-ngu-canh.svg)
+![CTX01a — Ngữ cảnh: người dùng và nhân sự](../uml/out/context/CTX01a-ngu-canh-con-nguoi.svg)
 
-*Hình 1. CTX01 — Tastoria là hộp đen; tác nhân người tương tác qua app/web, `/admin/*` hoặc CLI; hệ thống ngoài là dịch vụ email A09 và công cụ gán nhãn A10.*
+![CTX01b — Ngữ cảnh: tác nhân thời gian và hệ thống ngoài](../uml/out/context/CTX01b-ngu-canh-he-thong-ngoai.svg)
+
+*Hình 1. CTX01a–CTX01b — Tastoria là hộp đen; tác nhân người tương tác qua app/web, `/admin/*` hoặc CLI; hệ thống ngoài là dịch vụ email A09 và công cụ gán nhãn A10.*
 
 ---
 
@@ -122,9 +124,11 @@ Ngưỡng đầy đủ, điều kiện đo và quy trình đổi ngưỡng ở S
 
 ### 3.1. Sơ đồ tổng quan
 
-![UCD00 — Tổng quan use case](../uml/out/usecase/UCD00-tong-quan.svg)
+![UCD00a — Tổng quan: chức năng chính của khách và người dùng](../uml/out/usecase/UCD00a-tong-quan-nguoi-dung.svg)
 
-*Hình 2. UCD00 — 34 use case trong 10 gói, 10 tác nhân; quan hệ include/extend theo `model.yaml`.*
+![UCD00b — Tổng quan: chức năng của nhân sự và tác nhân hệ thống](../uml/out/usecase/UCD00b-tong-quan-nhan-su.svg)
+
+*Hình 2. UCD00a–UCD00b — 34 use case trong 10 gói, 10 tác nhân; quan hệ include/extend theo `model.yaml`.*
 
 Sơ đồ theo gói: [UCD01](../uml/out/usecase/UCD01-tai-khoan-bao-mat.svg), [UCD02](../uml/out/usecase/UCD02-quyen-rieng-tu.svg), [UCD03](../uml/out/usecase/UCD03-ho-so-muc-tieu.svg), [UCD04](../uml/out/usecase/UCD04-kho-quet.svg), [UCD05](../uml/out/usecase/UCD05-mam-com.svg), [UCD06](../uml/out/usecase/UCD06-nau-nhat-ky.svg), [UCD07](../uml/out/usecase/UCD07-khao-sat-gu.svg), [UCD08](../uml/out/usecase/UCD08-quan-tri-noi-dung-du-lieu.svg), [UCD09](../uml/out/usecase/UCD09-van-hanh-mo-hinh.svg), [UCD10](../uml/out/usecase/UCD10-tac-vu-dinh-ky.svg).
 
@@ -371,103 +375,149 @@ Bốn UC của luồng lõi quét → kho → mâm → nấu xong. Phần trích
 
 ### 5.1. Sơ đồ hoạt động
 
-![AD01 — Từ quét đến nấu xong](../uml/out/activity/AD01-quet-den-nau.svg)
+![AD01a — Quét và xác nhận nguyên liệu (UC12, UC13)](../uml/out/activity/AD01a-quet-va-xac-nhan.svg)
 
-*Hình 5. AD01 — Luồng nối các gói từ quét tủ lạnh tới nấu xong, ba làn Người dùng, App, api; gồm các nhánh đổi món, thay nguyên liệu và hoàn tác.*
+![AD01b — Nhận và điều chỉnh mâm cơm (UC15–UC18)](../uml/out/activity/AD01b-nhan-va-dieu-chinh-mam.svg)
 
-![AD02 — Ghép mâm](../uml/out/activity/AD02-ghep-mam.svg)
+![AD01c — Nấu cả mâm và hoàn tất bữa (UC19–UC21)](../uml/out/activity/AD01c-nau-va-hoan-tat.svg)
 
-*Hình 6. AD02 — Ghép mâm bên trong `POST /meal-plans`: làn `profile` cấp ràng buộc bữa ăn, `pantry` cấp lượng và độ gấp, `meal` lọc cứng, xếp hạng và chọn tổ hợp.*
+*Hình 5. AD01a–AD01c — Luồng nối các gói từ quét tủ lạnh tới nấu xong, ba làn Người dùng, App, api; gồm các nhánh đổi món, thay nguyên liệu và hoàn tác.*
 
-![AD03 — Xác nhận quét](../uml/out/activity/AD03-xac-nhan-quet.svg)
+![AD02a — Ghép mâm: lọc món và chuẩn bị kho (UC15)](../uml/out/activity/AD02a-loc-mon-va-chuan-bi-kho.svg)
 
-*Hình 7. AD03 — Xác nhận kết quả quét vào kho trong một Unit of Work, làn App, `scan`, `pantry`.*
+![AD02b — Ghép mâm: duyệt tổ hợp và chọn mâm (UC15)](../uml/out/activity/AD02b-ghep-va-chon-mam.svg)
 
-![AD04 — Vòng dữ liệu và mô hình](../uml/out/activity/AD04-vong-du-lieu-mo-hinh.svg)
+*Hình 6. AD02a–AD02b — Ghép mâm bên trong `POST /meal-plans`: làn `profile` cấp ràng buộc bữa ăn, `pantry` cấp lượng và độ gấp, `meal` lọc cứng, xếp hạng và chọn tổ hợp.*
 
-*Hình 8. AD04 — Ảnh góp có đồng ý đi qua gán nhãn, xuất dữ liệu bí danh hoá, huấn luyện trên GPU lab, đăng ký, kiểm định và triển khai mô hình.*
+![AD03a — Xác nhận quét: kiểm tra điều kiện (UC13)](../uml/out/activity/AD03a-kiem-tra-xac-nhan-quet.svg)
 
-![AD05 — Xoá tài khoản](../uml/out/activity/AD05-xoa-tai-khoan.svg)
+![AD03b — Xác nhận quét: ghi kho từ chip (UC13)](../uml/out/activity/AD03b-ghi-kho-tu-chip.svg)
+
+*Hình 7. AD03a–AD03b — Xác nhận kết quả quét vào kho trong một Unit of Work, làn App, `scan`, `pantry`.*
+
+![AD04a — Thu thập và xuất dữ liệu huấn luyện (UC12, UC28)](../uml/out/activity/AD04a-thu-thap-du-lieu.svg)
+
+![AD04b — Gán nhãn và huấn luyện mô hình (UC31)](../uml/out/activity/AD04b-gan-nhan-va-huan-luyen.svg)
+
+![AD04c — Đăng ký, kiểm định và triển khai mô hình (UC29, UC30)](../uml/out/activity/AD04c-dang-ky-trien-khai.svg)
+
+*Hình 8. AD04a–AD04c — Ảnh góp có đồng ý đi qua gán nhãn, xuất dữ liệu bí danh hoá, huấn luyện trên GPU lab, đăng ký, kiểm định và triển khai mô hình.*
+
+![AD05 — Xoá tài khoản và toàn bộ dữ liệu (UC07)](../uml/out/activity/AD05-xoa-tai-khoan.svg)
 
 *Hình 9. AD05 — Yêu cầu xoá tài khoản được worker xử lý trong hạn BR-DSR-01; ảnh và dữ liệu xoá theo BR-RETAIN-01.*
 
-![AD06 — Khảo sát](../uml/out/activity/AD06-khao-sat.svg)
+![AD06a — Tham gia khảo sát gu (UC23)](../uml/out/activity/AD06a-tham-gia-khao-sat.svg)
 
-*Hình 10. AD06 — Người vận hành tạo phiếu, người tham gia đồng ý rồi chấm món ẩn danh; kết quả xuất bằng `tastoria survey export`.*
+![AD06b — Quản lý đợt khảo sát (UC24)](../uml/out/activity/AD06b-quan-ly-dot-khao-sat.svg)
+
+*Hình 10. AD06a–AD06b — Người vận hành tạo phiếu, người tham gia đồng ý rồi chấm món ẩn danh; kết quả xuất bằng `tastoria survey export`.*
 
 ### 5.2. Sơ đồ tuần tự
 
-![SD01 — Quét ảnh bất đồng bộ](../uml/out/sequence/SD01-quet-anh-bat-dong-bo.svg)
+![SD01a — Gửi ảnh quét (UC12)](../uml/out/sequence/SD01a-gui-anh-quet.svg)
 
-*Hình 11. SD01 — `POST /scans` trả 202, worker suy luận bất đồng bộ, app chờ bằng long-poll; sweeper UC34 xử lý job kẹt.*
+![SD01b — Worker nhận diện nguyên liệu (UC12)](../uml/out/sequence/SD01b-worker-nhan-dien.svg)
 
-![SD02 — Xác nhận quét](../uml/out/sequence/SD02-xac-nhan-quet.svg)
+![SD01c — App chờ kết quả quét (UC12)](../uml/out/sequence/SD01c-cho-ket-qua-quet.svg)
 
-*Hình 12. SD02 — Sửa chip rồi xác nhận; module `scan` gọi `pantry` trong cùng Unit of Work để ghi lô và giao dịch.*
+![SD01d — Dọn lần quét bị kẹt (UC34)](../uml/out/sequence/SD01d-don-lan-quet-ket.svg)
 
-![SD03 — Tạo mâm](../uml/out/sequence/SD03-tao-mam.svg)
+*Hình 11. SD01a–SD01d — `POST /scans` trả 202, worker suy luận bất đồng bộ, app chờ bằng long-poll; sweeper UC34 xử lý job kẹt.*
 
-*Hình 13. SD03 — `meal` gọi `profile.get_meal_constraints()`, `pantry`, `privacy` và bộ xếp hạng; ghi mâm, sự kiện `served` và khoá lũy đẳng.*
+![SD02a — Sửa chip nguyên liệu (UC13)](../uml/out/sequence/SD02a-sua-chip.svg)
 
-![SD04 — Đổi món](../uml/out/sequence/SD04-doi-mon.svg)
+![SD02b — Xác nhận kết quả quét vào kho (UC13)](../uml/out/sequence/SD02b-xac-nhan-vao-kho.svg)
+
+![SD02c — Bỏ kết quả quét (UC13)](../uml/out/sequence/SD02c-bo-lan-quet.svg)
+
+*Hình 12. SD02a–SD02c — Sửa chip rồi xác nhận; module `scan` gọi `pantry` trong cùng Unit of Work để ghi lô và giao dịch.*
+
+![SD03a — Tạo mâm cơm hôm nay (UC15)](../uml/out/sequence/SD03a-tao-mam.svg)
+
+![SD03b — Nhận mâm cơm (UC15)](../uml/out/sequence/SD03b-nhan-mam.svg)
+
+*Hình 13. SD03a–SD03b — `meal` gọi `profile.get_meal_constraints()`, `pantry`, `privacy` và bộ xếp hạng; ghi mâm, sự kiện `served` và khoá lũy đẳng.*
+
+![SD04 — Đổi một món trong mâm (UC16)](../uml/out/sequence/SD04-doi-mon.svg)
 
 *Hình 14. SD04 — Đổi một món trong mâm (UC16) có lọc dị ứng lại cho món thay (BR-ALG-01).*
 
-![SD05 — Chọn thay thế](../uml/out/sequence/SD05-chon-thay-the.svg)
+![SD05a — Xem gợi ý thay thế nguyên liệu thiếu (UC17)](../uml/out/sequence/SD05a-xem-goi-y-thay-the.svg)
 
-*Hình 15. SD05 — "Thiếu gì?": `substitute` tra cặp thay thế và embedding, lọc cứng, rồi ghi lựa chọn hoặc thêm vào danh sách đi chợ.*
+![SD05b — Chọn một thay thế (UC17)](../uml/out/sequence/SD05b-chon-thay-the.svg)
 
-![SD06 — Nấu xong và hoàn tác](../uml/out/sequence/SD06-nau-xong-va-hoan-tac.svg)
+![SD05c — Thêm nguyên liệu thiếu vào danh sách đi chợ (UC18)](../uml/out/sequence/SD05c-them-di-cho.svg)
 
-*Hình 16. SD06 — Tạo phiên nấu với lịch CP-SAT, nấu xong trong một Unit of Work, hoàn tác trong 10 phút bằng giao dịch đảo.*
+*Hình 15. SD05a–SD05c — "Thiếu gì?": `substitute` tra cặp thay thế và embedding, lọc cứng, rồi ghi lựa chọn hoặc thêm vào danh sách đi chợ.*
 
-![SD07 — Rút đồng ý](../uml/out/sequence/SD07-rut-dong-y.svg)
+![SD06a — Mở phiên nấu và lập lịch (UC19)](../uml/out/sequence/SD06a-mo-phien-nau.svg)
 
-*Hình 17. SD07 — Rút đồng ý ghi `consent_events`, tăng `token_version` và tạo yêu cầu xoá dữ liệu của mục đích đó.*
+![SD06b — Nấu xong một chạm (UC20)](../uml/out/sequence/SD06b-nau-xong.svg)
 
-![SD08 — Làm mới token](../uml/out/sequence/SD08-lam-moi-token.svg)
+![SD06c — Hoàn tác trừ kho (UC21)](../uml/out/sequence/SD06c-hoan-tac.svg)
+
+*Hình 16. SD06a–SD06c — Tạo phiên nấu với lịch CP-SAT, nấu xong trong một Unit of Work, hoàn tác trong 10 phút bằng giao dịch đảo.*
+
+![SD07a — Rút đồng ý theo mục đích (UC05)](../uml/out/sequence/SD07a-rut-dong-y.svg)
+
+![SD07b — Xoá dữ liệu của mục đích đã rút (UC05)](../uml/out/sequence/SD07b-xoa-du-lieu-muc-dich.svg)
+
+*Hình 17. SD07a–SD07b — Rút đồng ý ghi `consent_events`, tăng `token_version` và tạo yêu cầu xoá dữ liệu của mục đích đó.*
+
+![SD08 — Làm mới phiên bằng refresh token xoay vòng (UC02)](../uml/out/sequence/SD08-lam-moi-token.svg)
 
 *Hình 18. SD08 — Refresh token opaque xoay vòng theo family; dùng lại token cũ thì thu hồi cả family.*
 
-![SD09 — Tải dữ liệu](../uml/out/sequence/SD09-tai-du-lieu.svg)
+![SD09a — Gửi yêu cầu tải dữ liệu cá nhân (UC06)](../uml/out/sequence/SD09a-yeu-cau-tai-du-lieu.svg)
 
-*Hình 19. SD09 — Yêu cầu xuất dữ liệu được worker xử lý, tệp tải về qua `X-Accel-Redirect` sau khi kiểm chủ sở hữu.*
+![SD09b — Worker tạo tệp dữ liệu cá nhân (UC06)](../uml/out/sequence/SD09b-worker-tao-tep-xuat.svg)
 
-![SD10 — Triển khai mô hình](../uml/out/sequence/SD10-trien-khai-mo-hinh.svg)
+![SD09c — Theo dõi và tải tệp dữ liệu (UC06)](../uml/out/sequence/SD09c-tai-tep-du-lieu.svg)
 
-*Hình 20. SD10 — CLI `tastoria mlops` đăng ký, kiểm định, triển khai và quay lui; quay lui đổi chỗ `active_version_id` và `previous_version_id` trong `model_deployments`.*
+*Hình 19. SD09a–SD09c — Yêu cầu xuất dữ liệu được worker xử lý, tệp tải về qua `X-Accel-Redirect` sau khi kiểm chủ sở hữu.*
+
+![SD10a — Đăng ký phiên bản mô hình (UC29)](../uml/out/sequence/SD10a-dang-ky-mo-hinh.svg)
+
+![SD10b — Kiểm định phiên bản mô hình (UC29)](../uml/out/sequence/SD10b-kiem-dinh-mo-hinh.svg)
+
+![SD10c — Triển khai phiên bản mô hình (UC30)](../uml/out/sequence/SD10c-trien-khai-mo-hinh.svg)
+
+![SD10d — Quay lui phiên bản mô hình (UC30)](../uml/out/sequence/SD10d-quay-lui-mo-hinh.svg)
+
+*Hình 20. SD10a–SD10d — CLI `tastoria mlops` đăng ký, kiểm định, triển khai và quay lui; quay lui đổi chỗ `active_version_id` và `previous_version_id` trong `model_deployments`.*
 
 ### 5.3. Sơ đồ máy trạng thái
 
-![ST01 — Scan](../uml/out/state/ST01-scan.svg)
+![ST01 — Trạng thái lần quét (Scan)](../uml/out/state/ST01-scan.svg)
 
 *Hình 21. ST01 — `scans`: `queued` → `processing` → `done` → `confirmed`/`discarded`; lỗi lặp tới 3 lần thì `failed`, kẹt thì sweeper đặt `expired`.*
 
-![ST02 — MealPlan](../uml/out/state/ST02-meal-plan.svg)
+![ST02 — Trạng thái mâm cơm (MealPlan)](../uml/out/state/ST02-meal-plan.svg)
 
 *Hình 22. ST02 — `meal_plans`: `proposed` → `accepted` → `cooked`; mâm cũ `expired` hoặc `abandoned` khi có mâm mới cùng bữa hoặc qua giờ bữa; hoàn tác đưa `cooked` về `accepted`.*
 
-![ST03 — CookSession](../uml/out/state/ST03-cook-session.svg)
+![ST03 — Trạng thái phiên nấu (CookSession)](../uml/out/state/ST03-cook-session.svg)
 
 *Hình 23. ST03 — `cook_sessions`: `completed` có trạng thái con "còn hoàn tác được" trong 10 phút, sau đó khoá lại.*
 
-![ST04 — Consent](../uml/out/state/ST04-consent.svg)
+![ST04 — Trạng thái đồng ý theo mục đích (Consent)](../uml/out/state/ST04-consent.svg)
 
 *Hình 24. ST04 — Đồng ý theo (người dùng, mục đích): `none`, `granted`, `withdrawn`, `superseded` khi có phiên bản điều khoản mới.*
 
-![ST05 — PantryLot](../uml/out/state/ST05-pantry-lot.svg)
+![ST05 — Trạng thái lô kho (PantryLot)](../uml/out/state/ST05-pantry-lot.svg)
 
 *Hình 25. ST05 — `pantry_lots`: `in_stock`, `not_seen` (quét toàn tủ không thấy), `used_up`, `discarded`; hoàn tác trả `used_up` về `in_stock`.*
 
-![ST06 — Account](../uml/out/state/ST06-account.svg)
+![ST06 — Trạng thái tài khoản (Account)](../uml/out/state/ST06-account.svg)
 
 *Hình 26. ST06 — Tài khoản: `locked` sau 5 lần sai mật khẩu, tự mở sau 15 phút; `deletion_requested` → `deleted` trong 24 giờ.*
 
-![ST07 — ModelVersion](../uml/out/state/ST07-model-version.svg)
+![ST07 — Trạng thái phiên bản mô hình (ModelVersion)](../uml/out/state/ST07-model-version.svg)
 
 *Hình 27. ST07 — `model_versions`: `candidate` qua cổng kiểm định thành `validated` hoặc `rejected`; `active` là vị trí trong `model_deployments`, không phải giá trị cột `status`.*
 
-![ST08 — DsrRequest](../uml/out/state/ST08-dsr-request.svg)
+![ST08 — Trạng thái yêu cầu dữ liệu (DsrRequest)](../uml/out/state/ST08-dsr-request.svg)
 
 *Hình 28. ST08 — `dsr_requests`: loại tự động do worker hoàn tất; loại `correct`, `restrict`, `object` do A04 xử lý qua `/admin/data-requests/{id}/resolve`.*
 
@@ -477,59 +527,105 @@ Bốn UC của luồng lõi quét → kho → mâm → nấu xong. Phần trích
 
 ### 6.1. Sơ đồ lớp
 
-![CL01 — Lớp miền](../uml/out/class/CL01-mien-phan-tich.svg)
+![CL01a — Miền: tài khoản, hồ sơ và đồng ý](../uml/out/class/CL01a-mien-tai-khoan-dong-y.svg)
 
-*Hình 29. CL01 — Lớp miền mức phân tích: người dùng, hồ sơ, lô kho, lần quét, món, mâm, phiên nấu và quan hệ bội số giữa chúng.*
+![CL01b — Miền: yêu cầu dữ liệu và kiểm toán](../uml/out/class/CL01b-mien-yeu-cau-du-lieu.svg)
+
+![CL01c — Miền: nguyên liệu, dinh dưỡng và dị ứng](../uml/out/class/CL01c-mien-danh-muc-nguyen-lieu.svg)
+
+![CL01d — Miền: món ăn và công thức](../uml/out/class/CL01d-mien-mon-an.svg)
+
+![CL01e — Miền: kho nguyên liệu và đi chợ](../uml/out/class/CL01e-mien-kho.svg)
+
+![CL01f — Miền: quét ảnh và nhận diện](../uml/out/class/CL01f-mien-quet-anh.svg)
+
+![CL01g — Miền: mâm cơm và phiên nấu](../uml/out/class/CL01g-mien-mam-nau.svg)
+
+![CL01h — Miền: tương tác và phiên bản mô hình](../uml/out/class/CL01h-mien-tuong-tac-mo-hinh.svg)
+
+![CL01i — Miền: khảo sát gu món ăn](../uml/out/class/CL01i-mien-khao-sat.svg)
+
+*Hình 29. CL01a–CL01i — Lớp miền mức phân tích: người dùng, hồ sơ, lô kho, lần quét, món, mâm, phiên nấu và quan hệ bội số giữa chúng.*
 
 Lớp phân tích BCE (boundary–control–entity) cho các UC lõi:
 
-![CL02 — BCE quét](../uml/out/class/CL02-bce-quet.svg)
+![CL02a — Lớp phân tích BCE: UC12 Quét nguyên liệu](../uml/out/class/CL02a-bce-quet.svg)
 
-*Hình 30. CL02 — BCE cho UC12 và UC13.*
+![CL02b — Lớp phân tích BCE: UC13 Xác nhận kết quả quét](../uml/out/class/CL02b-bce-xac-nhan-quet.svg)
 
-![CL03 — BCE mâm](../uml/out/class/CL03-bce-mam.svg)
+*Hình 30. CL02a–CL02b — BCE cho UC12 và UC13.*
 
-*Hình 31. CL03 — BCE cho UC15.*
+![CL03a — Lớp phân tích BCE: UC15 Tạo mâm cơm](../uml/out/class/CL03a-bce-tao-mam.svg)
 
-![CL04 — BCE nấu xong](../uml/out/class/CL04-bce-nau-xong.svg)
+![CL03b — Lớp phân tích BCE: UC15 Xem và nhận mâm](../uml/out/class/CL03b-bce-nhan-mam.svg)
 
-*Hình 32. CL04 — BCE cho UC20.*
+*Hình 31. CL03a–CL03b — BCE cho UC15.*
+
+![CL04a — Lớp phân tích BCE: UC20 Nấu xong – trừ kho](../uml/out/class/CL04a-bce-nau-xong-tru-kho.svg)
+
+![CL04b — Lớp phân tích BCE: UC20 Nấu xong – mâm và tương tác](../uml/out/class/CL04b-bce-nau-xong-tuong-tac.svg)
+
+*Hình 32. CL04a–CL04b — BCE cho UC20.*
 
 Lớp thiết kế cho bốn module có logic nặng nhất:
 
-![CL05 — Thiết kế meal](../uml/out/class/CL05-thiet-ke-meal.svg)
+![CL05a — Thiết kế module meal: điều phối và dữ liệu](../uml/out/class/CL05a-thiet-ke-meal-dieu-phoi.svg)
 
-*Hình 33. CL05 — Module `meal` (M11): router, service, lọc cứng, xếp hạng, ghép mâm, repository.*
+![CL05b — Thiết kế module meal: dịch vụ ghép mâm](../uml/out/class/CL05b-thiet-ke-meal-ghep-mam.svg)
 
-![CL06 — Thiết kế pantry](../uml/out/class/CL06-thiet-ke-pantry.svg)
+*Hình 33. CL05a–CL05b — Module `meal` (M11): router, service, lọc cứng, xếp hạng, ghép mâm, repository.*
 
-*Hình 34. CL06 — Module `pantry` (M06): lô, giao dịch chỉ ghi thêm, quy đổi lượng, tính độ gấp lúc đọc.*
+![CL06a — Thiết kế module pantry: điều phối và dữ liệu](../uml/out/class/CL06a-thiet-ke-pantry-dieu-phoi.svg)
 
-![CL07 — Thiết kế scan](../uml/out/class/CL07-thiet-ke-scan.svg)
+![CL06b — Thiết kế module pantry: quy đổi lượng và độ gấp](../uml/out/class/CL06b-thiet-ke-pantry-tinh-toan.svg)
 
-*Hình 35. CL07 — Module `scan` (M08): nhận ảnh, job worker, gộp chip, xác nhận vào kho.*
+*Hình 34. CL06a–CL06b — Module `pantry` (M06): lô, giao dịch chỉ ghi thêm, quy đổi lượng, tính độ gấp lúc đọc.*
 
-![CL08 — Thiết kế cooking](../uml/out/class/CL08-thiet-ke-cooking.svg)
+![CL07a — Thiết kế module scan: điều phối và dữ liệu](../uml/out/class/CL07a-thiet-ke-scan-dieu-phoi.svg)
 
-*Hình 36. CL08 — Module `cooking` (M12): lịch CP-SAT, phiên nấu, nấu xong và hoàn tác.*
+![CL07b — Thiết kế module scan: job nhận diện](../uml/out/class/CL07b-thiet-ke-scan-nhan-dien.svg)
+
+*Hình 35. CL07a–CL07b — Module `scan` (M08): nhận ảnh, job worker, gộp chip, xác nhận vào kho.*
+
+![CL08a — Thiết kế module cooking: điều phối và dữ liệu](../uml/out/class/CL08a-thiet-ke-cooking-dieu-phoi.svg)
+
+![CL08b — Thiết kế module cooking: lập lịch và hoàn tác](../uml/out/class/CL08b-thiet-ke-cooking-lap-lich.svg)
+
+*Hình 36. CL08a–CL08b — Module `cooking` (M12): lịch CP-SAT, phiên nấu, nấu xong và hoàn tác.*
 
 ### 6.2. Sơ đồ thành phần
 
-![CP01 — Thành phần](../uml/out/component/CP01-thanh-phan.svg)
+![CP01a — Thành phần: các khối chạy của hệ thống](../uml/out/component/CP01a-he-thong.svg)
 
-*Hình 37. CP01 — 16 module backend, giao diện mỗi module công bố qua `service.py` và các phụ thuộc được phép theo `model.yaml`; đồ thị phụ thuộc không có vòng, kiểm bằng import-linter (ADR 0001).*
+![CP01b — Thành phần: kết nối với hệ thống ngoài](../uml/out/component/CP01b-ket-noi-ngoai.svg)
+
+![CP01c — Thành phần: module lõi, định danh và danh mục](../uml/out/component/CP01c-module-loi.svg)
+
+![CP01d — Thành phần: module nghiệp vụ bếp](../uml/out/component/CP01d-module-bep.svg)
+
+![CP01e — Thành phần: module nhân sự, tác vụ và báo cáo](../uml/out/component/CP01e-module-nhan-su-tac-vu.svg)
+
+*Hình 37. CP01a–CP01e — 16 module backend, giao diện mỗi module công bố qua `service.py` và các phụ thuộc được phép theo `model.yaml`; đồ thị phụ thuộc không có vòng, kiểm bằng import-linter (ADR 0001).*
 
 ### 6.3. Sơ đồ gói
 
-![PG01 — Gói](../uml/out/package/PG01-goi.svg)
+![PG01a — Gói: bố cục mã nguồn tổng thể](../uml/out/package/PG01a-goi-tong-the.svg)
 
-*Hình 38. PG01 — Bố cục mã nguồn backend theo module và app Expo.*
+![PG01b — Gói: cấu trúc một module (ví dụ meal)](../uml/out/package/PG01b-cau-truc-module.svg)
+
+![PG01c — Gói: ứng dụng Expo](../uml/out/package/PG01c-goi-app.svg)
+
+*Hình 38. PG01a–PG01c — Bố cục mã nguồn backend theo module và app Expo.*
 
 ### 6.4. Sơ đồ triển khai
 
-![DP01 — Triển khai](../uml/out/deployment/DP01-trien-khai.svg)
+![DP01a — Triển khai: thiết bị và kết nối](../uml/out/deployment/DP01a-thiet-bi-ket-noi.svg)
 
-*Hình 39. DP01 — Docker Compose trên máy chủ lab: nginx, api, worker, scheduler, postgres, valkey; ra Internet qua Cloudflare Tunnel; sao lưu ra kho ngoài.*
+![DP01b — Triển khai: container trên máy chủ lab](../uml/out/deployment/DP01b-container-may-chu.svg)
+
+![DP01c — Triển khai: huấn luyện và nạp mô hình](../uml/out/deployment/DP01c-huan-luyen-mo-hinh.svg)
+
+*Hình 39. DP01a–DP01c — Docker Compose trên máy chủ lab: nginx, api, worker, scheduler, postgres, valkey; ra Internet qua Cloudflare Tunnel; sao lưu ra kho ngoài.*
 
 ---
 
@@ -539,25 +635,39 @@ Chi tiết: [04-chuan-hoa.md](04-chuan-hoa.md) (chuẩn hoá), [05-tu-dien-du-li
 
 ### 7.1. Mô hình khái niệm (Chen)
 
-![ERD00 — Mô hình khái niệm Chen](../uml/out/erd/ERD00-khai-niem-chen.svg)
+![ERD00a — Khái niệm (Chen): người dùng, hồ sơ, dị ứng, chế độ ăn](../uml/out/erd/ERD00a-chen-nguoi-dung-ho-so.svg)
 
-*Hình 40. ERD00 — 29 thực thể, quan hệ đặt tên bằng động từ; 1/N/M là tỉ số lực lượng, nét đôi là tham gia toàn phần.*
+![ERD00b — Khái niệm (Chen): nguyên liệu và món](../uml/out/erd/ERD00b-chen-nguyen-lieu-mon.svg)
+
+![ERD00c — Khái niệm (Chen): kho nguyên liệu](../uml/out/erd/ERD00c-chen-kho.svg)
+
+![ERD00d — Khái niệm (Chen): quét ảnh và nhận diện](../uml/out/erd/ERD00d-chen-quet.svg)
+
+![ERD00e — Khái niệm (Chen): mâm cơm và phiên nấu](../uml/out/erd/ERD00e-chen-mam-nau.svg)
+
+![ERD00f — Khái niệm (Chen): tương tác và mô hình](../uml/out/erd/ERD00f-chen-tuong-tac-mo-hinh.svg)
+
+![ERD00g — Khái niệm (Chen): đồng ý theo mục đích](../uml/out/erd/ERD00g-chen-dong-y.svg)
+
+![ERD00h — Khái niệm (Chen): khảo sát gu](../uml/out/erd/ERD00h-chen-khao-sat.svg)
+
+*Hình 40. ERD00a–ERD00h — 29 thực thể, quan hệ đặt tên bằng động từ; 1/N/M là tỉ số lực lượng, nét đôi là tham gia toàn phần.*
 
 ### 7.2. Mô hình logic/vật lý (chân quạ)
 
-![ERD08 — Tổng quan 63 bảng](../uml/out/erd/ERD08-tong-quan.svg)
+![ERD08 — Tổng quan bảng theo module (chỉ tên bảng; cột ở ERD01a–ERD07b)](../uml/out/erd/ERD08-tong-quan.svg)
 
-*Hình 41. ERD08 — Tổng quan 63 bảng và mọi khoá ngoại; cột chi tiết ở ERD01–ERD07.*
+*Hình 41. ERD08 — Tổng quan 63 bảng và mọi khoá ngoại; cột chi tiết ở ERD01a–ERD01b–ERD07a–ERD07b.*
 
 | ERD | Nhóm | Số bảng |
 |---|---|---|
-| [ERD01](../uml/out/erd/ERD01-dinh-danh-quyen-rieng-tu.svg) | core, identity, privacy | 9 |
+| [ERD01a](../uml/out/erd/ERD01a-dinh-danh.svg), [ERD01b](../uml/out/erd/ERD01b-quyen-rieng-tu.svg) | core, identity, privacy | 9 |
 | [ERD02](../uml/out/erd/ERD02-ho-so.svg) | profile | 4 |
-| [ERD03](../uml/out/erd/ERD03-danh-muc-thanh-phan.svg) | catalog: thành phần thực phẩm, nguyên liệu, dị ứng, chế độ ăn, đơn vị, mức lượng, lớp thị giác | 15 |
-| [ERD04](../uml/out/erd/ERD04-mon-an.svg) | catalog: món, bước, thẻ, nguồn, dinh dưỡng món | 8 |
-| [ERD05](../uml/out/erd/ERD05-kho-quet.svg) | pantry, scan | 6 |
-| [ERD06](../uml/out/erd/ERD06-mam-nau.svg) | meal, substitute, cooking, events | 11 |
-| [ERD07](../uml/out/erd/ERD07-khao-sat-mo-hinh.svg) | survey, mlops | 9 |
+| [ERD03a](../uml/out/erd/ERD03a-thanh-phan-dinh-duong.svg), [ERD03b](../uml/out/erd/ERD03b-nguyen-lieu-di-ung.svg), [ERD03c](../uml/out/erd/ERD03c-don-vi-lop-thi-giac.svg) | catalog: thành phần thực phẩm, nguyên liệu, dị ứng, chế độ ăn, đơn vị, mức lượng, lớp thị giác | 15 |
+| [ERD04a](../uml/out/erd/ERD04a-cong-thuc.svg), [ERD04b](../uml/out/erd/ERD04b-the-nguon-dinh-duong.svg) | catalog: món, bước, thẻ, nguồn, dinh dưỡng món | 8 |
+| [ERD05a](../uml/out/erd/ERD05a-kho.svg), [ERD05b](../uml/out/erd/ERD05b-quet.svg) | pantry, scan | 6 |
+| [ERD06a](../uml/out/erd/ERD06a-mam.svg), [ERD06b](../uml/out/erd/ERD06b-rang-buoc-mam.svg), [ERD06c](../uml/out/erd/ERD06c-thay-the-di-cho.svg), [ERD06d](../uml/out/erd/ERD06d-phien-nau.svg), [ERD06e](../uml/out/erd/ERD06e-tuong-tac.svg) | meal, substitute, cooking, events | 11 |
+| [ERD07a](../uml/out/erd/ERD07a-mo-hinh.svg), [ERD07b](../uml/out/erd/ERD07b-khao-sat.svg) | survey, mlops | 9 |
 | | **Tổng** | **62** |
 
 Ba view: `v_current_consents` (đồng ý hiện hành = sự kiện mới nhất mỗi mục đích), `v_pantry_lot_balance` (lượng hiện tại của lô = lượng đầu + Σ giao dịch, chặn dưới 0), `v_journal_days` (nhật ký theo ngày địa phương).
@@ -715,16 +825,16 @@ Kiểm chéo đi kèm: `check_refs.py` (mã lạ trong tài liệu và sơ đồ
 
 | Loại | Thư mục nguồn | Sơ đồ | Số tệp |
 |---|---|---|---|
-| Ngữ cảnh | `docs/uml/context/` | CTX01 | 1 |
-| Use case | `docs/uml/usecase/` | UCD00–UCD10 | 11 |
-| Hoạt động | `docs/uml/activity/` | AD01–AD06 | 6 |
-| Tuần tự | `docs/uml/sequence/` | SD01–SD10 | 10 |
+| Ngữ cảnh | `docs/uml/context/` | CTX01a–CTX01b | 1 |
+| Use case | `docs/uml/usecase/` | UCD00a–UCD00b–UCD10 | 11 |
+| Hoạt động | `docs/uml/activity/` | AD01a–AD01c–AD06a–AD06b | 6 |
+| Tuần tự | `docs/uml/sequence/` | SD01a–SD01d–SD10a–SD10d | 10 |
 | Máy trạng thái | `docs/uml/state/` | ST01–ST08 | 8 |
-| Lớp | `docs/uml/class/` | CL01–CL08 | 8 |
-| Thành phần | `docs/uml/component/` | CP01 | 1 |
-| Gói | `docs/uml/package/` | PG01 | 1 |
-| Triển khai | `docs/uml/deployment/` | DP01 | 1 |
-| ERD | `docs/erd/` | ERD00 (Chen), ERD01–ERD08 (chân quạ) | 9 |
+| Lớp | `docs/uml/class/` | CL01a–CL01i–CL08a–CL08b | 8 |
+| Thành phần | `docs/uml/component/` | CP01a–CP01e | 1 |
+| Gói | `docs/uml/package/` | PG01a–PG01c | 1 |
+| Triển khai | `docs/uml/deployment/` | DP01a–DP01c | 1 |
+| ERD | `docs/erd/` | ERD00a–ERD00h (Chen), ERD01a–ERD01b–ERD08 (chân quạ) | 9 |
 | | | **Tổng** | **56** |
 
 ### 13.3. Công cụ kiểm tra (`docs/sad/tools/`)

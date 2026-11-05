@@ -1,7 +1,7 @@
-"""Sinh ERD chân quạ ERD01–08 từ db/schema.sql và các migration tạo bảng sau 0001 (0003 recipe_make_ahead).
+"""Đọc DDL (db/schema.sql + migration tạo bảng sau 0001) và dựng khối entity/quan hệ chân quạ.
 
-Dùng: python3 docs/erd/gen_erd.py [thư mục đích] [tệp schema.json]
-Mặc định ghi vào docs/erd; ERD00 (Chen) viết tay, không sinh."""
+Thư viện cho docs/sad/tools/diagrams/gen_puml.py, nơi chia nhóm ERD01a–ERD07b, ERD08 và tách Chen ERD00a–h.
+Chạy tệp này = chạy gen_puml.py (ghi lại toàn bộ sơ đồ)."""
 import re, sys, pathlib, json
 
 ROOT = pathlib.Path("/home/namnx/NamBuw/Tastoria")
@@ -63,32 +63,7 @@ def parse(sql):
 T = parse(SQL)
 assert len(T) == 63, len(T)
 
-GROUPS = {
-    "ERD01-dinh-danh-quyen-rieng-tu": ("ERD01 — Lõi, định danh và quyền riêng tư (core, identity, privacy)",
-        ["idempotency_keys", "users", "refresh_tokens", "password_resets", "consent_purposes", "policy_versions",
-         "consent_events", "dsr_requests", "audit_log"]),
-    "ERD02-ho-so": ("ERD02 — Hồ sơ người dùng (profile) và danh mục được tham chiếu",
-        ["profiles", "user_allergens", "user_favorite_recipes", "user_settings"]),
-    "ERD03-danh-muc-thanh-phan": ("ERD03 — Danh mục: thành phần thực phẩm, nguyên liệu, dị ứng, chế độ ăn, đơn vị, mức lượng, lớp thị giác",
-        ["food_groups", "nutrient_sources", "food_items", "nutrients", "food_nutrients", "allergen_groups", "diets",
-         "diet_exclusions", "ingredients", "ingredient_synonyms", "ingredient_allergens", "ingredient_units",
-         "qty_levels", "vision_classes", "vision_class_ingredients"]),
-    "ERD04-mon-an": ("ERD04 — Món ăn: công thức, bước, thẻ, nguồn, dinh dưỡng món",
-        ["cooking_methods", "tags", "recipes", "recipe_ingredients", "recipe_steps", "recipe_tags", "recipe_sources",
-         "recipe_nutrition", "recipe_make_ahead"]),
-    "ERD05-kho-quet": ("ERD05 — Kho (pantry) và quét ảnh (scan)",
-        ["pantry_lots", "pantry_transactions", "scans", "scan_images", "scan_items", "detections"]),
-    "ERD06-mam-nau": ("ERD06 — Mâm cơm, thay thế, phiên nấu và tương tác (meal, substitute, cooking, events)",
-        ["substitution_pairs", "ingredient_embeddings", "shopping_items", "meal_plans", "meal_plan_coeater_allergens",
-         "meal_plan_pins", "meal_plan_items", "meal_plan_item_substitutions", "cook_sessions",
-         "cook_schedule_entries", "interactions"]),
-    "ERD07-khao-sat-mo-hinh": ("ERD07 — Khảo sát gu (survey) và vận hành mô hình (mlops)",
-        ["model_versions", "model_version_classes", "model_deployments", "survey_forms", "survey_form_anchors",
-         "survey_respondents", "survey_assignments", "survey_ratings", "survey_favorites"]),
-}
-HOME = {t: g for g, (_, ts) in GROUPS.items() for t in ts}
-allg = [t for _, ts in GROUPS.values() for t in ts]
-assert sorted(allg) == sorted(T) and len(allg) == 63, set(T) ^ set(allg)
+HOME = {}   # bảng -> mã ERD chứa chi tiết; gen_puml.py điền trước khi dùng entity_stub
 
 def is_unique(t, cols):
     """Khoá ngoại là duy nhất khi tập cột của nó chứa một khoá (PK hoặc UNIQUE)."""
@@ -157,73 +132,7 @@ def entity_stub(t):
     lines.append("}")
     return "\n".join(lines)
 
-HEADER = """@startuml
-title {title}
-hide circle
-"""
 
-LEGEND = """legend right
-  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
-  UNIQUE(...) WHERE ...: chỉ mục duy nhất một phần (không phải khoá của cả bảng)
-  ||  đúng một; |o  không hoặc một
-  o{  không hoặc nhiều; o|  không hoặc một
-  (cascade), (set_null): hành vi ON DELETE; không ghi = NO ACTION
-  Thực thể nền xám: bảng thuộc sơ đồ khác (chỉ ghi khoá chính)
-endlegend
-"""
-
-out_dir = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "docs/erd"
-out_dir.mkdir(parents=True, exist_ok=True)
-for g, (title, ts) in GROUPS.items():
-    rels, stubs = [], []
-    for t in ts:
-        for fk in T[t]["fks"]:
-            rels.append(rel(t, fk))
-            if fk["ref"] not in ts and fk["ref"] not in stubs:
-                stubs.append(fk["ref"])
-    body = [HEADER.format(title=title)]
-    for t in ts:
-        body.append(entity_full(t))
-    for t in stubs:
-        body.append(entity_stub(t))
-    body.append("")
-    body.extend(rels)
-    body.append("")
-    body.append(LEGEND)
-    body.append("@enduml\n")
-    (out_dir / f"{g}.puml").write_text("\n".join(body))
-
-# ERD08 tổng quan
-MODS = [
-    ("core", ["idempotency_keys"]),
-    ("identity", ["users", "refresh_tokens", "password_resets"]),
-    ("privacy", ["consent_purposes", "policy_versions", "consent_events", "dsr_requests", "audit_log"]),
-    ("catalog", GROUPS["ERD03-danh-muc-thanh-phan"][1] + GROUPS["ERD04-mon-an"][1]),
-    ("profile", GROUPS["ERD02-ho-so"][1]),
-    ("pantry", ["pantry_lots", "pantry_transactions"]),
-    ("scan", ["scans", "scan_images", "scan_items", "detections"]),
-    ("mlops", ["model_versions", "model_version_classes", "model_deployments"]),
-    ("substitute", ["substitution_pairs", "ingredient_embeddings", "shopping_items"]),
-    ("meal", ["meal_plans", "meal_plan_coeater_allergens", "meal_plan_pins", "meal_plan_items", "meal_plan_item_substitutions"]),
-    ("cooking", ["cook_sessions", "cook_schedule_entries"]),
-    ("events", ["interactions"]),
-    ("survey", GROUPS["ERD07-khao-sat-mo-hinh"][1][3:]),
-]
-assert sorted(x for _, l in MODS for x in l) == sorted(T)
-b = ["@startuml", f"title ERD08 — Tổng quan {len(T)} bảng và mọi khoá ngoại (chi tiết cột ở ERD01–ERD07)",
-     "hide circle", "hide empty members", "left to right direction", ""]
-for mname, ts in MODS:
-    b.append(f'package "{mname}" {{')
-    for t in ts:
-        b.append(f'  entity "{t}" as {t}')
-    b.append("}")
-b.append("")
-for t in T:
-    for fk in T[t]["fks"]:
-        b.append(rel(t, fk))
-b.append("")
-b.append("@enduml\n")
-(out_dir / "ERD08-tong-quan.puml").write_text("\n".join(b))
-if len(sys.argv) > 2:
-    json.dump(T, open(sys.argv[2], "w"), ensure_ascii=False, indent=1)
-print("ok", sum(len(t["fks"]) for t in T.values()), "FK")
+if __name__ == "__main__":
+    import runpy
+    runpy.run_path(str(ROOT / "docs/sad/tools/diagrams/gen_puml.py"), run_name="__main__")

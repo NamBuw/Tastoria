@@ -1,0 +1,43 @@
+@startuml
+title CL04a — Lớp phân tích BCE: UC20 Nấu xong – trừ kho
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Màn hình Nấu xong" as BN <<boundary>> {
+  -đánhGiáMón
+  +nấuXong()
+}
+class "Hoàn tất phiên nấu" as CH <<control>> {
+  +hoànTất()
+}
+class "Trừ kho theo độ gấp" as CTK <<control>> {
+  +tínhLượngDùng()
+  +trừKho()
+}
+class "Phiên nấu" as EPN <<entity>> {
+  -trạngThái
+  -hoànTấtLúc
+}
+class "Lô kho" as ELO <<entity>> {
+  -khoảngGam
+  -độGấp
+}
+class "Giao dịch kho" as EGD <<entity>> {
+  -lýDo
+  -delta
+}
+
+BN -- CH
+CH -- EPN
+CH -- CTK
+CTK -- ELO
+CTK -- EGD
+@enduml

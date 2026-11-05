@@ -1,0 +1,46 @@
+@startuml
+title CL02b — Lớp phân tích BCE: UC13 Xác nhận kết quả quét
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Màn hình Xác nhận" as BX <<boundary>> {
+  -danhSáchChip
+  +sửaChip()
+  +xácNhận()
+}
+class "Sửa chip" as CSC <<control>> {
+  +cậpNhậtChip()
+}
+class "Xác nhận vào kho" as CX <<control>> {
+  +xácNhận()
+  +quyĐổiLượng()
+}
+class "Chip nguyên liệu" as ECH <<entity>> {
+  -sốĐếm
+  -mứcLượng
+  -thaoTác
+}
+class "Lô kho" as ELO <<entity>> {
+  -khoảngGam
+  -trạngThái
+}
+class "Giao dịch kho" as EGD <<entity>> {
+  -lýDo
+  -delta
+}
+
+BX -- CSC
+BX -- CX
+CSC -- ECH
+CX -- ECH
+CX -- ELO
+CX -- EGD
+@enduml

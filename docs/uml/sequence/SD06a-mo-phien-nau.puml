@@ -1,0 +1,31 @@
+@startuml
+title SD06a — Mở phiên nấu và lập lịch (UC19)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Người dùng" as U
+boundary "App" as APP
+control "API (cooking)" as API
+control "meal + catalog" as MEAL
+entity "CSDL" as DB
+
+U -> APP : «Nấu cả mâm», chọn giờ dọn
+APP -> API : mở phiên nấu (khóa lũy đẳng)
+API -> MEAL : lấy mâm để nấu (kiểm tra chủ)
+MEAL --> API : mâm, các bước nấu
+alt mâm chưa nhận hoặc đã có phiên
+  API --> APP : 409 sai trạng thái
+else mâm «accepted»
+  API -> DB : ghi phiên «in_progress» và lịch các bước
+  API --> APP : 201 lịch nấu
+end
+APP --> U : hiện lịch nấu (chạy được khi mất mạng)
+@enduml

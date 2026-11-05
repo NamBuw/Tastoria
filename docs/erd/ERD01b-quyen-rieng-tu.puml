@@ -1,0 +1,76 @@
+@startuml
+title ERD01b — Đồng ý, yêu cầu dữ liệu và kiểm toán (privacy)
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "consent_purposes" as consent_purposes {
+  * code : text <<PK>>
+  --
+  * name_vi : text
+  * description_vi : text
+  * data_category : text
+  * is_sensitive : boolean
+  * is_required : boolean
+}
+entity "policy_versions" as policy_versions {
+  * id : uuid <<PK>>
+  --
+  * purpose_code : text <<FK>>
+  * version : text
+  * text_sha256 : bytea
+  * effective_from : timestamptz
+  .. UNIQUE(purpose_code, version) ..
+}
+entity "consent_events" as consent_events {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * policy_version_id : uuid <<FK>>
+  * action : consent_action_t
+  * channel : consent_channel_t
+    app_version : text
+  * created_at : timestamptz
+}
+entity "dsr_requests" as dsr_requests {
+  * id : uuid <<PK>>
+  --
+    user_id : uuid <<FK>>
+  * subject_ref : bytea
+  * type : dsr_type_t
+  * status : dsr_status_t
+  * received_at : timestamptz
+    acknowledged_at : timestamptz
+    completed_at : timestamptz
+    result_key : text
+    note : text
+}
+entity "audit_log" as audit_log {
+  * id : bigint <<PK>>
+  --
+    actor_user_id : uuid <<FK>>
+  * actor_role : text
+  * action : text
+  * entity : text
+    entity_id : text
+    purpose : text
+    request_id : text
+  * created_at : timestamptz
+}
+entity "users" as users #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01a ..
+}
+
+consent_purposes ||--o{ policy_versions : purpose_code
+users ||--o{ consent_events : user_id (cascade)
+policy_versions ||--o{ consent_events : policy_version_id
+users |o--o{ dsr_requests : user_id (set_null)
+users |o--o{ audit_log : actor_user_id (set_null)
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

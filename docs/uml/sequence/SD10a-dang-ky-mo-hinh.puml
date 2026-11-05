@@ -1,0 +1,31 @@
+@startuml
+title SD10a — Đăng ký phiên bản mô hình (UC29)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor "Người vận hành mô hình" as OP
+boundary "CLI tastoria" as CLI
+control "mlops" as ML
+entity "Kho tệp" as FS
+entity "CSDL" as DB
+
+OP -> CLI : mlops register <tên> <tệp> --metrics
+CLI -> ML : đăng ký (tệp, số đo)
+ML -> DB : tra trùng (tên, phiên bản)
+alt đã có
+  ML --> CLI : lỗi: phiên bản đã tồn tại
+else chưa có
+  ML -> FS : chép tệp ONNX vào models/
+  ML -> DB : tạo phiên bản «candidate», sha256
+  ML --> CLI : mã phiên bản
+end
+CLI --> OP : kết quả
+@enduml

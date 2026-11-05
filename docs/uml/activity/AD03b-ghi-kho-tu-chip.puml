@@ -1,0 +1,36 @@
+@startuml
+title AD03b — Xác nhận quét: ghi kho từ chip (UC13)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam ActivityBackgroundColor White
+
+|scan|
+|pantry|
+|catalog|
+|scan|
+start
+:Lấy các chip chưa xoá;
+while (Còn chip chưa quy đổi?) is (còn)
+  |catalog|
+  :Tra gam mỗi đơn vị hoặc mức lượng;
+  |pantry|
+  :Tính khoảng gam của chip;
+|scan|
+endwhile (hết)
+|pantry|
+:Tạo mỗi chip một lô «in_stock»;
+:Ghi giao dịch nhập kho;
+|scan|
+if (Chế độ toàn tủ?) then (có)
+  |pantry|
+  :Lô không thấy → «not_seen»;
+else (không)
+endif
+|scan|
+:Lần quét → «confirmed»; commit;
+stop
+@enduml

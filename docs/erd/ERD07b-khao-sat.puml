@@ -1,0 +1,75 @@
+@startuml
+title ERD07b — Khảo sát gu (survey)
+' Sinh từ db/schema.sql qua docs/sad/tools/diagrams/gen_puml.py — không sửa tay.
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName DejaVu Sans
+
+entity "survey_forms" as survey_forms {
+  * id : uuid <<PK>>
+  --
+  * version : text <<UQ>>
+  * n_anchor : smallint
+  * n_random : smallint
+  * is_open : boolean
+  * created_at : timestamptz
+}
+entity "survey_form_anchors" as survey_form_anchors {
+  * form_id : uuid <<PK, FK>>
+  * recipe_id : uuid <<PK, FK>>
+  --
+}
+entity "survey_respondents" as survey_respondents {
+  * id : uuid <<PK>>
+  --
+  * form_id : uuid <<FK>>
+  * policy_version_id : uuid <<FK>>
+  * consented_at : timestamptz
+    completed_at : timestamptz
+  * channel : survey_channel_t
+}
+entity "survey_assignments" as survey_assignments {
+  * respondent_id : uuid <<PK, FK>>
+  * recipe_id : uuid <<PK, FK>>
+  --
+  * display_order : smallint
+  * is_anchor : boolean
+  .. UNIQUE(respondent_id, display_order) ..
+}
+entity "survey_ratings" as survey_ratings {
+  * respondent_id : uuid <<PK, FK>>
+  * recipe_id : uuid <<PK, FK>>
+  --
+    rating : smallint
+  * never_eaten : boolean
+  * answered_at : timestamptz
+}
+entity "survey_favorites" as survey_favorites {
+  * respondent_id : uuid <<PK, FK>>
+  * recipe_id : uuid <<PK, FK>>
+  --
+}
+entity "recipes" as recipes #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD04a ..
+}
+entity "policy_versions" as policy_versions #EEEEEE {
+  * id : uuid <<PK>>
+  .. chi tiết ở ERD01b ..
+}
+
+survey_forms ||--o{ survey_form_anchors : form_id
+recipes ||--o{ survey_form_anchors : recipe_id
+survey_forms ||--o{ survey_respondents : form_id
+policy_versions ||--o{ survey_respondents : policy_version_id
+survey_respondents ||--o{ survey_assignments : respondent_id (cascade)
+recipes ||--o{ survey_assignments : recipe_id
+survey_assignments ||--o| survey_ratings : respondent_id, recipe_id (cascade)
+survey_respondents ||--o{ survey_favorites : respondent_id (cascade)
+recipes ||--o{ survey_favorites : recipe_id
+
+legend right
+  * = NOT NULL; PK khoá chính; FK khoá ngoại; UQ duy nhất
+  Bảng nền xám thuộc sơ đồ khác (chỉ ghi khoá chính)
+endlegend
+@enduml

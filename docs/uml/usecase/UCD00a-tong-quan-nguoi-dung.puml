@@ -1,0 +1,39 @@
+@startuml
+title UCD00a — Tổng quan: chức năng chính của khách và người dùng
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle stick
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Khách\n(A01)" as A01
+actor "Người dùng\n(A02)" as A02
+rectangle "Tastoria" {
+  usecase "UC01\nĐăng ký tài khoản" as UC01
+  usecase "UC02\nĐăng nhập" as UC02
+  usecase "UC09\nThiết lập hồ sơ 60 giây" as UC09
+  usecase "UC12\nQuét nguyên liệu" as UC12
+  usecase "UC15\nNhận mâm cơm hôm nay" as UC15
+  usecase "UC19\nNấu cả mâm" as UC19
+  usecase "UC20\nHoàn tất bữa nấu" as UC20
+  usecase "UC22\nXem nhật ký tuần" as UC22
+}
+
+A02 -|> A01
+A01 -- UC01
+A01 -- UC02
+A02 -- UC09
+A02 -- UC12
+A02 -- UC15
+A02 -- UC19
+A02 -- UC20
+A02 -- UC22
+@enduml

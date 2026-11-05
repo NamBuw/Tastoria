@@ -1,0 +1,31 @@
+@startuml
+title CP01e — Thành phần: module nhân sự, tác vụ và báo cáo
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam componentStyle rectangle
+
+component "M15 admin" as admin <<module>>
+component "M16 jobs" as jobs <<module>>
+component "M13 journal" as journal <<module>>
+component "M14 survey" as survey <<module>>
+component "M02 identity" as identity <<module>>
+component "M03 privacy" as privacy <<module>>
+component "M08 scan" as scan <<module>>
+component "M07 mlops" as mlops <<module>>
+
+admin ..> identity
+admin ..> privacy
+admin ..> mlops
+admin ..> survey
+jobs ..> scan
+jobs ..> identity
+jobs ..> privacy
+survey ..> privacy
+privacy ..> identity
+scan ..> mlops
+scan ..> privacy
+@enduml

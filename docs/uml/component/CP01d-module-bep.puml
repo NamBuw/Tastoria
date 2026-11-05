@@ -1,0 +1,37 @@
+@startuml
+title CP01d — Thành phần: module nghiệp vụ bếp
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam componentStyle rectangle
+
+component "M12 cooking" as cooking <<module>>
+component "M11 meal" as meal <<module>>
+component "M10 substitute" as substitute <<module>>
+component "M09 events" as events <<module>>
+component "M08 scan" as scan <<module>>
+component "M06 pantry" as pantry <<module>>
+component "M07 mlops" as mlops <<module>>
+component "M04 catalog" as catalog <<module>>
+
+cooking ..> catalog
+cooking ..> meal
+cooking ..> pantry
+cooking ..> events
+meal ..> catalog
+meal ..> pantry
+meal ..> substitute
+meal ..> events
+meal ..> mlops
+substitute ..> catalog
+substitute ..> pantry
+substitute ..> mlops
+scan ..> catalog
+scan ..> pantry
+scan ..> mlops
+pantry ..> catalog
+mlops ..> catalog
+@enduml

@@ -1,6 +1,11 @@
 @startuml
 title UCD09 — Gói PK9 Vận hành mô hình
-' Sinh từ docs/sad/model.yaml (actors, use_cases, rels). Không sửa tay mã định danh.
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
 left to right direction
 skinparam packageStyle rectangle
 skinparam actorStyle stick
@@ -9,23 +14,19 @@ skinparam usecase {
   BorderColor Black
 }
 
-actor "Người vận hành mô\nhình\n(A06)" as A06
+actor "Người vận hành mô hình\n(A06)" as A06
 actor "Người gán nhãn\n(A07)" as A07
-actor "Công cụ gán nhãn\n(A10)" as A10 <<system>>
-
 rectangle "Tastoria" {
-  package "PK9 Vận hành mô hình" as PK9 {
-    usecase "UC28 Xuất dữ liệu huấn luyện\nđã bí danh hoá" as UC28
-    usecase "UC29 Đăng ký và kiểm định\nphiên bản mô hình" as UC29
-    usecase "UC30 Triển khai và quay lui\nphiên bản mô hình" as UC30
-    usecase "UC31 Gán nhãn ảnh góp" as UC31
-  }
+  usecase "UC28\nXuất dữ liệu huấn luyện đã bí danh hoá" as UC28
+  usecase "UC29\nĐăng ký và kiểm định phiên bản mô hình" as UC29
+  usecase "UC30\nTriển khai và quay lui phiên bản mô hình" as UC30
+  usecase "UC31\nGán nhãn ảnh góp" as UC31
 }
+actor "Công cụ gán nhãn\n(A10)" as A10 <<system>>
 
 A06 -- UC28
 A06 -- UC29
 A06 -- UC30
 A07 -- UC31
 UC31 -- A10
-
 @enduml

@@ -1,0 +1,42 @@
+@startuml
+title CL01i — Miền: khảo sát gu món ăn
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Phiếu khảo sát" as PKS {
+  -phiênBản: Chuỗi
+  -sốNeo: Số nguyên
+  -sốNgẫuNhiên: Số nguyên
+  -đangMở: Boolean
+}
+class "Người tham gia khảo sát" as NTG {
+  -kênh: KênhKhảoSát
+  -hoànTấtLúc: Thời điểm
+}
+class "Phân công món" as PC {
+  -thứTự: Số nguyên
+}
+class "Điểm khảo sát" as DKS {
+  -điểm: 1..5
+}
+class "Món" as MON {
+  -tên: Chuỗi
+}
+class "Phiên bản điều khoản" as PB {
+  -phiênBản: Chuỗi
+}
+
+PKS "1" -- "0..*" NTG : điền
+NTG "1" *-- "1..*" PC : được giao
+PC "0..*" -- "1" MON
+PC "1" *-- "0..1" DKS
+NTG "0..*" -- "1" PB : chấp nhận
+@enduml
