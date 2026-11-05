@@ -619,21 +619,26 @@ def load_bundle(root: Path, processed: Path | None = None) -> Bundle:
     vd = r.doc(root / "vision_classes.yaml") if (root / "vision_classes.yaml").exists() else None
     if vd is not None and isinstance(vd.data, dict):
         seen_codes: set[str] = set()
-        for i, raw in enumerate(vd.data.get("classes") or []):
-            vc = r.model(vd, VisionClassIn, raw, "classes", i)
-            if vc is None:
-                continue
-            if vc.id in seen_codes:
-                r.err(vd.rel, vd.line("classes", i), "duplicate", f"lớp thị giác {vc.id} lặp")
-                continue
-            seen_codes.add(vc.id)
-            for j, name in enumerate(vc.ingredients):
-                if name not in b.ingredients:
-                    line = vd.line("classes", i, "ingredients", j)
-                    r.err(vd.rel, line, "unknown_ref", f"{vc.id}: nguyên liệu {name!r} không có")
-            if len(set(vc.ingredients)) != len(vc.ingredients):
-                r.err(vd.rel, vd.line("classes", i), "duplicate", f"{vc.id}: nguyên liệu lặp")
-            b.vision_classes.append(vc)
+        # `classes` (the 22 chosen in the analysis) then `proposed_classes` (added 30/10/2026 for the v2 dataset):
+        # both are rows of the vision_classes table, so a model trained on either can be registered (mlops checks
+        # every class code against the table). Which classes a deployed model actually outputs is its own class map
+        # (model_version_classes), not this list.
+        for key in ("classes", "proposed_classes"):
+            for i, raw in enumerate(vd.data.get(key) or []):
+                vc = r.model(vd, VisionClassIn, raw, key, i)
+                if vc is None:
+                    continue
+                if vc.id in seen_codes:
+                    r.err(vd.rel, vd.line(key, i), "duplicate", f"lớp thị giác {vc.id} lặp")
+                    continue
+                seen_codes.add(vc.id)
+                for j, name in enumerate(vc.ingredients):
+                    if name not in b.ingredients:
+                        line = vd.line(key, i, "ingredients", j)
+                        r.err(vd.rel, line, "unknown_ref", f"{vc.id}: nguyên liệu {name!r} không có")
+                if len(set(vc.ingredients)) != len(vc.ingredients):
+                    r.err(vd.rel, vd.line(key, i), "duplicate", f"{vc.id}: nguyên liệu lặp")
+                b.vision_classes.append(vc)
 
     # make-ahead (passive step > threshold)
     threshold = ma_file.passive_threshold_minutes if ma_file else 120

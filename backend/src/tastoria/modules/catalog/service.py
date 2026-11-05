@@ -146,11 +146,18 @@ def recipe_refs(session: Session, ids: Iterable[uuid.UUID]) -> dict[uuid.UUID, R
     return {r[0]: RecipeRef(*r) for r in rows}
 
 
+# Food groups that are never part of a meal tray: snacks, sweets and soft drinks (data/kb/ref/food_groups.yaml,
+# `do_an_vat`). The detector may recognise them and the pantry keeps them, but the composer, the hard filter and the
+# substitute picker always leave them out, whatever the diet.
+NON_MEAL_FOOD_GROUPS: frozenset[str] = frozenset({"do_an_vat"})
+
+
 def excluded_food_groups(session: Session, diet_code: str | None) -> frozenset[str]:
-    """Food groups a diet excludes (BR-DIET-01); none without a diet."""
+    """Food groups the meal composer must skip: the non-meal groups always, plus those a diet excludes
+    (BR-DIET-01)."""
     if diet_code is None:
-        return frozenset()
-    return frozenset(
+        return NON_MEAL_FOOD_GROUPS
+    return NON_MEAL_FOOD_GROUPS | frozenset(
         session.scalars(select(DietExclusion.food_group_code).where(DietExclusion.diet_code == diet_code)).all()
     )
 
@@ -163,12 +170,14 @@ def qty_level_grams(session: Session, food_group_code: str, level: str) -> tuple
 
 def recipe_allowed(recipe: RecipeView, allergens: Iterable[str], excluded_groups: Iterable[str]) -> bool:
     """Hard filter (BR-ALG-01, BR-DIET-01): False when any line (staples and optional lines too) or the make-ahead item
-    is in one of `allergens` or in one of `excluded_groups`."""
-    return not (recipe.allergen_codes & set(allergens)) and not (recipe.food_group_codes & set(excluded_groups))
+    is in one of `allergens`, in one of `excluded_groups` or in a non-meal group (NON_MEAL_FOOD_GROUPS)."""
+    groups = NON_MEAL_FOOD_GROUPS | set(excluded_groups)
+    return not (recipe.allergen_codes & set(allergens)) and not (recipe.food_group_codes & groups)
 
 
 def ingredient_allowed(ing: IngredientView, allergens: Iterable[str], excluded_groups: Iterable[str]) -> bool:
-    return not (ing.allergen_codes & set(allergens)) and ing.food_group_code not in set(excluded_groups)
+    groups = NON_MEAL_FOOD_GROUPS | set(excluded_groups)
+    return not (ing.allergen_codes & set(allergens)) and ing.food_group_code not in groups
 
 
 # ---------------------------------------------------------------- views

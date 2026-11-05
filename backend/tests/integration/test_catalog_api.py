@@ -100,7 +100,7 @@ def test_snapshot_has_the_whole_catalog_and_an_etag(kb_client: TestClient) -> No
     r = kb_client.get(f"{API}/catalog/snapshot", headers=s)
     assert r.status_code == 200
     snap = r.json()
-    assert len(snap["recipes"]) == 171 and len(snap["ingredients"]) == 225
+    assert len(snap["recipes"]) == 171 and len(snap["ingredients"]) == 232
     assert all(x["status"] == "published" for x in snap["recipes"])
     assert r.headers["ETag"] == f'"{snap["data_version"]}"'
     assert kb_client.get(f"{API}/catalog/snapshot", headers=s | {"If-None-Match": r.headers["ETag"]}).status_code == 304

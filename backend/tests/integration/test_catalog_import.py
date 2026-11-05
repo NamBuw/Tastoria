@@ -62,12 +62,12 @@ def test_kb_import_loads_the_whole_catalog(kb_database_url: str) -> None:
     assert _one(url, "SELECT count(*) FROM recipes WHERE status = 'published'") == 171
     assert _one(url, "SELECT count(*) FROM recipes WHERE status = 'draft'") == 9  # < 2 sources or unmapped main
     assert _one(url, "SELECT count(*) FROM recipes WHERE status = 'retired'") == 0
-    assert _one(url, "SELECT count(*) FROM ingredients WHERE is_active") == 225  # 223 + 2 made-ahead products
+    assert _one(url, "SELECT count(*) FROM ingredients WHERE is_active") == 232  # 230 (incl. 7 packaged/snack items for the detector) + 2 made-ahead products
     assert _one(url, "SELECT count(*) FROM allergen_groups") == 10
     assert _one(url, "SELECT count(*) FROM nutrient_sources") == 3
     assert _one(url, "SELECT count(*) FROM nutrients") == 7
     assert _one(url, "SELECT count(*) FROM diet_exclusions WHERE diet_code = 'chay'") == 6
-    assert _one(url, "SELECT count(*) FROM qty_levels") == 18 * 3
+    assert _one(url, "SELECT count(*) FROM qty_levels") == 19 * 3
     # every published recipe has energy, with the data version of the rules that computed it (BR-NUT-05)
     assert _one(url, "SELECT count(DISTINCT recipe_id) FROM recipe_nutrition rn JOIN recipes r ON r.id = rn.recipe_id "
                      "WHERE r.status = 'published' AND rn.nutrient_code = 'energy_kcal'") == 171  # fmt: skip
@@ -294,8 +294,10 @@ def test_cli_prints_a_json_report_and_exit_code(fresh_database, monkeypatch, cap
 
 def test_kb_import_loads_vision_classes_with_one_default_ingredient(kb_database_url: str) -> None:
     url = kb_database_url
-    classes = yaml.safe_load((KB_DIR / "vision_classes.yaml").read_text(encoding="utf-8"))["classes"]
-    assert _one(url, "SELECT count(*) FROM vision_classes") == len(classes) == 22
+    doc = yaml.safe_load((KB_DIR / "vision_classes.yaml").read_text(encoding="utf-8"))
+    classes = doc["classes"] + doc["proposed_classes"]
+    assert (len(doc["classes"]), len(doc["proposed_classes"])) == (22, 15)
+    assert _one(url, "SELECT count(*) FROM vision_classes") == len(classes) == 37
     # ids follow the file order on the first import; every class has exactly one default = first listed ingredient
     rows = _rows(url, "SELECT v.id, v.code, v.countable, i.name_vi FROM vision_classes v "
                       "JOIN vision_class_ingredients vi ON vi.vision_class_id = v.id AND vi.is_default "
