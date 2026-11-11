@@ -31,10 +31,10 @@ Lưu tệp & Ổ đĩa riêng, nginx tải sau kiểm quyền & Dễ vận hành
 Triển khai & Docker Compose, nginx, tunnel, CI frontend và pull deployment & Tái lập được bản frontend; máy chủ và sao lưu vẫn là điểm cần giám sát \\ \addlinespace[3pt]
 \end{longtable}}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.75\textheight,keepaspectratio]{assets/AR01.pdf}
-\caption{AR01 --- Phân tầng và phụ thuộc giữa các khối}\label{fig:Bao-cao-Tastoria:13}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CP01a.pdf}
+\caption{CP01a --- Thành phần: các khối chạy của hệ thống}\label{fig:Bao-cao-Tastoria:13}
 \end{figure}
-AR01 dùng UML dependency \guillemotleft{}use\guillemotright{}. Mũi tên worker \ensuremath{\rightarrow} queue thể hiện worker sử dụng hàng đợi, không phải hướng chảy dữ liệu. Đây là góc nhìn trách nhiệm/\allowbreak{}phụ thuộc, không phải sơ đồ mạng. PostgreSQL và tệp là kho lưu lâu dài; Valkey không thay thế cơ sở dữ liệu nghiệp vụ.
+CP01a dùng UML dependency \guillemotleft{}use\guillemotright{}. Mũi tên worker \ensuremath{\rightarrow} queue thể hiện worker sử dụng hàng đợi, không phải hướng chảy dữ liệu. Đây là góc nhìn trách nhiệm/\allowbreak{}phụ thuộc, không phải sơ đồ mạng. PostgreSQL và tệp là kho lưu lâu dài; Valkey không thay thế cơ sở dữ liệu nghiệp vụ.
 
 \section{Chuyển lớp phân tích sang thiết kế}
 {\footnotesize\setlength{\tabcolsep}{0pt}
@@ -57,8 +57,12 @@ Phiên bản và triển khai mô hình & Một phiên bản có thể tồn t�
 Ở pha thiết kế, router nhận yêu cầu, service phối hợp nhiều đối tượng, UnitOfWork quản lý giao dịch và ORM entity biểu diễn trạng thái lưu. Ví dụ complete\_\allowbreak{}session không phải phương thức cập nhật đơn lẻ của {\small\texttt{CookSession}}: nó còn cần kho, mâm, sự kiện và kiểm đồng ý.
 
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.75\textheight,keepaspectratio]{assets/DS01.pdf}
-\caption{DS01 --- Phân bổ trách nhiệm chức năng hoàn tất nấu}\label{fig:Bao-cao-Tastoria:14}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL08a.pdf}
+\caption{CL08a --- Thiết kế module cooking: điều phối và dữ liệu}\label{fig:Bao-cao-Tastoria:14}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL08b.pdf}
+\caption{CL08b --- Thiết kế module cooking: lập lịch và hoàn tác}\label{fig:Bao-cao-Tastoria:14-2}
 \end{figure}
 Tên phương thức trên các sơ đồ thiết kế được rút gọn tham số để dễ đọc; chữ ký thực và việc truyền session/\allowbreak{}dependency cần đối chiếu mã nguồn. \guillemotleft{}module\guillemotright{} biểu diễn module hàm, không khẳng định đó là lớp khởi tạo được.
 
@@ -93,19 +97,15 @@ Rút đồng ý & Cập nhật quyền xử lý theo mục đích & Đọc lại
 
 Khó nhất là chuyển đầu ra thị giác thành quyết định nhập kho: lớp phát hiện chưa chắc trùng mã nguyên liệu và ảnh không đảm bảo đo đúng lượng. Cách giải là ánh xạ có phiên bản, biểu diễn độ bất định và xác nhận của người dùng. Worker hiện có {\small\texttt{freshness\_\allowbreak{}\allowbreak{}version=None}}; báo cáo không coi mô hình độ tươi là thành phần đã triển khai.
 
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/DS02.pdf}
-\caption{DS02 --- Module thiết kế xác nhận quét}\label{fig:Bao-cao-Tastoria:15}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL07a.pdf}
+\caption{CL07a --- Thiết kế module scan: điều phối và dữ liệu}\label{fig:Bao-cao-Tastoria:15}
 \end{figure}
-\end{landscape}\clearpage
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/SQ03.pdf}
-\caption{SQ03 --- Xác nhận lần đầu, với scan đang done}\label{fig:Bao-cao-Tastoria:16}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/SD02b.pdf}
+\caption{SD02b --- Xác nhận kết quả quét vào kho (UC13)}\label{fig:Bao-cao-Tastoria:16}
 \end{figure}
-\end{landscape}\clearpage
-Ở SQ03, scan.service khóa bản ghi scan, kiểm chủ sở hữu, bỏ các mục đã xóa và kiểm lượng. Hàm pantry.apply\_\allowbreak{}scan nhận cùng session, ghi thay đổi kho rồi scan chuyển confirmed. UnitOfWork ở biên request commit trước khi hoàn tất phản hồi. Đường tới PostgreSQL biểu diễn truy vấn/\allowbreak{}ghi qua ORM trong cùng giao dịch, không có nghĩa App được truy cập DB trực tiếp.
+Ở SD02b, scan.service khóa bản ghi scan, kiểm chủ sở hữu, bỏ các mục đã xóa và kiểm lượng. Hàm pantry.apply\_\allowbreak{}scan nhận cùng session, ghi thay đổi kho rồi scan chuyển confirmed. UnitOfWork ở biên request commit trước khi hoàn tất phản hồi. Đường tới PostgreSQL biểu diễn truy vấn/\allowbreak{}ghi qua ORM trong cùng giao dịch, không có nghĩa App được truy cập DB trực tiếp.
 
 {\footnotesize\setlength{\tabcolsep}{0pt}
 \begin{longtable}{@{}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{}}
@@ -124,7 +124,7 @@ Thiếu mức lượng bắt buộc & Trả lỗi xác thực dữ liệu & Kho 
 scan chưa done hoặc đã bị bỏ & Từ chối trạng thái không hợp lệ & Không chuyển trạng thái lùi \\ \addlinespace[3pt]
 Hai request xác nhận đồng thời & Khóa scan để tuần tự hóa quyết định & Chỉ một lần áp dụng kho \\ \addlinespace[3pt]
 \end{longtable}}
-SQ03 chỉ vẽ nhánh thành công đầu tiên để giữ hình đọc được; các nhánh trong bảng và đặc tả UC13 là phần của cùng hợp đồng. Độ tin cậy nhận diện phải đánh giá riêng theo dữ liệu ảnh; không suy ra từ việc giao dịch xác nhận chạy đúng.
+SD02b chỉ vẽ nhánh thành công đầu tiên để giữ hình đọc được; các nhánh trong bảng và đặc tả UC13 là phần của cùng hợp đồng. Độ tin cậy nhận diện phải đánh giá riêng theo dữ liệu ảnh; không suy ra từ việc giao dịch xác nhận chạy đúng.
 
 \subsection{Gợi ý mâm, đổi món và đi chợ}
 {\small\texttt{meal.\allowbreak{}service}} điều phối hồ sơ, catalog, kho, bộ xếp hạng, thuật toán {\small\texttt{composer}} và bộ lịch {\small\texttt{schedule}}; {\small\texttt{substitute}} kiểm các cặp thay thế. {\small\texttt{meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items}} lưu phiên bản món trong mâm; thay món giữ dấu vết qua dòng bị thay. Năng lượng và lời giải thích lưu theo bối cảnh tạo mâm.
@@ -132,10 +132,14 @@ SQ03 chỉ vẽ nhánh thành công đầu tiên để giữ hình đọc đư�
 Điểm khó là tiêu chí mềm (gu, sử dụng nguyên liệu sớm, gần mục tiêu năng lượng) không được lấn điều kiện cứng (dị ứng, lượng dùng chung, nguồn lực). Kiểm riêng từng món không đủ; phải kiểm cả tổ hợp. Chưa có kết quả thử người dùng thì không tuyên bố xếp hạng ``phù hợp khẩu vị hơn'' đối thủ.
 
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.75\textheight,keepaspectratio]{assets/DS03.pdf}
-\caption{DS03 --- Phân bổ điều phối, ghép mâm và lập lịch}\label{fig:Bao-cao-Tastoria:17}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL05a.pdf}
+\caption{CL05a --- Thiết kế module meal: điều phối và dữ liệu}\label{fig:Bao-cao-Tastoria:17}
 \end{figure}
-Trong DS03, meal.router xử lý biên HTTP và khóa yêu cầu; meal.service dựng bối cảnh, lấy ứng viên và điều phối. meal.composer ghép tổ hợp theo cấu trúc mâm; meal.schedule kiểm khả năng sắp lịch. Catalog và truy vấn kho là đầu vào bổ sung, được lược khỏi góc nhìn này và đã thể hiện ở AR01/\allowbreak{}DM01.
+\begin{figure}[H]\centering
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL05b.pdf}
+\caption{CL05b --- Thiết kế module meal: dịch vụ ghép mâm}\label{fig:Bao-cao-Tastoria:17-2}
+\end{figure}
+Trong CL05a, CL05b, meal.router xử lý biên HTTP và khóa yêu cầu; meal.service dựng bối cảnh, lấy ứng viên và điều phối. meal.composer ghép tổ hợp theo cấu trúc mâm; meal.schedule kiểm khả năng sắp lịch. Catalog và truy vấn kho là đầu vào bổ sung, được lược khỏi góc nhìn này và đã thể hiện ở CP01a/\allowbreak{}CL01e.
 
 Một ví dụ phân tích: kho có 300 g thịt, món mặn cần 200 g và món canh cần 150 g. Hai món riêng lẻ đều không vượt 300 g nhưng tổng 350 g vượt kho. Phải cộng nhu cầu theo mã nguyên liệu sau quy đổi khẩu phần và thay thế, rồi kiểm cả mâm. Các số trên chỉ minh họa bất biến, không phải dữ liệu kiểm thử đã chạy.
 
@@ -161,18 +165,14 @@ Khó khăn thuật toán là số tổ hợp tăng nhanh khi thêm món; thu h�
 \subsection{Lịch nấu, hoàn tất, hoàn tác và nhật ký}
 {\small\texttt{meal.\allowbreak{}schedule}} dùng CP-\allowbreak{}SAT: NoOverlap cho thao tác chủ động, Cumulative cho bếp, ràng buộc thứ tự bước. {\small\texttt{cooking.\allowbreak{}service}} phối hợp kho và mâm; router dùng idempotency; {\small\texttt{core.\allowbreak{}db.\allowbreak{}UnitOfWork}} commit trước khi trả phản hồi. Đây là hiện thực bằng module hàm, không phải một lớp controller tự giữ mọi nghiệp vụ.
 
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/SQ01.pdf}
-\caption{SQ01 --- Nhánh lần đầu hoàn tất, phiên đang nấu; nhánh replay và lỗi được đặc tả ở UC20}\label{fig:Bao-cao-Tastoria:18}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/SD06b.pdf}
+\caption{SD06b --- Nấu xong một chạm (UC20)}\label{fig:Bao-cao-Tastoria:18}
 \end{figure}
-\end{landscape}\clearpage
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/SQ02.pdf}
-\caption{SQ02 --- Hai nhánh thời hạn của hoàn tác; các trạng thái khác xem UC21}\label{fig:Bao-cao-Tastoria:19}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/SD06c.pdf}
+\caption{SD06c --- Hoàn tác trừ kho (UC21)}\label{fig:Bao-cao-Tastoria:19}
 \end{figure}
-\end{landscape}\clearpage
 Ở mã hiện tại, nếu phiên đã {\small\texttt{completed}}, service trả tóm tắt đã có thay vì trừ kho lần nữa. Điều này khác một số sequence cũ mô tả trả 409 cho mọi phiên không {\small\texttt{in\_\allowbreak{}\allowbreak{}progress}}. Nhánh cùng Idempotency-\allowbreak{}Key được xử lý sớm tại router. Cả hai lớp bảo vệ đều cần test, không chỉ test nút bị vô hiệu hóa trên giao diện.
 
 {\footnotesize\setlength{\tabcolsep}{0pt}
@@ -260,22 +260,28 @@ Bộ dữ liệu ngoại tuyến & YAML, nguồn dinh dưỡng, dữ liệu hu�
 Các hình dưới chọn cột phục vụ giải thích; từ điển bảng đầy đủ được sinh từ {\small\texttt{db/\allowbreak{}\allowbreak{}schema.\allowbreak{}sql}} trong phụ lục. Kiểu cột/\allowbreak{}PK/\allowbreak{}FK lấy từ DDL, không suy từ tên màn hình. Quan hệ nhiều--nhiều giữa công thức và nguyên liệu được chuyển thành {\small\texttt{recipe\_\allowbreak{}\allowbreak{}ingredients}} có lượng gam.
 
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.75\textheight,keepaspectratio]{assets/DB01.pdf}
-\caption{DB01 --- Cấu trúc kho và lịch sử}\label{fig:Bao-cao-Tastoria:20}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/ERD05a.pdf}
+\caption{ERD05a --- Kho nguyên liệu (pantry)}\label{fig:Bao-cao-Tastoria:20}
 \end{figure}
-{\small\texttt{pantry\_\allowbreak{}\allowbreak{}transactions.\allowbreak{}lot\_\allowbreak{}\allowbreak{}id}} bắt buộc tham chiếu một lô. {\small\texttt{reverses\_\allowbreak{}\allowbreak{}id}} là FK tự tham chiếu nullable và UNIQUE: một giao dịch trừ có tối đa một bản ghi đảo. Hình DB01 giản lược cạnh tự tham chiếu để dễ đọc; ràng buộc vẫn được liệt kê trong bảng đầy đủ. {\small\texttt{ref\_\allowbreak{}\allowbreak{}type/\allowbreak{}\allowbreak{}ref\_\allowbreak{}\allowbreak{}id}} là cặp tham chiếu nghiệp vụ đa loại, không được trình bày như một FK thực khi DDL không có FK.
+{\small\texttt{pantry\_\allowbreak{}\allowbreak{}transactions.\allowbreak{}lot\_\allowbreak{}\allowbreak{}id}} bắt buộc tham chiếu một lô. {\small\texttt{reverses\_\allowbreak{}\allowbreak{}id}} là FK tự tham chiếu nullable và UNIQUE: một giao dịch trừ có tối đa một bản ghi đảo. Hình ERD05a giản lược cạnh tự tham chiếu để dễ đọc; ràng buộc vẫn được liệt kê trong bảng đầy đủ. {\small\texttt{ref\_\allowbreak{}\allowbreak{}type/\allowbreak{}\allowbreak{}ref\_\allowbreak{}\allowbreak{}id}} là cặp tham chiếu nghiệp vụ đa loại, không được trình bày như một FK thực khi DDL không có FK.
 
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/DB02.pdf}
-\caption{DB02 --- Công thức, mâm và phiên nấu}\label{fig:Bao-cao-Tastoria:21}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/ERD06a.pdf}
+\caption{ERD06a --- Mâm cơm và món trong mâm (meal)}\label{fig:Bao-cao-Tastoria:21}
 \end{figure}
-\end{landscape}\clearpage
+\begin{figure}[H]\centering
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/ERD04a.pdf}
+\caption{ERD04a --- Món ăn: công thức và bước nấu}\label{fig:Bao-cao-Tastoria:21-2}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/ERD06d.pdf}
+\caption{ERD06d --- Phiên nấu và lịch nấu (cooking)}\label{fig:Bao-cao-Tastoria:21-3}
+\end{figure}
 {\small\texttt{recipe\_\allowbreak{}\allowbreak{}ingredients}} có PK ghép {\small\texttt{(recipe\_\allowbreak{}\allowbreak{}id, ingredient\_\allowbreak{}\allowbreak{}id)}}. {\small\texttt{meal\_\allowbreak{}\allowbreak{}plan\_\allowbreak{}\allowbreak{}items}} giữ lịch sử món thay thế qua {\small\texttt{replaced\_\allowbreak{}\allowbreak{}item\_\allowbreak{}\allowbreak{}id}}; công thức và vị trí món được kiểm bằng FK ghép {\small\texttt{(recipe\_\allowbreak{}\allowbreak{}id, slot)}}. Một mâm có thể có nhiều phiên theo thời gian; ràng buộc một phiên đang nấu cần xem index/\allowbreak{}logic dịch vụ, không thay bội số toàn lịch sử thành 1--1.
 
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.75\textheight,keepaspectratio]{assets/DB03.pdf}
-\caption{DB03 --- Lần quét, ảnh và kết quả}\label{fig:Bao-cao-Tastoria:22}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/ERD05b.pdf}
+\caption{ERD05b --- Quét ảnh (scan)}\label{fig:Bao-cao-Tastoria:22}
 \end{figure}
 Mỗi ảnh/\allowbreak{}kết quả thuộc một lần quét. Scan thuộc đúng một người dùng. Ảnh thô và lô kho không đồng nhất: phải qua bước xác nhận rồi mới phát sinh thay đổi kho. {\small\texttt{detections}} lưu khung phát hiện; {\small\texttt{scan\_\allowbreak{}\allowbreak{}items}} là kết quả nghiệp vụ đã gộp/\allowbreak{}sửa.
 

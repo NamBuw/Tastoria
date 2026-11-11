@@ -200,7 +200,7 @@ Pha phân tích mô tả hệ thống phải làm gì để đáp ứng yêu c�
 
 ## 3.1. Mô hình use case tổng quát và phân hệ
 
-Mã UC01–UC34 được giữ để truy vết về đặc tả hiện có. Sơ đồ tổng quát chỉ trình bày các mục tiêu chính; **10 sơ đồ PK01–PK10 trong phụ lục** bao phủ đủ 34 UC. Không nhồi tất cả actor, oval và cạnh lên một hình khiến không đọc được.
+Mã UC01–UC34 được giữ để truy vết về đặc tả hiện có. Sơ đồ tổng quát chỉ trình bày các mục tiêu chính; **10 sơ đồ UCD01–UCD10 trong phụ lục** bao phủ đủ 34 UC. Không nhồi tất cả actor, oval và cạnh lên một hình khiến không đọc được.
 
 | Phân hệ | Use case | Vai trò chính |
 |---|---|---|
@@ -213,9 +213,11 @@ Mã UC01–UC34 được giữ để truy vết về đặc tả hiện có. Sơ
 | PK7 Khảo sát gu | UC23 tham gia khảo sát; UC24 quản lý đợt khảo sát | A03, A06 |
 | PK8 Nội dung và dữ liệu | UC25 nhập kho công thức; UC26 cặp thay thế; UC27 xử lý yêu cầu dữ liệu/kiểm toán | A05, A04 |
 | PK9 Vận hành mô hình | UC28 xuất dữ liệu huấn luyện; UC29 đăng ký/kiểm định; UC30 triển khai/quay lui; UC31 gán nhãn | A06, A07, A10 |
-| PK10 Tác vụ định kỳ | UC32 xóa ảnh quá hạn; UC33 sao lưu; UC34 dọn job/token/khóa hết hạn | A08 |
+| UCD10 Tác vụ định kỳ | UC32 xóa ảnh quá hạn; UC33 sao lưu; UC34 dọn job/token/khóa hết hạn | A08 |
 
-![UC00 — Các mục tiêu chính của người nấu](fig/png/UC00 Use case tổng quát – người nấu.png)
+![UCD00a — Tổng quan: chức năng chính của khách và người dùng](fig/png/UCD00a Tổng quan_ chức năng chính của khách và người dùng.png)
+
+![UCD00b — Tổng quan: chức năng của nhân sự và tác nhân hệ thống](fig/png/UCD00b Tổng quan_ chức năng của nhân sự và tác nhân hệ thống.png)
 
 **Quy tắc đọc sơ đồ:** đường actor–UC là association, không biểu diễn thứ tự. `extend` hướng từ UC mở rộng về UC cơ sở, có điểm mở rộng và điều kiện. `include` chỉ dùng khi hành vi được gọi bắt buộc, không dùng để biểu diễn “màn hình sau” hay “phải đăng nhập trước”. Không tạo kế thừa actor chỉ vì hai vai trò có chung một màn hình.
 
@@ -231,7 +233,7 @@ Mã UC01–UC34 được giữ để truy vết về đặc tả hiện có. Sơ
 
 Đây là điều chỉnh mô hình trong báo cáo, không tự sửa bộ đặc tả gốc hoặc thay đổi hành vi phần mềm. Nhóm cần thống nhất phiên bản khi hợp nhất lại `model.yaml`.
 
-![UC02 — Mở rộng khi xem mâm; không nối quét và xác nhận bằng include](fig/png/UC02 Quét và mở rộng gợi ý mâm.png)
+![UCD05 — Gói PK5 Mâm cơm](fig/png/UCD05 Gói PK5 Mâm cơm.png)
 
 ## 3.3. Đặc tả và hợp đồng nghiệp vụ
 
@@ -249,7 +251,7 @@ Phụ lục A giữ đủ 34 đặc tả. Với từng UC, người đọc cần
 
 ## 3.4. Phân tích luồng nghiệp vụ và ngoại lệ
 
-Các luồng dưới đây chọn theo mục tiêu nghiệp vụ, không theo người thực hiện bài tập. AD01–AD02 mô tả luồng thành công; AD03 và các bảng ngoại lệ bổ sung điều kiện quyết định. Đặc tả đầy đủ được giữ ở Phụ lục A.
+Các luồng dưới đây chọn theo mục tiêu nghiệp vụ, không theo người thực hiện bài tập. AD01a–AD01b, AD01c mô tả luồng thành công; ST03 và các bảng ngoại lệ bổ sung điều kiện quyết định. Đặc tả đầy đủ được giữ ở Phụ lục A.
 
 ### 3.4.1. Tài khoản, hồ sơ và quyền dữ liệu
 
@@ -263,7 +265,7 @@ UC12–UC14. Người dùng chọn chế độ toàn tủ hoặc đồ vừa mua
 
 Luồng thất bại: không cấp quyền ảnh → nhập tay; ảnh sai định dạng/dung lượng → sửa đầu vào; worker lỗi → retry giới hạn rồi báo thất bại; mất mạng → hỏi lại mã scan; bỏ kết quả → không đổi kho; xác nhận lặp → không thêm lô trùng.
 
-![AD01 — Luồng thành công quét và xác nhận; các ngoại lệ xem đặc tả UC12–UC14](fig/png/AD01 Quét và xác nhận nguyên liệu.png)
+![AD01a — Quét và xác nhận nguyên liệu (UC12, UC13)](fig/png/AD01a Quét và xác nhận nguyên liệu (UC12, UC13).png)
 
 ### 3.4.3. Gợi ý mâm, đổi món và đi chợ
 
@@ -271,7 +273,9 @@ UC15–UC18. Nhập số người, thời gian, dị ứng người ăn cùng v�
 
 Không có mâm khả thi phải báo thiếu gì hoặc đề xuất thay đổi điều kiện, không âm thầm bỏ ràng buộc dị ứng. Đổi món cố định các vị trí còn lại nhưng vẫn tính lại toàn mâm. Thêm thứ cần mua không được coi như nguyên liệu đã có trong kho.
 
-![AD02 — Luồng thành công từ yêu cầu mâm đến hoàn tất](fig/png/AD02 Nhận và sử dụng mâm cơm.png)
+![AD01b — Nhận và điều chỉnh mâm cơm (UC15–UC18)](fig/png/AD01b Nhận và điều chỉnh mâm cơm (UC15–UC18).png)
+
+![AD01c — Nấu cả mâm và hoàn tất bữa (UC19–UC21)](fig/png/AD01c Nấu cả mâm và hoàn tất bữa (UC19–UC21).png)
 
 ### 3.4.4. Lịch nấu, hoàn tất, hoàn tác và nhật ký
 
@@ -279,7 +283,7 @@ UC19–UC22. Mâm được chấp nhận mới tạo phiên nấu. Lịch xét t
 
 Bộ lịch có thể nới điều kiện các món xong gần nhau hoặc trả lịch tuần tự dự phòng; không nới số bếp và thứ tự công việc để tạo lịch giả. Khi mất mạng, outbox giữ yêu cầu hoàn tất và cùng khóa lũy đẳng để gửi lại.
 
-![AD03 — Nhánh nghiệp vụ hoàn tác với tiền điều kiện phiên đã hoàn tất, thuộc người gọi](fig/png/AD03 Hoàn tác – quyết định nghiệp vụ.png)
+![ST03 — Trạng thái phiên nấu (CookSession)](fig/png/ST03 Trạng thái phiên nấu (CookSession).png)
 
 ### 3.4.5. Dữ liệu, mô hình và vận hành
 
@@ -289,11 +293,11 @@ UC23–UC34. Quy trình gồm khảo sát gu, nhập/kiểm tra công thức, c�
 
 Ở pha phân tích, “Mâm cơm”, “Món trong mâm”, “Phiên nấu” là khái niệm nghiệp vụ. “Món trong mâm” cần tách khỏi “Công thức món” vì nó mang hệ số khẩu phần, trạng thái thay món và ảnh chụp giá trị ở bữa cụ thể. “Lô kho” tách khỏi “Nguyên liệu” vì mỗi lô có thời điểm nhập và lượng riêng. Cách tách này tương ứng nguyên tắc phân biệt đối tượng danh mục với dòng giao dịch trong slide.
 
-![DM01 — Lớp miền kho](fig/png/DM01 Miền kho nguyên liệu.png)
+![CL01e — Miền: kho nguyên liệu và đi chợ](fig/png/CL01e Miền_ kho nguyên liệu và đi chợ.png)
 
-![DM02 — Lớp miền mâm và phiên nấu](fig/png/DM02 Miền mâm cơm và phiên nấu.png)
+![CL01g — Miền: mâm cơm và phiên nấu](fig/png/CL01g Miền_ mâm cơm và phiên nấu.png)
 
-Bội số `2..3` ở DM02 là số **món active của một mâm hợp lệ** trong mô hình miền rút gọn; bảng vật lý có thể có nhiều dòng hơn để lưu lịch sử đổi. Composition chỉ đặt giữa đối tượng sở hữu và phần tử không có vòng đời độc lập, không đặt giữa người dùng và công thức dùng chung.
+Bội số `2..3` ở CL01g là số **món active của một mâm hợp lệ** trong mô hình miền rút gọn; bảng vật lý có thể có nhiều dòng hơn để lưu lịch sử đổi. Composition chỉ đặt giữa đối tượng sở hữu và phần tử không có vòng đời độc lập, không đặt giữa người dùng và công thức dùng chung.
 
 
 
@@ -313,41 +317,43 @@ Một quan hệ nhiều–nhiều chỉ có liên kết không đủ để giữ
 
 Lớp phân tích được rút ra từ thông tin cần nhớ và trách nhiệm trong UC. Một danh từ xuất hiện trong giao diện chưa chắc là lớp miền: “nút xác nhận” thuộc giao diện, “xác nhận nhập kho” là hành vi điều phối, còn “lần quét” và “lô nguyên liệu” có định danh, trạng thái và vòng đời cần lưu. Vì vậy, báo cáo dùng ba nhóm boundary, control và entity để giải thích trách nhiệm trước khi ánh xạ sang mã.
 
-Boundary nhận dữ liệu từ tác nhân và biểu diễn kết quả. Control điều phối một mục tiêu nghiệp vụ, kiểm điều kiện và gọi các đối tượng liên quan. Entity biểu diễn thông tin của miền. Đây là mô hình phân tích, không khẳng định mỗi control phải trở thành một class Python: Tastoria tổ chức phần lớn điều phối bằng module hàm. Các đường «use» trong CL09, CL13, CL15, CL20 và CL30 biểu diễn sử dụng trách nhiệm, không phải khóa ngoại hay quan hệ sở hữu; vì vậy không gán bội số cơ sở dữ liệu cho những đường này.
+Boundary nhận dữ liệu từ tác nhân và biểu diễn kết quả. Control điều phối một mục tiêu nghiệp vụ, kiểm điều kiện và gọi các đối tượng liên quan. Entity biểu diễn thông tin của miền. Đây là mô hình phân tích, không khẳng định mỗi control phải trở thành một class Python: Tastoria tổ chức phần lớn điều phối bằng module hàm. Các đường «use» trong CL01a, CL02b, CL03a, CL04a, CL04b và AD04c biểu diễn sử dụng trách nhiệm, không phải khóa ngoại hay quan hệ sở hữu; vì vậy không gán bội số cơ sở dữ liệu cho những đường này.
 
 ### 3.6.1. Tài khoản, hồ sơ và quyền dữ liệu
 
-![CL09 UC09–10 Hồ sơ và đồng ý](fig/png/CL09 UC09–10 Hồ sơ và đồng ý.png)
+![CL01a — Miền: tài khoản, hồ sơ và đồng ý](fig/png/CL01a Miền_ tài khoản, hồ sơ và đồng ý.png)
 
-CL09 tách màn hình hồ sơ khỏi điều phối đồng ý và các thực thể hồ sơ/dị ứng. Gửi thông tin sức khỏe cần kiểm mục đích xử lý tương ứng; việc đã đăng nhập không thay thế điều kiện này. Khi người dùng bỏ qua phần không bắt buộc, giao diện cần biểu diễn thiếu thông tin, không ghi số 0 như một giá trị đã đo.
+CL01a tách màn hình hồ sơ khỏi điều phối đồng ý và các thực thể hồ sơ/dị ứng. Gửi thông tin sức khỏe cần kiểm mục đích xử lý tương ứng; việc đã đăng nhập không thay thế điều kiện này. Khi người dùng bỏ qua phần không bắt buộc, giao diện cần biểu diễn thiếu thông tin, không ghi số 0 như một giá trị đã đo.
 
 ### 3.6.2. Quét ảnh và quản lý kho theo lô
 
-![CL13 UC13 Xác nhận kết quả quét](fig/png/CL13 UC13 Xác nhận kết quả quét.png)
+![CL02b — Lớp phân tích BCE: UC13 Xác nhận kết quả quét](fig/png/CL02b Lớp phân tích BCE_ UC13 Xác nhận kết quả quét.png)
 
-CL13 phân biệt “kết quả nguyên liệu” với “lô nguyên liệu”. Sửa một mục kết quả chưa tạo ra lô; control xác nhận mới chuyển dữ liệu đã duyệt sang nghiệp vụ kho. Quy tắc này giúp người dùng xóa dự đoán sai mà không phải thực hiện một giao dịch xuất kho giả.
+CL02b phân biệt “kết quả nguyên liệu” với “lô nguyên liệu”. Sửa một mục kết quả chưa tạo ra lô; control xác nhận mới chuyển dữ liệu đã duyệt sang nghiệp vụ kho. Quy tắc này giúp người dùng xóa dự đoán sai mà không phải thực hiện một giao dịch xuất kho giả.
 
 ### 3.6.3. Gợi ý mâm, đổi món và đi chợ
 
-![CL15 UC15 Đề xuất mâm cơm](fig/png/CL15 UC15 Đề xuất mâm cơm.png)
+![CL03a — Lớp phân tích BCE: UC15 Tạo mâm cơm](fig/png/CL03a Lớp phân tích BCE_ UC15 Tạo mâm cơm.png)
 
-CL15 cho thấy mâm đề xuất phụ thuộc đồng thời hồ sơ ràng buộc và tồn kho. Không để bộ xếp hạng tự quyết định tính hợp lệ: điểm gu cao chỉ giúp sắp thứ tự các phương án đã qua điều kiện bắt buộc.
+CL03a cho thấy mâm đề xuất phụ thuộc đồng thời hồ sơ ràng buộc và tồn kho. Không để bộ xếp hạng tự quyết định tính hợp lệ: điểm gu cao chỉ giúp sắp thứ tự các phương án đã qua điều kiện bắt buộc.
 
 ### 3.6.4. Lịch nấu, hoàn tất, hoàn tác và nhật ký
 
-![CL20 UC20 Hoàn tất nấu](fig/png/CL20 UC20 Hoàn tất nấu.png)
+![CL04a — Lớp phân tích BCE: UC20 Nấu xong – trừ kho](fig/png/CL04a Lớp phân tích BCE_ UC20 Nấu xong – trừ kho.png)
 
-CL20 đặt xử lý hoàn tất ở control vì thao tác tác động phiên, mâm và giao dịch kho. Không giao toàn bộ nghiệp vụ cho setter trạng thái của phiên. Các dependency tới entity biểu diễn phạm vi trách nhiệm, còn cơ chế khóa và commit được cụ thể hóa ở DS01, SQ01 và SQ02.
+![CL04b — Lớp phân tích BCE: UC20 Nấu xong – mâm và tương tác](fig/png/CL04b Lớp phân tích BCE_ UC20 Nấu xong – mâm và tương tác.png)
+
+CL04a, CL04b đặt xử lý hoàn tất ở control vì thao tác tác động phiên, mâm và giao dịch kho. Không giao toàn bộ nghiệp vụ cho setter trạng thái của phiên. Các dependency tới entity biểu diễn phạm vi trách nhiệm, còn cơ chế khóa và commit được cụ thể hóa ở CL08a, CL08b, SD06b và SD06c.
 
 ### 3.6.5. Dữ liệu, mô hình và vận hành
 
-![CL30 UC30 Triển khai mô hình](fig/png/CL30 UC30 Triển khai mô hình.png)
+![AD04c — Đăng ký, kiểm định và triển khai mô hình (UC29, UC30)](fig/png/AD04c Đăng ký, kiểm định và triển khai mô hình (UC29, UC30).png)
 
-CL30 tách phiên bản, kết quả kiểm định và bản triển khai: một phiên bản có mặt trong kho artifact chưa đồng nghĩa được phục vụ. Control triển khai kiểm quyền và tính phù hợp của phiên bản rồi cập nhật lựa chọn hoạt động. Boundary là lệnh vận hành, không phải một màn hình admin giả định.
+AD04c tách phiên bản, kết quả kiểm định và bản triển khai: một phiên bản có mặt trong kho artifact chưa đồng nghĩa được phục vụ. Control triển khai kiểm quyền và tính phù hợp của phiên bản rồi cập nhật lựa chọn hoạt động. Boundary là lệnh vận hành, không phải một màn hình admin giả định.
 
 ## 3.7. Kết quả của pha phân tích
 
-Đầu ra gồm danh mục 34 UC trong 10 phân hệ, các đặc tả có tiền/hậu điều kiện, mô hình miền DM01–DM02 và năm góc nhìn trách nhiệm CL09/13/15/20/30. Mô hình miền giải thích quan hệ và bội số; các dependency trong lớp trách nhiệm thể hiện sử dụng, không biểu diễn khóa ngoại. Không yêu cầu mọi UC đều có cùng số loại sơ đồ: mức chi tiết phụ thuộc rủi ro, độ phức tạp và nhu cầu giải thích. Bảng truy vết ở Chương 5 chỉ rõ mô hình nào hỗ trợ mỗi nhóm yêu cầu.
+Đầu ra gồm danh mục 34 UC trong 10 phân hệ, các đặc tả có tiền/hậu điều kiện, mô hình miền CL01e–CL01g và năm góc nhìn trách nhiệm CL01a/13/15/20/30. Mô hình miền giải thích quan hệ và bội số; các dependency trong lớp trách nhiệm thể hiện sử dụng, không biểu diễn khóa ngoại. Không yêu cầu mọi UC đều có cùng số loại sơ đồ: mức chi tiết phụ thuộc rủi ro, độ phức tạp và nhu cầu giải thích. Bảng truy vết ở Chương 5 chỉ rõ mô hình nào hỗ trợ mỗi nhóm yêu cầu.
 
 # 4. THIẾT KẾ HỆ THỐNG
 
@@ -375,9 +381,9 @@ Phân tầng: giao diện → router/validation/quyền → service nghiệp v�
 | Lưu tệp | Ổ đĩa riêng, nginx tải sau kiểm quyền | Dễ vận hành một máy; mở rộng nhiều máy cần shared/object storage |
 | Triển khai | Docker Compose, nginx, tunnel, CI frontend và pull deployment | Tái lập được bản frontend; máy chủ và sao lưu vẫn là điểm cần giám sát |
 
-![AR01 — Phân tầng và phụ thuộc giữa các khối](fig/png/AR01 Các tầng và phụ thuộc triển khai.png)
+![CP01a — Thành phần: các khối chạy của hệ thống](fig/png/CP01a Thành phần_ các khối chạy của hệ thống.png)
 
-AR01 dùng UML dependency «use». Mũi tên worker → queue thể hiện worker sử dụng hàng đợi, không phải hướng chảy dữ liệu. Đây là góc nhìn trách nhiệm/phụ thuộc, không phải sơ đồ mạng. PostgreSQL và tệp là kho lưu lâu dài; Valkey không thay thế cơ sở dữ liệu nghiệp vụ.
+CP01a dùng UML dependency «use». Mũi tên worker → queue thể hiện worker sử dụng hàng đợi, không phải hướng chảy dữ liệu. Đây là góc nhìn trách nhiệm/phụ thuộc, không phải sơ đồ mạng. PostgreSQL và tệp là kho lưu lâu dài; Valkey không thay thế cơ sở dữ liệu nghiệp vụ.
 
 ## 4.3. Chuyển lớp phân tích sang thiết kế
 
@@ -391,7 +397,9 @@ AR01 dùng UML dependency «use». Mũi tên worker → queue thể hiện worke
 
 Ở pha thiết kế, router nhận yêu cầu, service phối hợp nhiều đối tượng, UnitOfWork quản lý giao dịch và ORM entity biểu diễn trạng thái lưu. Ví dụ complete_session không phải phương thức cập nhật đơn lẻ của `CookSession`: nó còn cần kho, mâm, sự kiện và kiểm đồng ý.
 
-![DS01 — Phân bổ trách nhiệm chức năng hoàn tất nấu](fig/png/DS01 Thiết kế chức năng hoàn tất nấu.png)
+![CL08a — Thiết kế module cooking: điều phối và dữ liệu](fig/png/CL08a Thiết kế module cooking_ điều phối và dữ liệu.png)
+
+![CL08b — Thiết kế module cooking: lập lịch và hoàn tác](fig/png/CL08b Thiết kế module cooking_ lập lịch và hoàn tác.png)
 
 Tên phương thức trên các sơ đồ thiết kế được rút gọn tham số để dễ đọc; chữ ký thực và việc truyền session/dependency cần đối chiếu mã nguồn. «module» biểu diễn module hàm, không khẳng định đó là lớp khởi tạo được.
 
@@ -420,11 +428,11 @@ Khó nhất là phân biệt quyền đăng nhập với quyền xử lý từng
 
 Khó nhất là chuyển đầu ra thị giác thành quyết định nhập kho: lớp phát hiện chưa chắc trùng mã nguyên liệu và ảnh không đảm bảo đo đúng lượng. Cách giải là ánh xạ có phiên bản, biểu diễn độ bất định và xác nhận của người dùng. Worker hiện có `freshness_version=None`; báo cáo không coi mô hình độ tươi là thành phần đã triển khai.
 
-![DS02 — Module thiết kế xác nhận quét](fig/png/DS02 UC13 Thiết kế xác nhận quét.png)
+![CL07a — Thiết kế module scan: điều phối và dữ liệu](fig/png/CL07a Thiết kế module scan_ điều phối và dữ liệu.png)
 
-![SQ03 — Xác nhận lần đầu, với scan đang done](fig/png/SQ03 Xác nhận quét – ghi kho một lần.png)
+![SD02b — Xác nhận kết quả quét vào kho (UC13)](fig/png/SD02b Xác nhận kết quả quét vào kho (UC13).png)
 
-Ở SQ03, scan.service khóa bản ghi scan, kiểm chủ sở hữu, bỏ các mục đã xóa và kiểm lượng. Hàm pantry.apply_scan nhận cùng session, ghi thay đổi kho rồi scan chuyển confirmed. UnitOfWork ở biên request commit trước khi hoàn tất phản hồi. Đường tới PostgreSQL biểu diễn truy vấn/ghi qua ORM trong cùng giao dịch, không có nghĩa App được truy cập DB trực tiếp.
+Ở SD02b, scan.service khóa bản ghi scan, kiểm chủ sở hữu, bỏ các mục đã xóa và kiểm lượng. Hàm pantry.apply_scan nhận cùng session, ghi thay đổi kho rồi scan chuyển confirmed. UnitOfWork ở biên request commit trước khi hoàn tất phản hồi. Đường tới PostgreSQL biểu diễn truy vấn/ghi qua ORM trong cùng giao dịch, không có nghĩa App được truy cập DB trực tiếp.
 
 | Trường hợp | Xử lý của chức năng | Hậu điều kiện cần kiểm |
 |---|---|---|
@@ -434,7 +442,7 @@ Khó nhất là chuyển đầu ra thị giác thành quyết định nhập kho
 | scan chưa done hoặc đã bị bỏ | Từ chối trạng thái không hợp lệ | Không chuyển trạng thái lùi |
 | Hai request xác nhận đồng thời | Khóa scan để tuần tự hóa quyết định | Chỉ một lần áp dụng kho |
 
-SQ03 chỉ vẽ nhánh thành công đầu tiên để giữ hình đọc được; các nhánh trong bảng và đặc tả UC13 là phần của cùng hợp đồng. Độ tin cậy nhận diện phải đánh giá riêng theo dữ liệu ảnh; không suy ra từ việc giao dịch xác nhận chạy đúng.
+SD02b chỉ vẽ nhánh thành công đầu tiên để giữ hình đọc được; các nhánh trong bảng và đặc tả UC13 là phần của cùng hợp đồng. Độ tin cậy nhận diện phải đánh giá riêng theo dữ liệu ảnh; không suy ra từ việc giao dịch xác nhận chạy đúng.
 
 ### 4.4.3. Gợi ý mâm, đổi món và đi chợ
 
@@ -442,9 +450,11 @@ SQ03 chỉ vẽ nhánh thành công đầu tiên để giữ hình đọc đư�
 
 Điểm khó là tiêu chí mềm (gu, sử dụng nguyên liệu sớm, gần mục tiêu năng lượng) không được lấn điều kiện cứng (dị ứng, lượng dùng chung, nguồn lực). Kiểm riêng từng món không đủ; phải kiểm cả tổ hợp. Chưa có kết quả thử người dùng thì không tuyên bố xếp hạng “phù hợp khẩu vị hơn” đối thủ.
 
-![DS03 — Phân bổ điều phối, ghép mâm và lập lịch](fig/png/DS03 UC15 Thiết kế tạo mâm.png)
+![CL05a — Thiết kế module meal: điều phối và dữ liệu](fig/png/CL05a Thiết kế module meal_ điều phối và dữ liệu.png)
 
-Trong DS03, meal.router xử lý biên HTTP và khóa yêu cầu; meal.service dựng bối cảnh, lấy ứng viên và điều phối. meal.composer ghép tổ hợp theo cấu trúc mâm; meal.schedule kiểm khả năng sắp lịch. Catalog và truy vấn kho là đầu vào bổ sung, được lược khỏi góc nhìn này và đã thể hiện ở AR01/DM01.
+![CL05b — Thiết kế module meal: dịch vụ ghép mâm](fig/png/CL05b Thiết kế module meal_ dịch vụ ghép mâm.png)
+
+Trong CL05a, CL05b, meal.router xử lý biên HTTP và khóa yêu cầu; meal.service dựng bối cảnh, lấy ứng viên và điều phối. meal.composer ghép tổ hợp theo cấu trúc mâm; meal.schedule kiểm khả năng sắp lịch. Catalog và truy vấn kho là đầu vào bổ sung, được lược khỏi góc nhìn này và đã thể hiện ở CP01a/DM01.
 
 Một ví dụ phân tích: kho có 300 g thịt, món mặn cần 200 g và món canh cần 150 g. Hai món riêng lẻ đều không vượt 300 g nhưng tổng 350 g vượt kho. Phải cộng nhu cầu theo mã nguyên liệu sau quy đổi khẩu phần và thay thế, rồi kiểm cả mâm. Các số trên chỉ minh họa bất biến, không phải dữ liệu kiểm thử đã chạy.
 
@@ -462,9 +472,9 @@ Khó khăn thuật toán là số tổ hợp tăng nhanh khi thêm món; thu h�
 
 `meal.schedule` dùng CP-SAT: NoOverlap cho thao tác chủ động, Cumulative cho bếp, ràng buộc thứ tự bước. `cooking.service` phối hợp kho và mâm; router dùng idempotency; `core.db.UnitOfWork` commit trước khi trả phản hồi. Đây là hiện thực bằng module hàm, không phải một lớp controller tự giữ mọi nghiệp vụ.
 
-![SQ01 — Nhánh lần đầu hoàn tất, phiên đang nấu; nhánh replay và lỗi được đặc tả ở UC20](fig/png/SQ01 Hoàn tất nấu – chống ghi lặp.png)
+![SD06b — Nấu xong một chạm (UC20)](fig/png/SD06b Nấu xong một chạm (UC20).png)
 
-![SQ02 — Hai nhánh thời hạn của hoàn tác; các trạng thái khác xem UC21](fig/png/SQ02 Hoàn tác trong thời hạn.png)
+![SD06c — Hoàn tác trừ kho (UC21)](fig/png/SD06c Hoàn tác trừ kho (UC21).png)
 
 Ở mã hiện tại, nếu phiên đã `completed`, service trả tóm tắt đã có thay vì trừ kho lần nữa. Điều này khác một số sequence cũ mô tả trả 409 cho mọi phiên không `in_progress`. Nhánh cùng Idempotency-Key được xử lý sớm tại router. Cả hai lớp bảo vệ đều cần test, không chỉ test nút bị vô hiệu hóa trên giao diện.
 
@@ -530,15 +540,19 @@ Mô hình dữ liệu cụ thể hóa các thực thể miền bằng bảng, kh
 
 Các hình dưới chọn cột phục vụ giải thích; từ điển bảng đầy đủ được sinh từ `db/schema.sql` trong phụ lục. Kiểu cột/PK/FK lấy từ DDL, không suy từ tên màn hình. Quan hệ nhiều–nhiều giữa công thức và nguyên liệu được chuyển thành `recipe_ingredients` có lượng gam.
 
-![DB01 — Cấu trúc kho và lịch sử](fig/png/DB01 Kho và lịch sử giao dịch.png)
+![ERD05a — Kho nguyên liệu (pantry)](fig/png/ERD05a Kho nguyên liệu (pantry).png)
 
-`pantry_transactions.lot_id` bắt buộc tham chiếu một lô. `reverses_id` là FK tự tham chiếu nullable và UNIQUE: một giao dịch trừ có tối đa một bản ghi đảo. Hình DB01 giản lược cạnh tự tham chiếu để dễ đọc; ràng buộc vẫn được liệt kê trong bảng đầy đủ. `ref_type/ref_id` là cặp tham chiếu nghiệp vụ đa loại, không được trình bày như một FK thực khi DDL không có FK.
+`pantry_transactions.lot_id` bắt buộc tham chiếu một lô. `reverses_id` là FK tự tham chiếu nullable và UNIQUE: một giao dịch trừ có tối đa một bản ghi đảo. Hình ERD05a giản lược cạnh tự tham chiếu để dễ đọc; ràng buộc vẫn được liệt kê trong bảng đầy đủ. `ref_type/ref_id` là cặp tham chiếu nghiệp vụ đa loại, không được trình bày như một FK thực khi DDL không có FK.
 
-![DB02 — Công thức, mâm và phiên nấu](fig/png/DB02 Công thức, mâm và phiên nấu.png)
+![ERD06a — Mâm cơm và món trong mâm (meal)](fig/png/ERD06a Mâm cơm và món trong mâm (meal).png)
+
+![ERD04a — Món ăn: công thức và bước nấu](fig/png/ERD04a Món ăn_ công thức và bước nấu.png)
+
+![ERD06d — Phiên nấu và lịch nấu (cooking)](fig/png/ERD06d Phiên nấu và lịch nấu (cooking).png)
 
 `recipe_ingredients` có PK ghép `(recipe_id, ingredient_id)`. `meal_plan_items` giữ lịch sử món thay thế qua `replaced_item_id`; công thức và vị trí món được kiểm bằng FK ghép `(recipe_id, slot)`. Một mâm có thể có nhiều phiên theo thời gian; ràng buộc một phiên đang nấu cần xem index/logic dịch vụ, không thay bội số toàn lịch sử thành 1–1.
 
-![DB03 — Lần quét, ảnh và kết quả](fig/png/DB03 Quét ảnh và kết quả.png)
+![ERD05b — Quét ảnh (scan)](fig/png/ERD05b Quét ảnh (scan).png)
 
 Mỗi ảnh/kết quả thuộc một lần quét. Scan thuộc đúng một người dùng. Ảnh thô và lô kho không đồng nhất: phải qua bước xác nhận rồi mới phát sinh thay đổi kho. `detections` lưu khung phát hiện; `scan_items` là kết quả nghiệp vụ đã gộp/sửa.
 
@@ -592,11 +606,11 @@ Pha hiện thực ánh xạ thiết kế vào module, API, bảng và giao diệ
 
 | Nhóm yêu cầu | UC | Hành vi / mô hình | Thành phần thực hiện | Dữ liệu | Ca cần chứng minh |
 |---|---|---|---|---|---|
-| F01–F03 | 01–11 | PK01–03, CL09 | identity/profile/privacy | users, consents, profiles | Truy cập chéo, thu hồi phiên, rút đồng ý |
-| F04–F05 | 12–14 | PK04, AD01, CL13, DS02, SQ03, DM01, DB01/03 | scan, pantry, worker | scans, items, lots, transactions | Quét không đổi kho; xác nhận lặp |
-| F06–F08 | 15–18 | PK05, UC02, AD02, CL15, DS03, DM02, DB02 | meal, substitute | plans, items, substitutions | Vượt kho tổng; dị ứng; đổi món bất khả thi |
-| F09–F11 | 19–22 | PK06, AD03, CL20, SQ01/02, DS01 | cooking, pantry, journal | sessions, transactions | Retry; rollback; hoàn tác đúng hạn/quá hạn |
-| F12 | 23–34 | PK07–10, CL30 | survey, catalog, mlops, admin, jobs | model_versions, surveys, audit | Phân quyền, version mismatch, restore |
+| F01–F03 | 01–11 | UCD01–03, CL01a | identity/profile/privacy | users, consents, profiles | Truy cập chéo, thu hồi phiên, rút đồng ý |
+| F04–F05 | 12–14 | UCD04, AD01a, CL02b, CL07a, SD02b, CL01e, ERD05a/03 | scan, pantry, worker | scans, items, lots, transactions | Quét không đổi kho; xác nhận lặp |
+| F06–F08 | 15–18 | UCD05, UC02, AD01b, AD01c, CL03a, CL05a, CL05b, CL01g, ERD06a, ERD04a, ERD06d | meal, substitute | plans, items, substitutions | Vượt kho tổng; dị ứng; đổi món bất khả thi |
+| F09–F11 | 19–22 | UCD06, ST03, CL04a, CL04b, SD06b/02, CL08a, CL08b | cooking, pantry, journal | sessions, transactions | Retry; rollback; hoàn tác đúng hạn/quá hạn |
+| F12 | 23–34 | UCD07–10, AD04c | survey, catalog, mlops, admin, jobs | model_versions, surveys, audit | Phân quyền, version mismatch, restore |
 
 ## 5.2. Đối chiếu thiết kế với hiện trạng mã nguồn
 

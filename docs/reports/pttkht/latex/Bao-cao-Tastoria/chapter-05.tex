@@ -13,11 +13,11 @@ Pha hiện thực ánh xạ thiết kế vào module, API, bảng và giao diệ
 \textbf{Nhóm yêu cầu} & \textbf{UC} & \textbf{Hành vi /\allowbreak{} mô hình} & \textbf{Thành phần thực hiện} & \textbf{Dữ liệu} & \textbf{Ca cần chứng minh} \\
 \midrule\endhead
 \bottomrule\endfoot
-F01--F03 & 01--11 & PK01--03, CL09 & identity/\allowbreak{}profile/\allowbreak{}privacy & users, consents, profiles & Truy cập chéo, thu hồi phiên, rút đồng ý \\ \addlinespace[3pt]
-F04--F05 & 12--14 & PK04, AD01, CL13, DS02, SQ03, DM01, DB01/\allowbreak{}03 & scan, pantry, worker & scans, items, lots, transactions & Quét không đổi kho; xác nhận lặp \\ \addlinespace[3pt]
-F06--F08 & 15--18 & PK05, UC02, AD02, CL15, DS03, DM02, DB02 & meal, substitute & plans, items, substitutions & Vượt kho tổng; dị ứng; đổi món bất khả thi \\ \addlinespace[3pt]
-F09--F11 & 19--22 & PK06, AD03, CL20, SQ01/\allowbreak{}02, DS01 & cooking, pantry, journal & sessions, transactions & Retry; rollback; hoàn tác đúng hạn/\allowbreak{}quá hạn \\ \addlinespace[3pt]
-F12 & 23--34 & PK07--10, CL30 & survey, catalog, mlops, admin, jobs & model\_\allowbreak{}versions, surveys, audit & Phân quyền, version mismatch, restore \\ \addlinespace[3pt]
+F01--F03 & 01--11 & UCD01--03, CL01a & identity/\allowbreak{}profile/\allowbreak{}privacy & users, consents, profiles & Truy cập chéo, thu hồi phiên, rút đồng ý \\ \addlinespace[3pt]
+F04--F05 & 12--14 & UCD04, AD01a, CL02b, CL07a, SD02b, CL01e, ERD05a/\allowbreak{}03 & scan, pantry, worker & scans, items, lots, transactions & Quét không đổi kho; xác nhận lặp \\ \addlinespace[3pt]
+F06--F08 & 15--18 & UCD05, UC02, AD01b, AD01c, CL03a, CL05a, CL05b, CL01g, ERD06a, ERD04a, ERD06d & meal, substitute & plans, items, substitutions & Vượt kho tổng; dị ứng; đổi món bất khả thi \\ \addlinespace[3pt]
+F09--F11 & 19--22 & UCD06, ST03, CL04a, CL04b, SD06b/\allowbreak{}02, CL08a, CL08b & cooking, pantry, journal & sessions, transactions & Retry; rollback; hoàn tác đúng hạn/\allowbreak{}quá hạn \\ \addlinespace[3pt]
+F12 & 23--34 & UCD07--10, AD04c & survey, catalog, mlops, admin, jobs & model\_\allowbreak{}versions, surveys, audit & Phân quyền, version mismatch, restore \\ \addlinespace[3pt]
 \end{longtable}}
 \section{Đối chiếu thiết kế với hiện trạng mã nguồn}
 {\footnotesize\setlength{\tabcolsep}{0pt}

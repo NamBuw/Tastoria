@@ -2,7 +2,7 @@
 Pha phân tích mô tả hệ thống phải làm gì để đáp ứng yêu cầu: mục tiêu của tác nhân, hành vi, các khái niệm miền và trách nhiệm phối hợp. Phần này chưa quyết định cấu trúc router, kiểu lưu trữ hay hợp đồng HTTP; các lựa chọn đó được cụ thể hóa ở Chương 4.
 
 \section{Mô hình use case tổng quát và phân hệ}
-Mã UC01--UC34 được giữ để truy vết về đặc tả hiện có. Sơ đồ tổng quát chỉ trình bày các mục tiêu chính; \textbf{10 sơ đồ PK01--PK10 trong phụ lục} bao phủ đủ 34 UC. Không nhồi tất cả actor, oval và cạnh lên một hình khiến không đọc được.
+Mã UC01--UC34 được giữ để truy vết về đặc tả hiện có. Sơ đồ tổng quát chỉ trình bày các mục tiêu chính; \textbf{10 sơ đồ UCD01--UCD10 trong phụ lục} bao phủ đủ 34 UC. Không nhồi tất cả actor, oval và cạnh lên một hình khiến không đọc được.
 
 {\footnotesize\setlength{\tabcolsep}{0pt}
 \begin{longtable}{@{}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{}}
@@ -24,11 +24,15 @@ PK6 Nấu và nhật ký & UC19 nấu cả mâm; UC20 hoàn tất; UC21 hoàn t�
 PK7 Khảo sát gu & UC23 tham gia khảo sát; UC24 quản lý đợt khảo sát & A03, A06 \\ \addlinespace[3pt]
 PK8 Nội dung và dữ liệu & UC25 nhập kho công thức; UC26 cặp thay thế; UC27 xử lý yêu cầu dữ liệu/\allowbreak{}kiểm toán & A05, A04 \\ \addlinespace[3pt]
 PK9 Vận hành mô hình & UC28 xuất dữ liệu huấn luyện; UC29 đăng ký/\allowbreak{}kiểm định; UC30 triển khai/\allowbreak{}quay lui; UC31 gán nhãn & A06, A07, A10 \\ \addlinespace[3pt]
-PK10 Tác vụ định kỳ & UC32 xóa ảnh quá hạn; UC33 sao lưu; UC34 dọn job/\allowbreak{}token/\allowbreak{}khóa hết hạn & A08 \\ \addlinespace[3pt]
+UCD10 Tác vụ định kỳ & UC32 xóa ảnh quá hạn; UC33 sao lưu; UC34 dọn job/\allowbreak{}token/\allowbreak{}khóa hết hạn & A08 \\ \addlinespace[3pt]
 \end{longtable}}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.75\textheight,keepaspectratio]{assets/UC00.pdf}
-\caption{UC00 --- Các mục tiêu chính của người nấu}\label{fig:Bao-cao-Tastoria:1}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/UCD00a.pdf}
+\caption{UCD00a --- Tổng quan: chức năng chính của khách và người dùng}\label{fig:Bao-cao-Tastoria:1}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/UCD00b.pdf}
+\caption{UCD00b --- Tổng quan: chức năng của nhân sự và tác nhân hệ thống}\label{fig:Bao-cao-Tastoria:1-2}
 \end{figure}
 \textbf{Quy tắc đọc sơ đồ:} đường actor--UC là association, không biểu diễn thứ tự. {\small\texttt{extend}} hướng từ UC mở rộng về UC cơ sở, có điểm mở rộng và điều kiện. {\small\texttt{include}} chỉ dùng khi hành vi được gọi bắt buộc, không dùng để biểu diễn ``màn hình sau'' hay ``phải đăng nhập trước''. Không tạo kế thừa actor chỉ vì hai vai trò có chung một màn hình.
 
@@ -52,12 +56,10 @@ UC21 extend UC20 & Hoàn tác diễn ra sau giao dịch hoàn tất đã kết t
 \end{longtable}}
 Đây là điều chỉnh mô hình trong báo cáo, không tự sửa bộ đặc tả gốc hoặc thay đổi hành vi phần mềm. Nhóm cần thống nhất phiên bản khi hợp nhất lại {\small\texttt{model.\allowbreak{}yaml}}.
 
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/UC02.pdf}
-\caption{UC02 --- Mở rộng khi xem mâm; không nối quét và xác nhận bằng include}\label{fig:Bao-cao-Tastoria:2}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/UCD05.pdf}
+\caption{UCD05 --- Gói PK5 Mâm cơm}\label{fig:Bao-cao-Tastoria:2}
 \end{figure}
-\end{landscape}\clearpage
 \section{Đặc tả và hợp đồng nghiệp vụ}
 UC tổng quát thể hiện mục tiêu có giá trị cho tác nhân. Sơ đồ PK phân nhóm các mục tiêu đó theo trách nhiệm; không phải cứ nằm trong cùng phân hệ thì các UC có quan hệ include. Các thao tác kỹ thuật như kiểm JWT, khóa bản ghi và commit là trách nhiệm thiết kế, không tách thành UC người dùng chỉ để làm sơ đồ nhiều nút hơn.
 
@@ -81,7 +83,7 @@ UC21 Hoàn tác & Phiên đã completed và còn thời hạn & Thời gian máy
 UC30 Triển khai & Vai trò vận hành và phiên bản được phép chọn & Tính tương thích artifact, ánh xạ lớp và trạng thái kiểm định & Chọn phiên bản hoạt động có khả năng truy vết & Không dùng tên phiên bản thay cho bằng chứng chất lượng \\ \addlinespace[3pt]
 \end{longtable}}
 \section{Phân tích luồng nghiệp vụ và ngoại lệ}
-Các luồng dưới đây chọn theo mục tiêu nghiệp vụ, không theo người thực hiện bài tập. AD01--AD02 mô tả luồng thành công; AD03 và các bảng ngoại lệ bổ sung điều kiện quyết định. Đặc tả đầy đủ được giữ ở Phụ lục A.
+Các luồng dưới đây chọn theo mục tiêu nghiệp vụ, không theo người thực hiện bài tập. AD01a--AD01c mô tả luồng thành công; ST03 và các bảng ngoại lệ bổ sung điều kiện quyết định. Đặc tả đầy đủ được giữ ở Phụ lục A.
 
 \subsection{Tài khoản, hồ sơ và quyền dữ liệu}
 Phạm vi UC01--UC11. Khách đăng ký bằng email/\allowbreak{}mật khẩu; đăng nhập thành công mở vùng bếp. Người dùng thiết lập dị ứng, chế độ ăn, số bếp và mục tiêu; chỉ thu thập dữ liệu nhạy cảm khi có đồng ý thích hợp. Rút đồng ý không đồng nghĩa xóa toàn bộ tài khoản; xóa tài khoản là quy trình riêng.
@@ -94,8 +96,8 @@ UC12--UC14. Người dùng chọn chế độ toàn tủ hoặc đồ vừa mua,
 Luồng thất bại: không cấp quyền ảnh \ensuremath{\rightarrow} nhập tay; ảnh sai định dạng/\allowbreak{}dung lượng \ensuremath{\rightarrow} sửa đầu vào; worker lỗi \ensuremath{\rightarrow} retry giới hạn rồi báo thất bại; mất mạng \ensuremath{\rightarrow} hỏi lại mã scan; bỏ kết quả \ensuremath{\rightarrow} không đổi kho; xác nhận lặp \ensuremath{\rightarrow} không thêm lô trùng.
 
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.75\textheight,keepaspectratio]{assets/AD01.pdf}
-\caption{AD01 --- Luồng thành công quét và xác nhận; các ngoại lệ xem đặc tả UC12--UC14}\label{fig:Bao-cao-Tastoria:3}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/AD01a.pdf}
+\caption{AD01a --- Quét và xác nhận nguyên liệu (UC12, UC13)}\label{fig:Bao-cao-Tastoria:3}
 \end{figure}
 \subsection{Gợi ý mâm, đổi món và đi chợ}
 UC15--UC18. Nhập số người, thời gian, dị ứng người ăn cùng và lô ưu tiên. Hệ thống loại món không hợp lệ, tính lượng theo khẩu phần, ghép tổ hợp, kiểm tổng nhu cầu và thời gian rồi xếp hạng. Người dùng xem lý do, đổi một món hoặc chọn thay thế hợp lệ trước khi chấp nhận.
@@ -103,20 +105,22 @@ UC15--UC18. Nhập số người, thời gian, dị ứng người ăn cùng và
 Không có mâm khả thi phải báo thiếu gì hoặc đề xuất thay đổi điều kiện, không âm thầm bỏ ràng buộc dị ứng. Đổi món cố định các vị trí còn lại nhưng vẫn tính lại toàn mâm. Thêm thứ cần mua không được coi như nguyên liệu đã có trong kho.
 
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.75\textheight,keepaspectratio]{assets/AD02.pdf}
-\caption{AD02 --- Luồng thành công từ yêu cầu mâm đến hoàn tất}\label{fig:Bao-cao-Tastoria:4}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/AD01b.pdf}
+\caption{AD01b --- Nhận và điều chỉnh mâm cơm (UC15–UC18)}\label{fig:Bao-cao-Tastoria:4}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/AD01c.pdf}
+\caption{AD01c --- Nấu cả mâm và hoàn tất bữa (UC19–UC21)}\label{fig:Bao-cao-Tastoria:4-2}
 \end{figure}
 \subsection{Lịch nấu, hoàn tất, hoàn tác và nhật ký}
 UC19--UC22. Mâm được chấp nhận mới tạo phiên nấu. Lịch xét thứ tự bước, thao tác chủ động và số bếp. Khi nấu xong, người dùng đánh giá tùy chọn và xác nhận. Hệ thống trừ kho một lần, cập nhật phiên/\allowbreak{}mâm; hoàn tác trong 10 phút bằng giao dịch đảo. Nhật ký dựa trên dữ liệu đã hoàn tất, không đếm lại một request retry.
 
 Bộ lịch có thể nới điều kiện các món xong gần nhau hoặc trả lịch tuần tự dự phòng; không nới số bếp và thứ tự công việc để tạo lịch giả. Khi mất mạng, outbox giữ yêu cầu hoàn tất và cùng khóa lũy đẳng để gửi lại.
 
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/AD03.pdf}
-\caption{AD03 --- Nhánh nghiệp vụ hoàn tác với tiền điều kiện phiên đã hoàn tất, thuộc người gọi}\label{fig:Bao-cao-Tastoria:5}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/ST03.pdf}
+\caption{ST03 --- Trạng thái phiên nấu (CookSession)}\label{fig:Bao-cao-Tastoria:5}
 \end{figure}
-\end{landscape}\clearpage
 \subsection{Dữ liệu, mô hình và vận hành}
 UC23--UC34. Quy trình gồm khảo sát gu, nhập/\allowbreak{}kiểm tra công thức, cặp thay thế, xuất dữ liệu có quyền sử dụng, đăng ký/\allowbreak{}kiểm định/\allowbreak{}triển khai mô hình, gán nhãn và bảo trì. Tách người biên soạn với người vận hành mô hình; người tham gia khảo sát không trở thành quản trị viên.
 
@@ -124,16 +128,14 @@ UC23--UC34. Quy trình gồm khảo sát gu, nhập/\allowbreak{}kiểm tra côn
 Ở pha phân tích, ``Mâm cơm'', ``Món trong mâm'', ``Phiên nấu'' là khái niệm nghiệp vụ. ``Món trong mâm'' cần tách khỏi ``Công thức món'' vì nó mang hệ số khẩu phần, trạng thái thay món và ảnh chụp giá trị ở bữa cụ thể. ``Lô kho'' tách khỏi ``Nguyên liệu'' vì mỗi lô có thời điểm nhập và lượng riêng. Cách tách này tương ứng nguyên tắc phân biệt đối tượng danh mục với dòng giao dịch trong slide.
 
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.75\textheight,keepaspectratio]{assets/DM01.pdf}
-\caption{DM01 --- Lớp miền kho}\label{fig:Bao-cao-Tastoria:6}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL01e.pdf}
+\caption{CL01e --- Miền: kho nguyên liệu và đi chợ}\label{fig:Bao-cao-Tastoria:6}
 \end{figure}
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/DM02.pdf}
-\caption{DM02 --- Lớp miền mâm và phiên nấu}\label{fig:Bao-cao-Tastoria:7}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL01g.pdf}
+\caption{CL01g --- Miền: mâm cơm và phiên nấu}\label{fig:Bao-cao-Tastoria:7}
 \end{figure}
-\end{landscape}\clearpage
-Bội số {\small\texttt{2.\allowbreak{}.\allowbreak{}3}} ở DM02 là số \textbf{món active của một mâm hợp lệ} trong mô hình miền rút gọn; bảng vật lý có thể có nhiều dòng hơn để lưu lịch sử đổi. Composition chỉ đặt giữa đối tượng sở hữu và phần tử không có vòng đời độc lập, không đặt giữa người dùng và công thức dùng chung.
+Bội số {\small\texttt{2.\allowbreak{}.\allowbreak{}3}} ở CL01g là số \textbf{món active của một mâm hợp lệ} trong mô hình miền rút gọn; bảng vật lý có thể có nhiều dòng hơn để lưu lịch sử đổi. Composition chỉ đặt giữa đối tượng sở hữu và phần tử không có vòng đời độc lập, không đặt giữa người dùng và công thức dùng chung.
 
 {\footnotesize\setlength{\tabcolsep}{0pt}
 \begin{longtable}{@{}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{}}
@@ -159,52 +161,46 @@ Một quan hệ nhiều--nhiều chỉ có liên kết không đủ để giữ 
 \section{Lớp phân tích theo use case}
 Lớp phân tích được rút ra từ thông tin cần nhớ và trách nhiệm trong UC. Một danh từ xuất hiện trong giao diện chưa chắc là lớp miền: ``nút xác nhận'' thuộc giao diện, ``xác nhận nhập kho'' là hành vi điều phối, còn ``lần quét'' và ``lô nguyên liệu'' có định danh, trạng thái và vòng đời cần lưu. Vì vậy, báo cáo dùng ba nhóm boundary, control và entity để giải thích trách nhiệm trước khi ánh xạ sang mã.
 
-Boundary nhận dữ liệu từ tác nhân và biểu diễn kết quả. Control điều phối một mục tiêu nghiệp vụ, kiểm điều kiện và gọi các đối tượng liên quan. Entity biểu diễn thông tin của miền. Đây là mô hình phân tích, không khẳng định mỗi control phải trở thành một class Python: Tastoria tổ chức phần lớn điều phối bằng module hàm. Các đường \guillemotleft{}use\guillemotright{} trong CL09, CL13, CL15, CL20 và CL30 biểu diễn sử dụng trách nhiệm, không phải khóa ngoại hay quan hệ sở hữu; vì vậy không gán bội số cơ sở dữ liệu cho những đường này.
+Boundary nhận dữ liệu từ tác nhân và biểu diễn kết quả. Control điều phối một mục tiêu nghiệp vụ, kiểm điều kiện và gọi các đối tượng liên quan. Entity biểu diễn thông tin của miền. Đây là mô hình phân tích, không khẳng định mỗi control phải trở thành một class Python: Tastoria tổ chức phần lớn điều phối bằng module hàm. Các đường \guillemotleft{}use\guillemotright{} trong CL01a, CL02b, CL03a, CL04a, CL04b và AD04c biểu diễn sử dụng trách nhiệm, không phải khóa ngoại hay quan hệ sở hữu; vì vậy không gán bội số cơ sở dữ liệu cho những đường này.
 
 \subsection{Tài khoản, hồ sơ và quyền dữ liệu}
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/CL09.pdf}
-\caption{CL09 UC09--10 Hồ sơ và đồng ý}\label{fig:Bao-cao-Tastoria:8}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL01a.pdf}
+\caption{CL01a --- Miền: tài khoản, hồ sơ và đồng ý}\label{fig:Bao-cao-Tastoria:8}
 \end{figure}
-\end{landscape}\clearpage
-CL09 tách màn hình hồ sơ khỏi điều phối đồng ý và các thực thể hồ sơ/\allowbreak{}dị ứng. Gửi thông tin sức khỏe cần kiểm mục đích xử lý tương ứng; việc đã đăng nhập không thay thế điều kiện này. Khi người dùng bỏ qua phần không bắt buộc, giao diện cần biểu diễn thiếu thông tin, không ghi số 0 như một giá trị đã đo.
+CL01a tách màn hình hồ sơ khỏi điều phối đồng ý và các thực thể hồ sơ/\allowbreak{}dị ứng. Gửi thông tin sức khỏe cần kiểm mục đích xử lý tương ứng; việc đã đăng nhập không thay thế điều kiện này. Khi người dùng bỏ qua phần không bắt buộc, giao diện cần biểu diễn thiếu thông tin, không ghi số 0 như một giá trị đã đo.
 
 \subsection{Quét ảnh và quản lý kho theo lô}
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/CL13.pdf}
-\caption{CL13 UC13 Xác nhận kết quả quét}\label{fig:Bao-cao-Tastoria:9}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL02b.pdf}
+\caption{CL02b --- Lớp phân tích BCE: UC13 Xác nhận kết quả quét}\label{fig:Bao-cao-Tastoria:9}
 \end{figure}
-\end{landscape}\clearpage
-CL13 phân biệt ``kết quả nguyên liệu'' với ``lô nguyên liệu''. Sửa một mục kết quả chưa tạo ra lô; control xác nhận mới chuyển dữ liệu đã duyệt sang nghiệp vụ kho. Quy tắc này giúp người dùng xóa dự đoán sai mà không phải thực hiện một giao dịch xuất kho giả.
+CL02b phân biệt ``kết quả nguyên liệu'' với ``lô nguyên liệu''. Sửa một mục kết quả chưa tạo ra lô; control xác nhận mới chuyển dữ liệu đã duyệt sang nghiệp vụ kho. Quy tắc này giúp người dùng xóa dự đoán sai mà không phải thực hiện một giao dịch xuất kho giả.
 
 \subsection{Gợi ý mâm, đổi món và đi chợ}
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/CL15.pdf}
-\caption{CL15 UC15 Đề xuất mâm cơm}\label{fig:Bao-cao-Tastoria:10}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL03a.pdf}
+\caption{CL03a --- Lớp phân tích BCE: UC15 Tạo mâm cơm}\label{fig:Bao-cao-Tastoria:10}
 \end{figure}
-\end{landscape}\clearpage
-CL15 cho thấy mâm đề xuất phụ thuộc đồng thời hồ sơ ràng buộc và tồn kho. Không để bộ xếp hạng tự quyết định tính hợp lệ: điểm gu cao chỉ giúp sắp thứ tự các phương án đã qua điều kiện bắt buộc.
+CL03a cho thấy mâm đề xuất phụ thuộc đồng thời hồ sơ ràng buộc và tồn kho. Không để bộ xếp hạng tự quyết định tính hợp lệ: điểm gu cao chỉ giúp sắp thứ tự các phương án đã qua điều kiện bắt buộc.
 
 \subsection{Lịch nấu, hoàn tất, hoàn tác và nhật ký}
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/CL20.pdf}
-\caption{CL20 UC20 Hoàn tất nấu}\label{fig:Bao-cao-Tastoria:11}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL04a.pdf}
+\caption{CL04a --- Lớp phân tích BCE: UC20 Nấu xong – trừ kho}\label{fig:Bao-cao-Tastoria:11}
 \end{figure}
-\end{landscape}\clearpage
-CL20 đặt xử lý hoàn tất ở control vì thao tác tác động phiên, mâm và giao dịch kho. Không giao toàn bộ nghiệp vụ cho setter trạng thái của phiên. Các dependency tới entity biểu diễn phạm vi trách nhiệm, còn cơ chế khóa và commit được cụ thể hóa ở DS01, SQ01 và SQ02.
+\begin{figure}[H]\centering
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/CL04b.pdf}
+\caption{CL04b --- Lớp phân tích BCE: UC20 Nấu xong – mâm và tương tác}\label{fig:Bao-cao-Tastoria:11-2}
+\end{figure}
+CL04a, CL04b đặt xử lý hoàn tất ở control vì thao tác tác động phiên, mâm và giao dịch kho. Không giao toàn bộ nghiệp vụ cho setter trạng thái của phiên. Các dependency tới entity biểu diễn phạm vi trách nhiệm, còn cơ chế khóa và commit được cụ thể hóa ở CL08a, CL08b, SD06b và SD06c.
 
 \subsection{Dữ liệu, mô hình và vận hành}
-\clearpage\begin{landscape}
 \begin{figure}[H]\centering
-\includegraphics[width=0.96\linewidth,height=0.78\textwidth,keepaspectratio]{assets/CL30.pdf}
-\caption{CL30 UC30 Triển khai mô hình}\label{fig:Bao-cao-Tastoria:12}
+\includegraphics[width=0.96\linewidth,height=0.72\textheight,keepaspectratio]{assets/AD04c.pdf}
+\caption{AD04c --- Đăng ký, kiểm định và triển khai mô hình (UC29, UC30)}\label{fig:Bao-cao-Tastoria:12}
 \end{figure}
-\end{landscape}\clearpage
-CL30 tách phiên bản, kết quả kiểm định và bản triển khai: một phiên bản có mặt trong kho artifact chưa đồng nghĩa được phục vụ. Control triển khai kiểm quyền và tính phù hợp của phiên bản rồi cập nhật lựa chọn hoạt động. Boundary là lệnh vận hành, không phải một màn hình admin giả định.
+AD04c tách phiên bản, kết quả kiểm định và bản triển khai: một phiên bản có mặt trong kho artifact chưa đồng nghĩa được phục vụ. Control triển khai kiểm quyền và tính phù hợp của phiên bản rồi cập nhật lựa chọn hoạt động. Boundary là lệnh vận hành, không phải một màn hình admin giả định.
 
 \section{Kết quả của pha phân tích}
-Đầu ra gồm danh mục 34 UC trong 10 phân hệ, các đặc tả có tiền/\allowbreak{}hậu điều kiện, mô hình miền DM01--DM02 và năm góc nhìn trách nhiệm CL09/\allowbreak{}13/\allowbreak{}15/\allowbreak{}20/\allowbreak{}30. Mô hình miền giải thích quan hệ và bội số; các dependency trong lớp trách nhiệm thể hiện sử dụng, không biểu diễn khóa ngoại. Không yêu cầu mọi UC đều có cùng số loại sơ đồ: mức chi tiết phụ thuộc rủi ro, độ phức tạp và nhu cầu giải thích. Bảng truy vết ở Chương 5 chỉ rõ mô hình nào hỗ trợ mỗi nhóm yêu cầu.
+Đầu ra gồm danh mục 34 UC trong 10 phân hệ, các đặc tả có tiền/\allowbreak{}hậu điều kiện, mô hình miền CL01a--CL01i và năm góc nhìn trách nhiệm CL01a/\allowbreak{}13/\allowbreak{}15/\allowbreak{}20/\allowbreak{}30. Mô hình miền giải thích quan hệ và bội số; các dependency trong lớp trách nhiệm thể hiện sử dụng, không biểu diễn khóa ngoại. Không yêu cầu mọi UC đều có cùng số loại sơ đồ: mức chi tiết phụ thuộc rủi ro, độ phức tạp và nhu cầu giải thích. Bảng truy vết ở Chương 5 chỉ rõ mô hình nào hỗ trợ mỗi nhóm yêu cầu.

@@ -5,7 +5,7 @@ Bản biên tập theo bộ đặc tả Tastoria và đối chiếu ngày 31/10/
 
 # PK1 — Tài khoản & bảo mật
 
-![PK01 — Phân rã use case](fig/png/PK01 Tài khoản & bảo mật.png)
+![UCD01 — Gói PK1 Tài khoản & bảo mật](fig/png/UCD01 Gói PK1 Tài khoản & bảo mật.png)
 
 
 
@@ -319,7 +319,7 @@ Giữ phạm vi yêu cầu của đặc tả nguồn; cần kiểm thử theo m�
 
 # PK2 — Quyền riêng tư
 
-![PK02 — Phân rã use case](fig/png/PK02 Quyền riêng tư.png)
+![UCD02 — Gói PK2 Quyền riêng tư](fig/png/UCD02 Gói PK2 Quyền riêng tư.png)
 
 
 
@@ -657,7 +657,7 @@ Giữ phạm vi yêu cầu của đặc tả nguồn; cần kiểm thử theo m�
 
 # PK3 — Hồ sơ & mục tiêu
 
-![PK03 — Phân rã use case](fig/png/PK03 Hồ sơ & mục tiêu.png)
+![UCD03 — Gói PK3 Hồ sơ & mục tiêu](fig/png/UCD03 Gói PK3 Hồ sơ & mục tiêu.png)
 
 
 
@@ -935,7 +935,7 @@ Giữ phạm vi yêu cầu của đặc tả nguồn; cần kiểm thử theo m�
 
 # PK4 — Kho & quét
 
-![PK04 — Phân rã use case](fig/png/PK04 Kho & quét.png)
+![UCD04 — Gói PK4 Kho & quét](fig/png/UCD04 Gói PK4 Kho & quét.png)
 
 
 
@@ -1224,7 +1224,7 @@ Giữ phạm vi yêu cầu của đặc tả nguồn; cần kiểm thử theo m�
 
 # PK5 — Mâm cơm
 
-![PK05 — Phân rã use case](fig/png/PK05 Mâm cơm.png)
+![UCD05 — Gói PK5 Mâm cơm](fig/png/UCD05 Gói PK5 Mâm cơm.png)
 
 
 
@@ -1593,7 +1593,7 @@ Danh sách đi chợ là mục tiêu độc lập; việc thêm nguyên liệu t
 
 # PK6 — Nấu & nhật ký
 
-![PK06 — Phân rã use case](fig/png/PK06 Nấu & nhật ký.png)
+![UCD06 — Gói PK6 Nấu & nhật ký](fig/png/UCD06 Gói PK6 Nấu & nhật ký.png)
 
 
 
@@ -1944,7 +1944,7 @@ Giữ phạm vi yêu cầu của đặc tả nguồn; cần kiểm thử theo m�
 
 # PK7 — Khảo sát gu
 
-![PK07 — Phân rã use case](fig/png/PK07 Khảo sát gu.png)
+![UCD07 — Gói PK7 Khảo sát gu](fig/png/UCD07 Gói PK7 Khảo sát gu.png)
 
 
 
@@ -2133,7 +2133,7 @@ Giữ phạm vi yêu cầu của đặc tả nguồn; cần kiểm thử theo m�
 
 # PK8 — Quản trị nội dung & dữ liệu
 
-![PK08 — Phân rã use case](fig/png/PK08 Quản trị nội dung & dữ liệu.png)
+![UCD08 — Gói PK8 Quản trị nội dung & dữ liệu](fig/png/UCD08 Gói PK8 Quản trị nội dung & dữ liệu.png)
 
 
 
@@ -2373,7 +2373,7 @@ Giữ phạm vi yêu cầu của đặc tả nguồn; cần kiểm thử theo m�
 
 # PK9 — Vận hành mô hình
 
-![PK09 — Phân rã use case](fig/png/PK09 Vận hành mô hình.png)
+![UCD09 — Gói PK9 Vận hành mô hình](fig/png/UCD09 Gói PK9 Vận hành mô hình.png)
 
 
 
@@ -2684,9 +2684,9 @@ Giữ phạm vi yêu cầu của đặc tả nguồn; cần kiểm thử theo m�
 **Điểm giao tiếp:** `CLI tastoria labeling push|pull`.
 
 
-# PK10 — Tác vụ định kỳ
+# UCD10 — Tác vụ định kỳ
 
-![PK10 — Phân rã use case](fig/png/PK10 Tác vụ định kỳ.png)
+![UCD10 — Gói UCD10 Tác vụ định kỳ](fig/png/UCD10 Gói UCD10 Tác vụ định kỳ.png)
 
 
 
