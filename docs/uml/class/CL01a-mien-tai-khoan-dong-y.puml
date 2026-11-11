@@ -43,8 +43,8 @@ class "Sự kiện đồng ý" as SK {
   -thờiĐiểm: Thời điểm
 }
 
-TK "1" *-- "0..1" HS
-TK "1" *-- "1" CD
+TK *-- "0..1" HS
+TK *-- "1" CD
 TK "1" -- "0..*" SK : ghi
 MD "1" -- "1..*" PB : có
 PB "1" -- "0..*" SK : theo

@@ -12,18 +12,18 @@ skinparam classAttributeIconSize 0
 skinparam ClassBackgroundColor White
 
 class "CookingService" as S <<service>> {
-  +start()
-  +complete()
-  +undo()
+  +start(user_id: UUID, req: CookStartRequest): CookSessionOut
+  +complete(user_id: UUID, session_id: UUID): CookCompletion
+  +undo(user_id: UUID, session_id: UUID, now: datetime): CookSessionOut
 }
 class "CookScheduler" as SC <<domain service>> {
-  +solve()
+  +solve(steps: list, burners: int, serve_at: datetime): Schedule
 }
 class "NeedCalculator" as NC <<domain service>> {
-  +needs()
+  +needs(plan: PlanForCooking, recipes: dict): list
 }
 class "UndoPolicy" as UP <<domain service>> {
-  +can_undo()
+  +can_undo(session: CookSession, now: datetime): bool
 }
 class "Schedule" as SH <<value object>> {
   -entries: list

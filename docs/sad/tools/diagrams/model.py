@@ -129,6 +129,7 @@ sq("SD01b", "worker-nhan-dien", "SD01b — Worker nhận diện nguyên liệu (
     m("WK", "DB", "lần quét → «processing»"),
     m("WK", "FS", "đọc ảnh quét"),
     m("FS", "WK", "ảnh", True),
+    m("WK", "WK", "nhận diện, gộp số đếm theo ngăn"),
     frag("alt",
          ("nhận diện thành công", [m("WK", "DB", "ghi chip và khung phát hiện; → «done»"),
                                    m("WK", "Q", "thông báo «done»")]),
@@ -422,6 +423,11 @@ def WHILE(lane, q, yes, body, no):
 STOP = ("stop",)
 
 
+def FORK(*branches):
+    """Các nhánh song song, mỗi nhánh một danh sách hành động, gộp lại ở thanh join."""
+    return ("fork", [list(b) for b in branches])
+
+
 def ad(did, slug, title, lanes, items):
     return D("act", did, slug, title, lanes=list(lanes), items=list(items))
 
@@ -534,7 +540,7 @@ ad("AD04c", "dang-ky-trien-khai", "AD04c — Đăng ký, kiểm định và tri�
     IF("Người vận hành mô hình", "Bản mới có sự cố?", "không", [], "có",
        [a("Người vận hành mô hình", "Quay lui về bản trước")])])
 ad("AD05", "xoa-tai-khoan", "AD05 — Xoá tài khoản và toàn bộ dữ liệu (UC07)",
-   ["Người dùng", "App", "Hệ thống", "Worker"], [
+   ["Người dùng", "App", "Hệ thống", "Worker", "Bộ lập lịch"], [
     a("Người dùng", "Chọn Xoá tài khoản"),
     a("App", "Hiện hậu quả, hỏi xác nhận"),
     IF("Người dùng", "Xác nhận xoá?", "có", [], "không", [STOP]),
@@ -543,7 +549,9 @@ ad("AD05", "xoa-tai-khoan", "AD05 — Xoá tài khoản và toàn bộ dữ li�
     a("Hệ thống", "Đưa job xoá vào hàng đợi"),
     a("Worker", "Xoá ảnh và tệp xuất"),
     a("Worker", "Xoá dữ liệu trong CSDL"),
-    a("Worker", "Giữ bằng chứng ẩn danh, đóng yêu cầu")])
+    a("Worker", "Giữ bằng chứng ẩn danh, đóng yêu cầu"),
+    FORK([a("Hệ thống", "Lần xuất huấn luyện kế tiếp bỏ tài khoản đã xoá")],
+         [a("Bộ lập lịch", "Bản sao lưu cũ tự hết hạn")])])
 ad("AD06a", "tham-gia-khao-sat", "AD06a — Tham gia khảo sát gu (UC23)",
    ["Người tham gia khảo sát", "Hệ thống"], [
     a("Người tham gia khảo sát", "Mở link khảo sát"),
@@ -902,6 +910,114 @@ cl("CL08b", "thiet-ke-cooking-lap-lich", "CL08b — Thiết kế module cooking:
    {"S": (1, 0), "SC": (0, 1), "NC": (1, 1), "UP": (2, 1), "SH": (0, 2), "CS": (2, 2)})
 
 
+# Chữ ký thao tác (tham số và kiểu trả về) áp cho mọi sơ đồ lớp; khoá = (tên lớp, tên thao tác).
+SIG = {
+    ("Màn hình Quét", "gửiẢnh"): "gửiẢnh(chếĐộ: ChếĐộQuét, ảnh: Ảnh[1..2]): LầnQuét",
+    ("Màn hình Xác nhận", "sửaChip"): "sửaChip(chip: Chip): Chip",
+    ("Màn hình Xác nhận", "xácNhận"): "xácNhận(lầnQuét: LầnQuét): Lô[*]",
+    ("Nhận diện ảnh", "nhậnDiện"): "nhậnDiện(ảnh: Ảnh): Khung[*]",
+    ("Nhận diện ảnh", "gộpChip"): "gộpChip(khung: Khung[*]): Chip[*]",
+    ("Sửa chip", "cậpNhậtChip"): "cậpNhậtChip(chip: Chip): Chip",
+    ("Tạo lần quét", "kiểmTraẢnh"): "kiểmTraẢnh(ảnh: Ảnh): Boolean",
+    ("Tạo lần quét", "tạoLầnQuét"): "tạoLầnQuét(chếĐộ: ChếĐộQuét, ảnh: Ảnh[1..2]): LầnQuét",
+    ("Xác nhận vào kho", "quyĐổiLượng"): "quyĐổiLượng(chip: Chip): KhoảngGam",
+    ("Xác nhận vào kho", "xácNhận"): "xácNhận(lầnQuét: LầnQuét): Lô[*]",
+    ("Ghi tương tác", "ghi"): "ghi(loại: LoạiTươngTác, món: Món): void",
+    ("Ghép mâm", "ghép"): "ghép(ứngViên: Món[*], kho: Lô[*]): Mâm",
+    ("Ghép mâm", "lọcCứng"): "lọcCứng(món: Món[*], hồSơ: HồSơ): Món[*]",
+    ("Ghép mâm", "xếpHạng"): "xếpHạng(món: Món[*]): Điểm[*]",
+    ("Màn hình Mâm cơm", "nhậnMâm"): "nhậnMâm(mâm: Mâm): Mâm",
+    ("Màn hình Mâm cơm", "yêuCầuMâm"): "yêuCầuMâm(bữa: Bữa, sốNgười: Số nguyên): Mâm",
+    ("Nhận mâm", "nhận"): "nhận(mâm: Mâm): Mâm",
+    ("Tạo mâm", "tạoMâm"): "tạoMâm(bữa: Bữa, sốNgười: Số nguyên): Mâm",
+    ("Chuyển trạng thái mâm", "đánhDấuĐãNấu"): "đánhDấuĐãNấu(mâm: Mâm): void",
+    ("Hoàn tất phiên nấu", "hoànTất"): "hoànTất(phiên: PhiênNấu, đánhGiá: ĐánhGiá[*]): KếtQuả",
+    ("Màn hình Nấu xong", "nấuXong"): "nấuXong(phiên: PhiênNấu): KếtQuả",
+    ("Trừ kho theo độ gấp", "trừKho"): "trừKho(nhuCầu: NhuCầu[*]): GiaoDịch[*]",
+    ("Trừ kho theo độ gấp", "tínhLượngDùng"): "tínhLượngDùng(mâm: Mâm): NhuCầu[*]",
+    ("HardFilter", "filter"): "filter(recipes: list, c: MealConstraints): list",
+    ("MakespanEstimator", "estimate"): "estimate(steps: list, burners: int): int",
+    ("MealRepository", "add_plan"): "add_plan(plan: MealPlan): None",
+    ("MealRepository", "get_plan"): "get_plan(user_id: UUID, plan_id: UUID): MealPlan",
+    ("MealRepository", "set_status"): "set_status(plan_id: UUID, status: PlanStatus): None",
+    ("MealRepository", "swap_out"): "swap_out(item_id: UUID, new_item: MealPlanItem): None",
+    ("MealRouter", "accept"): "accept(id: UUID): MealPlanOut",
+    ("MealRouter", "choose_substitution"): "choose_substitution(id: UUID, item_id: UUID): ItemOut",
+    ("MealRouter", "create_plan"): "create_plan(req: MealPlanRequest): MealPlanOut",
+    ("MealRouter", "list_substitutes"): "list_substitutes(id: UUID, item_id: UUID): list",
+    ("MealRouter", "swap"): "swap(id: UUID, item_id: UUID, req: SwapRequest): MealPlanOut",
+    ("MealService", "accept"): "accept(user_id: UUID, plan_id: UUID): MealPlanOut",
+    ("MealService", "choose_substitution"): "choose_substitution(plan_id: UUID, item_id: UUID): ItemOut",
+    ("MealService", "create_plan"): "create_plan(user_id: UUID, req: MealPlanRequest): MealPlanOut",
+    ("MealService", "get_plan_for_cooking"): "get_plan_for_cooking(user_id: UUID, plan_id: UUID): PlanForCooking",
+    ("MealService", "swap_item"): "swap_item(plan_id: UUID, item_id: UUID, reason: SwapReason): MealPlanOut",
+    ("ReasonBuilder", "build"): "build(best: TrayScore, runner_up: TrayScore): str",
+    ("TasteRanker", "score"): "score(user_id: UUID, recipes: list): dict",
+    ("TrayComposer", "compose"): "compose(cands: dict, stock: StockView): list",
+    ("TrayComposer", "resolve_swap"): "resolve_swap(plan: MealPlan, slot: Slot): TrayResult",
+    ("DeductionPlanner", "plan"): "plan(needs: list, lots: list): list",
+    ("GramRange", "clamp_zero"): "clamp_zero(): GramRange",
+    ("PantryRepository", "add_lot"): "add_lot(lot: PantryLot): None",
+    ("PantryRepository", "add_transaction"): "add_transaction(tx: PantryTransaction): int",
+    ("PantryRepository", "balances"): "balances(lot_ids: list): dict",
+    ("PantryRepository", "get_lot"): "get_lot(user_id: UUID, lot_id: UUID): PantryLot",
+    ("PantryRepository", "set_status"): "set_status(lot_id: UUID, status: LotStatus): None",
+    ("PantryRouter", "add_lot"): "add_lot(req: LotCreate): LotOut",
+    ("PantryRouter", "discard_lot"): "discard_lot(id: UUID): LotOut",
+    ("PantryRouter", "list_lots"): "list_lots(status: LotStatus): list",
+    ("PantryRouter", "update_lot"): "update_lot(id: UUID, req: LotPatch): LotOut",
+    ("PantryService", "add_lots_from_scan"): "add_lots_from_scan(user_id: UUID, items: list): list",
+    ("PantryService", "deduct_for_cooking"): "deduct_for_cooking(user_id: UUID, needs: list): list",
+    ("PantryService", "list_available_lots"): "list_available_lots(user_id: UUID, at: datetime): list",
+    ("PantryService", "mark_not_seen"): "mark_not_seen(user_id: UUID, seen: set): int",
+    ("PantryService", "revert_cooking"): "revert_cooking(user_id: UUID, session_id: UUID): list",
+    ("QuantityConverter", "from_count"): "from_count(grams_per_unit: float, count: int): GramRange",
+    ("QuantityConverter", "from_level"): "from_level(level: GramRange): GramRange",
+    ("UrgencyCalculator", "u_img"): "u_img(probs: FreshnessProbs): float",
+    ("UrgencyCalculator", "u_time"): "u_time(acquired_at: datetime, now: datetime): float",
+    ("UrgencyCalculator", "urgency"): "urgency(lot: PantryLot, now: datetime): Urgency",
+    ("ChipBuilder", "build"): "build(counts: dict, class_map: ClassMap): list",
+    ("DetectionMerger", "merge"): "merge(dets: list, shelf_groups: dict): dict",
+    ("ImageSanitizer", "sanitize"): "sanitize(data: bytes): SanitizedImage",
+    ("InferenceJob", "run"): "run(scan_id: UUID): None",
+    ("InferenceJob", "warm_up"): "warm_up(): None",
+    ("ScanRepository", "add_scan"): "add_scan(scan: Scan): None",
+    ("ScanRepository", "get_scan"): "get_scan(user_id: UUID, scan_id: UUID): Scan",
+    ("ScanRepository", "set_status"): "set_status(scan_id: UUID, status: ScanStatus): None",
+    ("ScanRepository", "stuck_scans"): "stuck_scans(now: datetime): list",
+    ("ScanRepository", "upsert_item"): "upsert_item(item: ScanItem): None",
+    ("ScanRouter", "confirm"): "confirm(id: UUID): ConfirmOut",
+    ("ScanRouter", "create_scan"): "create_scan(mode: ScanMode, images: list): ScanAccepted",
+    ("ScanRouter", "discard"): "discard(id: UUID): ScanOut",
+    ("ScanRouter", "get_scan"): "get_scan(id: UUID, wait: int): ScanOut",
+    ("ScanRouter", "update_item"): "update_item(id: UUID, item_id: UUID, req: ItemPatch): ItemOut",
+    ("ScanService", "confirm"): "confirm(user_id: UUID, scan_id: UUID): ConfirmOut",
+    ("ScanService", "create_scan"): "create_scan(user_id: UUID, mode: ScanMode, images: list): ScanAccepted",
+    ("ScanService", "discard"): "discard(user_id: UUID, scan_id: UUID): ScanOut",
+    ("ScanService", "get_scan"): "get_scan(user_id: UUID, scan_id: UUID, wait_s: int): ScanOut",
+    ("ScanService", "sweep_stuck_scans"): "sweep_stuck_scans(now: datetime): int",
+    ("CookScheduler", "solve"): "solve(steps: list, burners: int, serve_at: datetime): Schedule",
+    ("CookingRepository", "add_entries"): "add_entries(session_id: UUID, entries: list): None",
+    ("CookingRepository", "add_session"): "add_session(s: CookSession): None",
+    ("CookingRepository", "lock_session"): "lock_session(session_id: UUID): CookSession",
+    ("CookingRepository", "transition"): "transition(session_id: UUID, to: SessionStatus): bool",
+    ("CookingRouter", "abandon"): "abandon(id: UUID): CookSessionOut",
+    ("CookingRouter", "complete"): "complete(id: UUID, req: CookCompleteRequest): CookCompletion",
+    ("CookingRouter", "start"): "start(req: CookStartRequest): CookSessionOut",
+    ("CookingRouter", "undo"): "undo(id: UUID): CookSessionOut",
+    ("CookingService", "abandon"): "abandon(user_id: UUID, session_id: UUID): CookSessionOut",
+    ("CookingService", "complete"): "complete(user_id: UUID, session_id: UUID): CookCompletion",
+    ("CookingService", "start"): "start(user_id: UUID, req: CookStartRequest): CookSessionOut",
+    ("CookingService", "undo"): "undo(user_id: UUID, session_id: UUID, now: datetime): CookSessionOut",
+    ("NeedCalculator", "needs"): "needs(plan: PlanForCooking, recipes: dict): list",
+    ("UndoPolicy", "can_undo"): "can_undo(session: CookSession, now: datetime): bool",
+}
+for _d in DIAGRAMS:
+    if _d["kind"] == "class":
+        _d["classes"] = [(k, n, at, [SIG.get((n, o.split("(")[0]), o) for o in ops], st)
+                         for k, n, at, ops, st in _d["classes"]]
+
+
 # =====================================================================  THÀNH PHẦN / TRIỂN KHAI / GÓI
 def box(key, name, st=None, parent=None):
     return (key, name, st, parent)
@@ -1081,6 +1197,8 @@ def check():
                         n += cnt(it[4]) + cnt(it[6])
                     elif it[0] == "while":
                         n += cnt(it[4])
+                    elif it[0] == "fork":
+                        n += sum(cnt(b) for b in it[1])
                 return n
             if cnt(d["items"]) > 10:
                 bad.append((d["id"], cnt(d["items"])))

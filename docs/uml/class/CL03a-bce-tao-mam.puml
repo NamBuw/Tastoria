@@ -14,15 +14,15 @@ skinparam ClassBackgroundColor White
 class "Màn hình Mâm cơm" as BM <<boundary>> {
   -bữa
   -sốNgười
-  +yêuCầuMâm()
+  +yêuCầuMâm(bữa: Bữa, sốNgười: Số nguyên): Mâm
 }
 class "Tạo mâm" as CT <<control>> {
-  +tạoMâm()
+  +tạoMâm(bữa: Bữa, sốNgười: Số nguyên): Mâm
 }
 class "Ghép mâm" as CG <<control>> {
-  +lọcCứng()
-  +xếpHạng()
-  +ghép()
+  +lọcCứng(món: Món[*], hồSơ: HồSơ): Món[*]
+  +xếpHạng(món: Món[*]): Điểm[*]
+  +ghép(ứngViên: Món[*], kho: Lô[*]): Mâm
 }
 class "Hồ sơ" as EHS <<entity>> {
   -dịỨng

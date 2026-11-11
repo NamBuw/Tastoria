@@ -40,10 +40,10 @@ class "Nguyên liệu" as NL {
   -tên: Chuỗi
 }
 
-LQ "1" *-- "1..2" AQ
-AQ "1" *-- "0..*" KH
+LQ *-- "1..2" AQ
+AQ *-- "0..*" KH
 KH "0..*" -- "1" LTG
 KH "0..*" -- "0..1" CHIP : gộp vào
-LQ "1" *-- "0..*" CHIP : đề xuất
+LQ *-- "0..*" CHIP : đề xuất
 CHIP "0..*" -- "1" NL
 @enduml

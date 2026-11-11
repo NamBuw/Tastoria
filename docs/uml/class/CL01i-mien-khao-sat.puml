@@ -35,8 +35,8 @@ class "Phiên bản điều khoản" as PB {
 }
 
 PKS "1" -- "0..*" NTG : điền
-NTG "1" *-- "1..*" PC : được giao
+NTG *-- "1..*" PC : được giao
 PC "0..*" -- "1" MON
-PC "1" *-- "0..1" DKS
+PC *-- "0..1" DKS
 NTG "0..*" -- "1" PB : chấp nhận
 @enduml

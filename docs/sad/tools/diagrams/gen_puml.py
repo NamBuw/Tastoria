@@ -132,6 +132,11 @@ def w_act(d):
                 o.append(f"{ind}else ({yes})")
                 emit(yi, ind + "  ")
                 o.append(f"{ind}endif")
+            elif it[0] == "fork":
+                for i, br in enumerate(it[1]):
+                    o.append(f"{ind}fork" if i == 0 else f"{ind}fork again")
+                    emit(br, ind + "  ")
+                o.append(f"{ind}end fork")
             elif it[0] == "while":
                 _, ln, qq, yes, body, no = it
                 lane(ln, ind)
@@ -179,7 +184,7 @@ def w_class(d):
         o.append("}")
     o.append("")
     for kind, x, y, lab, ma, mb in d["rels"]:
-        l = f'"{ma}" ' if ma else ""
+        l = f'"{ma}" ' if ma and kind != "comp" else ""
         r = f' "{mb}"' if mb else ""
         o.append(f"{x} {l}{ARROW[kind]}{r} {y}" + (f" : {lab}" if lab else ""))
     o.append("@enduml")

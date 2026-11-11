@@ -20,6 +20,7 @@ Q -> WK : giao job nhận diện
 WK -> DB : lần quét → «processing»
 WK -> FS : đọc ảnh quét
 FS --> WK : ảnh
+WK -> WK : nhận diện, gộp số đếm theo ngăn
 alt nhận diện thành công
   WK -> DB : ghi chip và khung phát hiện; → «done»
   WK -> Q : thông báo «done»

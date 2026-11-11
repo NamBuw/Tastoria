@@ -13,13 +13,13 @@ skinparam ClassBackgroundColor White
 
 class "Màn hình Mâm cơm" as BM <<boundary>> {
   -dòngLýDo
-  +nhậnMâm()
+  +nhậnMâm(mâm: Mâm): Mâm
 }
 class "Nhận mâm" as CN <<control>> {
-  +nhận()
+  +nhận(mâm: Mâm): Mâm
 }
 class "Ghi tương tác" as CSK <<control>> {
-  +ghi()
+  +ghi(loại: LoạiTươngTác, món: Món): void
 }
 class "Mâm cơm" as EM <<entity>> {
   -trạngThái

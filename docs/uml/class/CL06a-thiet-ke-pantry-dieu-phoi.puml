@@ -12,24 +12,24 @@ skinparam classAttributeIconSize 0
 skinparam ClassBackgroundColor White
 
 class "PantryRouter" as R <<router>> {
-  +list_lots()
-  +add_lot()
-  +update_lot()
-  +discard_lot()
+  +list_lots(status: LotStatus): list
+  +add_lot(req: LotCreate): LotOut
+  +update_lot(id: UUID, req: LotPatch): LotOut
+  +discard_lot(id: UUID): LotOut
 }
 class "PantryService" as S <<service>> {
-  +list_available_lots()
-  +add_lots_from_scan()
-  +mark_not_seen()
-  +deduct_for_cooking()
-  +revert_cooking()
+  +list_available_lots(user_id: UUID, at: datetime): list
+  +add_lots_from_scan(user_id: UUID, items: list): list
+  +mark_not_seen(user_id: UUID, seen: set): int
+  +deduct_for_cooking(user_id: UUID, needs: list): list
+  +revert_cooking(user_id: UUID, session_id: UUID): list
 }
 class "PantryRepository" as RP <<repository>> {
-  +add_lot()
-  +get_lot()
-  +balances()
-  +add_transaction()
-  +set_status()
+  +add_lot(lot: PantryLot): None
+  +get_lot(user_id: UUID, lot_id: UUID): PantryLot
+  +balances(lot_ids: list): dict
+  +add_transaction(tx: PantryTransaction): int
+  +set_status(lot_id: UUID, status: LotStatus): None
 }
 class "PantryLot" as LO <<domain>> {
   -ingredient_id: UUID
@@ -46,12 +46,12 @@ class "PantryTransaction" as TX <<domain>> {
 class "GramRange" as GR <<value object>> {
   -g_min: float
   -g_max: float
-  +clamp_zero()
+  +clamp_zero(): GramRange
 }
 
 R ..> S
 S ..> RP
 RP ..> LO
-LO "1" *-- "1..*" TX
+LO *-- "1..*" TX
 LO ..> GR
 @enduml

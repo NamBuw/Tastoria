@@ -12,24 +12,24 @@ skinparam classAttributeIconSize 0
 skinparam ClassBackgroundColor White
 
 class "MealRouter" as R <<router>> {
-  +create_plan()
-  +accept()
-  +swap()
-  +list_substitutes()
-  +choose_substitution()
+  +create_plan(req: MealPlanRequest): MealPlanOut
+  +accept(id: UUID): MealPlanOut
+  +swap(id: UUID, item_id: UUID, req: SwapRequest): MealPlanOut
+  +list_substitutes(id: UUID, item_id: UUID): list
+  +choose_substitution(id: UUID, item_id: UUID): ItemOut
 }
 class "MealService" as S <<service>> {
-  +create_plan()
-  +accept()
-  +swap_item()
-  +choose_substitution()
-  +get_plan_for_cooking()
+  +create_plan(user_id: UUID, req: MealPlanRequest): MealPlanOut
+  +accept(user_id: UUID, plan_id: UUID): MealPlanOut
+  +swap_item(plan_id: UUID, item_id: UUID, reason: SwapReason): MealPlanOut
+  +choose_substitution(plan_id: UUID, item_id: UUID): ItemOut
+  +get_plan_for_cooking(user_id: UUID, plan_id: UUID): PlanForCooking
 }
 class "MealRepository" as RP <<repository>> {
-  +add_plan()
-  +get_plan()
-  +set_status()
-  +swap_out()
+  +add_plan(plan: MealPlan): None
+  +get_plan(user_id: UUID, plan_id: UUID): MealPlan
+  +set_status(plan_id: UUID, status: PlanStatus): None
+  +swap_out(item_id: UUID, new_item: MealPlanItem): None
 }
 class "MealPlanRequest" as RQ <<DTO>> {
   -meal: Meal
@@ -54,5 +54,5 @@ R ..> S
 R ..> RQ
 S ..> RP
 RP ..> MP
-MP "1" *-- "2..3" MI
+MP *-- "2..3" MI
 @enduml

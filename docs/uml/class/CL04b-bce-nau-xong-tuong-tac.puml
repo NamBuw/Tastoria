@@ -12,13 +12,13 @@ skinparam classAttributeIconSize 0
 skinparam ClassBackgroundColor White
 
 class "Hoàn tất phiên nấu" as CH <<control>> {
-  +hoànTất()
+  +hoànTất(phiên: PhiênNấu, đánhGiá: ĐánhGiá[*]): KếtQuả
 }
 class "Chuyển trạng thái mâm" as CM <<control>> {
-  +đánhDấuĐãNấu()
+  +đánhDấuĐãNấu(mâm: Mâm): void
 }
 class "Ghi tương tác" as CSK <<control>> {
-  +ghi()
+  +ghi(loại: LoạiTươngTác, món: Món): void
 }
 class "Mâm cơm" as EM <<entity>> {
   -trạngThái

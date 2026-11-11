@@ -12,22 +12,22 @@ skinparam classAttributeIconSize 0
 skinparam ClassBackgroundColor White
 
 class "CookingRouter" as R <<router>> {
-  +start()
-  +complete()
-  +undo()
-  +abandon()
+  +start(req: CookStartRequest): CookSessionOut
+  +complete(id: UUID, req: CookCompleteRequest): CookCompletion
+  +undo(id: UUID): CookSessionOut
+  +abandon(id: UUID): CookSessionOut
 }
 class "CookingService" as S <<service>> {
-  +start()
-  +complete()
-  +undo()
-  +abandon()
+  +start(user_id: UUID, req: CookStartRequest): CookSessionOut
+  +complete(user_id: UUID, session_id: UUID): CookCompletion
+  +undo(user_id: UUID, session_id: UUID, now: datetime): CookSessionOut
+  +abandon(user_id: UUID, session_id: UUID): CookSessionOut
 }
 class "CookingRepository" as RP <<repository>> {
-  +add_session()
-  +lock_session()
-  +add_entries()
-  +transition()
+  +add_session(s: CookSession): None
+  +lock_session(session_id: UUID): CookSession
+  +add_entries(session_id: UUID, entries: list): None
+  +transition(session_id: UUID, to: SessionStatus): bool
 }
 class "CookSession" as CS <<domain>> {
   -meal_plan_id: UUID
@@ -51,6 +51,6 @@ class "CookCompletion" as CC <<DTO>> {
 R ..> S
 S ..> RP
 RP ..> CS
-CS "1" *-- "1..*" SE
+CS *-- "1..*" SE
 S ..> CC
 @enduml

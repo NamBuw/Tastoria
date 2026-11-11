@@ -12,17 +12,17 @@ skinparam classAttributeIconSize 0
 skinparam ClassBackgroundColor White
 
 class "InferenceJob" as J <<worker job>> {
-  +warm_up()
-  +run()
+  +warm_up(): None
+  +run(scan_id: UUID): None
 }
 class "ImageSanitizer" as IS <<domain service>> {
-  +sanitize()
+  +sanitize(data: bytes): SanitizedImage
 }
 class "DetectionMerger" as DM <<domain service>> {
-  +merge()
+  +merge(dets: list, shelf_groups: dict): dict
 }
 class "ChipBuilder" as CB <<domain service>> {
-  +build()
+  +build(counts: dict, class_map: ClassMap): list
 }
 class "Detection" as DT <<domain>> {
   -box: Box

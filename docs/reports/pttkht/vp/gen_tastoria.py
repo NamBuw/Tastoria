@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT / "docs/sad/tools/diagrams"))
 sys.path.insert(0, str(HERE))
 import model as M  # noqa: E402
 import gen_puml as G  # noqa: E402
-from spec_lib import Spec, FONT, tw  # noqa: E402
+from spec_lib import Spec, FONT, tw, FP  # noqa: E402
 from gen_beh import Act, Seq, Stm, B  # noqa: E402
 
 s = Spec()
@@ -134,7 +134,12 @@ def vp_uc(d):
         s.conn(K(d, f"g{c}"))
     for i, (a, u) in enumerate(d["links"]):
         s.link(K(d, f"l{i}"), K(d, a), K(d, u))
-        s.conn(K(d, f"l{i}"))
+        ax_, ay_ = s.geo[K(d, a)][:2]
+        ux, uy, uw, uh = s.geo[K(d, u)]
+        if a in sec:
+            s.conn(K(d, f"l{i}"), [FP((ax_, ay_ + 22)), FP((ux + uw, uy + uh / 2))])
+        else:
+            s.conn(K(d, f"l{i}"), [FP((ax_ + 30, ay_ + 22)), FP((ux, uy + uh / 2))])
     for i, (kind, x, y, cond) in enumerate(d["rels"]):
         if kind == "include":
             s.inc(K(d, f"r{i}"), K(d, x), K(d, y))
@@ -196,7 +201,13 @@ def vp_seq(d):
     for _ in range(10):
         for mm, lab in zip(msgs, labels):
             a, b = sorted((idx[mm[1]], idx[mm[2]]))
-            need = tw(lab) + 50
+            if a == b:
+                if a + 1 < len(lls):
+                    b, need = a + 1, tw(lab) + 140
+                else:
+                    continue
+            else:
+                need = tw(lab) + 50
             if cx[b] - cx[a] < need:
                 sh = need - (cx[b] - cx[a])
                 for j in range(b, len(lls)):
@@ -212,7 +223,7 @@ def vp_seq(d):
         if it[0] == "m":
             plan.append((it, y, labels[k]))
             k += 1
-            y += 50
+            y += 50 + (26 if it[1] == it[2] else 0)
         else:
             _, op, operands = it
             fy1 = y - 20
@@ -296,6 +307,22 @@ def act_layout(d):
                 edges.append((yl, mk, yes if not yi else None, "auto"))
                 edges.append((ny_last, mk, no if not ni else None, "side_merge"))
                 prev, g = mk, None
+            elif it[0] == "fork":
+                fk = new("ForkNode", lane_of(prev), col)
+                edges.append((prev, fk, g, "auto"))
+                r0, ends, rmax = row[0], [], row[0]
+                for br in it[1]:
+                    row[0] = r0
+                    n0 = len(edges)
+                    last, _ = run(br, fk, col)
+                    edges[n0] = edges[n0][:3] + ("fromfork",)
+                    ends.append(last)
+                    rmax = max(rmax, row[0])
+                row[0] = rmax
+                jk = new("JoinNode", lane_of(prev), col)
+                for e in ends:
+                    edges.append((e, jk, None, "tojoin"))
+                prev, g = jk, None
             elif it[0] == "while":
                 _, ln, qq, yes, body, no = it
                 dk = new("DecisionNode", ln, col, qq)
@@ -327,7 +354,7 @@ def vp_act(d):
     ROWH = 92
     colw = {}
     for k, typ, ln, col, r, text in nodes:
-        w = tw(text) + 60 if typ == "ActivityAction" else (tw(text) + 40 if typ == "DecisionNode" else 80)
+        w = tw(text) + 60 if typ == "ActivityAction" else (2 * (tw(text) + 50) if typ == "DecisionNode" else 80)
         colw[(ln, col)] = max(colw.get((ln, col), 0), w, 200)
     lanes = []
     x = 20
@@ -348,18 +375,30 @@ def vp_act(d):
     for k, typ, ln, col, r, text in nodes:
         cy = 20 + 30 + 50 + r * ROWH
         if typ == "DecisionNode":
-            a.new(K(d, k), typ, " ")
+            a.new(K(d, k), typ, text)
             w = 36
             a.show(K(d, k), cxs[(ln, col)] - w / 2, cy - w / 2, w, w, laneKey[ln])
-            # câu hỏi: ghi chú nhỏ cạnh nút quyết định
-            a.s.note(K(d, k + "q"), text)
-            a.show(K(d, k + "q"), cxs[(ln, col)] + 22, cy - 66, tw(text) + 30, 30, laneKey[ln])
+            # câu hỏi là tên nút quyết định, đặt phía trên bên trái, trong làn
+            a.caption(K(d, k), cxs[(ln, col)] - 20 - tw(text) - 12, cy - 44, tw(text) + 12, 22)
+        elif typ in ("ForkNode", "JoinNode"):
+            continue
         else:
             a.node(K(d, k), typ, cxs[(ln, col)], cy, text, lane=laneKey[ln])
+    for k, typ, ln, col, r, text in nodes:      # thanh fork/join trải qua các nhánh nối với nó
+        if typ not in ("ForkNode", "JoinNode"):
+            continue
+        cy = 20 + 30 + 50 + r * ROWH
+        xs = [cxs[(ln, col)]] + [a.geo[K(d, e[1] if typ == "ForkNode" else e[0])][0] +
+                                 a.geo[K(d, e[1] if typ == "ForkNode" else e[0])][2] / 2
+                                 for e in edges if (e[0] if typ == "ForkNode" else e[1]) == k and
+                                 K(d, e[1] if typ == "ForkNode" else e[0]) in a.geo]
+        a.new(K(d, k), typ, None)
+        a.show(K(d, k), min(xs) - 40, cy - 4, max(xs) - min(xs) + 80, 8)
     geo = a.geo
 
     def P(k):
         return K(d, k)
+    routed = []
     for i, (x1, x2, g, mode) in enumerate(edges):
         A, Bk = P(x1), P(x2)
         ax, ay, aw, ah = geo[A]
@@ -367,7 +406,16 @@ def vp_act(d):
         acx, acy, bcx, bcy = ax + aw / 2, ay + ah / 2, bx + bw / 2, by + bh / 2
         guard = g[1] if isinstance(g, tuple) else g
         dec = nodes[[n[0] for n in nodes].index(x1)][1] == "DecisionNode"
-        if mode == "loop":
+        if mode == "fromfork":
+            pts = [(bcx, ay + ah), (bcx, by)]
+        elif mode == "tojoin":
+            pts = [(acx, ay + ah), (acx, by)]
+        elif nodes[[n[0] for n in nodes].index(x2)][1] in ("ForkNode", "JoinNode") or \
+                nodes[[n[0] for n in nodes].index(x1)][1] in ("ForkNode", "JoinNode"):
+            src_bar = nodes[[n[0] for n in nodes].index(x1)][1] in ("ForkNode", "JoinNode")
+            xx = bcx if src_bar else acx
+            pts = [(xx, ay + ah), (xx, by)]
+        elif mode == "loop":
             xr = max([g_[0] + g_[2] for g_ in geo.values() if g_[2] > 40 and abs(g_[0] + g_[2] / 2 - bcx) < 5
                       and by - 5 < g_[1] < ay + ah + 5] + [ax + aw, bx + bw]) + 30
             pts = [(ax + aw, acy), (xr, acy), (xr, bcy), (bx + bw, bcy)]
@@ -375,7 +423,8 @@ def vp_act(d):
             body = [geo[P(n[0])] for n in nodes if n[0] != x1 and acx - 5 < geo[P(n[0])][0] + geo[P(n[0])][2] / 2 < acx + 5
                     and ay < geo[P(n[0])][1] < by]
             xl = min([bb[0] for bb in body] + [ax]) - 30
-            pts = [(ax, acy), (xl, acy), (xl, by - 22), (bcx, by - 22), (bcx, by)] if abs(bcx - acx) < 5 else \
+            yy = by - (50 if nodes[[n[0] for n in nodes].index(x2)][1] == "DecisionNode" else 22)
+            pts = [(ax, acy), (xl, acy), (xl, yy), (bcx, yy), (bcx, by)] if abs(bcx - acx) < 5 else \
                 [(ax, acy), (xl, acy), (xl, bcy), (bx if bcx > xl else bx + bw, bcy)]
         elif mode == "side_merge":
             if abs(acx - bcx) < 5:
@@ -397,11 +446,20 @@ def vp_act(d):
             pts = [(acx, ay + ah), (acx, bcy), (bx + bw if acx > bcx else bx, bcy)]
         else:
             pts = [(ax + aw if bcx > acx else ax, acy), (bcx, acy), (bcx, by)]
+        routed.append((i, x1, A, Bk, pts, guard))
+    # nhãn rẽ nhánh: nhánh đi ngang ghi ngay cạnh đoạn ngang; nhánh đi xuống ghi ở phía đối diện nhánh ngang
+    hdir = {}
+    for i, x1, A, Bk, pts, guard in routed:
+        if pts and pts[1][1] == pts[0][1] and pts[1][0] != pts[0][0]:
+            hdir.setdefault(x1, set()).add(1 if pts[1][0] > pts[0][0] else -1)
+    for i, x1, A, Bk, pts, guard in routed:
         if not guard:
             at = None
         elif pts[1][0] == pts[0][0]:
-            loop_exit = any(e[0] == x1 and isinstance(e[2], tuple) for e in edges)
-            at = (pts[0][0] + 6, pts[0][1] + 2) if loop_exit else (pts[0][0] - tw(guard) - 18, pts[0][1] + 2)
+            right = -1 in hdir.get(x1, set()) or not hdir.get(x1)
+            if 1 in hdir.get(x1, set()):
+                right = False
+            at = (pts[0][0] + 6, pts[0][1] + 2) if right else (pts[0][0] - tw(guard) - 18, pts[0][1] + 2)
         elif pts[1][0] > pts[0][0]:
             at = (pts[0][0] + 8, pts[0][1] - 26)
         else:
@@ -528,8 +586,11 @@ def vp_class(d):
             s.emit("ATTR", kk, "-", n_.strip(), t_.strip() or None, None, None)
             rows.append("-" + at)
         for op in ops:
-            s.emit("OPER", kk, "+", op.split("(")[0], None, None)
-            rows.append("+" + op)
+            nm, rest = op.split("(", 1)
+            params, ret = rest.rsplit(")", 1)
+            ret = ret.lstrip(":").strip() or None
+            s.emit("OPER", kk, "+", nm, params.replace(" ", "") or None, ret)
+            rows.append("+" + op.replace(":", " : "))
         sizes[k] = box_size(name, rows, st)
     cols = max(c for c, r in d["grid"].values()) + 1
     gxs = [230] * cols
@@ -543,7 +604,7 @@ def vp_class(d):
     for i, (kind, x, y, lab, ma, mb) in enumerate(d["rels"]):
         r = K(d, f"r{i}")
         if kind in ("assoc", "comp"):
-            s.assoc(r, K(d, x), K(d, y), name=lab or None, ma=ma or None, mb=mb or None,
+            s.assoc(r, K(d, x), K(d, y), name=lab or None, ma=(ma or None) if kind != "comp" else None, mb=mb or None,
                     agg_a="composite" if kind == "comp" else None)
         elif kind == "dep":
             s.dep(r, K(d, x), K(d, y))
@@ -558,9 +619,56 @@ def vp_class(d):
 
 
 # ------------------------------------------------------------------ thành phần / triển khai / gói
+def _cross(p1, p2, p3, p4):
+    def o(a, b, c):
+        return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+    return o(p1, p2, p3) * o(p1, p2, p4) < 0 and o(p3, p4, p1) * o(p3, p4, p2) < 0
+
+
+def best_grid(keys, links, sizes, cols=4, seed=11, tries=6000):
+    """Chọn ô lưới cho các hộp: không đường nối xuyên hộp, ít giao cắt giữa các đường, đường ngắn."""
+    import random
+    rnd = random.Random(seed)
+    rows = -(-len(keys) // cols) + 1
+    cells = [(c, r) for r in range(rows) for c in range(cols)]
+    def cost(grid):
+        xy = grid_xy(grid, sizes, gx=190, gy=130, x0=80, y0=100)
+        cen = {k: (xy[k][0] + sizes[k][0] / 2, xy[k][1] + sizes[k][1] / 2) for k in keys}
+        boxes = {k: (xy[k][0], xy[k][1], *sizes[k]) for k in keys}
+        c = 0
+        segs = [(cen[a], cen[b], a, b) for a, b in links]
+        for p, q, a, b in segs:
+            c += 1000 * sum(1 for k in keys if k not in (a, b) and _hits(p, q, [boxes[k]], pad=14))
+            c += (abs(grid[a][0] - grid[b][0]) + abs(grid[a][1] - grid[b][1]))
+        for i in range(len(segs)):
+            for j in range(i + 1, len(segs)):
+                if not {segs[i][2], segs[i][3]} & {segs[j][2], segs[j][3]} and _cross(*segs[i][:2], *segs[j][:2]):
+                    c += 40
+        return c
+    best, bc = None, None
+    for _ in range(60):                       # leo đồi từ nhiều điểm xuất phát
+        grid = dict(zip(keys, rnd.sample(cells, len(keys))))
+        cc = cost(grid)
+        for _ in range(tries // 20):
+            k = rnd.choice(keys)
+            cell = rnd.choice(cells)
+            other = next((o for o in keys if grid[o] == cell), None)
+            g2 = dict(grid)
+            g2[k] = cell
+            if other:
+                g2[other] = grid[k]
+            c2 = cost(g2)
+            if c2 <= cc:
+                grid, cc = g2, c2
+        if bc is None or cc < bc:
+            best, bc = grid, cc
+    return best
+
+
 def vp_struct(d):
     typ = {"comp": "CMP", "deploy": "DPL", "pkg": "PKGD"}[d["kind"]]
     start(d, typ)
+    s.emit("DSTYLE", d["id"], 1)   # đường nối thẳng, khớp với bước chọn ô lưới
     kids = {}
     for b in d["boxes"]:
         kids.setdefault(b[3], []).append(b)
@@ -574,6 +682,8 @@ def vp_struct(d):
             w = max(w, tw(f"<<{st}>>") + 70)
         sizes[k] = (max(w, 170), 60 + 20 * len(lines) + (14 if st else 0))
     leaf_grid = {k: v for k, v in d["grid"].items() if k in sizes}
+    if d["kind"] == "comp" and not any(lab for _, _, lab in d["links"]) and len(sizes) > 4:
+        leaf_grid = best_grid(list(sizes), [(x, y) for x, y, _ in d["links"]], sizes)
     xy = grid_xy(leaf_grid, sizes, gx=300 if kids.keys() - {None} else 190, gy=130, x0=80, y0=100)
     geo = {k: (xy[k][0], xy[k][1], *sizes[k]) for k in sizes}
     for k in [b[0] for b in d["boxes"] if b[0] in kids]:

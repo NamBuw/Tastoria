@@ -44,7 +44,7 @@ class "Cặp thay thế" as CT {
 
 TK "1" -- "0..*" LO : sở hữu
 NL "1" -- "0..*" LO : là
-LO "1" *-- "1..*" GD : phát sinh
+LO *-- "1..*" GD : phát sinh
 TK "1" -- "0..*" DC
 NL "1" -- "0..*" DC
 NL "2" -- "0..*" CT : gốc / thay

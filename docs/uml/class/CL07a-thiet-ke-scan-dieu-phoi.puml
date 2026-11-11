@@ -12,25 +12,25 @@ skinparam classAttributeIconSize 0
 skinparam ClassBackgroundColor White
 
 class "ScanRouter" as R <<router>> {
-  +create_scan()
-  +get_scan()
-  +update_item()
-  +confirm()
-  +discard()
+  +create_scan(mode: ScanMode, images: list): ScanAccepted
+  +get_scan(id: UUID, wait: int): ScanOut
+  +update_item(id: UUID, item_id: UUID, req: ItemPatch): ItemOut
+  +confirm(id: UUID): ConfirmOut
+  +discard(id: UUID): ScanOut
 }
 class "ScanService" as S <<service>> {
-  +create_scan()
-  +get_scan()
-  +confirm()
-  +discard()
-  +sweep_stuck_scans()
+  +create_scan(user_id: UUID, mode: ScanMode, images: list): ScanAccepted
+  +get_scan(user_id: UUID, scan_id: UUID, wait_s: int): ScanOut
+  +confirm(user_id: UUID, scan_id: UUID): ConfirmOut
+  +discard(user_id: UUID, scan_id: UUID): ScanOut
+  +sweep_stuck_scans(now: datetime): int
 }
 class "ScanRepository" as RP <<repository>> {
-  +add_scan()
-  +get_scan()
-  +set_status()
-  +upsert_item()
-  +stuck_scans()
+  +add_scan(scan: Scan): None
+  +get_scan(user_id: UUID, scan_id: UUID): Scan
+  +set_status(scan_id: UUID, status: ScanStatus): None
+  +upsert_item(item: ScanItem): None
+  +stuck_scans(now: datetime): list
 }
 class "Scan" as SC <<domain>> {
   -mode: ScanMode
@@ -54,6 +54,6 @@ class "ScanItem" as IT <<domain>> {
 R ..> S
 S ..> RP
 RP ..> SC
-SC "1" *-- "1..2" SI
-SC "1" *-- "0..*" IT
+SC *-- "1..2" SI
+SC *-- "0..*" IT
 @enduml

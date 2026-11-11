@@ -13,15 +13,15 @@ skinparam ClassBackgroundColor White
 
 class "Màn hình Xác nhận" as BX <<boundary>> {
   -danhSáchChip
-  +sửaChip()
-  +xácNhận()
+  +sửaChip(chip: Chip): Chip
+  +xácNhận(lầnQuét: LầnQuét): Lô[*]
 }
 class "Sửa chip" as CSC <<control>> {
-  +cậpNhậtChip()
+  +cậpNhậtChip(chip: Chip): Chip
 }
 class "Xác nhận vào kho" as CX <<control>> {
-  +xácNhận()
-  +quyĐổiLượng()
+  +xácNhận(lầnQuét: LầnQuét): Lô[*]
+  +quyĐổiLượng(chip: Chip): KhoảngGam
 }
 class "Chip nguyên liệu" as ECH <<entity>> {
   -sốĐếm

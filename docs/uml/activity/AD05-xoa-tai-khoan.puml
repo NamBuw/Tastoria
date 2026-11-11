@@ -12,6 +12,7 @@ skinparam ActivityBackgroundColor White
 |App|
 |Hệ thống|
 |Worker|
+|Bộ lập lịch|
 |Người dùng|
 start
 :Chọn Xoá tài khoản;
@@ -31,5 +32,12 @@ endif
 :Xoá ảnh và tệp xuất;
 :Xoá dữ liệu trong CSDL;
 :Giữ bằng chứng ẩn danh, đóng yêu cầu;
+fork
+  |Hệ thống|
+  :Lần xuất huấn luyện kế tiếp bỏ tài khoản đã xoá;
+fork again
+  |Bộ lập lịch|
+  :Bản sao lưu cũ tự hết hạn;
+end fork
 stop
 @enduml

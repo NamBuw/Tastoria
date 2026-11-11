@@ -13,14 +13,14 @@ skinparam ClassBackgroundColor White
 
 class "Màn hình Nấu xong" as BN <<boundary>> {
   -đánhGiáMón
-  +nấuXong()
+  +nấuXong(phiên: PhiênNấu): KếtQuả
 }
 class "Hoàn tất phiên nấu" as CH <<control>> {
-  +hoànTất()
+  +hoànTất(phiên: PhiênNấu, đánhGiá: ĐánhGiá[*]): KếtQuả
 }
 class "Trừ kho theo độ gấp" as CTK <<control>> {
-  +tínhLượngDùng()
-  +trừKho()
+  +tínhLượngDùng(mâm: Mâm): NhuCầu[*]
+  +trừKho(nhuCầu: NhuCầu[*]): GiaoDịch[*]
 }
 class "Phiên nấu" as EPN <<entity>> {
   -trạngThái

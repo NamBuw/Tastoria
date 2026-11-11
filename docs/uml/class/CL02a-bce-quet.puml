@@ -14,15 +14,15 @@ skinparam ClassBackgroundColor White
 class "Màn hình Quét" as BQ <<boundary>> {
   -chếĐộ
   -ảnh[1..2]
-  +gửiẢnh()
+  +gửiẢnh(chếĐộ: ChếĐộQuét, ảnh: Ảnh[1..2]): LầnQuét
 }
 class "Tạo lần quét" as CT <<control>> {
-  +kiểmTraẢnh()
-  +tạoLầnQuét()
+  +kiểmTraẢnh(ảnh: Ảnh): Boolean
+  +tạoLầnQuét(chếĐộ: ChếĐộQuét, ảnh: Ảnh[1..2]): LầnQuét
 }
 class "Nhận diện ảnh" as CS <<control>> {
-  +nhậnDiện()
-  +gộpChip()
+  +nhậnDiện(ảnh: Ảnh): Khung[*]
+  +gộpChip(khung: Khung[*]): Chip[*]
 }
 class "Lần quét" as ELQ <<entity>> {
   -chếĐộ

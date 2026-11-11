@@ -315,6 +315,8 @@ class Seq(B):
         return None
 
     def msg(self, k, a, b, label, y, kind="call"):
+        self.labels = getattr(self, "labels", {})
+        self.labels[k] = label
         self.rel(k, "Message", a, b, label)
         if kind == "return":
             self.new(k + "_rt", "ActionTypeReturn")
@@ -369,6 +371,12 @@ class Seq(B):
                 self.show(ok, x1, oy, x2 - x1, ny - oy, k)
         for k, a, b, y, kind in self.msgs:
             xa, xb = self.cxs[a], self.cxs[b]
+            if a == b:      # thông điệp tự gọi: vòng sang phải rồi quay về cùng lifeline
+                fa = self._act_at(a, y)
+                self.conn(k, [(xa + 7, y), (xa + 60, y), (xa + 60, y + 24), (xa + 7, y + 24)], frm=fa or a, to=fa or a)
+                lab = self.labels.get(k, "")
+                self.caption(k, xa + 68, y + 1, tw(lab) + 12, 22)
+                continue
             right = xb > xa
             fa, ta = self._act_at(a, y), self._act_at(b, y)
             sx = xa + (7 if right else -7) if fa else xa

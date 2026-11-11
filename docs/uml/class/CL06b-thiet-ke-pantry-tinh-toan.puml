@@ -12,20 +12,20 @@ skinparam classAttributeIconSize 0
 skinparam ClassBackgroundColor White
 
 class "PantryService" as S <<service>> {
-  +deduct_for_cooking()
-  +list_available_lots()
+  +deduct_for_cooking(user_id: UUID, needs: list): list
+  +list_available_lots(user_id: UUID, at: datetime): list
 }
 class "UrgencyCalculator" as UC <<domain service>> {
-  +u_time()
-  +u_img()
-  +urgency()
+  +u_time(acquired_at: datetime, now: datetime): float
+  +u_img(probs: FreshnessProbs): float
+  +urgency(lot: PantryLot, now: datetime): Urgency
 }
 class "QuantityConverter" as QC <<domain service>> {
-  +from_count()
-  +from_level()
+  +from_count(grams_per_unit: float, count: int): GramRange
+  +from_level(level: GramRange): GramRange
 }
 class "DeductionPlanner" as DP <<domain service>> {
-  +plan()
+  +plan(needs: list, lots: list): list
 }
 class "Urgency" as UR <<value object>> {
   -u: float

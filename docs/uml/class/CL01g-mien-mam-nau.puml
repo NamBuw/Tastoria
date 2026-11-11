@@ -40,9 +40,9 @@ class "Món" as MON {
   -tên: Chuỗi
 }
 
-MAM "1" *-- "2..3" MTM
+MAM *-- "2..3" MTM
 MTM "0..*" -- "1" MON
-MTM "1" *-- "0..*" TTDC
+MTM *-- "0..*" TTDC
 MAM "1" -- "0..*" PN : được nấu
-PN "1" *-- "1..*" ML
+PN *-- "1..*" ML
 @enduml

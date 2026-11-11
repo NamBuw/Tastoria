@@ -42,9 +42,9 @@ class "Thẻ" as THE {
   -tên: Chuỗi
 }
 
-MON "1" *-- "1..*" TPM
+MON *-- "1..*" TPM
 NL "1" -- "0..*" TPM
-MON "1" *-- "1..*" BN
-MON "1" *-- "0..1" DDM
+MON *-- "1..*" BN
+MON *-- "0..1" DDM
 MON "0..*" -- "0..*" THE
 @enduml

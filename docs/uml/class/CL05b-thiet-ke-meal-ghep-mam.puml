@@ -12,24 +12,24 @@ skinparam classAttributeIconSize 0
 skinparam ClassBackgroundColor White
 
 class "MealService" as S <<service>> {
-  +create_plan()
-  +swap_item()
+  +create_plan(user_id: UUID, req: MealPlanRequest): MealPlanOut
+  +swap_item(plan_id: UUID, item_id: UUID, reason: SwapReason): MealPlanOut
 }
 class "HardFilter" as HF <<domain service>> {
-  +filter()
+  +filter(recipes: list, c: MealConstraints): list
 }
 class "TasteRanker" as TR <<domain service>> {
-  +score()
+  +score(user_id: UUID, recipes: list): dict
 }
 class "TrayComposer" as TC <<domain service>> {
-  +compose()
-  +resolve_swap()
+  +compose(cands: dict, stock: StockView): list
+  +resolve_swap(plan: MealPlan, slot: Slot): TrayResult
 }
 class "MakespanEstimator" as ME <<domain service>> {
-  +estimate()
+  +estimate(steps: list, burners: int): int
 }
 class "ReasonBuilder" as RB <<domain service>> {
-  +build()
+  +build(best: TrayScore, runner_up: TrayScore): str
 }
 
 S ..> HF
