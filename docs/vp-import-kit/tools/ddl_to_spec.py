@@ -84,11 +84,11 @@ for name in order:
         out.append('\t'.join(['F', fk[0], name, ','.join(fk[1]), fk[2], ','.join(fk[3]), fk[4]]))
 allg = []
 FONT = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 11)
-def size(t):
-    w = max(FONT.getlength(t) + 40, max(FONT.getlength(c[0]) for c in tables[t]['cols']) +
-            max(FONT.getlength(c[1]) for c in tables[t]['cols']) + 110)
-    return int(w), int(30 + 18 * len(tables[t]['cols']))
-def place(g, shown, edges):
+def size(t, stub=False):
+    cs = [c for c in tables[t]['cols'] if not stub or c[0] in tables[t]['pk']]
+    w = max(FONT.getlength(t) + 40, max(FONT.getlength(c[0]) for c in cs) + max(FONT.getlength(c[1]) for c in cs) + 110)
+    return int(w), int(30 + 18 * len(cs))
+def place(g, shown, edges, home=()):
     """Đặt bảng vào lưới bằng tìm kiếm ngẫu nhiên có hạt giống cố định: ít đường nối xuyên bảng nhất,
     đường nối ngắn, ô dưới cùng bên phải để trống cho dòng watermark của VP CE."""
     import random, itertools
@@ -97,7 +97,7 @@ def place(g, shown, edges):
     cols = 3 if n > 4 else 2
     rows = -(-(n + 1) // cols)
     cells = [(c, r) for r in range(rows) for c in range(cols) if (c, r) != (cols - 1, rows - 1)]
-    sz = {t: size(t) for t in shown}
+    sz = {t: size(t, t not in home) for t in shown}
     def geo(assign):
         cw = [max([sz[t][0] for t in shown if assign[t][0] == c] or [150]) for c in range(cols)]
         rh = [max([sz[t][1] for t in shown if assign[t][1] == r] or [60]) for r in range(rows)]
@@ -135,7 +135,7 @@ for g, (title, ts) in groups.items():
         for fk in tables[name]['fks']:
             if fk[2] not in shown: shown.append(fk[2])
     edges = [(name, fk[2]) for name in ts for fk in tables[name]['fks'] if fk[2] != name]
-    out.extend(place(g, shown, edges))
+    out.extend(place(g, shown, edges, set(ts)))
 assert sorted(allg) == sorted(tables), set(allg) ^ set(tables)
 open(sys.argv[3], 'w', encoding='utf-8').write('\n'.join(out) + '\n')
 print(len(tables), 'tables', sum(len(t['cols']) for t in tables.values()), 'columns', nfk, 'FKs')
