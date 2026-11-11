@@ -271,20 +271,12 @@ def w_erd_groups(ns):
     gid, slug, title = M.ERD_OVERVIEW
     b = ["@startuml", f"title {title}", "' Sinh từ db/schema.sql — không sửa tay.", "hide circle",
          "hide empty members", "skinparam defaultFontName DejaVu Sans", "skinparam linetype ortho",
-         "skinparam packageStyle rectangle", "left to right direction", ""]
+         "skinparam packageStyle rectangle", ""]
     for g, (_, t2, ts) in M.ERD_GROUPS.items():
         b.append(f'package "{g} {t2.split(" — ")[1]}" {{')
         for t in ts:
             b.append(f'  entity "{t}" as {t}')
         b.append("}")
-    seen = set()
-    for t in T:
-        for fk in T[t]["fks"]:
-            key = (fk["ref"], t)
-            if key in seen or fk["ref"] == t:
-                continue
-            seen.add(key)
-            b.append(f"{fk['ref']} ||--o{{ {t}")
     b += ["@enduml", ""]
     files[ERD / f"{gid}-{slug}.puml"] = "\n".join(b)
     return files

@@ -50,6 +50,10 @@ def uc_diagram(did, slug, title, ucs, primary=None, extra_actors=()):
                 rels.append(("include", u, r["include"], None))
             if "extend" in r and r["extend"] in ucs:
                 rels.append(("extend", u, r["extend"], r.get("condition")))
+    # UC mở rộng / được include chỉ nối qua quan hệ đó, không nối thẳng với actor (đỡ chéo đường)
+    sub = {x for k, x, y, _ in rels if k == "extend"} | {y for k, x, y, _ in rels if k == "include"}
+    links = [(a, u) for a, u in links if u not in sub]
+    actors = [a for a in actors if any(x == a for x, _ in links)] + [a for a in extra_actors if a not in actors]
     gens = []
     if "A01" in actors and "A02" in actors:
         gens.append(("A02", "A01"))
@@ -491,7 +495,7 @@ ad("AD03a", "kiem-tra-xac-nhan-quet", "AD03a — Xác nhận quét: kiểm tra �
     IF("scan", "Còn chip cần kiểm tra?", "không", [], "còn", [a("scan", "Trả 422"), STOP]),
     a("scan", "Ghi kho từ chip (AD03b)")])
 ad("AD03b", "ghi-kho-tu-chip", "AD03b — Xác nhận quét: ghi kho từ chip (UC13)",
-   ["scan", "pantry", "catalog"], [
+   ["scan", "catalog", "pantry"], [
     a("scan", "Lấy các chip chưa xoá"),
     WHILE("scan", "Còn chip chưa quy đổi?", "còn", [a("catalog", "Tra gam mỗi đơn vị hoặc mức lượng"),
                                                      a("pantry", "Tính khoảng gam của chip")], "hết"),
@@ -575,8 +579,8 @@ st("ST01", "scan", "ST01 — Trạng thái lần quét (Scan)",
     ("processing", "done", "nhận diện xong"), ("processing", "cErr", "lỗi nhận diện"),
     ("cErr", "queued", "[còn lượt thử]"), ("cErr", "failed", "[lần thứ 3]"),
     ("queued", "expired", "quá 60 s"), ("done", "confirmed", "xác nhận"), ("done", "discarded", "bỏ")],
-   {"*": (0, 0), "queued": (0, 1), "processing": (1, 1), "done": (2, 1), "cErr": (1, 2),
-    "failed": (1, 3), "expired": (0, 3), "confirmed": (3, 0), "discarded": (3, 2)})
+   {"*": (1, 0), "expired": (0, 1), "queued": (1, 1), "processing": (2, 1), "cErr": (2, 2), "failed": (2, 3),
+    "done": (3, 1), "confirmed": (4, 1), "discarded": (3, 2)})
 st("ST02", "meal-plan", "ST02 — Trạng thái mâm cơm (MealPlan)",
    [("proposed", "proposed", None), ("accepted", "accepted", None), ("cooked", "cooked", None),
     ("abandoned", "abandoned", None), ("expired", "expired", None)],
@@ -607,7 +611,7 @@ st("ST05", "pantry-lot", "ST05 — Trạng thái lô kho (PantryLot)",
     ("not_seen", "in_stock", "xác nhận còn / thấy lại"), ("not_seen", "discarded", "bỏ"),
     ("in_stock", "discarded", "bỏ"), ("in_stock", "used_up", "hết lượng"),
     ("used_up", "in_stock", "hoàn tác nấu")],
-   {"*": (0, 0), "in_stock": (1, 1), "not_seen": (0, 2), "used_up": (2, 1), "discarded": (1, 3)})
+   {"*": (1, 0), "in_stock": (1, 1), "not_seen": (0, 1), "used_up": (2, 1), "discarded": (1, 2)})
 st("ST06", "account", "ST06 — Trạng thái tài khoản (Account)",
    [("active", "active", None), ("locked", "locked", "khoá 15 phút"),
     ("deletion_requested", "deletion_requested", "thu hồi mọi phiên"), ("deleted", "deleted", None)],
@@ -916,7 +920,7 @@ struct("comp", "CP01a", "he-thong", "CP01a — Thành phần: các khối chạy
    [("App", "Nginx", "HTTPS"), ("Nginx", "Api", "HTTP"), ("Nginx", "Fs", "đọc tệp"), ("Api", "Pg", "SQL"),
     ("Api", "Vk", "job"), ("Api", "Fs", "ghi ảnh"), ("Worker", "Vk", "nhận job"), ("Worker", "Pg", "SQL"),
     ("Worker", "Fs", "đọc ảnh, mô hình"), ("Sched", "Pg", "SQL")],
-   {"App": (0, 0), "Nginx": (1, 0), "Api": (1, 1), "Fs": (2, 0), "Vk": (2, 1), "Worker": (2, 2),
+   {"App": (0, 0), "Nginx": (1, 0), "Fs": (2, 0), "Api": (1, 1), "Vk": (2, 1), "Worker": (3, 1),
     "Pg": (1, 2), "Sched": (0, 2)})
 struct("comp", "CP01b", "ket-noi-ngoai", "CP01b — Thành phần: kết nối với hệ thống ngoài", [
     box("App", "App Tastoria (Expo)", "client"), box("CF", "Cloudflare Tunnel", "external"),
@@ -938,14 +942,14 @@ def mod_struct(did, slug, title, names, grid):
 mod_struct("CP01c", "module-loi", "CP01c — Thành phần: module lõi, định danh và danh mục",
            ["core", "identity", "privacy", "catalog", "profile"],
            {"profile": (1, 0), "privacy": (0, 1), "catalog": (2, 1), "identity": (0, 2), "core": (1, 3)})
-mod_struct("CP01d", "module-bep", "CP01d — Thành phần: module nghiệp vụ bếp",
-           ["cooking", "meal", "substitute", "events", "scan", "pantry", "mlops", "catalog"],
+mod_struct("CP01d", "module-bep", "CP01d — Thành phần: module nghiệp vụ bếp (catalog, core ở CP01c)",
+           ["cooking", "meal", "substitute", "events", "scan", "pantry", "mlops"],
            {"cooking": (1, 0), "meal": (1, 1), "events": (0, 1), "substitute": (2, 1), "scan": (3, 1),
-            "pantry": (1, 2), "mlops": (3, 2), "catalog": (2, 3)})
+            "pantry": (0, 2), "mlops": (3, 2)})
 mod_struct("CP01e", "module-nhan-su-tac-vu", "CP01e — Thành phần: module nhân sự, tác vụ và báo cáo",
            ["admin", "jobs", "journal", "survey", "identity", "privacy", "scan", "mlops"],
-           {"admin": (1, 0), "jobs": (3, 0), "journal": (0, 0), "survey": (0, 1), "mlops": (1, 1),
-            "privacy": (2, 1), "identity": (3, 1), "scan": (4, 1)})
+           {"journal": (0, 0), "admin": (2, 0), "jobs": (4, 0), "survey": (0, 1), "mlops": (1, 1),
+            "identity": (4, 1), "scan": (3, 2), "privacy": (2, 2)})
 
 struct("deploy", "DP01a", "thiet-bi-ket-noi", "DP01a — Triển khai: thiết bị và kết nối", [
     box("Phone", "Điện thoại Android\n(App APK)", "device"), box("Browser", "Trình duyệt\n(web app, landing)", "device"),
@@ -970,7 +974,7 @@ struct("deploy", "DP01c", "huan-luyen-mo-hinh", "DP01c — Triển khai: huấn 
     box("Mlflow", "MLflow", "artifact", "Gpu"),
     box("Lab", "Máy chủ lab", "device"),
     box("Cli", "CLI tastoria mlops", "artifact", "Lab"), box("Models", "volume models/", "artifact", "Lab")],
-   [("Train", "Mlflow", "ghi run"), ("Train", "Cli", "ONNX + số đo"), ("Cli", "Models", "đăng ký")],
+   [("Train", "Mlflow", "ghi run"), ("Gpu", "Lab", "chép ONNX + số đo"), ("Cli", "Models", "đăng ký")],
    {"Train": (0, 0), "Mlflow": (0, 1), "Cli": (1, 0), "Models": (1, 1)})
 
 struct("pkg", "PG01a", "goi-tong-the", "PG01a — Gói: bố cục mã nguồn tổng thể", [
@@ -1031,7 +1035,7 @@ ERD_GROUPS = {
                ["survey_forms", "survey_form_anchors", "survey_respondents", "survey_assignments", "survey_ratings",
                 "survey_favorites"]),
 }
-ERD_OVERVIEW = ("ERD08", "tong-quan", "ERD08 — Tổng quan bảng theo module (chỉ tên bảng; cột ở ERD01a–ERD07b)")
+ERD_OVERVIEW = ("ERD08", "tong-quan", "ERD08 — Tổng quan bảng theo nhóm (chỉ tên bảng; cột và khoá ngoại ở ERD01a–ERD07b)")
 
 # Chen khái niệm: tách theo mảng từ mô hình đầy đủ docs/erd/src/khai-niem-day-du.chen
 CHEN_GROUPS = {

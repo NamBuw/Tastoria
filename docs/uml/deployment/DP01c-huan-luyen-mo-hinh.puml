@@ -18,6 +18,6 @@ node "Máy chủ lab" as Lab <<device>> {
 }
 
 Train ..> Mlflow : ghi run
-Train ..> Cli : ONNX + số đo
+Gpu ..> Lab : chép ONNX + số đo
 Cli ..> Models : đăng ký
 @enduml

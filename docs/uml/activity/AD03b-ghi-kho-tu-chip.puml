@@ -9,8 +9,8 @@ skinparam dpi 110
 skinparam ActivityBackgroundColor White
 
 |scan|
-|pantry|
 |catalog|
+|pantry|
 |scan|
 start
 :Lấy các chip chưa xoá;

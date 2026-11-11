@@ -1,12 +1,11 @@
 @startuml
-title ERD08 — Tổng quan bảng theo module (chỉ tên bảng; cột ở ERD01a–ERD07b)
+title ERD08 — Tổng quan bảng theo nhóm (chỉ tên bảng; cột và khoá ngoại ở ERD01a–ERD07b)
 ' Sinh từ db/schema.sql — không sửa tay.
 hide circle
 hide empty members
 skinparam defaultFontName DejaVu Sans
 skinparam linetype ortho
 skinparam packageStyle rectangle
-left to right direction
 
 package "ERD01a Định danh và khoá lũy đẳng (core, identity)" {
   entity "users" as users
@@ -105,96 +104,4 @@ package "ERD07b Khảo sát gu (survey)" {
   entity "survey_ratings" as survey_ratings
   entity "survey_favorites" as survey_favorites
 }
-users ||--o{ idempotency_keys
-users ||--o{ refresh_tokens
-users ||--o{ password_resets
-consent_purposes ||--o{ policy_versions
-users ||--o{ consent_events
-policy_versions ||--o{ consent_events
-users ||--o{ dsr_requests
-users ||--o{ audit_log
-nutrient_sources ||--o{ food_items
-nutrients ||--o{ food_nutrients
-food_items ||--o{ food_nutrients
-diets ||--o{ diet_exclusions
-food_groups ||--o{ diet_exclusions
-food_groups ||--o{ ingredients
-food_items ||--o{ ingredients
-ingredients ||--o{ ingredient_synonyms
-ingredients ||--o{ ingredient_allergens
-allergen_groups ||--o{ ingredient_allergens
-ingredients ||--o{ ingredient_units
-food_groups ||--o{ qty_levels
-cooking_methods ||--o{ recipes
-recipes ||--o{ recipe_ingredients
-ingredients ||--o{ recipe_ingredients
-recipes ||--o{ recipe_steps
-recipes ||--o{ recipe_tags
-tags ||--o{ recipe_tags
-recipes ||--o{ recipe_sources
-recipes ||--o{ recipe_nutrition
-nutrients ||--o{ recipe_nutrition
-vision_classes ||--o{ vision_class_ingredients
-ingredients ||--o{ vision_class_ingredients
-users ||--o{ profiles
-diets ||--o{ profiles
-users ||--o{ user_allergens
-allergen_groups ||--o{ user_allergens
-users ||--o{ user_favorite_recipes
-recipes ||--o{ user_favorite_recipes
-users ||--o{ user_settings
-users ||--o{ pantry_lots
-ingredients ||--o{ pantry_lots
-model_versions ||--o{ pantry_lots
-scan_items ||--o{ pantry_lots
-pantry_lots ||--o{ pantry_transactions
-model_versions ||--o{ model_version_classes
-vision_classes ||--o{ model_version_classes
-model_versions ||--o{ model_deployments
-users ||--o{ model_deployments
-users ||--o{ scans
-model_versions ||--o{ scans
-scans ||--o{ scan_images
-scans ||--o{ scan_items
-ingredients ||--o{ scan_items
-scan_images ||--o{ detections
-scan_items ||--o{ detections
-vision_classes ||--o{ detections
-ingredients ||--o{ substitution_pairs
-cooking_methods ||--o{ substitution_pairs
-ingredients ||--o{ ingredient_embeddings
-model_versions ||--o{ ingredient_embeddings
-users ||--o{ shopping_items
-ingredients ||--o{ shopping_items
-meal_plan_items ||--o{ shopping_items
-users ||--o{ meal_plans
-model_versions ||--o{ meal_plans
-meal_plans ||--o{ meal_plan_coeater_allergens
-allergen_groups ||--o{ meal_plan_coeater_allergens
-meal_plans ||--o{ meal_plan_pins
-pantry_lots ||--o{ meal_plan_pins
-meal_plans ||--o{ meal_plan_items
-recipes ||--o{ meal_plan_items
-meal_plan_items ||--o{ meal_plan_item_substitutions
-ingredients ||--o{ meal_plan_item_substitutions
-meal_plans ||--o{ cook_sessions
-cook_sessions ||--o{ cook_schedule_entries
-recipe_steps ||--o{ cook_schedule_entries
-users ||--o{ interactions
-recipes ||--o{ interactions
-meal_plan_items ||--o{ interactions
-model_versions ||--o{ interactions
-meal_plans ||--o{ interactions
-survey_forms ||--o{ survey_form_anchors
-recipes ||--o{ survey_form_anchors
-survey_forms ||--o{ survey_respondents
-policy_versions ||--o{ survey_respondents
-survey_respondents ||--o{ survey_assignments
-recipes ||--o{ survey_assignments
-survey_assignments ||--o{ survey_ratings
-survey_respondents ||--o{ survey_favorites
-recipes ||--o{ survey_favorites
-recipes ||--o{ recipe_make_ahead
-recipe_steps ||--o{ recipe_make_ahead
-ingredients ||--o{ recipe_make_ahead
 @enduml

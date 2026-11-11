@@ -23,9 +23,6 @@ rectangle "Tastoria" {
 }
 
 A02 -- UC15
-A02 -- UC16
-A02 -- UC17
-A02 -- UC18
 UC16 ..> UC15 : <<extend>>
 UC17 ..> UC15 : <<extend>>
 UC18 ..> UC17 : <<extend>>

@@ -24,7 +24,6 @@ rectangle "Tastoria" {
 
 A02 -- UC19
 A02 -- UC20
-A02 -- UC21
 A02 -- UC22
 UC21 ..> UC20 : <<extend>>
 @enduml

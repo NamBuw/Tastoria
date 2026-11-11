@@ -22,7 +22,6 @@ rectangle "Tastoria" {
 }
 
 A02 -- UC12
-A02 -- UC13
 A02 -- UC14
 UC12 ..> UC13 : <<include>>
 @enduml

@@ -1,5 +1,5 @@
 @startuml
-title CP01d — Thành phần: module nghiệp vụ bếp
+title CP01d — Thành phần: module nghiệp vụ bếp (catalog, core ở CP01c)
 ' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
 skinparam shadowing false
 skinparam defaultFontName DejaVu Sans
@@ -15,23 +15,16 @@ component "M09 events" as events <<module>>
 component "M08 scan" as scan <<module>>
 component "M06 pantry" as pantry <<module>>
 component "M07 mlops" as mlops <<module>>
-component "M04 catalog" as catalog <<module>>
 
-cooking ..> catalog
 cooking ..> meal
 cooking ..> pantry
 cooking ..> events
-meal ..> catalog
 meal ..> pantry
 meal ..> substitute
 meal ..> events
 meal ..> mlops
-substitute ..> catalog
 substitute ..> pantry
 substitute ..> mlops
-scan ..> catalog
 scan ..> pantry
 scan ..> mlops
-pantry ..> catalog
-mlops ..> catalog
 @enduml
