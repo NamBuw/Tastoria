@@ -1,170 +1,696 @@
-"""Native VP models via the newer DesignV2 generator and pttkht.uml Open API plugin."""
+"""Dựng spec Visual Paradigm (plugin pttkht.uml) từ đúng bộ sơ đồ PlantUML: docs/sad/tools/diagrams/model.py.
+
+Tên, mã và nội dung mỗi sơ đồ trùng 1:1 với tệp .puml cùng mã. Bố cục tính tự động theo loại sơ đồ.
+ERD chi tiết (ERD01a–ERD07b) dựng riêng ở Tastoria-ERD.vpp bằng plugin tastoria.erd (xem build.sh).
+"""
+import re
+import sys
 from pathlib import Path
-from spec_lib import Spec, FONT, FP
-from gen_beh import Act, Seq, B
-ROOT=Path(__file__).resolve().parent
-s=Spec();s.no_relax=True;s.emit('NEWPROJECT');s.emit('FONTSIZE',FONT);s.emit('CPTCENTER',1);s.emit('EXTDIR',3,2)
 
-def package(k,n):s.pkg(k,n);s.usepkg(k)
-def diagram(k,typ,title):s.diag(k,typ,title)
-def cls(k,n,attrs=(),ops=(),st=None):s.cls(k,n,attrs,ops,stereo=st)
-def finish():
- # A native VP note below the content leaves clear space for the CE watermark.
- if s.geo:
-  bottom=max(y+h for x,y,w,h in s.geo.values())
-  key='foot'+s.cur_diag;s.note(key,'Tastoria | '+s.cur_diag)
-  s.show(key,20,bottom+65,300,40,final=True)
- s.flush()
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[3]
+sys.path.insert(0, str(ROOT / "docs/sad/tools/diagrams"))
+sys.path.insert(0, str(HERE))
+import model as M  # noqa: E402
+import gen_puml as G  # noqa: E402
+from spec_lib import Spec, FONT, tw  # noqa: E402
+from gen_beh import Act, Seq, Stm, B  # noqa: E402
 
-def uc_view(code,title,actor,items):
- package('p'+code,title);s.actor('a'+code,actor)
- for key,name in items:s.uc(key,name,eps=['Đổi món', 'Thay nguyên liệu'] if key=='uc15' else None)
- diagram(code,'UC',code+' '+title);s.system('sys'+code,'Tastoria',230,20,650,len(items)*180+55)
- s.show_actor('a'+code,50,len(items)*90-10)
- for i,(key,name) in enumerate(items):
-  s.show_uc(key,340,65+i*180,parent='sys'+code,w=370)
-  rel='r'+code+str(i);s.link(rel,'a'+code,key);s.conn(rel,[s.R('a'+code),s.L(key)])
- finish()
-uc_view('UC00','Use case tổng quát – người nấu','Người dùng',[
- ('uc10','UC10 Cập nhật hồ sơ và dị ứng'),('uc12','UC12 Quét nguyên liệu'),('uc14','UC14 Quản lý kho theo lô'),('uc15','UC15 Nhận mâm cơm hôm nay'),('uc19','UC19 Lập lịch và bắt đầu nấu'),('uc20','UC20 Xác nhận nấu xong'),('uc22','UC22 Xem nhật ký'),('uc05','UC05 Quản lý đồng ý')])
-uc_view('UC01','Use case công khai và tài khoản','Khách',[
- ('uc01','UC01 Đăng ký tài khoản'),('uc02','UC02 Đăng nhập'),('uc04','UC04 Đặt lại mật khẩu'),('uc23','UC23 Tham gia khảo sát gu')])
-package('pUC02','Phân rã use case');s.uc('uc13','UC13 Xác nhận kết quả quét');s.uc('uc16','UC16 Đổi một món');s.uc('uc17','UC17 Chọn thay thế nguyên liệu')
-# Existing UC15 is intentionally reused: one model element, multiple diagram views.
-s.extd('ext16','uc16','uc15','Đổi món','Người dùng yêu cầu đổi món');s.extd('ext17','uc17','uc15','Thay nguyên liệu','Người dùng chọn thay thế hợp lệ')
-diagram('UC02','UC','UC02 Quét và mở rộng gợi ý mâm');s.system('sys02','Tastoria',20,20,1080,540)
-for k,x,y in [('uc12',80,80),('uc13',650,80),('uc15',80,320),('uc16',650,250),('uc17',650,420)]:s.show_uc(k,x,y,w=320,parent='sys02')
-s.conn('ext16',[s.L('uc16'),s.R('uc15',.3)]);s.conn('ext17',[s.L('uc17'),s.R('uc15',.75)]);finish()
+s = Spec()
+s.no_relax = True
+s.emit("NEWPROJECT")
+s.emit("FONTSIZE", FONT)
+s.emit("CPTCENTER", 1)
+s.emit("EXTDIR", 3, 2)
 
-uc_view('UC03','Các chức năng bổ sung của người dùng','Người dùng',[
- ('uc03','UC03 Đăng xuất'),('uc06','UC06 Tải dữ liệu cá nhân'),('uc07','UC07 Xóa tài khoản'),('uc08','UC08 Yêu cầu về xử lý dữ liệu'),('uc09','UC09 Thiết lập hồ sơ'),('uc11','UC11 Đặt mục tiêu năng lượng'),('uc18','UC18 Quản lý danh sách đi chợ'),('uc21','UC21 Hoàn tác trừ kho')])
-# Each operational actor is a role outside the application boundary; no invented admin UI.
-for code,title,actor,items in [
- ('UC04','Biên soạn dữ liệu','Người biên soạn', [('uc25','UC25 Nhập kho công thức'),('uc26','UC26 Quản lý cặp thay thế')]),
- ('UC05','Vận hành mô hình và khảo sát','Người vận hành mô hình',[('uc24','UC24 Quản lý đợt khảo sát'),('uc28','UC28 Xuất dữ liệu huấn luyện'),('uc29','UC29 Kiểm định phiên bản mô hình'),('uc30','UC30 Triển khai và quay lui')]),
- ('UC06','Quản trị quyền dữ liệu','Quản trị viên',[('uc27','UC27 Xử lý yêu cầu dữ liệu')]),
- ('UC07','Gán nhãn dữ liệu','Người gán nhãn',[('uc31','UC31 Gán nhãn ảnh góp')]),
- ('UC08','Tác vụ theo lịch','Bộ lập lịch',[('uc32','UC32 Xóa ảnh quét quá hạn'),('uc33','UC33 Sao lưu dữ liệu'),('uc34','UC34 Dọn job và khóa hết hạn')])]:uc_view(code,title,actor,items)
 
-# Package views share canonical UC elements. Read metadata, never copy old diagram geometry.
-import yaml
-meta=yaml.safe_load((ROOT.parents[2]/'Tastoria/docs/sad/model.yaml').read_text())
-# Resolve explicit repository path; report lives inside PTTKHT/Tastoria.
-for pk in meta['packages']:
- items=[u for u in meta['use_cases'] if u['pkg']==pk['id']]
- code='PK'+pk['id'][2:].zfill(2);package('view'+code,pk['name'])
- roles=sorted({u['primary'] for u in items}|{a for u in items for a in u.get('secondary',[])})
- actor_names={a['id']:a['name'] for a in meta['actors']}
- for aid in roles:s.actor(code+aid,actor_names[aid])
- diagram(code,'UC',code+' '+pk['name']);s.system('sys'+code,'Tastoria / '+pk['name'],260,20,740,len(items)*160+90)
- for i,aid in enumerate(roles):s.show_actor(code+aid,30,90+i*max(180,len(items)*150//len(roles)))
- for i,u in enumerate(items):
-  key=u['id'].lower();s.show_uc(key,350,65+i*160,w=500,parent='sys'+code)
-  for j,aid in enumerate([u['primary']]+u.get('secondary',[])):
-   r=code+u['id']+aid;s.link(r,code+aid,key);s.conn(r,[s.R(code+aid),s.L(key)])
- finish()
+def name_of(title):
+    return title.replace(" — ", " ")
 
-package('pDM','Mô hình miền – phân tích')
-for k,n,a in [('nguoi','Người dùng',['mãNgườiDùng:Định danh']),('lo','Lô nguyên liệu',['ngàyNhập:Ngày','lượngMin:Gam','lượngMax:Gam']),('nl','Nguyên liệu',['tên:Tên nguyên liệu']),('gd','Giao dịch kho',['thayĐổiMin:Gam','thayĐổiMax:Gam','lýDo:Loại giao dịch']),('mam','Mâm cơm',['sốNgười:Số nguyên','trạngThái:Trạng thái mâm']),('mm','Món trong mâm',['hệSốKhẩuPhần:Số thực']),('mon','Công thức món',['tên:Tên món','khẩuPhầnGốc:Số nguyên']),('tp','Thành phần công thức',['lượng:Gam']),('phien','Phiên nấu',['giờDọn:Thời điểm','trạngThái:Trạng thái phiên'])]:cls(k,n,a)
-rels=[('d1','nguoi','lo','1','0..*',None),('d2','nl','lo','1','0..*',None),('d3','lo','gd','1','0..*',None),('d4','nguoi','mam','1','0..*',None),('d5','mam','mm','1','2..3','composite'),('d6','mon','mm','1','0..*',None),('d7','mon','tp','1','1..*','composite'),('d8','nl','tp','1','0..*',None),('d9','mam','phien','1','0..*',None)]
-for k,a,b,ma,mb,agg in rels:s.assoc(k,a,b,ma=ma,mb=mb,agg_a=agg)
-diagram('DM01','CLASS','DM01 Miền kho nguyên liệu')
-for k,x,y in [('nguoi',30,30),('nl',650,30),('lo',340,280),('gd',340,550)]:s.show(k,x,y)
-for k in ['d1','d2','d3']:s.conn(k)
-finish();diagram('DM02','CLASS','DM02 Miền mâm cơm và phiên nấu')
-for k,x,y in [('nguoi',30,30),('mam',30,260),('mm',470,260),('mon',900,260),('phien',30,540),('tp',900,540),('nl',470,540)]:s.show(k,x,y)
-for k in ['d4','d5','d6','d7','d8','d9']:s.conn(k)
-finish()
 
-package('pAR','Thiết kế kiến trúc')
-for k,n,st in [('ui','Expo Android / Web','presentation'),('api','FastAPI routers','controller'),('svc','Nghiệp vụ theo module','service'),('orm','SQLAlchemy + Unit of Work','persistence'),('db','PostgreSQL + pgvector','database'),('queue','Valkey / RQ','queue'),('worker','Worker / ONNX Runtime','worker'),('files','Tệp riêng + nginx','storage')]:cls(k,n,st=st)
-for k,a,b in [('ar1','ui','api'),('ar2','api','svc'),('ar3','svc','orm'),('ar4','orm','db'),('ar5','svc','queue'),('ar6','worker','queue'),('ar7','worker','db'),('ar8','worker','files')]:s.dep(k,a,b,stereo='use')
-diagram('AR01','CLASS','AR01 Các tầng và phụ thuộc triển khai')
-for k,x,y in [('ui',30,30),('api',30,230),('svc',30,430),('orm',30,630),('db',30,830),('queue',650,430),('worker',650,630),('files',650,830)]:s.show(k,x,y)
-for k in ['ar1','ar2','ar3','ar4','ar5','ar6','ar8']:s.conn(k)
-s.conn('ar7',[s.L('worker'),FP((500,s.cy('worker'))),FP((500,s.cy('db'))),s.R('db')]);finish()
+def start(d, typ, pkg=True):
+    if pkg:
+        s.pkg("P" + d["id"], d["id"])
+        s.usepkg("P" + d["id"])
+    s.diag(d["id"], typ, name_of(d["title"]))
 
-# Relational schema view: native UML classes stereotyped table, not falsely labelled a Chen ERD.
-package('pDB','Cấu trúc bảng và khóa ngoại')
-tables={
- 'users':['id:uuid {PK}','email:text {UQ}'],
- 'ingredients':['id:uuid {PK}','name_vi:text'],
- 'pantry_lots':['id:uuid {PK}','user_id:uuid {FK}','ingredient_id:uuid {FK}','initial_g_min:numeric','initial_g_max:numeric','status:lot_status_t'],
- 'pantry_transactions':['id:bigint {PK}','lot_id:uuid {FK}','delta_g_min:numeric','delta_g_max:numeric','reverses_id:bigint {FK UQ nullable}'],
- 'recipes':['id:uuid {PK}','name_vi:text'],
- 'recipe_ingredients':['recipe_id:uuid {PK FK}','ingredient_id:uuid {PK FK}','grams:numeric'],
- 'meal_plans':['id:uuid {PK}','user_id:uuid {FK}','status:meal_plan_status_t'],
- 'meal_plan_items':['id:uuid {PK}','meal_plan_id:uuid {FK}','recipe_id:uuid {FK}','servings_scale:numeric'],
- 'cook_sessions':['id:uuid {PK}','meal_plan_id:uuid {FK}','status:cook_status_t','completed_at:timestamptz'],
- 'scans':['id:uuid {PK}','user_id:uuid {FK}','status:scan_status_t'],
- 'scan_images':['id:uuid {PK}','scan_id:uuid {FK}','storage_key:text'],
- 'scan_items':['id:uuid {PK}','scan_id:uuid {FK}','ingredient_id:uuid {FK}']}
-for t,a in tables.items():cls('t'+t,t,a,st='table')
-fks=[('users','pantry_lots'),('ingredients','pantry_lots'),('pantry_lots','pantry_transactions'),('recipes','recipe_ingredients'),('ingredients','recipe_ingredients'),('users','meal_plans'),('meal_plans','meal_plan_items'),('recipes','meal_plan_items'),('meal_plans','cook_sessions'),('users','scans'),('scans','scan_images'),('scans','scan_items'),('ingredients','scan_items')]
-for a,b in fks:s.assoc('fk'+a+b,'t'+a,'t'+b,ma='1',mb='0..*')
-for code,title,pos,pairs in [
- ('DB01','Kho và lịch sử giao dịch',{'users':(30,30),'ingredients':(800,30),'pantry_lots':(420,290),'pantry_transactions':(420,650)},fks[:3]),
- ('DB02','Công thức, mâm và phiên nấu',{'users':(30,30),'meal_plans':(30,260),'cook_sessions':(30,560),'meal_plan_items':(490,260),'recipes':(970,260),'recipe_ingredients':(970,560),'ingredients':(490,560)},fks[3:9]),
- ('DB03','Quét ảnh và kết quả',{'users':(30,30),'scans':(30,260),'scan_images':(30,550),'scan_items':(650,260),'ingredients':(650,30)},fks[9:])]:
- diagram(code,'CLASS',code+' '+title)
- for t,(x,y) in pos.items():s.show('t'+t,x,y)
- for a,b in pairs:s.conn('fk'+a+b)
- finish()
 
-package('pAD','Hoạt động nghiệp vụ')
-def activity(code,title,steps):
- a=Act(s);a.diag(code,'ACT',code+' '+title);c=a.lanes(code+'sw',[(code+'u','Người dùng',460),(code+'h','Tastoria',600)],20,len(steps)*105+150)
- prev=code+'start';a.node(prev,'InitialNode',c[code+'u'],90,lane=code+'u')
- for i,(lane,name) in enumerate(steps):
-  k=code+'n'+str(i);ln=code+lane;a.node(k,'ActivityAction',c[ln],190+i*105,name,lane=ln)
-  a.f(code+'f'+str(i),prev,k,'v' if a.geo[prev][0]+a.geo[prev][2]/2==c[ln] else 'vh');prev=k
- end=code+'end';a.node(end,'ActivityFinalNode',c[code+steps[-1][0]],190+len(steps)*105,lane=code+steps[-1][0]);a.f(code+'last',prev,end);finish()
-activity('AD01','Quét và xác nhận nguyên liệu', [('u','Chọn ảnh và chế độ quét'),('h','Kiểm tra ảnh, tạo yêu cầu quét'),('h','Nhận diện và tạo kết quả đề xuất'),('u','Sửa tên, số lượng và cách ghép lô'),('u','Xác nhận danh sách nguyên liệu'),('h','Ghi kho và xác nhận quét cùng giao dịch'),('h','Trả về kho đã cập nhật')])
-activity('AD02','Nhận và sử dụng mâm cơm', [('u','Chọn số người, thời gian và dị ứng'),('h','Lọc món theo ràng buộc bắt buộc'),('h','Ghép mâm và kiểm tra tổng lượng kho'),('h','Tính lịch nấu, xếp hạng mâm hợp lệ'),('u','Xem lý do gợi ý và chấp nhận mâm'),('h','Tạo phiên nấu và lịch các bước'),('u','Nấu theo lịch, xác nhận hoàn thành'),('h','Trừ kho và ghi nhận kết quả')])
+def K(d, k):
+    return f"{d['id']}_{k}"
 
-package('pEX','Luồng ngoại lệ')
-a=Act(s);a.diag('AD03','ACT','AD03 Hoàn tác – quyết định nghiệp vụ')
-a.node('exi','InitialNode',360,50)
-a.node('ex1','ActivityAction',360,135,'Yêu cầu hoàn tác phiên đã hoàn tất')
-a.node('ex2','ActivityAction',360,235,'Kiểm tra sở hữu và khóa phiên')
-a.node('exd','DecisionNode',360,340)
-a.node('exok','ActivityAction',360,465,'Ghi giao dịch đảo, cập nhật mâm và phiên')
-a.node('exno','ActivityAction',940,340,'Từ chối: đã hết thời hạn')
-a.node('exend1','ActivityFinalNode',360,575);a.node('exend2','ActivityFinalNode',940,465)
-a.f('exf1','exi','ex1');a.f('exf2','ex1','ex2');a.f('exf3','ex2','exd')
-a.f('exf4','exd','exok',guard='[trong 10 phút]',at=(380,380))
-a.f('exf5','exd','exno','h',guard='[quá 10 phút]',at=(540,305))
-a.f('exf6','exok','exend1');a.f('exf7','exno','exend2');finish()
 
-package('pDS','Phân bổ trách nhiệm thiết kế')
-for k,n,attrs,ops,st in [
- ('dsrouter','cooking.router',[],['complete_session():JSONResponse'],'module'),
- ('dsservice','cooking.service',[],['complete_session():CookCompletion','undo_session():CookSessionOut'],'module'),
- ('dspantry','pantry.service',[],['deduct():DeductionResult'],'module'),
- ('dsuow','UnitOfWork',['session:Session'],['after_commit(fn:Callable)'],'class'),
- ('dsentity','CookSession',['id:UUID','status:cook_status_t'],[],'ORM entity')]:cls(k,n,attrs,ops,st)
-for k,a1,b1 in [('ds1','dsrouter','dsservice'),('ds2','dsrouter','dsuow'),('ds3','dsservice','dspantry'),('ds4','dsservice','dsentity')]:s.dep(k,a1,b1,stereo='use')
-diagram('DS01','CLASS','DS01 Thiết kế chức năng hoàn tất nấu')
-for k,x,y in [('dsrouter',30,30),('dsservice',30,300),('dspantry',650,300),('dsuow',650,30),('dsentity',30,580)]:s.show(k,x,y)
-for k in ['ds1','ds2','ds3','ds4']:s.conn(k)
-finish()
+def footer(did, bottom, right=400):
+    """Ghi chú nhỏ dưới cùng chừa chỗ cho dòng watermark của VP CE."""
+    k = f"{did}_foot"
+    s.emit("NOTE", k, f"Tastoria | {did}")
+    s.emit("SHOW", did, k, 20, int(bottom + 50), 260, 34, None)
 
-package('pSQ','Tương tác thiết kế')
-q=Seq(s);q.diag('SQ01','SEQ','SQ01 Hoàn tất nấu – chống ghi lặp')
-q.setup('sq', [('sqA','boundary','App',100,150,None),('sqR','control','cooking.router',440,200,None),('sqS','control','cooking.service',800,220,None),('sqD','entity','PostgreSQL',1200,180,None)],30,1000)
-for i,(a,b,label,kind) in enumerate([
- ('sqA','sqR','POST complete + Idempotency-Key','call'),('sqR','sqD','begin: khóa và tra khóa yêu cầu','call'),('sqD','sqR','chưa có phản hồi đã lưu','return'),('sqR','sqS','complete_session(...)','call'),('sqS','sqD','khóa phiên, kiểm tra chủ sở hữu','call'),('sqD','sqS','phiên đang nấu','return'),('sqS','sqD','ghi giao dịch kho; cập nhật phiên, mâm','call'),('sqS','sqR','CookCompletion','return'),('sqR','sqD','lưu phản hồi lũy đẳng; COMMIT','call'),('sqR','sqA','200 + lượng trừ và hạn hoàn tác','return')]):q.msg('sqm'+str(i),a,b,label,140+i*75,kind)
-q.act('sqR',140,850);q.act('sqS',365,665);q.draw();finish()
 
-# Native sequence alt fragment rather than drawing dashed boxes as pictures.
-q=Seq(s);q.diag('SQ02','SEQ','SQ02 Hoàn tác trong thời hạn')
-q.setup('uq',[('uqA','boundary','App',100,150,None),('uqS','control','cooking.service',500,220,None),('uqD','entity','PostgreSQL',1000,180,None)],30,890)
-for i,(a,b,label,y,kind) in enumerate([
- ('uqA','uqS','POST /cook-sessions/{id}/undo',130,'call'),('uqS','uqD','khóa phiên; đọc completed_at',210,'call'),('uqD','uqS','trạng thái và thời điểm máy chủ',270,'return'),('uqS','uqD','ghi giao dịch đảo; phiên reverted',400,'call'),('uqS','uqD','mâm accepted; COMMIT',480,'call'),('uqS','uqA','200 phiên đã hoàn tác',550,'return'),('uqS','uqA','409 undo_window_expired',720,'return')]):q.msg('uqm'+str(i),a,b,label,y,kind)
-q.frag('uqalt','alt',30,320,1130,800,['uqA','uqS','uqD'],[('completed và còn trong 10 phút',320),('completed và đã quá 10 phút',630)])
-q.act('uqS',130,760);q.draw();finish()
-exec((ROOT/'analysis_v2.py').read_text())
-s.emit('ELEMFONT',FONT)
-for d in sorted({l.split('\t')[1] for l in s.lines if l.startswith('DIAG\t')}):s.emit('FIT',d)
-s.emit('REPOINT');s.emit('SANITIZE','Tastoria – Phân tích và thiết kế','Nhóm Tastoria');s.emit('SAVEAS',str(ROOT/'Tastoria.vpp'));s.write(str(ROOT/'spec_tastoria.tsv'))
-print('Wrote',len(s.lines),'commands')
+def mult(c):
+    return {"N": "*", "M": "*"}.get(c, c)
+
+
+# ------------------------------------------------------------------ kích thước ước lượng
+def box_size(name, rows=(), stereo=None, minw=150):
+    w = max([tw(name, True)] + [tw(r.replace(":", " : ")) for r in rows] +
+            ([tw(f"<<{stereo}>>")] if stereo else [])) + 36
+    h = 30 + (19 if stereo else 0) + 19 * max(len(rows), 1) + 14
+    return max(w, minw), h
+
+
+def grid_xy(grid, sizes, gx=130, gy=110, x0=40, y0=40, gxs=None):
+    cols = max(c for c, r in grid.values()) + 1
+    rows = max(r for c, r in grid.values()) + 1
+    cw = [max([sizes[k][0] for k, (c, r) in grid.items() if c == i and k in sizes] or [150]) for i in range(cols)]
+    rh = [max([sizes[k][1] for k, (c, r) in grid.items() if r == j and k in sizes] or [60]) for j in range(rows)]
+    gl = gxs or [gx] * cols
+    xs = [x0 + sum(cw[:i]) + sum(gl[:i]) for i in range(cols)]
+    ys = [y0 + sum(rh[:j]) + gy * j for j in range(rows)]
+    return {k: (xs[c] + (cw[c] - sizes[k][0]) / 2, ys[r] + (rh[r] - sizes[k][1]) / 2) for k, (c, r) in grid.items()
+            if k in sizes}
+
+
+# ------------------------------------------------------------------ use case
+def vp_uc(d):
+    start(d, "UC")
+    prim = [a for a in d["actors"] if any(l[0] == a and M.UCS[l[1]]["primary"] == a for l in d["links"])]
+    sec = [a for a in d["actors"] if a not in prim]
+    for a in d["actors"]:
+        s.actor(K(d, a), M.ACTOR[a], stereo="system" if a in ("A09", "A10") else None)
+    eps = {}
+    for kind, x, y, cond in d["rels"]:
+        if kind == "extend":
+            eps.setdefault(y, []).append(x)
+    for u in d["ucs"]:
+        s.uc(K(d, u), f"{u} {M.ucname(u)}", eps=eps.get(u))
+    linked = {u for _, u in d["links"]}
+    order = {a: i for i, a in enumerate(d["actors"])}
+    first_actor = lambda u: min(order[a] for a, x in d["links"] if x == u)
+    col0 = sorted([u for u in d["ucs"] if u in linked], key=lambda u: (first_actor(u), d["ucs"].index(u)))
+    multi = [u for u in d["ucs"] if u not in linked and sum(1 for k, x, y, _ in d["rels"] if x == u) > 1]
+    col0 += multi
+    col1 = [u for u in d["ucs"] if u not in linked and u not in multi]
+    size = {u: s.ucsize(K(d, u)) for u in d["ucs"]}
+    W0 = max([size[u][0] for u in col0] or [300])
+    W1 = max([size[u][0] for u in col1] or [0])
+    sx, sy, gap = 260, 30, 40
+    pos, y = {}, sy + 60
+    for u in col0:
+        if u in multi:
+            y += 60
+        pos[u] = (sx + 50, y)
+        y += size[u][1] + gap
+    y1 = sy + 60
+    for u in col1:
+        base = next((yy for k, x, yy, _ in d["rels"] if x == u and yy in pos), None) or \
+            next((x for k, x, yy, _ in d["rels"] if yy == u and x in pos), None)
+        yb = pos[base][1] if base else y1
+        yy = max(yb, y1)
+        pos[u] = (sx + 50 + W0 + 200, yy)
+        y1 = yy + size[u][1] + gap
+    bottom = max(p[1] + size[u][1] for u, p in pos.items()) + 40
+    width = 50 + W0 + (200 + W1 if col1 else 0) + 50
+    s.system(K(d, "sys"), "Tastoria", sx / 1.05, sy / 1.05, width / 1.05, (bottom - sy) / 1.05)
+    for u, (x, y) in pos.items():
+        s.show(K(d, u), x, y, size[u][0], size[u][1], parent=K(d, "sys"), final=True)
+    def ay(a):
+        ys = [pos[u][1] + size[u][1] / 2 for x, u in d["links"] if x == a]
+        return sum(ys) / len(ys)
+    ys = sorted(((ay(a), a) for a in prim))
+    placed = []
+    for y, a in ys:
+        if placed and y - placed[-1][0] < 115:
+            y = placed[-1][0] + 115
+        placed.append((y, a))
+    over = max(0, placed[-1][0] + 60 - bottom) if placed else 0
+    for y, a in placed:
+        s.show(K(d, a), 70, y - 30 - over / 2, 30, 60, final=True)
+    bottom = max(bottom, (placed[-1][0] + 60) if placed else 0)
+    right = sx + width + 120
+    for i, a in enumerate(sec):
+        s.show(K(d, a), right, ay(a) - 30 + 70 * i, 30, 60, final=True)
+    for c, p in d["gens"]:
+        s.gen(K(d, f"g{c}"), K(d, c), K(d, p))
+        s.conn(K(d, f"g{c}"))
+    for i, (a, u) in enumerate(d["links"]):
+        s.link(K(d, f"l{i}"), K(d, a), K(d, u))
+        s.conn(K(d, f"l{i}"))
+    for i, (kind, x, y, cond) in enumerate(d["rels"]):
+        if kind == "include":
+            s.inc(K(d, f"r{i}"), K(d, x), K(d, y))
+        else:
+            s.extd(K(d, f"r{i}"), K(d, x), K(d, y), x, cond)
+        s.conn(K(d, f"r{i}"))
+    footer(d["id"], bottom)
+    s.flush()
+
+
+def vp_ctx(d):
+    start(d, "CLASS")
+    name = lambda k: d.get("extra", {}).get(k) or M.ACTOR[k]
+    sysk = K(d, "SYS")
+    s.cls(sysk, d["center"], stereo="system")
+    n = max(len(d["left"]), len(d["right"]))
+    H = max(n * 150, 200)
+    s.show(sysk, 520, 40 + H / 2 - 40, 300, 90, final=True)
+    for side, items, x in (("L", d["left"], 60), ("R", d["right"], 1300)):
+        for i, (k, lab) in enumerate(items):
+            kk = K(d, k)
+            if k == "DRIVE":
+                s.cls(kk, name(k), stereo="system")
+                s.show(kk, x - 60, 40 + i * 150 + (H - len(items) * 150) / 2 + 40, 260, 70, final=True)
+            else:
+                s.actor(kk, name(k), stereo="system" if k in ("A09", "A10") else None)
+                s.show(kk, x, 40 + i * 150 + (H - len(items) * 150) / 2 + 30, 30, 60, final=True)
+            r = K(d, "r" + k)
+            s.assoc(r, kk, sysk, name=lab) if side == "L" else s.assoc(r, sysk, kk, name=lab)
+            s.conn(r)
+    footer(d["id"], 40 + H + 60)
+    s.flush()
+
+
+# ------------------------------------------------------------------ tuần tự
+def vp_seq(d):
+    q = Seq(s)
+    s.pkg("P" + d["id"], d["id"])
+    s.usepkg("P" + d["id"])
+    lls = d["lls"]
+    idx = {k: i for i, (k, _, _) in enumerate(lls)}
+    widths = [max(tw(n, True) + 40, 110) if kind != "actor" else 60 for k, kind, n in lls]
+    msgs = []
+    for it in d["items"]:
+        if it[0] == "m":
+            msgs.append(it)
+        else:
+            for _, ms in it[2]:
+                msgs.extend(ms)
+    n = 0
+    labels = []
+    for mm in msgs:
+        n += 1
+        labels.append(f"{n}: {mm[3]}")
+    cx = [0.0] * len(lls)
+    cx[0] = 90
+    for i in range(1, len(lls)):
+        cx[i] = cx[i - 1] + max((widths[i - 1] + widths[i]) / 2 + 60, 170)
+    for _ in range(10):
+        for mm, lab in zip(msgs, labels):
+            a, b = sorted((idx[mm[1]], idx[mm[2]]))
+            need = tw(lab) + 50
+            if cx[b] - cx[a] < need:
+                sh = need - (cx[b] - cx[a])
+                for j in range(b, len(lls)):
+                    cx[j] += sh
+    LL = [(K(d, k), kind if kind != "entity" or True else kind, nm, cx[i], widths[i], None)
+          for i, (k, kind, nm) in enumerate(lls)]
+    top = 30
+    y = top + 110
+    plan = []   # (msg, y)
+    frag = None
+    k = 0
+    for it in d["items"]:
+        if it[0] == "m":
+            plan.append((it, y, labels[k]))
+            k += 1
+            y += 50
+        else:
+            _, op, operands = it
+            fy1 = y - 20
+            ops = []
+            for g, ms in operands:
+                ops.append((g, y - 20 if not ops else y - 14))
+                y += 58
+                for mm in ms:
+                    plan.append((mm, y, labels[k]))
+                    k += 1
+                    y += 50
+                y -= 14
+            inv = {mm[1] for mm, _, _ in plan[-sum(len(ms) for _, ms in operands):]} | \
+                  {mm[2] for mm, _, _ in plan[-sum(len(ms) for _, ms in operands):]}
+            xs = [cx[idx[v]] for v in inv]
+            frag = (op, min(xs) - 70, fy1, max(xs) + 70, y + 10, sorted(inv, key=lambda v: idx[v]), ops)
+            y += 60
+    bottom = y + 30
+    q.setup(K(d, "ll"), LL, top, bottom)
+    q.diag(d["id"], "SEQ", name_of(d["title"]))
+    for i, (mm, my, lab) in enumerate(plan):
+        q.msg(K(d, f"m{i}"), K(d, mm[1]), K(d, mm[2]), lab, my, "return" if mm[4] == "ret" else "call")
+    for kk, kind, nm in lls:
+        if kind == "actor":
+            continue
+        ys = [my for mm, my, _ in plan if kk in (mm[1], mm[2])]
+        if ys:
+            q.act(K(d, kk), min(ys) - 10, max(ys) + 10)
+    if frag:
+        op, x1, y1, x2, y2, inv, ops = frag
+        q.frag(K(d, "f"), op, x1, y1, x2, y2, [K(d, v) for v in inv], ops)
+    q.draw()
+    footer(d["id"], bottom, cx[-1])
+    s.flush()
+
+
+# ------------------------------------------------------------------ hoạt động
+def act_layout(d):
+    nodes, edges = [], []   # nodes: [key, type, lane, col, row, text]; edges: (a, b, guard, mode)
+    cnt = [0]
+    row = [1]
+
+    def new(typ, lane, col, text=None):
+        cnt[0] += 1
+        k = f"n{cnt[0]}"
+        nodes.append([k, typ, lane, col, row[0], text])
+        row[0] += 1
+        return k
+
+    first_lane = d["items"][0][1]
+    nodes.append(["start", "InitialNode", first_lane, 0, 0, None])
+
+    def run(items, prev, col, pguard=None):
+        """trả về (nút cuối, đã dừng?)"""
+        g = pguard
+        for it in items:
+            if it[0] == "a":
+                k = new("ActivityAction", it[1], col, it[2])
+                edges.append((prev, k, g, "auto"))
+                prev, g = k, None
+            elif it[0] == "stop":
+                k = new("ActivityFinalNode", lane_of(prev), col)
+                edges.append((prev, k, g, "auto"))
+                return k, True
+            elif it[0] == "if":
+                _, ln, qq, yes, yi, no, ni = it
+                dk = new("DecisionNode", ln, col, qq)
+                edges.append((prev, dk, g, "auto"))
+                r0 = row[0]
+                ny_last, ny_stop = run(ni, dk, col + 1, no) if ni else (dk, False)
+                r_no = row[0]
+                row[0] = r0
+                yl, ys = run(yi, dk, col, yes) if yi else (dk, False)
+                row[0] = max(row[0], r_no)
+                if ny_stop:
+                    prev, g = yl, (yes if not yi else None)
+                    if ys:
+                        return yl, True
+                    continue
+                mk = new("MergeNode", ln, col)
+                edges.append((yl, mk, yes if not yi else None, "auto"))
+                edges.append((ny_last, mk, no if not ni else None, "side_merge"))
+                prev, g = mk, None
+            elif it[0] == "while":
+                _, ln, qq, yes, body, no = it
+                dk = new("DecisionNode", ln, col, qq)
+                edges.append((prev, dk, g, "auto"))
+                n0 = len(edges)
+                last, _ = run(body, dk, col, yes)
+                if n0 < len(edges):
+                    e0 = edges[n0]
+                    edges[n0] = (e0[0], e0[1], e0[2], "body")
+                edges.append((last, dk, None, "loop"))
+                prev, g = dk, ("exit", no)
+        return prev, False
+
+    def lane_of(k):
+        return next(n[2] for n in nodes if n[0] == k)
+
+    last, stopped = run(d["items"], "start", 0)
+    if not stopped:
+        k = new("ActivityFinalNode", lane_of(last), 0)
+        edges.append((last, k, None, "auto"))
+    return nodes, edges
+
+
+def vp_act(d):
+    a = Act(s)
+    s.pkg("P" + d["id"], d["id"])
+    s.usepkg("P" + d["id"])
+    nodes, edges = act_layout(d)
+    ROWH = 92
+    colw = {}
+    for k, typ, ln, col, r, text in nodes:
+        w = tw(text) + 60 if typ == "ActivityAction" else (tw(text) + 40 if typ == "DecisionNode" else 80)
+        colw[(ln, col)] = max(colw.get((ln, col), 0), w, 200)
+    lanes = []
+    x = 20
+    cxs = {}
+    for ln in d["lanes"]:
+        cols = sorted(c for (l2, c) in colw if l2 == ln) or [0]
+        w = sum(colw.get((ln, c), 200) for c in range(max(cols) + 1)) + 40
+        cx = x + 20
+        for c in range(max(cols) + 1):
+            cxs[(ln, c)] = cx + colw.get((ln, c), 200) / 2
+            cx += colw.get((ln, c), 200)
+        lanes.append((K(d, "L" + str(len(lanes))), ln, w))
+        x += w
+    laneKey = {ln: lanes[i][0] for i, ln in enumerate(d["lanes"])}
+    maxrow = max(n[4] for n in nodes)
+    a.diag(d["id"], "ACT", name_of(d["title"]))
+    a.lanes(K(d, "SW"), lanes, 20, 90 + (maxrow + 1) * ROWH + 30)
+    for k, typ, ln, col, r, text in nodes:
+        cy = 20 + 30 + 50 + r * ROWH
+        if typ == "DecisionNode":
+            a.new(K(d, k), typ, " ")
+            w = 36
+            a.show(K(d, k), cxs[(ln, col)] - w / 2, cy - w / 2, w, w, laneKey[ln])
+            # câu hỏi: ghi chú nhỏ cạnh nút quyết định
+            a.s.note(K(d, k + "q"), text)
+            a.show(K(d, k + "q"), cxs[(ln, col)] + 22, cy - 66, tw(text) + 30, 30, laneKey[ln])
+        else:
+            a.node(K(d, k), typ, cxs[(ln, col)], cy, text, lane=laneKey[ln])
+    geo = a.geo
+
+    def P(k):
+        return K(d, k)
+    for i, (x1, x2, g, mode) in enumerate(edges):
+        A, Bk = P(x1), P(x2)
+        ax, ay, aw, ah = geo[A]
+        bx, by, bw, bh = geo[Bk]
+        acx, acy, bcx, bcy = ax + aw / 2, ay + ah / 2, bx + bw / 2, by + bh / 2
+        guard = g[1] if isinstance(g, tuple) else g
+        dec = nodes[[n[0] for n in nodes].index(x1)][1] == "DecisionNode"
+        if mode == "loop":
+            xr = max([g_[0] + g_[2] for g_ in geo.values() if g_[2] > 40 and abs(g_[0] + g_[2] / 2 - bcx) < 5
+                      and by - 5 < g_[1] < ay + ah + 5] + [ax + aw, bx + bw]) + 30
+            pts = [(ax + aw, acy), (xr, acy), (xr, bcy), (bx + bw, bcy)]
+        elif isinstance(g, tuple):    # thoát vòng lặp: vòng phải thân vòng
+            body = [geo[P(n[0])] for n in nodes if n[0] != x1 and acx - 5 < geo[P(n[0])][0] + geo[P(n[0])][2] / 2 < acx + 5
+                    and ay < geo[P(n[0])][1] < by]
+            xl = min([bb[0] for bb in body] + [ax]) - 30
+            pts = [(ax, acy), (xl, acy), (xl, by - 22), (bcx, by - 22), (bcx, by)] if abs(bcx - acx) < 5 else \
+                [(ax, acy), (xl, acy), (xl, bcy), (bx if bcx > xl else bx + bw, bcy)]
+        elif mode == "side_merge":
+            if abs(acx - bcx) < 5:
+                pts = [(acx, ay + ah), (bcx, by)]
+            elif x1 == x2:
+                pts = None
+            else:
+                pts = [(acx, ay + ah) if x1 not in [e[0] for e in edges if e[3] == "x"] else (ax + aw, acy),
+                       (acx, bcy), (bx + bw if acx > bcx else bx, bcy)]
+                if nodes[[n[0] for n in nodes].index(x1)][1] == "DecisionNode":
+                    xr = acx + 0
+                    pts = [(ax + aw, acy), (ax + aw + 60, acy), (ax + aw + 60, bcy), (bx + bw, bcy)]
+        elif abs(acx - bcx) < 5:
+            pts = [(acx, ay + ah), (bcx, by)] if bcy > acy else [(acx, ay), (bcx, by + bh)]
+        elif mode == "body":
+            pts = [(acx, ay + ah), (acx, bcy), (bx if bcx > acx else bx + bw, bcy)]
+        elif dec and guard and sum(1 for e in edges if e[0] == x1) > 1 and \
+                [e for e in edges if e[0] == x1][0][1] != x2:     # nhánh chính của nút quyết định: xuống rồi ngang
+            pts = [(acx, ay + ah), (acx, bcy), (bx + bw if acx > bcx else bx, bcy)]
+        else:
+            pts = [(ax + aw if bcx > acx else ax, acy), (bcx, acy), (bcx, by)]
+        if not guard:
+            at = None
+        elif pts[1][0] == pts[0][0]:
+            loop_exit = any(e[0] == x1 and isinstance(e[2], tuple) for e in edges)
+            at = (pts[0][0] + 6, pts[0][1] + 2) if loop_exit else (pts[0][0] - tw(guard) - 18, pts[0][1] + 2)
+        elif pts[1][0] > pts[0][0]:
+            at = (pts[0][0] + 8, pts[0][1] - 26)
+        else:
+            at = (pts[0][0] - tw(guard) - 20, pts[0][1] + 4)
+        a.flow(K(d, f"e{i}"), A, Bk, pts, guard, at)
+    footer(d["id"], 20 + 90 + (maxrow + 1) * ROWH + 30)
+    s.flush()
+
+
+# ------------------------------------------------------------------ trạng thái
+def vp_state(d):
+    m = Stm(s)
+    s.pkg("P" + d["id"], d["id"])
+    s.usepkg("P" + d["id"])
+    m.diag(d["id"], "STM", name_of(d["title"]))
+    sizes = {}
+    for k, name, entry in d["states"]:
+        sizes[k] = (36, 36) if name == "<<choice>>" else (max(tw(name, True) + 60, 150), 56)
+    sizes["*"] = (30, 30)
+    sizes["#"] = (30, 30)
+    ncol = max(c for c, r in d["grid"].values()) + 1
+    gxs = [190] * ncol
+    for a_, b_, lab in d["trans"]:
+        if a_ in d["grid"] and b_ in d["grid"]:
+            (c1, r1), (c2, r2) = d["grid"][a_], d["grid"][b_]
+            if r1 == r2 and abs(c1 - c2) == 1:
+                gxs[min(c1, c2)] = max(gxs[min(c1, c2)], tw(lab) + 60)
+    xy = grid_xy(d["grid"], sizes, gy=120, gxs=gxs)
+    for k, name, entry in d["states"]:
+        x, y = xy[k]
+        if name == "<<choice>>":
+            m.new(K(d, k), "Choice", None)
+            m.show(K(d, k), x, y, 36, 36)
+        else:
+            m.state(K(d, k), name, x, y, sizes[k][0], 56)
+    x, y = xy["*"]
+    m.pseudo(K(d, "init"), "InitialPseudoState", x + 15, y + 15)
+    if "#" in xy and any(t[1] == "#" for t in d["trans"]):
+        x, y = xy["#"]
+        m.pseudo(K(d, "fin"), "FinalState2", x + 15, y + 15)
+    key = lambda v: K(d, "init") if v == "*" else K(d, "fin") if v == "#" else K(d, v)
+    pairs = {(a, b) for a, b, _ in d["trans"]}
+    labels = []
+    for i, (a, b, lab) in enumerate(d["trans"]):
+        A, Bk = key(a), key(b)
+        others = [g for kk, g in m.geo.items() if kk not in (A, Bk)]
+        pts = state_route(m.geo[A], m.geo[Bk], others, (b, a) in pairs and a < b, (b, a) in pairs)
+        at = None
+        if lab:
+            at = label_at(pts, lab, labels + others)
+            labels.append((at[0], at[1], tw(lab) + 12, 22))
+        m.tr(K(d, f"t{i}"), A, Bk, lab or None, pts, at)
+    footer(d["id"], max(g[1] + g[3] for g in m.geo.values()))
+    s.flush()
+
+
+def _hits(p, q, boxes, pad=6):
+    (x1, y1), (x2, y2) = p, q
+    for bx, by, bw, bh in boxes:
+        if min(x1, x2) < bx + bw + pad and max(x1, x2) > bx - pad and min(y1, y2) < by + bh + pad and \
+                max(y1, y2) > by - pad:
+            return True
+    return False
+
+
+def path_ok(pts, boxes):
+    return not any(_hits(pts[i], pts[i + 1], boxes) for i in range(len(pts) - 1))
+
+
+def state_route(Ag, Bg, others, first, paired):
+    ax, ay, aw, ah = Ag
+    bx, by, bw, bh = Bg
+    acx, acy, bcx, bcy = ax + aw / 2, ay + ah / 2, bx + bw / 2, by + bh / 2
+    o = (-12 if first else 12) if paired else 0
+    cands = []
+    if abs(acy - bcy) < 30:
+        cands.append([(ax + aw if bcx > acx else ax, acy + o), (bx if bcx > acx else bx + bw, acy + o)])
+        yt = min(ay, by) - 40 - (12 if first else 0)
+        cands.append([(acx + 15, ay), (acx + 15, yt), (bcx - 15, yt), (bcx - 15, by)])
+        yb = max(ay + ah, by + bh) + 40
+        cands.append([(acx - 15, ay + ah), (acx - 15, yb), (bcx + 15, yb), (bcx + 15, by + bh)])
+    elif abs(acx - bcx) < 30:
+        cands.append([(acx + o, ay + ah if bcy > acy else ay), (acx + o, by if bcy > acy else by + bh)])
+        xr = max(ax + aw, bx + bw) + 40
+        cands.append([(ax + aw, acy), (xr, acy), (xr, bcy), (bx + bw, bcy)])
+        xl = min(ax, bx) - 40
+        cands.append([(ax, acy), (xl, acy), (xl, bcy), (bx, bcy)])
+    else:
+        ex = bx + bw * (0.75 if acx > bcx else 0.25)
+        cands.append([(ax + aw if bcx > acx else ax, acy), (ex, acy), (ex, by if bcy > acy else by + bh)])
+        sx = ax + aw * (0.75 if bcx > acx else 0.25)
+        cands.append([(sx, ay + ah if bcy > acy else ay), (sx, bcy), (bx if bcx > acx else bx + bw, bcy)])
+    for c in cands:
+        if path_ok(c, others):
+            return c
+    return cands[0]
+
+
+def label_at(pts, lab, avoid):
+    w = tw(lab) + 12
+    segs = sorted(range(len(pts) - 1), key=lambda i: -(abs(pts[i + 1][0] - pts[i][0]) + abs(pts[i + 1][1] - pts[i][1])))
+    for i in segs:
+        (x1, y1), (x2, y2) = pts[i], pts[i + 1]
+        mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+        opts = [(mx - w / 2, my - 26), (mx - w / 2, my + 4)] if abs(y1 - y2) < 2 else \
+            [(mx + 8, my - 11), (mx - w - 8, my - 11), (mx + 8, my + 14), (mx - w - 8, my - 36)]
+        for x, y in opts:
+            if not any(x < bx + bw and x + w > bx and y < by + bh and y + 22 > by for bx, by, bw, bh in avoid):
+                return (x, y)
+    (x1, y1), (x2, y2) = pts[segs[0]], pts[segs[0] + 1]
+    return ((x1 + x2) / 2 + 8, (y1 + y2) / 2 - 26)
+
+
+# ------------------------------------------------------------------ lớp
+def vp_class(d):
+    start(d, "CLASS")
+    sizes = {}
+    for k, name, attrs, ops, st in d["classes"]:
+        kk = K(d, k)
+        s.emit("CLASS", kk, name, None, st)
+        rows = []
+        for at in attrs:
+            n_, t_ = (at.split(":", 1) + [""])[:2]
+            s.emit("ATTR", kk, "-", n_.strip(), t_.strip() or None, None, None)
+            rows.append("-" + at)
+        for op in ops:
+            s.emit("OPER", kk, "+", op.split("(")[0], None, None)
+            rows.append("+" + op)
+        sizes[k] = box_size(name, rows, st)
+    cols = max(c for c, r in d["grid"].values()) + 1
+    gxs = [230] * cols
+    for kind, x, y, lab, ma, mb in d["rels"]:
+        (c1, r1), (c2, r2) = d["grid"][x], d["grid"][y]
+        if r1 == r2 and abs(c1 - c2) == 1:
+            gxs[min(c1, c2)] = max(gxs[min(c1, c2)], tw(lab) + tw(ma) + tw(mb) + 110)
+    xy = grid_xy(d["grid"], sizes, gy=140, gxs=gxs)
+    for k, *_ in d["classes"]:
+        s.show(K(d, k), xy[k][0], xy[k][1], int(sizes[k][0]), int(sizes[k][1]), final=True)
+    for i, (kind, x, y, lab, ma, mb) in enumerate(d["rels"]):
+        r = K(d, f"r{i}")
+        if kind in ("assoc", "comp"):
+            s.assoc(r, K(d, x), K(d, y), name=lab or None, ma=ma or None, mb=mb or None,
+                    agg_a="composite" if kind == "comp" else None)
+        elif kind == "dep":
+            s.dep(r, K(d, x), K(d, y))
+        else:
+            s.gen(r, K(d, x), K(d, y))
+        s.conn(r)
+    footer(d["id"], max(xy[k][1] + sizes[k][1] for k in sizes))
+    s.flush()
+    if any(c[4] in ("boundary", "control", "entity") for c in d["classes"]):
+        for k, *_ in d["classes"]:
+            s.emit("SCALL", d["id"], K(d, k), "setDisplayAsRobustnessAnalysisIcon", "b:false")
+
+
+# ------------------------------------------------------------------ thành phần / triển khai / gói
+def vp_struct(d):
+    typ = {"comp": "CMP", "deploy": "DPL", "pkg": "PKGD"}[d["kind"]]
+    start(d, typ)
+    kids = {}
+    for b in d["boxes"]:
+        kids.setdefault(b[3], []).append(b)
+    sizes = {}
+    for k, name, st, parent in d["boxes"]:
+        if k in kids:
+            continue
+        lines = name.split("\n")
+        w = max(tw(l, True) for l in lines) + 70
+        if st:
+            w = max(w, tw(f"<<{st}>>") + 70)
+        sizes[k] = (max(w, 170), 60 + 20 * len(lines) + (14 if st else 0))
+    leaf_grid = {k: v for k, v in d["grid"].items() if k in sizes}
+    xy = grid_xy(leaf_grid, sizes, gx=300 if kids.keys() - {None} else 190, gy=130, x0=80, y0=100)
+    geo = {k: (xy[k][0], xy[k][1], *sizes[k]) for k in sizes}
+    for k in [b[0] for b in d["boxes"] if b[0] in kids]:
+        ch = [geo[c[0]] for c in kids[k]]
+        x1 = min(g[0] for g in ch) - 40
+        y1 = min(g[1] for g in ch) - 60
+        x2 = max(g[0] + g[2] for g in ch) + 40
+        y2 = max(g[1] + g[3] for g in ch) + 40
+        geo[k] = (x1, y1, x2 - x1, y2 - y1)
+    # hộp ngoài cùng không con nằm cạnh cha (lưới riêng đã tránh chồng)
+    for k, name, st, parent in d["boxes"]:
+        kk = K(d, k)
+        if d["kind"] == "comp":
+            t = "Component"
+        elif d["kind"] == "deploy":
+            t = "Artifact" if st == "artifact" else "Node"
+        else:
+            t = "Package" if (k in kids or parent is None) else "Class"
+        s.emit("NEW", kk, t, name.replace("\n", " "), K(d, parent) if parent else None)
+        if st and st != "artifact":
+            s.emit("CALL", kk, "addStereotype", st)
+    order = [b for b in d["boxes"] if b[3] is None] + [b for b in d["boxes"] if b[3] is not None]
+    for k, name, st, parent in order:
+        x, y, w, h = geo[k]
+        s.emit("SHOW", d["id"], K(d, k), int(x), int(y), int(w), int(h), K(d, parent) if parent else None)
+    for i, (x1, x2, lab) in enumerate(d["links"]):
+        r = K(d, f"r{i}")
+        s.dep(r, K(d, x1), K(d, x2), name=lab or None)
+        s.emit("CONN", d["id"], r, None, None, None)
+    footer(d["id"], max(g[1] + g[3] for g in geo.values()))
+    s.flush()
+
+
+# ------------------------------------------------------------------ Chen (ký pháp lớp) và tổng quan bảng
+CHEN_GRID = {
+    "ERD00a": {"DIUNG": (0, 0), "NGUOIDUNG": (1, 0), "HOSO": (2, 0), "CHEDO": (2, 1), "NHOMTP": (1, 1)},
+    "ERD00b": {"NHOMTP": (0, 0), "NGUYENLIEU": (1, 0), "DIUNG": (2, 0), "THUCPHAM": (1, 1), "CHATDD": (2, 1),
+               "MON": (0, 1), "BUOCNAU": (0, 2)},
+    "ERD00c": {"NGUOIDUNG": (0, 0), "LOKHO": (1, 0), "GIAODICH": (2, 0), "NGUYENLIEU": (1, 1), "CHIP": (0, 1)},
+    "ERD00d": {"NGUOIDUNG": (0, 0), "LANQUET": (1, 0), "ANHQUET": (2, 0), "CHIP": (1, 1), "KHUNG": (2, 1),
+               "NGUYENLIEU": (1, 2), "LOPTG": (2, 2)},
+    "ERD00e": {"LOKHO": (0, 0), "NGUOIDUNG": (1, 0), "MAM": (1, 1), "MONMAM": (2, 1), "PHIENNAU": (1, 2),
+               "MON": (2, 2), "BUOCNAU": (1, 3)},
+    "ERD00f": {"NGUOIDUNG": (0, 0), "TUONGTAC": (1, 0), "MON": (2, 0), "MAM": (1, 1), "MOHINH": (2, 1),
+               "LOPTG": (2, 2)},
+    "ERD00g": {"NGUOIDUNG": (0, 0), "SUKIENDY": (1, 0), "DIEUKHOAN": (2, 0), "MUCDICH": (2, 1)},
+    "ERD00h": {"PHIEUKS": (0, 0), "NGUOIKS": (1, 0), "DIEUKHOAN": (2, 0), "PHANCONG": (1, 1), "MON": (2, 1),
+               "DIEMKS": (1, 2)},
+}
+
+
+def vp_chen():
+    for gid, (slug, title, es, rs) in G.chen_model().items():
+        s.pkg("P" + gid, gid)
+        s.usepkg("P" + gid)
+        s.diag(gid, "CLASS", name_of(title))
+        for e, name, weak, attrs in es:
+            kk = f"{gid}_{e}"
+            s.emit("CLASS", kk, name, None, "weak entity" if weak else "entity")
+            for at in attrs:
+                s.emit("ATTR", kk, "0", re.sub(r"\s*<<(?!key)[^>]*>>", "", at).replace(" <<key>>", " {key}"),
+                       None, None, None)
+        sizes = {e: box_size(name, attrs, "entity") for e, name, weak, attrs in es}
+        grid = CHEN_GRID[gid]
+        xy = grid_xy(grid, sizes, gx=240, gy=150)
+        for e, *_ in es:
+            s.show(f"{gid}_{e}", xy[e][0], xy[e][1], int(sizes[e][0]), int(sizes[e][1]), final=True)
+        for r, rname, ends in rs:
+            (e1, c1, t1), (e2, c2, t2) = ends
+            rk = f"{gid}_{r}"
+            s.assoc(rk, f"{gid}_{e1}", f"{gid}_{e2}", name=rname, ma=mult(c1), mb=mult(c2))
+            s.conn(rk)
+        footer(gid, max(xy[e][1] + sizes[e][1] for e in sizes))
+        s.flush()
+        for e, *_ in es:
+            s.emit("SCALL", gid, f"{gid}_{e}", "setDisplayAsRobustnessAnalysisIcon", "b:false")
+
+
+def vp_overview(ns):
+    gid, slug, title = M.ERD_OVERVIEW
+    s.pkg("P" + gid, gid)
+    s.usepkg("P" + gid)
+    s.diag(gid, "CLASS", name_of(title))
+    y = 40
+    for g, (_, t2, ts) in M.ERD_GROUPS.items():
+        nk = f"{gid}_n{g}"
+        s.note(nk, g + " " + t2.split(" — ")[1])
+        s.show(nk, 40, y + 4, 520, 40, final=True)
+        x = 600
+        for t in ts:
+            s.emit("CLASS", f"{gid}_{t}", t, None, "table")
+            w = box_size(t, [], "table", 120)[0]
+            s.show(f"{gid}_{t}", x, y, int(w), 56, final=True)
+            x += w + 40
+        y += 86
+    footer(gid, y)
+    s.flush()
+
+
+V = {"uc": vp_uc, "ctx": vp_ctx, "seq": vp_seq, "act": vp_act, "state": vp_state, "class": vp_class,
+     "comp": vp_struct, "deploy": vp_struct, "pkg": vp_struct}
+
+if __name__ == "__main__":
+    only = set(sys.argv[1:])
+    for d in M.DIAGRAMS:
+        if not only or d["id"] in only:
+            V[d["kind"]](d)
+    if not only or only & set(M.CHEN_GROUPS):
+        vp_chen()
+    if not only or M.ERD_OVERVIEW[0] in only:
+        vp_overview(G.erd_api())
+    s.flush()
+    s.emit("ELEMFONT", FONT)
+    s.emit("REPOINT")
+    s.emit("SANITIZE", "Tastoria – Phân tích và thiết kế", "Nhóm Tastoria")
+    out = HERE / ("Tastoria.vpp" if not only else "Tastoria-test.vpp")
+    s.emit("SAVEAS", str(out))
+    spec = HERE / ("spec_tastoria.tsv" if not only else "spec_test.tsv")
+    s.write(str(spec))
+    print("Wrote", len(s.lines), "commands ->", spec)

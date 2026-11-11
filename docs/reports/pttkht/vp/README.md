@@ -23,4 +23,11 @@ Phân biệt mô hình: DM là lớp miền phân tích; AR là phân tầng v�
 
 Màu giữ nguyên DesignV2/VP: #7ACFF5. Không chỉnh màu ảnh sau export. check_svg.py được sửa đúng một nhận diện: khung System được nhận từ modelType=System nên cạnh actor–UC qua biên hệ thống không bị báo nhầm là xuyên vật cản. Các kiểm tra chồng chữ/hình khác giữ nguyên.
 
-Bản theo pha bổ sung `analysis_v2.py`: CL09/13/15/20/30, DS02/03 và SQ03, tổng cộng 39 sơ đồ. Các lớp BCE hiển thị dạng lớp có stereotype bằng `setDisplayAsRobustnessAnalysisIcon(false)` để giữ đầy đủ thuộc tính. Kiểm tra nhãn rút gọn được bổ sung trong `../verify_delivery.py`.
+Từ 11/2026 `gen_tastoria.py` không tự đặc tả sơ đồ nữa: đọc `docs/sad/tools/diagrams/model.py` (cùng nguồn với PlantUML) và tự tính bố cục lưới, tuyến đường nối, vị trí nhãn. 104 sơ đồ ở `Tastoria.vpp`; 17 ERD chi tiết ở `Tastoria-ERD.vpp`:
+
+```bash
+python3 ../../../vp-import-kit/tools/ddl_to_spec.py ../../../../db/schema_vp.sql ../../../sad/tools/diagrams/model.py /tmp/erd-spec.tsv
+bash ./run_erd.sh /tmp/erd-spec.tsv "$PWD/Tastoria-ERD.vpp" /tmp/erdpng
+```
+
+Plugin `pttkht.uml` được thêm kiểu sơ đồ CMP/DPL/PKGD; plugin `tastoria.erd` nhận dòng `P` (vị trí đặt tay) và bỏ bố cục tự động khi có. Các lớp BCE hiển thị dạng lớp có stereotype bằng `setDisplayAsRobustnessAnalysisIcon(false)` để giữ đầy đủ thuộc tính. Kiểm tra nhãn rút gọn được bổ sung trong `../verify_delivery.py`.
