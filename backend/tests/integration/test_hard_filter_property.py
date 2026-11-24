@@ -38,7 +38,7 @@ def catalog_facts(kb_engine):
 
 def test_every_recipe_times_every_allergen_group(catalog_facts) -> None:
     views, allergens, _, codes, _ = catalog_facts
-    assert len(views) == 171 and len(codes) == 10
+    assert len(views) == 560 and len(codes) == 10
     staples_with_allergen = 0
     violations = []
     for v in views:

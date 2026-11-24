@@ -109,7 +109,7 @@ def test_create_form_draws_stratified_published_anchors_and_closes_the_previous(
 
 
 def test_create_form_refuses_infeasible_or_bad_arguments(cli, kb_db) -> None:
-    code, body, err = cli("survey", "create-form", "--anchors", "100", "--random", "100")
+    code, body, err = cli("survey", "create-form", "--anchors", "300", "--random", "300")
     assert code == 1 and body["ok"] is False and "không đủ món published" in err
     assert q(kb_db, "SELECT count(*) FROM survey_forms").scalar() == 0
     assert (

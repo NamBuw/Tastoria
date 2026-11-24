@@ -1,0 +1,53 @@
+slug: tom-nuong-muoi-ot
+name_vi: Tôm nướng muối ớt sả
+slot: man
+servings: 3
+method: nuong
+tags:
+- cay
+- gion
+- thom_sa_gung
+- cuoi_tuan
+ingredients:
+- name: tôm
+  grams: 450.0
+  role: main
+- name: muối
+  grams: 8.0
+  role: seasoning
+- name: ớt
+  grams: 12.0
+  role: seasoning
+- name: tỏi
+  grams: 12.0
+  role: seasoning
+- name: sả
+  grams: 20.0
+  role: seasoning
+- name: dầu ăn
+  grams: 10.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế tôm và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Trộn đều tôm với gia vị ướp.
+  kind: active
+  minutes: 5
+  uses_burner: false
+- step_no: 3
+  text_vi: Nướng tôm ở 190°C đến khi xém cạnh chín vàng thơm.
+  kind: passive
+  minutes: 20
+  uses_burner: false
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng nam, đối chiếu định lượng thành phần FCT2007/USDA.

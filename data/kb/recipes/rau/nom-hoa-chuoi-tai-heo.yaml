@@ -1,0 +1,61 @@
+slug: nom-hoa-chuoi-tai-heo
+name_vi: Nộm hoa chuối tai heo lạc rang
+slot: rau
+servings: 4
+method: tron
+tags:
+- chua_ngot
+- gion
+- troi_nong
+- cuoi_tuan
+- nau_nhanh
+ingredients:
+- name: hoa chuối
+  grams: 350.0
+  role: main
+- name: tai lợn
+  grams: 200.0
+  role: main
+- name: lạc
+  grams: 40.0
+  role: side
+- name: cà rốt
+  grams: 60.0
+  role: side
+- name: chanh
+  grams: 30.0
+  role: seasoning
+- name: đường
+  grams: 25.0
+  role: seasoning
+- name: nước mắm
+  grams: 30.0
+  role: seasoning
+- name: tỏi
+  grams: 12.0
+  role: seasoning
+- name: ớt
+  grams: 8.0
+  role: seasoning
+- name: kinh giới
+  grams: 20.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế hoa chuối, tai lợn cùng lạc, cà rốt và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Pha nước trộn chua ngọt tỏi ớt cho tan đều, trộn nhẹ tay cùng hoa chuối, tai lợn cùng lạc, cà rốt và rắc lạc/vừng trước khi ăn.
+  kind: active
+  minutes: 7
+  uses_burner: false
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.dienmayxanh.com/vao-bep
+  title: Điện Máy XANH — Vào bếp (Món ngon gia đình Việt Nam)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng bac, đối chiếu định lượng thành phần FCT2007/USDA.

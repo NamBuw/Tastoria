@@ -1,0 +1,58 @@
+slug: canh-cu-sung-ham-thit-bam
+name_vi: Canh củ súng khô hầm hạt sen chay
+slot: canh
+servings: 4
+method: ham
+tags:
+- thanh
+- mem
+- nhieu_nuoc
+- bua_thuong
+ingredients:
+- name: củ súng khô (đã bỏ vỏ)
+  grams: 120.0
+  role: main
+- name: hạt sen
+  grams: 100.0
+  role: main
+- name: nấm hương tươi
+  grams: 100.0
+  role: main
+- name: hạt nêm chay
+  grams: 8.0
+  role: seasoning
+- name: muối
+  grams: 4.0
+  role: seasoning
+- name: rau mùi
+  grams: 15.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Sơ chế củ súng khô (đã bỏ vỏ) và nguyên liệu phụ.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Ngâm củ súng khô 4 giờ trong nước ấm cho mềm trước khi nấu.
+  kind: passive
+  minutes: 240
+  uses_burner: false
+- step_no: 3
+  text_vi: Chần sơ và đảo săn củ súng khô (đã bỏ vỏ), hạt sen, nấm hương tươi, đổ ngập nước đun sôi rồi hớt bọt.
+  kind: active
+  minutes: 8
+  uses_burner: true
+- step_no: 4
+  text_vi: Hầm nhỏ lửa cùng nguyên liệu phụ đến khi chín mềm, nêm lại vừa miệng.
+  kind: passive
+  minutes: 40
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng nam, đối chiếu định lượng thành phần FCT2007/USDA.

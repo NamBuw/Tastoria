@@ -1,0 +1,56 @@
+slug: ca-tim-nuong-mo-hanh-chay
+name_vi: Cà tím nướng mỡ hành nước tương chay
+slot: rau
+servings: 3
+method: nuong
+tags:
+- mem
+- dam_da
+- thom_toi
+- bua_thuong
+ingredients:
+- name: cà tím
+  grams: 450.0
+  role: main
+- name: hành lá
+  grams: 35.0
+  role: seasoning
+- name: nước tương
+  grams: 25.0
+  role: seasoning
+- name: đường
+  grams: 8.0
+  role: seasoning
+- name: tỏi
+  grams: 8.0
+  role: seasoning
+- name: ớt
+  grams: 5.0
+  role: seasoning
+- name: dầu ăn
+  grams: 15.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế cà tím và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Trộn đều cà tím với gia vị ướp.
+  kind: active
+  minutes: 5
+  uses_burner: false
+- step_no: 3
+  text_vi: Nướng cà tím ở 190°C đến khi xém cạnh chín vàng thơm.
+  kind: passive
+  minutes: 20
+  uses_burner: false
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.dienmayxanh.com/vao-bep
+  title: Điện Máy XANH — Vào bếp (Món ngon gia đình Việt Nam)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng nam, đối chiếu định lượng thành phần FCT2007/USDA.

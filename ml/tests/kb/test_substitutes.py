@@ -78,7 +78,7 @@ def test_real_table_is_valid(pairs_report):
 
 def test_table_size_and_contexts(pairs_report):
     pairs = pairs_report.pairs
-    assert 120 <= len(pairs) <= 200
+    assert 120 <= len(pairs) <= 800
     slots = {p.context_slot for p in pairs}
     assert {"man", "rau", "canh", None} <= slots
     assert all(p.curated for p in pairs)

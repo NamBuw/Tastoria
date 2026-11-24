@@ -1,0 +1,52 @@
+slug: tom-chien-bo-toi
+name_vi: Tôm chiên bơ tỏi
+slot: man
+servings: 3
+method: chien
+tags:
+- gion
+- beo
+- thom_toi
+- nau_nhanh
+- bua_thuong
+ingredients:
+- name: tôm
+  grams: 400.0
+  role: main
+- name: bơ
+  grams: 25.0
+  role: seasoning
+- name: tỏi
+  grams: 20.0
+  role: seasoning
+- name: hành lá
+  grams: 15.0
+  role: seasoning
+- name: muối
+  grams: 3.0
+  role: seasoning
+- name: tiêu
+  grams: 2.0
+  role: seasoning
+- name: dầu ăn
+  grams: 15.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế tôm và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Làm nóng chảo với lượng dầu vừa phải, chiên tôm vàng đều các mặt, vớt ráo dầu và dọn kèm gia vị chấm.
+  kind: active
+  minutes: 10
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng chung, đối chiếu định lượng thành phần FCT2007/USDA.

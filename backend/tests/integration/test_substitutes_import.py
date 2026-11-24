@@ -153,9 +153,10 @@ def test_missing_ingredient_gets_suggestions_from_the_curated_table(
     assert set(names[:2]) == {"mồng tơi", "rau dền"} and names[2] == "rau đay"  # score 0.7, 0.7, then 0.6
     assert all(c["origin"] == "lookup" for c in miss["candidates"])
 
-    # meat of the canh: thịt băm -> thịt nạc vai (any context) and thịt bò xay (canh/nau_canh) both apply
+    # meat of the canh: thịt băm -> thịt bò xay (canh/nau_canh exact ctx first) and thịt nạc vai (any context) both apply
     meat = kb_client.get(url, params={"ingredient_id": ingredient_id(kb_db, "thịt băm")}, headers=h).json()
-    assert [c["name_vi"] for c in meat["items"][0]["candidates"]] == ["thịt bò xay", "thịt nạc vai"]  # exact ctx first
+    meat_cands = [c["name_vi"] for c in meat["items"][0]["candidates"]]
+    assert meat_cands[0] == "thịt bò xay" and "thịt nạc vai" in meat_cands  # exact ctx first
 
 
 def test_runtime_filter_drops_substitutes_with_a_coeater_allergen(

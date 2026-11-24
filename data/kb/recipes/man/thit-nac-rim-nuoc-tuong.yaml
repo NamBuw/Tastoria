@@ -1,0 +1,54 @@
+slug: thit-nac-rim-nuoc-tuong
+name_vi: Thịt nạc rim nước tương tỏi
+slot: man
+servings: 3
+method: rim
+tags:
+- dam_da
+- sot_sanh
+- thom_toi
+- com_hop
+- bua_thuong
+ingredients:
+- name: thịt nạc
+  grams: 400.0
+  role: main
+- name: nước tương
+  grams: 30.0
+  role: seasoning
+- name: tỏi
+  grams: 15.0
+  role: seasoning
+- name: đường
+  grams: 12.0
+  role: seasoning
+- name: tiêu
+  grams: 2.0
+  role: seasoning
+- name: dầu ăn
+  grams: 12.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế thịt nạc và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Phi thơm hành tỏi, đảo săn thịt nạc.
+  kind: active
+  minutes: 5
+  uses_burner: true
+- step_no: 3
+  text_vi: Hạ lửa vừa, rim thịt nạc với hỗn hợp gia vị đến khi nước sánh bóng bám đều.
+  kind: passive
+  minutes: 12
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng chung, đối chiếu định lượng thành phần FCT2007/USDA.

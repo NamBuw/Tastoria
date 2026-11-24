@@ -1,0 +1,58 @@
+slug: suon-non-ram-toi-ot
+name_vi: Sườn non ram tỏi ớt
+slot: man
+servings: 4
+method: rim
+tags:
+- dam_da
+- cay
+- sot_sanh
+- thom_toi
+- com_hop
+- bua_thuong
+ingredients:
+- name: sườn non
+  grams: 550.0
+  role: main
+- name: tỏi
+  grams: 20.0
+  role: seasoning
+- name: ớt
+  grams: 10.0
+  role: seasoning
+- name: nước mắm
+  grams: 30.0
+  role: seasoning
+- name: đường
+  grams: 18.0
+  role: seasoning
+- name: dầu ăn
+  grams: 14.0
+  role: seasoning
+- name: tiêu
+  grams: 2.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế sườn non và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Phi thơm hành tỏi, đảo săn sườn non.
+  kind: active
+  minutes: 5
+  uses_burner: true
+- step_no: 3
+  text_vi: Hạ lửa vừa, rim sườn non với hỗn hợp gia vị đến khi nước sánh bóng bám đều.
+  kind: passive
+  minutes: 12
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng nam, đối chiếu định lượng thành phần FCT2007/USDA.

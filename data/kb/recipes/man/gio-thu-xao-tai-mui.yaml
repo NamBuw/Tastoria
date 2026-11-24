@@ -1,0 +1,55 @@
+slug: gio-thu-xao-tai-mui
+name_vi: Giò thủ xào tai mũi mộc nhĩ
+slot: man
+servings: 4
+method: xao
+tags:
+- gion
+- dam_da
+- cuoi_tuan
+ingredients:
+- name: tai lợn
+  grams: 450.0
+  role: main
+- name: thịt nạc vai
+  grams: 200.0
+  role: main
+- name: mộc nhĩ
+  grams: 25.0
+  role: main
+- name: nước mắm
+  grams: 25.0
+  role: seasoning
+- name: hành tím
+  grams: 20.0
+  role: seasoning
+- name: tiêu
+  grams: 5.0
+  role: seasoning
+- name: dầu ăn
+  grams: 10.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Sơ chế mộc nhĩ và nguyên liệu phụ.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Ngâm mộc nhĩ khô trong nước ấm khoảng 3 giờ trước khi thái sợi.
+  kind: passive
+  minutes: 180
+  uses_burner: false
+- step_no: 3
+  text_vi: Phi thơm tỏi hành trên lửa lớn, cho tai lợn, thịt nạc vai, mộc nhĩ vào đảo nhanh tay đến khi chín tới, nêm gia vị rồi tắt bếp.
+  kind: active
+  minutes: 7
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng bac, đối chiếu định lượng thành phần FCT2007/USDA.

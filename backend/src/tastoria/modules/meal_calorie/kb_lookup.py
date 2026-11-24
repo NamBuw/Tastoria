@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import re
 import unicodedata
 from dataclasses import dataclass, replace
@@ -226,6 +227,37 @@ class KBDishCatalog:
                         serving_g=_parse_serving_g(r.get("serving_g"), sdesc),
                     )
                 )
+        open_path = kb_dir / "dish_taxonomy_expanded.json"
+        if open_path.exists():
+            open_doc = json.loads(open_path.read_text(encoding="utf-8")) or {}
+            for r in open_doc.get("dishes") or []:
+                did = str(r.get("dish_id") or "")
+                if not did or did in seen_rec_ids:
+                    continue
+                seen_rec_ids.add(did)
+                p = float(r.get("protein_g") or 0.0)
+                c = float(r.get("glucid_g") or 0.0)
+                f = float(r.get("lipid_g") or 0.0)
+                kcal = float(r.get("kcal_per_serving") or round(4.0 * p + 4.0 * c + 9.0 * f, 1))
+                sdesc = str(r.get("serving_desc_vi") or "")
+                recognized.append(
+                    RecognizedDishNutrition(
+                        dish_id=did,
+                        name_vi=str(r.get("name_vi") or did),
+                        name_en=str(r.get("name_en") or did),
+                        category=str(r.get("category") or "global"),
+                        kb_slug=r.get("kb_slug"),
+                        slot=str(r.get("slot") or "man"),
+                        kcal_per_serving=kcal,
+                        protein_g=p,
+                        lipid_g=f,
+                        glucid_g=c,
+                        fiber_g=float(r.get("fiber_g") or 0.0),
+                        serving_desc_vi=sdesc,
+                        source_ref=str(r.get("source_ref") or "M7 Expanded Open-Vocab Taxonomy"),
+                        serving_g=_parse_serving_g(r.get("serving_g"), sdesc),
+                    )
+                )
         pkg_path = kb_dir / "everyday_packaged_foods.yaml"
         if pkg_path.exists():
             pkg_doc = yaml.safe_load(pkg_path.read_text(encoding="utf-8")) or {}
@@ -254,6 +286,37 @@ class KBDishCatalog:
                         fiber_g=float(r.get("fiber_g") or 0.0),
                         serving_desc_vi=sdesc,
                         source_ref=str(r.get("source_ref") or ""),
+                        serving_g=_parse_serving_g(r.get("serving_g"), sdesc),
+                    )
+                )
+        open_path = kb_dir / "dish_taxonomy_expanded.json"
+        if open_path.exists():
+            open_doc = json.loads(open_path.read_text(encoding="utf-8")) or {}
+            for r in open_doc.get("dishes") or []:
+                did = str(r.get("dish_id") or "")
+                if not did or did in seen_rec_ids:
+                    continue
+                seen_rec_ids.add(did)
+                p = float(r.get("protein_g") or 0.0)
+                c = float(r.get("glucid_g") or 0.0)
+                f = float(r.get("lipid_g") or 0.0)
+                kcal = float(r.get("kcal_per_serving") or round(4.0 * p + 4.0 * c + 9.0 * f, 1))
+                sdesc = str(r.get("serving_desc_vi") or "")
+                recognized.append(
+                    RecognizedDishNutrition(
+                        dish_id=did,
+                        name_vi=str(r.get("name_vi") or did),
+                        name_en=str(r.get("name_en") or did),
+                        category=str(r.get("category") or "global"),
+                        kb_slug=r.get("kb_slug"),
+                        slot=str(r.get("slot") or "man"),
+                        kcal_per_serving=kcal,
+                        protein_g=p,
+                        lipid_g=f,
+                        glucid_g=c,
+                        fiber_g=float(r.get("fiber_g") or 0.0),
+                        serving_desc_vi=sdesc,
+                        source_ref=str(r.get("source_ref") or "M7 Expanded Open-Vocab Taxonomy"),
                         serving_g=_parse_serving_g(r.get("serving_g"), sdesc),
                     )
                 )

@@ -1,0 +1,54 @@
+slug: ca-bat-muoi-nen
+name_vi: Cà bát muối nén truyền thống
+slot: rau
+servings: 4
+method: muoi_chua
+tags:
+- chua
+- gion
+- bua_thuong
+ingredients:
+- name: cà muối nén
+  grams: 500.0
+  role: main
+- name: muối
+  grams: 45.0
+  role: seasoning
+- name: tỏi
+  grams: 15.0
+  role: seasoning
+- name: riềng
+  grams: 20.0
+  role: seasoning
+- name: ớt
+  grams: 8.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Nhặt rửa sạch cà muối nén, cắt miếng vừa ăn rồi để thật ráo nước.
+  kind: active
+  minutes: 12
+  uses_burner: false
+- step_no: 2
+  text_vi: Đun sôi nước gia vị muối chua cho tan muối đường rồi để nguội còn ấm.
+  kind: active
+  minutes: 6
+  uses_burner: true
+- step_no: 3
+  text_vi: Xếp nguyên liệu vào hũ, đổ ngập nước gia vị và nén nhẹ.
+  kind: active
+  minutes: 5
+  uses_burner: false
+- step_no: 4
+  text_vi: Nén chặt cà bát với muối hạt và riềng tỏi trong hũ sành khoảng 3 ngày.
+  kind: passive
+  minutes: 4320
+  uses_burner: false
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.dienmayxanh.com/vao-bep
+  title: Điện Máy XANH — Vào bếp (Món ngon gia đình Việt Nam)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng bac, đối chiếu định lượng thành phần FCT2007/USDA.

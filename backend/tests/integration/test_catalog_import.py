@@ -59,10 +59,10 @@ def _edit_yaml(path: Path, fn) -> None:
 
 def test_kb_import_loads_the_whole_catalog(kb_database_url: str) -> None:
     url = kb_database_url
-    assert _one(url, "SELECT count(*) FROM recipes WHERE status = 'published'") == 171
+    assert _one(url, "SELECT count(*) FROM recipes WHERE status = 'published'") == 560
     assert _one(url, "SELECT count(*) FROM recipes WHERE status = 'draft'") == 9  # < 2 sources or unmapped main
     assert _one(url, "SELECT count(*) FROM recipes WHERE status = 'retired'") == 0
-    assert _one(url, "SELECT count(*) FROM ingredients WHERE is_active") == 233  # 231 (incl. 7 packaged/snack items for the detector) + 2 made-ahead products
+    assert _one(url, "SELECT count(*) FROM ingredients WHERE is_active") == 1114  # 1107 YAML + 7 made-ahead products
     assert _one(url, "SELECT count(*) FROM allergen_groups") == 10
     assert _one(url, "SELECT count(*) FROM nutrient_sources") == 3
     assert _one(url, "SELECT count(*) FROM nutrients") == 7
@@ -70,7 +70,7 @@ def test_kb_import_loads_the_whole_catalog(kb_database_url: str) -> None:
     assert _one(url, "SELECT count(*) FROM qty_levels") == 19 * 3
     # every published recipe has energy, with the data version of the rules that computed it (BR-NUT-05)
     assert _one(url, "SELECT count(DISTINCT recipe_id) FROM recipe_nutrition rn JOIN recipes r ON r.id = rn.recipe_id "
-                     "WHERE r.status = 'published' AND rn.nutrient_code = 'energy_kcal'") == 171  # fmt: skip
+                     "WHERE r.status = 'published' AND rn.nutrient_code = 'energy_kcal'") == 560  # fmt: skip
     assert _one(url, "SELECT count(DISTINCT data_version) FROM recipe_nutrition") == 1
     # composition rows only for codes the ingredients use (+ rice for E_bát)
     used = _one(url, "SELECT count(DISTINCT (comp_source_id, comp_source_code)) FROM ingredients "
@@ -97,13 +97,16 @@ def test_make_ahead_recipes_are_tagged_and_mapped(kb_database_url: str) -> None:
         "JOIN ingredients i ON i.id = m.item_ingredient_id ORDER BY r.name_vi",
     )
     got = {r.name_vi: (r.item, r.through_step_no, r.last_step, r.tagged) for r in rows}
-    assert got == {
+    assert len(got) == 50
+    for k, v in {
         "Canh măng nấu chân giò": ("măng khô", 2, 9, True),
         "Cà pháo muối": ("cà pháo muối", 5, 5, True),
         "Dưa cải muối": ("dưa cải chua", 5, 5, True),
         "Dưa giá": ("dưa giá", 4, 4, True),
-    }
-    assert _one(kb_database_url, "SELECT count(*) FROM recipe_tags WHERE tag_code = 'lam_san'") == 4
+    }.items():
+        assert got[k] == v
+    assert all(tagged for (_, _, _, tagged) in got.values())
+    assert _one(kb_database_url, "SELECT count(*) FROM recipe_tags WHERE tag_code = 'lam_san'") == 50
     assert _one(kb_database_url, "SELECT kind FROM tags WHERE code = 'lam_san'") == "occasion"
 
 
@@ -188,8 +191,14 @@ def test_missing_items_are_retired_and_deactivated_not_deleted(fresh_database, b
     url = fresh_database()
     assert _run(url, bundle_copy).ok
     (bundle_copy / "recipes/rau/dau-dua-xao-toi.yaml").unlink()
-    _edit_yaml(bundle_copy / "make_ahead.yaml", lambda d: d["ingredients"].pop())  # drop "dưa giá" product …
-    _edit_yaml(bundle_copy / "make_ahead.yaml", lambda d: d["make_ahead"].pop(2))  # … and its mapping
+    _edit_yaml(
+        bundle_copy / "make_ahead.yaml",
+        lambda d: d.__setitem__("ingredients", [i for i in d["ingredients"] if i.get("name_vi") != "dưa giá"]),
+    )
+    _edit_yaml(
+        bundle_copy / "make_ahead.yaml",
+        lambda d: d.__setitem__("make_ahead", [m for m in d["make_ahead"] if m.get("recipe") != "dua-gia"]),
+    )
     (bundle_copy / "recipes/rau/dua-gia.yaml").unlink()
     res = _run(url, bundle_copy)
     assert res.ok, res.errors

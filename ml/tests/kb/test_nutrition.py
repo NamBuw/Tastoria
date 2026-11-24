@@ -145,6 +145,13 @@ JUSTIFIED = {
     "goi-ga-bap-cai": "gỏi có thịt gà",
     "goi-ngo-sen-tom-thit": "gỏi có tôm và thịt ba chỉ",
     "ngon-su-su-xao-toi": "ngọn su su chưa có thành phần",
+    "canh-duoi-lon-ham-dau-den": "đuôi lợn nhiều mỡ (FCT 7038: 467 kcal/100 g) và đậu đen, nồi canh hầm ăn thay món chính",
+    "cu-cai-do-tron-chua-ngot": "USDA củ cải đỏ (2747665) & giấm (172237): acid acetic và chất xơ không nằm đủ trong 4P+9L+4G",
+    "dau-bap-nuong-sa-te": "USDA đậu bắp (169260): năng lượng theo hệ số Atwater riêng, carb trừ chất xơ",
+    "dau-co-ve-luoc": "USDA đậu cô ve xanh (2346400): năng lượng theo hệ số Atwater riêng và chất xơ",
+    "nam-moi-kho-nuoc-tuong-chay": "nấm kho chay thanh đạm, rất ít dầu mỡ",
+    "ram-muoi-do": "hải sản nhiều vỏ, thải bỏ lớn, ít dầu mỡ",
+    "tom-hap-nuoc-dua": "tôm hấp thải bỏ vỏ 54 %, ít béo",
 }
 
 

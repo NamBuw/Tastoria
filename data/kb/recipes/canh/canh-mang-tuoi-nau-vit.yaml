@@ -1,0 +1,56 @@
+slug: canh-mang-tuoi-nau-vit
+name_vi: Canh măng tươi nấu thịt vịt
+slot: canh
+servings: 4
+method: nau_canh
+tags:
+- dam_da
+- nhieu_nuoc
+- cuoi_tuan
+- nau_nhanh
+ingredients:
+- name: thịt vịt
+  grams: 500.0
+  role: main
+- name: măng tươi
+  grams: 350.0
+  role: main
+- name: hành lá
+  grams: 20.0
+  role: seasoning
+- name: rau mùi
+  grams: 15.0
+  role: seasoning
+- name: gừng
+  grams: 15.0
+  role: seasoning
+- name: nước mắm
+  grams: 25.0
+  role: seasoning
+- name: hành tím
+  grams: 15.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế thịt vịt, măng tươi và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Đun sôi khoảng 1,2 lít nước (hoặc xào sơ thịt vịt, măng tươi), hớt bọt cho nước trong.
+  kind: active
+  minutes: 6
+  uses_burner: true
+- step_no: 3
+  text_vi: Cho phần rau củ còn lại vào nấu chín tới, nêm gia vị vừa ăn và rắc rau thơm.
+  kind: active
+  minutes: 6
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng bac, đối chiếu định lượng thành phần FCT2007/USDA.

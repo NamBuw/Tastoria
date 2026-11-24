@@ -1,0 +1,48 @@
+slug: ca-rot-xao-dau-ha-lan
+name_vi: Cà rốt xào đậu Hà Lan chay
+slot: rau
+servings: 3
+method: xao
+tags:
+- gion
+- thanh
+- nau_nhanh
+- bua_thuong
+ingredients:
+- name: cà rốt
+  grams: 200.0
+  role: main
+- name: đậu Hà Lan
+  grams: 200.0
+  role: main
+- name: tỏi
+  grams: 10.0
+  role: seasoning
+- name: hạt nêm chay
+  grams: 6.0
+  role: seasoning
+- name: tiêu
+  grams: 1.0
+  role: seasoning
+- name: dầu ăn
+  grams: 12.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế cà rốt, đậu Hà Lan và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Phi thơm tỏi hành trên lửa lớn, cho cà rốt, đậu Hà Lan vào đảo nhanh tay đến khi chín tới, nêm gia vị rồi tắt bếp.
+  kind: active
+  minutes: 7
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.dienmayxanh.com/vao-bep
+  title: Điện Máy XANH — Vào bếp (Món ngon gia đình Việt Nam)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng chung, đối chiếu định lượng thành phần FCT2007/USDA.

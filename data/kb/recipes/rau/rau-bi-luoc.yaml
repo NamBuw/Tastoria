@@ -1,0 +1,39 @@
+slug: rau-bi-luoc
+name_vi: Ngọn bí luộc chấm muối vừng
+slot: rau
+servings: 3
+method: luoc
+tags:
+- thanh
+- mem
+- nau_nhanh
+- bua_thuong
+ingredients:
+- name: rau bí
+  grams: 450.0
+  role: main
+- name: vừng
+  grams: 20.0
+  role: seasoning
+- name: muối
+  grams: 4.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế rau bí và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Đun sôi nước với chút muối hoặc gừng sả, cho rau bí vào luộc chín tới rồi vớt ra đĩa.
+  kind: passive
+  minutes: 10
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.dienmayxanh.com/vao-bep
+  title: Điện Máy XANH — Vào bếp (Món ngon gia đình Việt Nam)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng bac, đối chiếu định lượng thành phần FCT2007/USDA.

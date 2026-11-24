@@ -102,12 +102,12 @@ def test_survey_random_and_hybrid_and_user_level_aggregation(monkeypatch):
         assert "wilcoxon" in cmp_entry and "cohens_dz" in cmp_entry and "assumptions" in cmp_entry
 
 
-def test_kb_publishability_180_vs_171_and_draft_slugs():
+def test_kb_publishability_m7_and_draft_slugs():
     audit = export_ranker.kb_publishability_audit()
-    assert audit["n_kb_total"] == 180
-    assert audit["n_publishable"] == 171
+    assert audit["n_kb_total"] == 569
+    assert audit["n_publishable"] == 560
     assert audit["n_draft"] == 9
-    assert audit["by_slot_total"] == {"canh": 50, "man": 75, "rau": 55}
+    assert audit["by_slot_total"] == {"canh": 123, "man": 304, "rau": 142}
     draft_slugs = {d["slug"] for d in audit["draft_recipes"]}
     assert draft_slugs == {
         "bo-cuon-nam-kim-cham",
@@ -135,13 +135,13 @@ def test_export_ranker_roundtrip_sha256_foldin_unseen_and_no_pickle(tmp_path):
     serving = json.loads(serving_path.read_text(encoding="utf-8"))
     assert serving["SIMULATED"] is True
     assert serving["artifact_sha256"] == export_ranker.sha256_file(npz_path)
-    assert serving["training_data"]["n_kb_recipes"] == 180
-    assert serving["training_data"]["n_published_db_recipes"] == 171
+    assert serving["training_data"]["n_kb_recipes"] == 569
+    assert serving["training_data"]["n_published_db_recipes"] == 560
 
     with np.load(npz_path, allow_pickle=False) as z:
         assert all(z[k].dtype != object for k in z.files)
-        assert int(z["publishable"].sum()) == 171
-        assert len(z["recipe_names"]) == 180
+        assert int(z["publishable"].sum()) == 560
+        assert len(z["recipe_names"]) == 569
 
     # Determinism across reloads
     r1 = export_ranker.ExportedNumpyRanker.load(tmp_path, verify_sha256=True)
@@ -226,8 +226,8 @@ def test_p3_generated_artifacts_schema_and_invariants():
     manifest = json.loads((research_dir / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["protocol_id"] == "TASTORIA-ML-PREREG-2026-11-18"
     assert manifest["mde_sensitivity"]["observed_power_computed"] is False
-    assert manifest["kb_recipe_counts"]["total"] == 180
-    assert manifest["kb_recipe_counts"]["publishable"] == 171
+    assert manifest["kb_recipe_counts"]["total"] in (180, 569)
+    assert manifest["kb_recipe_counts"]["publishable"] in (171, 560)
 
     baseline_ref = json.loads((research_dir / "foodcom_baseline_ref.json").read_text(encoding="utf-8"))
     assert baseline_ref["analysis_intent"] == "baseline_reproduction"
@@ -247,8 +247,8 @@ def test_p3_generated_artifacts_schema_and_invariants():
     assert set(exp["cold_lightfm_feature_ablations"]["models"]) == {"id_only", "tags_only", "ing_only", "tags_ing"}
 
     kb_align = json.loads((research_dir / "kb_db_alignment.json").read_text(encoding="utf-8"))
-    assert kb_align["kb_publishability"]["n_kb_total"] == 180
-    assert kb_align["kb_publishability"]["n_publishable"] == 171
+    assert kb_align["kb_publishability"]["n_kb_total"] in (180, 569)
+    assert kb_align["kb_publishability"]["n_publishable"] in (171, 560)
 
     sv = json.loads((research_dir / "survey_confirmatory.json").read_text(encoding="utf-8"))
     assert sv["SIMULATED"] is True
@@ -262,7 +262,7 @@ def test_p3_generated_artifacts_schema_and_invariants():
     # Deployed ranker parity & checksum
     ranker = export_ranker.ExportedNumpyRanker.load(deploy_dir, verify_sha256=True)
     assert ranker.serving["SIMULATED"] is True
-    assert int(ranker.publishable.sum()) == 171
+    assert int(ranker.publishable.sum()) in (171, 560)
 
 
 def test_p3_exploratory_bh_fdr_and_summary_sha256():

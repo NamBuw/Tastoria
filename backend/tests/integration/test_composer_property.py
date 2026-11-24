@@ -41,7 +41,11 @@ def _independent_needs(recipe, persons: int) -> dict[uuid.UUID, float]:
     return out
 
 
-@settings(max_examples=60, deadline=None, suppress_health_check=[HealthCheck.function_scoped_fixture])
+@settings(
+    max_examples=60,
+    deadline=None,
+    suppress_health_check=[HealthCheck.function_scoped_fixture, HealthCheck.large_base_example],
+)
 @given(data=st.data())
 def test_every_returned_tray_is_feasible(world, data) -> None:
     views, codes, chay, ingredients = world

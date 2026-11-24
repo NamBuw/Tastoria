@@ -1,0 +1,46 @@
+slug: muop-dang-luoc-cham-ruoc
+name_vi: Khổ qua luộc chấm kho quẹt chay
+slot: rau
+servings: 3
+method: luoc
+tags:
+- dang
+- thanh
+- troi_nong
+- nau_nhanh
+- bua_thuong
+ingredients:
+- name: mướp đắng
+  grams: 400.0
+  role: main
+- name: nước tương
+  grams: 25.0
+  role: seasoning
+- name: đường
+  grams: 12.0
+  role: seasoning
+- name: tiêu
+  grams: 2.0
+  role: seasoning
+- name: ớt
+  grams: 5.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế mướp đắng và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Đun sôi nước với chút muối hoặc gừng sả, cho mướp đắng vào luộc chín tới rồi vớt ra đĩa.
+  kind: passive
+  minutes: 10
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.dienmayxanh.com/vao-bep
+  title: Điện Máy XANH — Vào bếp (Món ngon gia đình Việt Nam)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng nam, đối chiếu định lượng thành phần FCT2007/USDA.

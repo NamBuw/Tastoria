@@ -1,0 +1,58 @@
+slug: canh-kim-chi-dau-phu
+name_vi: Canh dưa cải chua nấu đậu phụ thịt ba chỉ
+slot: canh
+servings: 4
+method: nau_canh
+tags:
+- chua
+- cay
+- nhieu_nuoc
+- troi_lanh
+- nau_nhanh
+- bua_thuong
+ingredients:
+- name: dưa cải chua
+  grams: 280.0
+  role: main
+- name: đậu phụ
+  grams: 200.0
+  role: main
+- name: thịt ba chỉ
+  grams: 150.0
+  role: main
+- name: hành lá
+  grams: 20.0
+  role: seasoning
+- name: tỏi
+  grams: 10.0
+  role: seasoning
+- name: ớt
+  grams: 6.0
+  role: seasoning
+- name: nước mắm
+  grams: 18.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế dưa cải chua, đậu phụ, thịt ba chỉ và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Đun sôi khoảng 1,2 lít nước (hoặc xào sơ dưa cải chua, đậu phụ, thịt ba chỉ), hớt bọt cho nước trong.
+  kind: active
+  minutes: 6
+  uses_burner: true
+- step_no: 3
+  text_vi: Cho phần rau củ còn lại vào nấu chín tới, nêm gia vị vừa ăn và rắc rau thơm.
+  kind: active
+  minutes: 6
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng chung, đối chiếu định lượng thành phần FCT2007/USDA.

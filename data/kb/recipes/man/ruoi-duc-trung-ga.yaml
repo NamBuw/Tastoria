@@ -1,0 +1,58 @@
+slug: ruoi-duc-trung-ga
+name_vi: Chả rươi rán lá lốt vỏ quýt
+slot: man
+servings: 4
+method: chien
+tags:
+- beo
+- gion
+- dam_da
+- cuoi_tuan
+- nau_nhanh
+ingredients:
+- name: rươi
+  grams: 350.0
+  role: main
+- name: trứng gà
+  grams: 180.0
+  role: main
+- name: thịt băm
+  grams: 150.0
+  role: main
+- name: lá lốt
+  grams: 20.0
+  role: seasoning
+- name: hành lá
+  grams: 25.0
+  role: seasoning
+- name: thì là
+  grams: 20.0
+  role: seasoning
+- name: nước mắm
+  grams: 20.0
+  role: seasoning
+- name: tiêu
+  grams: 2.0
+  role: seasoning
+- name: dầu ăn
+  grams: 30.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế rươi, trứng gà, thịt băm và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Làm nóng chảo với lượng dầu vừa phải, chiên rươi, trứng gà, thịt băm vàng đều các mặt, vớt ráo dầu và dọn kèm gia vị chấm.
+  kind: active
+  minutes: 10
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng bac, đối chiếu định lượng thành phần FCT2007/USDA.

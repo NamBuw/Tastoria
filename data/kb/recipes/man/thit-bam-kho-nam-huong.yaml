@@ -1,0 +1,56 @@
+slug: thit-bam-kho-nam-huong
+name_vi: Thịt băm kho nấm hương nước mắm
+slot: man
+servings: 3
+method: kho
+tags:
+- dam_da
+- mem
+- bua_thuong
+- com_hop
+ingredients:
+- name: thịt băm
+  grams: 320.0
+  role: main
+- name: nấm hương tươi
+  grams: 120.0
+  role: main
+- name: nước mắm
+  grams: 25.0
+  role: seasoning
+- name: hành tím
+  grams: 15.0
+  role: seasoning
+- name: tiêu
+  grams: 2.0
+  role: seasoning
+- name: hành lá
+  grams: 15.0
+  role: seasoning
+- name: dầu ăn
+  grams: 10.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế thịt băm, nấm hương tươi và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Ướp thịt băm, nấm hương tươi với gia vị cho thấm đều khoảng 10 phút.
+  kind: passive
+  minutes: 10
+  uses_burner: false
+- step_no: 3
+  text_vi: Xào săn thịt băm, nấm hương tươi, thêm nước xâm xấp mặt và kho lửa nhỏ liu riu đến khi sệt đậm đà.
+  kind: passive
+  minutes: 25
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng bac, đối chiếu định lượng thành phần FCT2007/USDA.

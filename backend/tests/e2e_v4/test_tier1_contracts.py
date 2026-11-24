@@ -149,12 +149,12 @@ def test_build_chips_shelf_aggregation_and_freshness_contract(rule_case: str) ->
 def test_kb_bundle_and_nutrition_compute_contract() -> None:
     b = load_bundle(KB_DIR, PROCESSED_DIR)
     assert b.ok, f"Catalog bundle errors: {b.errors[:5]}"
-    assert len(b.recipes) == 180
-    assert len(b.ingredients) >= 232
+    assert len(b.recipes) == 569
+    assert len(b.ingredients) >= 1107
 
     nut = compute(b, PROCESSED_DIR)
     assert nut.engine == "tastoria_ml"
-    assert len(nut.per_serving) == 180
+    assert len(nut.per_serving) == 569
     assert nut.rice_bowl_kcal == pytest.approx(173.2, abs=0.5)
 
 
@@ -172,7 +172,7 @@ def test_nin_dishes_calibration_and_recipe_nutrition_csv_contract(e2e_cfg) -> No
 
     dish_list = yaml.safe_load((KB_DIR / "dish_list.yaml").read_text(encoding="utf-8"))["dishes"]
     expected_slugs = {str(d["slug"]) for d in dish_list}
-    assert len(expected_slugs) == 180
+    assert len(expected_slugs) == 569
 
     with (PROCESSED_DIR / "kb/recipe_nutrition.csv").open(newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
@@ -218,7 +218,7 @@ def test_meal_calorie_service_or_api_contract(e2e_cfg, meal_calorie_probe: dict[
     svc = meal_calorie_probe["service"]
     deps = meal_calorie_probe["deps"]
     dish_list = svc.list_dishes(deps)
-    assert len(dish_list.dishes) == 180
+    assert len(dish_list.dishes) == 569
 
     # KB-calibrated portion estimation works in both baseline & strict modes
     kb_kcals: list[float] = []
@@ -254,7 +254,7 @@ def test_rice_bowl_and_kb_catalog_portion_scaling_contract() -> None:
     assert float(rice["cooked_g"]) == pytest.approx(150.0, abs=0.5)
 
     cat = KBDishCatalog.from_dirs(KB_DIR, PROCESSED_DIR / "kb")
-    assert len(cat.dishes) == 180
+    assert len(cat.dishes) == 569
     assert cat.calibrated is True
     assert 0.0 < cat.half_width_rel <= 0.25
 
@@ -278,7 +278,7 @@ def test_meal_calorie_catalog_and_kb_alignment_contract(
 
     dish_yaml = yaml.safe_load((KB_DIR / "dish_list.yaml").read_text(encoding="utf-8"))["dishes"]
     yaml_by_slug = {str(d["slug"]): d for d in dish_yaml}
-    assert len(yaml_by_slug) == 180
+    assert len(yaml_by_slug) == 569
 
     cat = KBDishCatalog.from_dirs(KB_DIR, PROCESSED_DIR / "kb")
     assert {d.slug for d in cat.dishes} == set(yaml_by_slug)
@@ -291,7 +291,7 @@ def test_meal_calorie_catalog_and_kb_alignment_contract(
         svc = meal_calorie_probe["service"]
         deps = meal_calorie_probe["deps"]
         listed = svc.list_dishes(deps)
-        assert len(listed.dishes) == 180
+        assert len(listed.dishes) == 569
         assert listed.calibrated is True
         assert {d.slug for d in listed.dishes} == set(yaml_by_slug)
     else:
@@ -305,7 +305,7 @@ def test_meal_calorie_http_endpoints_contract(kb_client, e2e_cfg) -> None:
     r_list = kb_client.get(f"{API}/meal-calorie/dishes", headers=h)
     assert r_list.status_code == 200, r_list.text
     list_body = r_list.json()
-    assert len(list_body["dishes"]) == 180
+    assert len(list_body["dishes"]) == 569
     assert list_body["calibrated"] is True
     assert list_body["data_version"]
 
@@ -460,9 +460,10 @@ def test_vision_classes_zero_cooked_dish_slugs_or_names() -> None:
     assert not (vc_names_vi & nin_names_vi)
 
 
-def test_cpu_execution_provider_and_threads_enforcement(e2e_detector) -> None:
+def test_cpu_execution_provider_and_threads_enforcement(e2e_detector, tmp_path: Path) -> None:
     """EF6 CPU runtime contract: CPUExecutionProvider & intra_op_num_threads == 2 in detector & mlops.load_onnx."""
     import inspect
+    import shutil
     from datetime import UTC, datetime
 
     from tastoria.modules.mlops import service as mlops_svc
@@ -479,11 +480,15 @@ def test_cpu_execution_provider_and_threads_enforcement(e2e_detector) -> None:
 
     # Exercise real mlops.load_onnx end-to-end against detector ONNX artifact
     digest = hashlib.sha256(e2e_detector.onnx_path.read_bytes()).hexdigest()
+    staged_dir = tmp_path / "models" / "detector"
+    staged_dir.mkdir(parents=True, exist_ok=True)
+    staged_onnx = staged_dir / e2e_detector.onnx_path.name
+    shutil.copy2(e2e_detector.onnx_path, staged_onnx)
     view = ModelVersionView(
         id=uuid.uuid4(),
         name="detector",
         version="e2e-cpu-check",
-        artifact_key=e2e_detector.onnx_path.name,
+        artifact_key=f"models/detector/{staged_onnx.name}",
         sha256=digest,
         preprocess_version=e2e_detector.manifest.get("preprocess_version"),
         metrics={},
@@ -494,7 +499,7 @@ def test_cpu_execution_provider_and_threads_enforcement(e2e_detector) -> None:
         gate_report_key=None,
         mlflow_run_id=None,
     )
-    loaded_sess = mlops_svc.load_onnx(e2e_detector.onnx_path.parent, view)
+    loaded_sess = mlops_svc.load_onnx(tmp_path, view)
     assert loaded_sess.get_providers() == ["CPUExecutionProvider"]
 
     from tastoria.modules.meal_calorie import estimator as mc_est

@@ -1,0 +1,49 @@
+slug: nam-bao-ngu-xao-sa-ot
+name_vi: Nấm bào ngư xào sả ớt chay
+slot: rau
+servings: 3
+method: xao
+tags:
+- gion
+- cay
+- thom_sa_gung
+- nau_nhanh
+- bua_thuong
+ingredients:
+- name: nấm sò
+  grams: 350.0
+  role: main
+- name: sả
+  grams: 25.0
+  role: seasoning
+- name: ớt
+  grams: 6.0
+  role: seasoning
+- name: tỏi
+  grams: 10.0
+  role: seasoning
+- name: nước tương
+  grams: 18.0
+  role: seasoning
+- name: dầu ăn
+  grams: 14.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế nấm sò và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Phi thơm tỏi hành trên lửa lớn, cho nấm sò vào đảo nhanh tay đến khi chín tới, nêm gia vị rồi tắt bếp.
+  kind: active
+  minutes: 7
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.dienmayxanh.com/vao-bep
+  title: Điện Máy XANH — Vào bếp (Món ngon gia đình Việt Nam)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng chung, đối chiếu định lượng thành phần FCT2007/USDA.

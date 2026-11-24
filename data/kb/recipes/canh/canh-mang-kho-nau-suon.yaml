@@ -1,0 +1,62 @@
+slug: canh-mang-kho-nau-suon
+name_vi: Canh măng khô hầm sườn non
+slot: canh
+servings: 4
+method: ham
+tags:
+- dam_da
+- mem
+- nhieu_nuoc
+- troi_lanh
+- bua_thuong
+ingredients:
+- name: măng khô
+  grams: 140.0
+  role: main
+- name: sườn non
+  grams: 500.0
+  role: main
+- name: hành lá
+  grams: 25.0
+  role: seasoning
+- name: rau mùi
+  grams: 15.0
+  role: seasoning
+- name: hành tím
+  grams: 20.0
+  role: seasoning
+- name: nước mắm
+  grams: 25.0
+  role: seasoning
+- name: muối
+  grams: 4.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Sơ chế măng khô và nguyên liệu phụ.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Ngâm măng khô qua đêm khoảng 8 giờ rồi luộc xả cho hết vị đắng.
+  kind: passive
+  minutes: 480
+  uses_burner: false
+- step_no: 3
+  text_vi: Chần sơ và đảo săn măng khô, sườn non, đổ ngập nước đun sôi rồi hớt bọt.
+  kind: active
+  minutes: 8
+  uses_burner: true
+- step_no: 4
+  text_vi: Hầm nhỏ lửa cùng nguyên liệu phụ đến khi chín mềm, nêm lại vừa miệng.
+  kind: passive
+  minutes: 40
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng bac, đối chiếu định lượng thành phần FCT2007/USDA.

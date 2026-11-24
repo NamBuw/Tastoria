@@ -1,0 +1,61 @@
+slug: canh-dau-trang-ham-suon
+name_vi: Canh đậu trắng hầm sườn cà rốt
+slot: canh
+servings: 4
+method: ham
+tags:
+- beo
+- mem
+- nhieu_nuoc
+- cuoi_tuan
+ingredients:
+- name: sườn non
+  grams: 400.0
+  role: main
+- name: đậu trắng cannellini khô
+  grams: 120.0
+  role: main
+- name: cà rốt
+  grams: 150.0
+  role: main
+- name: hành lá
+  grams: 20.0
+  role: seasoning
+- name: nước mắm
+  grams: 20.0
+  role: seasoning
+- name: muối
+  grams: 4.0
+  role: seasoning
+- name: tiêu
+  grams: 1.5
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Sơ chế đậu trắng cannellini khô và nguyên liệu phụ.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Ngâm đậu trắng khô trong nước lạnh 4 giờ cho mềm trước khi hầm.
+  kind: passive
+  minutes: 240
+  uses_burner: false
+- step_no: 3
+  text_vi: Chần sơ và đảo săn sườn non, đậu trắng cannellini khô, cà rốt, đổ ngập nước đun sôi rồi hớt bọt.
+  kind: active
+  minutes: 8
+  uses_burner: true
+- step_no: 4
+  text_vi: Hầm nhỏ lửa cùng nguyên liệu phụ đến khi chín mềm, nêm lại vừa miệng.
+  kind: passive
+  minutes: 40
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng nam, đối chiếu định lượng thành phần FCT2007/USDA.

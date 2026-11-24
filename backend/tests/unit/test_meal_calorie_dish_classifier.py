@@ -115,7 +115,7 @@ def test_recognized_dishes_nutrition_catalog_atwater_and_lookup() -> None:
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
     assert doc["n_dishes"] == len(doc["dishes"]) >= 216
     cat = KBDishCatalog.from_dirs(REPO_ROOT / "data" / "kb", REPO_ROOT / "data" / "processed" / "kb")
-    assert len(cat.dishes) == 180
+    assert len(cat.dishes) == 569
     assert len(cat.recognized) >= 250
     for d in doc["dishes"]:
         p, c, f, kcal = d["protein_g"], d["glucid_g"], d["lipid_g"], d["kcal_per_serving"]
@@ -152,7 +152,7 @@ def test_barcode_lookup_and_extended_dish_list(tmp_path: Path, monkeypatch: pyte
 
     base = list_dishes(deps, include_extended=False)
     ext = list_dishes(deps, include_extended=True)
-    assert len(base.dishes) == 180
+    assert len(base.dishes) == 569
     assert len(ext.dishes) > 400
     assert any("Hảo Hảo" in d.name_vi for d in ext.dishes)
 
@@ -833,3 +833,91 @@ def test_stage1_margin_and_stage2_conf_smooth_continuity() -> None:
         )
         k_s2.append(fuse_photo_estimate(kb=kb, vis=vis_s2, cls_res=cls_s2, portion="vua").estimated_kcal)
     assert abs(k_s2[1] - k_s2[0]) < 10.0, f"Stage 2 conf cliff: {k_s2}"
+
+
+def test_m7_expanded_barcode_catalog_and_yaml_precedence() -> None:
+    from tastoria.modules.meal_calorie.barcode import BarcodeCatalog
+
+    cat = BarcodeCatalog.from_kb_dir(REPO_ROOT / "data" / "kb")
+    try:
+        assert len(cat.local_items) >= 2000
+        # Curated YAML entry takes precedence over JSON overlay
+        hh = cat.lookup("8934563138165", allow_remote=False)
+        assert hh is not None
+        assert "Hảo Hảo" in hh.product_name
+        assert hh.kcal_per_serving == 350.0
+
+        # JSON-only entry with per-100g nutrition resolves finite values
+        json_item = cat.lookup("0070074118659", allow_remote=False)
+        assert json_item is not None
+        assert json_item.kcal_per_100g == 250.0
+        assert json_item.protein_g_per_100g == 9.0
+    finally:
+        cat.close()
+
+
+def test_dual_head_open_vocab_prototype_fallback() -> None:
+    class _DualInput:
+        name = "image"
+        shape = [1, 3, 224, 224]
+
+    class _DualSession:
+        def __init__(self, logits: np.ndarray, emb: np.ndarray) -> None:
+            self._logits = logits
+            self._emb = emb
+
+        def get_inputs(self) -> list[_DualInput]:
+            return [_DualInput()]
+
+        def run(self, *_args: object, **_kwargs: object) -> list[np.ndarray]:
+            return [self._logits, self._emb]
+
+    proto_0 = np.zeros((768,), dtype=np.float32)
+    proto_0[0] = 1.0
+    proto_1 = np.zeros((768,), dtype=np.float32)
+    proto_1[1] = 1.0
+    open_embs = np.stack([proto_0, proto_1], axis=0)
+    open_meta = [
+        {"dish_id": "dau_phu_non", "name_vi": "Đậu phụ non chần hành gừng", "name_en": "Steamed Silken Tofu", "kb_slug": None, "slot": "man"},
+        {"dish_id": "pho", "name_vi": "Phở bò", "name_en": "Beef Pho", "kb_slug": None, "slot": "man"},
+    ]
+    serving = {
+        "conf_threshold": 0.42,
+        "margin_threshold": 0.05,
+        "classes": [
+            {"id": "pho", "name_vi": "Phở", "name_en": "Pho", "category": "vn"},
+            {"id": "com_tam", "name_vi": "Cơm tấm", "name_en": "Broken Rice", "category": "vn"},
+        ],
+    }
+    textured = Image.open(io.BytesIO(_textured_jpeg_bytes()))
+
+    # Low-margin closed head cascades into 768-d open-vocab prototypes
+    emb_tofu = np.zeros((1, 768), dtype=np.float32)
+    emb_tofu[0, 0] = 0.99
+    emb_tofu[0, 1] = 0.14
+    clf_ambig = DishClassifier(
+        _DualSession(np.array([[0.10, 0.09]], dtype=np.float32), emb_tofu),  # type: ignore[arg-type]
+        serving=serving,
+        open_vocab_embeddings=open_embs,
+        open_vocab_meta=open_meta,
+    )
+    res_ov = clf_ambig.predict(textured, top_k=2)
+    assert res_ov.top1_id == "dau_phu_non"
+    assert res_ov.confident is True
+    assert res_ov.is_ood is False
+
+    # High-margin confident closed prediction stays on closed head
+    clf_conf = DishClassifier(
+        _DualSession(np.array([[12.0, 0.0]], dtype=np.float32), emb_tofu),  # type: ignore[arg-type]
+        serving=serving,
+        open_vocab_embeddings=open_embs,
+        open_vocab_meta=open_meta,
+    )
+    res_closed = clf_conf.predict(textured, top_k=2)
+    assert res_closed.top1_id == "pho"
+    assert res_closed.confident is True
+
+    # Flat solid-color OOD input never triggers open-vocab rescue
+    res_flat = clf_ambig.predict(Image.new("RGB", (224, 224), (120, 90, 60)), top_k=2)
+    assert res_flat.is_ood is True
+    assert res_flat.confident is False

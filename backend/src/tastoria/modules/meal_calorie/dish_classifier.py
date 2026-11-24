@@ -74,9 +74,16 @@ def _softmax(logits: np.ndarray) -> np.ndarray:
 
 
 class DishClassifier:
-    """CPU ONNXRuntime wrapper for 131-class Vietnamese, Asian & Global dish recognition."""
+    """CPU ONNXRuntime wrapper for 310-class closed-set + optional 1,220-class open-vocab dish recognition."""
 
-    def __init__(self, session: ort.InferenceSession, *, serving: dict[str, Any]) -> None:
+    def __init__(
+        self,
+        session: ort.InferenceSession,
+        *,
+        serving: dict[str, Any],
+        open_vocab_embeddings: np.ndarray | None = None,
+        open_vocab_meta: list[dict[str, Any]] | None = None,
+    ) -> None:
         self.session = session
         self.serving = serving
         inp = session.get_inputs()[0]
@@ -94,15 +101,75 @@ class DishClassifier:
         self.raps_k_reg = int(serving.get("raps_k_reg", 3))
         self.raps_lambda = float(serving.get("raps_lambda", 0.01))
         self.classes: list[dict[str, Any]] = list(serving.get("classes") or [])
+        self.open_vocab_min_cos = float(serving.get("open_vocab_min_cos", 0.135))
+        self._open_emb: np.ndarray | None = None
+        self._open_meta: list[dict[str, Any]] = []
+        if open_vocab_embeddings is not None and open_vocab_meta and len(open_vocab_embeddings) == len(open_vocab_meta):
+            arr = np.asarray(open_vocab_embeddings, dtype=np.float32)
+            norms = np.linalg.norm(arr, axis=1, keepdims=True)
+            norms = np.where(norms > 1e-8, norms, 1.0)
+            self._open_emb = arr / norms
+            self._open_meta = list(open_vocab_meta)
+
+    def _open_vocab_fallback(self, raw_emb: np.ndarray, *, top_k: int, flat_ood: bool) -> DishClassification | None:
+        if self._open_emb is None or not self._open_meta:
+            return None
+        vec = np.asarray(raw_emb, dtype=np.float32).reshape(-1)
+        if vec.shape[0] != self._open_emb.shape[1] or not np.all(np.isfinite(vec)):
+            return None
+        norm = float(np.linalg.norm(vec))
+        if norm <= 1e-8:
+            return None
+        sims = self._open_emb @ (vec / norm)
+        pool_n = min(max(5, top_k), len(sims))
+        top_idx = np.argsort(-sims)[:pool_n]
+        top_sims = sims[top_idx]
+        max_sim = float(top_sims[0])
+        if max_sim < self.open_vocab_min_cos:
+            return None
+        second_sim = float(top_sims[1]) if len(top_sims) > 1 else max_sim
+        exps = np.exp((top_sims - max_sim) * 55.0)
+        rel_probs = exps / float(np.sum(exps))
+        k = max(1, min(top_k, len(top_idx)))
+        candidates: list[DishCandidate] = []
+        for rank_i in range(k):
+            idx = int(top_idx[rank_i])
+            meta = self._open_meta[idx]
+            candidates.append(
+                DishCandidate(
+                    dish_id=str(meta["dish_id"]),
+                    name_vi=str(meta.get("name_vi") or meta["dish_id"]),
+                    name_en=str(meta.get("name_en") or meta["dish_id"]),
+                    confidence=round(float(rel_probs[rank_i]), 4),
+                    kb_slug=meta.get("kb_slug"),
+                    slot=meta.get("slot"),
+                )
+            )
+        margin = round(max(0.0, float(rel_probs[0] - rel_probs[1])), 4) if k >= 2 else candidates[0].confidence
+        confident = (not flat_ood) and (max_sim >= 0.145) and ((max_sim - second_sim) >= 0.004 or max_sim >= 0.160)
+        return DishClassification(
+            top_k=candidates,
+            top1_id=candidates[0].dish_id,
+            top1_name_vi=candidates[0].name_vi,
+            top1_confidence=candidates[0].confidence,
+            confident=confident,
+            conf_threshold=self.conf_threshold,
+            latency_ms=0.0,
+            top_margin=margin,
+            energy_score=0.0,
+            max_logit=round(max_sim, 4),
+            raps_set_size=1 if confident else 3,
+            is_ood=not confident,
+        )
 
     def predict(self, img: Image.Image, *, top_k: int = 3) -> DishClassification:
         x = center_crop_rgb(img, size=self.size)
         with onnx_infer_slot("dish_classifier"):
             t0 = time.perf_counter()
-            raw = self.session.run(None, {self.input_name: x})[0]
+            raw_outs = self.session.run(None, {self.input_name: x})
             latency_ms = round((time.perf_counter() - t0) * 1000.0, 3)
 
-        logits = np.asarray(raw, dtype=np.float64).reshape(-1)
+        logits = np.asarray(raw_outs[0], dtype=np.float64).reshape(-1)
         if not np.all(np.isfinite(logits)):
             return DishClassification(
                 [],
@@ -165,12 +232,35 @@ class DishClassifier:
         logit_ood = self.ood_max_logit_min is not None and max_logit < self.ood_max_logit_min
         is_ood = bool(energy_ood or logit_ood or zero_var_ood or (flat_ood and top1.confidence < 0.95))
         eff_thresh = max(self.conf_threshold, 0.95) if flat_ood else self.conf_threshold
+        closed_confident = (top1.confidence >= eff_thresh) and (not is_ood)
+        if (
+            len(raw_outs) >= 2
+            and self._open_emb is not None
+            and not zero_var_ood
+            and not (closed_confident and top_margin >= self.margin_threshold)
+        ):
+            ov = self._open_vocab_fallback(raw_outs[1], top_k=top_k, flat_ood=flat_ood)
+            if ov is not None:
+                return DishClassification(
+                    top_k=ov.top_k,
+                    top1_id=ov.top1_id,
+                    top1_name_vi=ov.top1_name_vi,
+                    top1_confidence=ov.top1_confidence,
+                    confident=ov.confident,
+                    conf_threshold=self.conf_threshold,
+                    latency_ms=latency_ms,
+                    top_margin=ov.top_margin,
+                    energy_score=round(energy_score, 4),
+                    max_logit=round(max_logit, 4),
+                    raps_set_size=ov.raps_set_size,
+                    is_ood=ov.is_ood,
+                )
         return DishClassification(
             top_k=candidates,
             top1_id=top1.dish_id,
             top1_name_vi=top1.name_vi,
             top1_confidence=top1.confidence,
-            confident=(top1.confidence >= eff_thresh) and (not is_ood),
+            confident=closed_confident,
             conf_threshold=self.conf_threshold,
             latency_ms=latency_ms,
             top_margin=top_margin,
@@ -179,6 +269,29 @@ class DishClassifier:
             raps_set_size=raps_set_size,
             is_ood=is_ood,
         )
+
+
+def load_open_vocab_index(model_dir: Path) -> tuple[np.ndarray | None, list[dict[str, Any]] | None]:
+    npz_path = model_dir / "dish_prototypes_expanded.npz"
+    tax_path = model_dir / "dish_taxonomy_expanded.json"
+    if not (npz_path.is_file() and tax_path.is_file()):
+        return None, None
+    tax = json.loads(tax_path.read_text(encoding="utf-8")) or {}
+    dishes = tax.get("dishes") or []
+    by_id = {str(d["dish_id"]): d for d in dishes if isinstance(d, dict) and d.get("dish_id")}
+    with np.load(npz_path, allow_pickle=False) as z:
+        emb = np.asarray(z["embeddings"], dtype=np.float32)
+        ids = [str(x) for x in z["dish_ids"]]
+    keep_rows: list[int] = []
+    meta: list[dict[str, Any]] = []
+    for idx, did in enumerate(ids):
+        row = by_id.get(did)
+        if row is not None:
+            keep_rows.append(idx)
+            meta.append(row)
+    if not keep_rows:
+        return None, None
+    return emb[keep_rows], meta
 
 
 def load_dish_classifier(model_dir: Path, *, verify_sha256: bool = True) -> DishClassifier:
@@ -199,4 +312,5 @@ def load_dish_classifier(model_dir: Path, *, verify_sha256: bool = True) -> Dish
         if actual != expected:
             raise ArtifactIntegrityError(f"SHA-256 mismatch for {onnx_path}: expected {expected}, got {actual}")
     sess = make_cpu_session(onnx_path, intra_threads=2)
-    return DishClassifier(sess, serving=serving)
+    open_emb, open_meta = load_open_vocab_index(model_dir)
+    return DishClassifier(sess, serving=serving, open_vocab_embeddings=open_emb, open_vocab_meta=open_meta)

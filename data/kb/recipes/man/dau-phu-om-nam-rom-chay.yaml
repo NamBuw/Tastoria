@@ -1,0 +1,56 @@
+slug: dau-phu-om-nam-rom-chay
+name_vi: Đậu phụ om nấm rơm nước tương chay
+slot: man
+servings: 3
+method: om
+tags:
+- mem
+- dam_da
+- sot_sanh
+- bua_thuong
+ingredients:
+- name: đậu phụ
+  grams: 350.0
+  role: main
+- name: nấm rơm
+  grams: 200.0
+  role: main
+- name: nước tương
+  grams: 25.0
+  role: seasoning
+- name: hành lá
+  grams: 20.0
+  role: seasoning
+- name: tiêu
+  grams: 2.0
+  role: seasoning
+- name: đường
+  grams: 8.0
+  role: seasoning
+- name: dầu ăn
+  grams: 12.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế đậu phụ, nấm rơm và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Phi thơm hành tỏi, đảo qua đậu phụ, nấm rơm.
+  kind: active
+  minutes: 6
+  uses_burner: true
+- step_no: 3
+  text_vi: Đậy vung om nhỏ lửa đến khi nguyên liệu chín mềm quyện nước sốt sánh.
+  kind: passive
+  minutes: 18
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng nam, đối chiếu định lượng thành phần FCT2007/USDA.

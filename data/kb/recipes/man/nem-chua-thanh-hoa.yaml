@@ -1,0 +1,61 @@
+slug: nem-chua-thanh-hoa
+name_vi: Thịt lợn muối chua lên men
+slot: man
+servings: 4
+method: muoi_chua
+tags:
+- chua
+- gion
+- cay
+- bua_thuong
+ingredients:
+- name: thịt nạc
+  grams: 450.0
+  role: main
+- name: bì lợn
+  grams: 150.0
+  role: main
+- name: tỏi
+  grams: 20.0
+  role: seasoning
+- name: ớt
+  grams: 10.0
+  role: seasoning
+- name: tiêu
+  grams: 5.0
+  role: seasoning
+- name: muối
+  grams: 12.0
+  role: seasoning
+- name: đường
+  grams: 10.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Nhặt rửa sạch thịt nạc, bì lợn, cắt miếng vừa ăn rồi để thật ráo nước.
+  kind: active
+  minutes: 12
+  uses_burner: false
+- step_no: 2
+  text_vi: Đun sôi nước gia vị muối chua cho tan muối đường rồi để nguội còn ấm.
+  kind: active
+  minutes: 6
+  uses_burner: true
+- step_no: 3
+  text_vi: Xếp nguyên liệu vào hũ, đổ ngập nước gia vị và nén nhẹ.
+  kind: active
+  minutes: 5
+  uses_burner: false
+- step_no: 4
+  text_vi: Gói kín thịt nạc bì lợn gia vị để lên men chua tự nhiên trong 2 ngày.
+  kind: passive
+  minutes: 2880
+  uses_burner: false
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng trung, đối chiếu định lượng thành phần FCT2007/USDA.

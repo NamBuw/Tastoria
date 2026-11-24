@@ -51,7 +51,7 @@ def test_no_validator_errors(report):
 
 def test_every_rau_canh_dish_has_a_recipe(kb, recipes):
     want = {d.slug for d in kb.dishes.dishes if d.slot in SLOTS}
-    assert len(want) == 105
+    assert len(want) == 265
     assert sorted(want - recipes.keys()) == []
     assert sorted(recipes.keys() - want) == []
 

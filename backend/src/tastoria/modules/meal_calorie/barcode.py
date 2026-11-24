@@ -125,42 +125,85 @@ class BarcodeCatalog:
     def close(self) -> None:
         self._client.close()
 
+    @staticmethod
+    def _product_from_row(row: dict[str, object]) -> BarcodeProduct | None:
+        raw_bc = row.get("barcode")
+        if raw_bc is None:
+            return None
+        bc = str(raw_bc).strip()
+        if not BARCODE_RE.match(bc):
+            return None
+        raw_name = row.get("name_vi") or row.get("name") or row.get("product_name")
+        if not isinstance(raw_name, str) or not raw_name.strip():
+            return None
+        sg = _float_or_none(row.get("serving_g"))
+        kcal_s = _float_or_none(row.get("kcal_per_serving"))
+        prot_s = _float_or_none(row.get("protein_g_per_serving"))
+        carb_s = _float_or_none(row.get("carbs_g_per_serving"))
+        fat_s = _float_or_none(row.get("fat_g_per_serving"))
+        fib_s = _float_or_none(row.get("fiber_g_per_serving"))
+        scale = (100.0 / sg) if (sg and sg > 0.0) else None
+
+        kcal_100 = _float_or_none(row.get("kcal_per_100g"))
+        prot_100 = _float_or_none(row.get("protein_g_per_100g"))
+        carb_100 = _float_or_none(row.get("carbs_g_per_100g"))
+        fat_100 = _float_or_none(row.get("fat_g_per_100g"))
+        fib_100 = _float_or_none(row.get("fiber_g_per_100g"))
+        if kcal_100 is None and kcal_s is not None and scale:
+            kcal_100 = kcal_s * scale
+        if prot_100 is None and prot_s is not None and scale:
+            prot_100 = prot_s * scale
+        if carb_100 is None and carb_s is not None and scale:
+            carb_100 = carb_s * scale
+        if fat_100 is None and fat_s is not None and scale:
+            fat_100 = fat_s * scale
+        if fib_100 is None and fib_s is not None and scale:
+            fib_100 = fib_s * scale
+
+        raw_src = str(row.get("source") or "").strip()
+        source = LOCAL_CATALOG_SOURCE_VI if (not raw_src or raw_src == "Tastoria VN Label Catalog") else raw_src
+        brand = row.get("brand")
+        serving_size = row.get("serving_size")
+        return BarcodeProduct(
+            barcode=bc,
+            product_name=raw_name.strip(),
+            brand=str(brand).strip() if isinstance(brand, str) and brand.strip() else None,
+            serving_size=str(serving_size).strip() if isinstance(serving_size, str) and serving_size.strip() else None,
+            serving_g=sg,
+            kcal_per_serving=_r1(kcal_s),
+            protein_g_per_serving=_r1(prot_s),
+            carbs_g_per_serving=_r1(carb_s),
+            fat_g_per_serving=_r1(fat_s),
+            fiber_g_per_serving=_r1(fib_s),
+            kcal_per_100g=_r1(kcal_100),
+            protein_g_per_100g=_r1(prot_100),
+            carbs_g_per_100g=_r1(carb_100),
+            fat_g_per_100g=_r1(fat_100),
+            fiber_g_per_100g=_r1(fib_100),
+            source=source,
+            image_url=_sanitize_image_url(row.get("image_url")),
+        )
+
     @classmethod
     def from_kb_dir(cls, kb_dir: Path) -> BarcodeCatalog:
-        path = Path(kb_dir) / "vn_barcodes.yaml"
+        kb_dir = Path(kb_dir)
         items: dict[str, BarcodeProduct] = {}
+        exp_path = kb_dir / "vn_barcodes_expanded.json"
+        if exp_path.is_file():
+            exp_doc = json.loads(exp_path.read_text(encoding="utf-8")) or {}
+            for row in exp_doc.get("products") or []:
+                if isinstance(row, dict):
+                    prod = cls._product_from_row(row)
+                    if prod is not None:
+                        items[prod.barcode] = prod
+        path = kb_dir / "vn_barcodes.yaml"
         if path.is_file():
             doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
             for row in doc.get("products") or []:
-                bc = str(row["barcode"]).strip()
-                sg = _float_or_none(row.get("serving_g"))
-                kcal_s = _float_or_none(row.get("kcal_per_serving"))
-                prot_s = _float_or_none(row.get("protein_g_per_serving"))
-                carb_s = _float_or_none(row.get("carbs_g_per_serving"))
-                fat_s = _float_or_none(row.get("fat_g_per_serving"))
-                fib_s = _float_or_none(row.get("fiber_g_per_serving"))
-                scale = (100.0 / sg) if (sg and sg > 0.0) else None
-                raw_src = str(row.get("source") or "").strip()
-                source = LOCAL_CATALOG_SOURCE_VI if (not raw_src or raw_src == "Tastoria VN Label Catalog") else raw_src
-                items[bc] = BarcodeProduct(
-                    barcode=bc,
-                    product_name=str(row["name_vi"]),
-                    brand=row.get("brand"),
-                    serving_size=row.get("serving_size"),
-                    serving_g=sg,
-                    kcal_per_serving=_r1(kcal_s),
-                    protein_g_per_serving=_r1(prot_s),
-                    carbs_g_per_serving=_r1(carb_s),
-                    fat_g_per_serving=_r1(fat_s),
-                    fiber_g_per_serving=_r1(fib_s),
-                    kcal_per_100g=_r1(kcal_s * scale) if (kcal_s is not None and scale) else None,
-                    protein_g_per_100g=_r1(prot_s * scale) if (prot_s is not None and scale) else None,
-                    carbs_g_per_100g=_r1(carb_s * scale) if (carb_s is not None and scale) else None,
-                    fat_g_per_100g=_r1(fat_s * scale) if (fat_s is not None and scale) else None,
-                    fiber_g_per_100g=_r1(fib_s * scale) if (fib_s is not None and scale) else None,
-                    source=source,
-                    image_url=None,
-                )
+                if isinstance(row, dict):
+                    prod = cls._product_from_row(row)
+                    if prod is not None:
+                        items[prod.barcode] = prod
         return cls(items)
 
     def _fetch_openfoodfacts(self, barcode: str, *, timeout: float = 4.0) -> BarcodeProduct | None:

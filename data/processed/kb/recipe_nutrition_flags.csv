@@ -1,12 +1,19 @@
 slug,slot,kcal_per_serving,flag
+canh-duoi-lon-ham-dau-den,canh,572.9,"kcal/serving 572.9 outside [10, 300] for slot canh"
 canh-mang-chan-gio,canh,381.9,"kcal/serving 381.9 outside [10, 300] for slot canh"
 canh-xuong-ham-cu-cai,canh,44.9,51% of recipe grams have no composition
 ghe-hap-gung,man,72.2,"kcal/serving 72.2 outside [80, 650] for slot man"
 muc-hap-gung,man,79.2,"kcal/serving 79.2 outside [80, 650] for slot man"
+nam-moi-kho-nuoc-tuong-chay,man,78.7,"kcal/serving 78.7 outside [80, 650] for slot man"
 ngheu-hap-sa,man,69.2,"kcal/serving 69.2 outside [80, 650] for slot man"
+ram-muoi-do,man,53.7,"kcal/serving 53.7 outside [80, 650] for slot man"
+tom-hap-nuoc-dua,man,77.8,"kcal/serving 77.8 outside [80, 650] for slot man"
 tom-hap-sa,man,75.6,"kcal/serving 75.6 outside [80, 650] for slot man"
 ca-bung,rau,409.5,"kcal/serving 409.5 outside [10, 250] for slot rau"
+cu-cai-do-tron-chua-ngot,rau,66.1,Atwater 4P+9L+4G differs from table energy by -15.3%
 dau-bap-luoc,rau,33.0,Atwater 4P+9L+4G differs from table energy by -20.0%
+dau-bap-nuong-sa-te,rau,65.8,Atwater 4P+9L+4G differs from table energy by -11.7%
+dau-co-ve-luoc,rau,49.9,Atwater 4P+9L+4G differs from table energy by -15.0%
 goi-ga-bap-cai,rau,252.4,"kcal/serving 252.4 outside [10, 250] for slot rau"
 goi-ngo-sen-tom-thit,rau,284.4,"kcal/serving 284.4 outside [10, 250] for slot rau"
 ngon-su-su-xao-toi,rau,50.7,91% of recipe grams have no composition

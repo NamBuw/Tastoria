@@ -1,0 +1,51 @@
+slug: long-ga-xao-muop
+name_vi: Lòng gà xào mướp hương
+slot: man
+servings: 3
+method: xao
+tags:
+- thanh
+- mem
+- nau_nhanh
+- bua_thuong
+ingredients:
+- name: lòng gà (cả bộ)
+  grams: 300.0
+  role: main
+- name: mướp
+  grams: 350.0
+  role: main
+- name: hành tím
+  grams: 15.0
+  role: seasoning
+- name: hành lá
+  grams: 20.0
+  role: seasoning
+- name: nước mắm
+  grams: 18.0
+  role: seasoning
+- name: tiêu
+  grams: 1.5
+  role: seasoning
+- name: dầu ăn
+  grams: 12.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế lòng gà (cả bộ), mướp và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Phi thơm tỏi hành trên lửa lớn, cho lòng gà (cả bộ), mướp vào đảo nhanh tay đến khi chín tới, nêm gia vị rồi tắt bếp.
+  kind: active
+  minutes: 7
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng chung, đối chiếu định lượng thành phần FCT2007/USDA.

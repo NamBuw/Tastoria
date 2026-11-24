@@ -181,7 +181,7 @@ def test_sha256_verification_and_tamper_rejection(tmp_path: Path) -> None:
 
 def test_kb_catalog_lookup_and_portion_scaling() -> None:
     cat = KBDishCatalog.from_dirs(REPO_ROOT / "data" / "kb", REPO_ROOT / "data" / "processed" / "kb")
-    assert len(cat.dishes) == 180
+    assert len(cat.dishes) == 569
     assert cat.calibrated is True
     assert 0.05 < cat.half_width_rel < 0.25
 
@@ -255,7 +255,7 @@ def test_http_endpoints_and_oversized_pixel_bomb(tmp_path: Path) -> None:
     r_list = client.get("/api/v1/meal-calorie/dishes")
     assert r_list.status_code == 200
     body = r_list.json()
-    assert len(body["dishes"]) == 180
+    assert len(body["dishes"]) == 569
     assert body["calibrated"] is True
 
     r_kb = client.post("/api/v1/meal-calorie/estimate", data={"dish_slug": "canh-chua-ca-loc", "portion": "vua"})

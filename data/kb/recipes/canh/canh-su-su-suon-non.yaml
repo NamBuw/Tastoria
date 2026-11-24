@@ -1,0 +1,57 @@
+slug: canh-su-su-suon-non
+name_vi: Canh su su hầm sườn non cà rốt
+slot: canh
+servings: 4
+method: nau_canh
+tags:
+- thanh
+- mem
+- nhieu_nuoc
+- bua_thuong
+- nau_nhanh
+ingredients:
+- name: su su
+  grams: 350.0
+  role: main
+- name: sườn non
+  grams: 350.0
+  role: main
+- name: cà rốt
+  grams: 100.0
+  role: side
+- name: hành lá
+  grams: 20.0
+  role: seasoning
+- name: rau mùi
+  grams: 10.0
+  role: seasoning
+- name: nước mắm
+  grams: 20.0
+  role: seasoning
+- name: muối
+  grams: 4.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế su su, sườn non cùng cà rốt và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Đun sôi khoảng 1,2 lít nước (hoặc xào sơ su su, sườn non), hớt bọt cho nước trong.
+  kind: active
+  minutes: 6
+  uses_burner: true
+- step_no: 3
+  text_vi: Cho phần rau củ còn lại cùng cà rốt vào nấu chín tới, nêm gia vị vừa ăn và rắc rau thơm.
+  kind: active
+  minutes: 6
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng chung, đối chiếu định lượng thành phần FCT2007/USDA.

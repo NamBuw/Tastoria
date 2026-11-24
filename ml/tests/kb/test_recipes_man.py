@@ -42,7 +42,7 @@ def test_no_errors_in_man_recipes(report):
 
 def test_every_man_dish_has_a_recipe(kb, man):
     want = {d.slug for d in kb.dishes.dishes if d.slot == "man"}
-    assert len(want) == 75
+    assert len(want) == 304
     assert sorted(want - man.keys()) == []
     assert sorted(man.keys() - want) == []
 

@@ -1,0 +1,61 @@
+slug: suon-non-nuong-mat-ong
+name_vi: Sườn non nướng mật ong
+slot: man
+servings: 4
+method: nuong
+tags:
+- dam_da
+- thom_toi
+- kho_rao
+- cuoi_tuan
+ingredients:
+- name: sườn non
+  grams: 600.0
+  role: main
+- name: mật ong
+  grams: 30.0
+  role: seasoning
+- name: nước tương
+  grams: 25.0
+  role: seasoning
+- name: tỏi
+  grams: 15.0
+  role: seasoning
+- name: hành tím
+  grams: 20.0
+  role: seasoning
+- name: dầu hào
+  grams: 15.0
+  role: seasoning
+- name: tiêu
+  grams: 2.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Sơ chế sườn non và nguyên liệu phụ.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Ướp sườn non với mật ong, nước tương, hành tỏi qua nhiều giờ cho thấm đều.
+  kind: passive
+  minutes: 180
+  uses_burner: false
+- step_no: 3
+  text_vi: Trộn đều sườn non với gia vị ướp.
+  kind: active
+  minutes: 5
+  uses_burner: false
+- step_no: 4
+  text_vi: Nướng sườn non ở 190°C đến khi xém cạnh chín vàng thơm.
+  kind: passive
+  minutes: 20
+  uses_burner: false
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng chung, đối chiếu định lượng thành phần FCT2007/USDA.

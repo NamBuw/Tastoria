@@ -1,0 +1,49 @@
+slug: thit-nac-rang-gung
+name_vi: Thịt nạc rang gừng sả
+slot: man
+servings: 3
+method: rang
+tags:
+- dam_da
+- thom_sa_gung
+- kho_rao
+- nau_nhanh
+- bua_thuong
+ingredients:
+- name: thịt nạc
+  grams: 400.0
+  role: main
+- name: gừng
+  grams: 25.0
+  role: seasoning
+- name: sả
+  grams: 20.0
+  role: seasoning
+- name: nước mắm
+  grams: 25.0
+  role: seasoning
+- name: đường
+  grams: 10.0
+  role: seasoning
+- name: dầu ăn
+  grams: 10.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế thịt nạc và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Đảo thịt nạc trên chảo nóng lửa vừa đến khi săn vàng ráo mặt, nêm gia vị rang thêm 3 phút cho dậy mùi thơm.
+  kind: active
+  minutes: 10
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng bac, đối chiếu định lượng thành phần FCT2007/USDA.

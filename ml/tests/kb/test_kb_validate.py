@@ -62,12 +62,12 @@ def test_committed_kb_is_valid(real_report):
 
 def test_committed_kb_meets_targets(real_report):
     s = real_report.stats
-    assert s["dishes"] == 180
-    assert s["by_slot"] == {"man": 75, "rau": 55, "canh": 50}
+    assert s["dishes"] == 569
+    assert s["by_slot"] == {"man": 304, "rau": 142, "canh": 123}
     assert s["vegetarian"] >= 15
     assert len(s["vegetarian_by_slot"]) == 3, "vegetarian dishes in every slot"
     assert s["le_20_min"] >= 20
-    assert 200 <= s["ingredients"] <= 260
+    assert 1000 <= s["ingredients"] <= 1200
     assert {"muối", "đường", "nước mắm", "dầu ăn", "tiêu"} <= set(s["staples"])
 
 

@@ -126,11 +126,11 @@ def test_gold_cli_reports_missing_answers(tmp_path):
 
 
 def test_catalog_pairs_and_queries_counts(cat):
-    assert len(cat.ingredients) == 233
-    assert len(cat.recipes) == 180
+    assert len(cat.ingredients) == 1114
+    assert len(cat.recipes) == 569
     pairs = R.load_pairs()
-    assert len(pairs) == 197
-    assert len({p.ingredient for p in pairs}) == 107
+    assert len(pairs) == 650
+    assert len({p.ingredient for p in pairs}) == 325
     queries = gold.load_queries()
     assert len(queries) == 90
     assert sum(1 for q in queries if q["split"] == "dev") == 27
@@ -166,7 +166,8 @@ def test_hybrid_scorer_fusion_missing_modes_and_curated(cat):
     cur = M.Curated(pairs)
     hc = M.HybridWithCurated(cur, hyb_renorm)
     ranked = M.rank(hc.score("thịt ba chỉ", cands, "man", "kho"), cands)
-    assert ranked[0] == "thịt nạc vai"
+    assert ranked[0] == "thịt băm"
+    assert "thịt nạc vai" in ranked[:3]
 
 
 def test_slugify_vi_and_export_embeddings_contract(cat, tmp_path):
@@ -188,8 +189,8 @@ def test_slugify_vi_and_export_embeddings_contract(cat, tmp_path):
     man_path = tmp_path / "manifest.json"
     assert npz_path.exists() and man_path.exists()
     assert man["dim"] == 100 and man["l2_normalized"] is True and man["key_field"] == "name_vi"
-    assert man["catalog_total"] == 233
-    assert man["embedded_count"] + len(man["uncovered_ingredients"]) == 233
+    assert man["catalog_total"] == 1114
+    assert man["embedded_count"] + len(man["uncovered_ingredients"]) == 1114
     assert man["artifact_sha256"] == hashlib.sha256(npz_path.read_bytes()).hexdigest()
 
     d = np.load(npz_path)

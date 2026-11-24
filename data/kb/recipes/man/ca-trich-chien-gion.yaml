@@ -1,0 +1,51 @@
+slug: ca-trich-chien-gion
+name_vi: Cá trích chiên giòn chấm mắm tỏi
+slot: man
+servings: 3
+method: chien
+tags:
+- gion
+- dam_da
+- bua_thuong
+- nau_nhanh
+ingredients:
+- name: cá trích
+  grams: 450.0
+  role: main
+- name: tỏi
+  grams: 15.0
+  role: seasoning
+- name: ớt
+  grams: 8.0
+  role: seasoning
+- name: nước mắm
+  grams: 25.0
+  role: seasoning
+- name: chanh
+  grams: 20.0
+  role: seasoning
+- name: đường
+  grams: 12.0
+  role: seasoning
+- name: dầu ăn
+  grams: 30.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế cá trích và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Làm nóng chảo với lượng dầu vừa phải, chiên cá trích vàng đều các mặt, vớt ráo dầu và dọn kèm gia vị chấm.
+  kind: active
+  minutes: 10
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng trung, đối chiếu định lượng thành phần FCT2007/USDA.

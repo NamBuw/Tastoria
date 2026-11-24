@@ -1,0 +1,48 @@
+slug: bi-ngoi-xao-nam
+name_vi: Bí ngòi xào nấm đùi gà chay
+slot: rau
+servings: 3
+method: xao
+tags:
+- gion
+- thanh
+- nau_nhanh
+- bua_thuong
+ingredients:
+- name: bí ngòi
+  grams: 350.0
+  role: main
+- name: nấm đùi gà
+  grams: 150.0
+  role: main
+- name: tỏi
+  grams: 12.0
+  role: seasoning
+- name: nước tương
+  grams: 14.0
+  role: seasoning
+- name: tiêu
+  grams: 1.5
+  role: seasoning
+- name: dầu ăn
+  grams: 12.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế bí ngòi, nấm đùi gà và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Phi thơm tỏi hành trên lửa lớn, cho bí ngòi, nấm đùi gà vào đảo nhanh tay đến khi chín tới, nêm gia vị rồi tắt bếp.
+  kind: active
+  minutes: 7
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.dienmayxanh.com/vao-bep
+  title: Điện Máy XANH — Vào bếp (Món ngon gia đình Việt Nam)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng chung, đối chiếu định lượng thành phần FCT2007/USDA.

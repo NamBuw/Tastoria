@@ -1,13 +1,42 @@
-# Chế độ ăn (bảng catalog.diets + catalog.diet_exclusions). Căn cứ: thiết kế v2 BR-DIET-01.
-# v2 chỉ có một chế độ: chay.
-# Định nghĩa "chay" của Tastoria v2 (quyết định của nhóm, đổi được):
-#   - Loại mọi thịt, gia cầm, cá, tôm cua, nhuyễn thể, trứng và gia vị nguồn động vật
-#     (nước mắm, mắm tôm, mắm tép, dầu hào, hạt nêm thường).
-#   - Giữ sữa và sản phẩm sữa (kiểu ăn chay có sữa), giữ mật ong.
-#   - Chưa loại "ngũ vị tân" (hành, tỏi, hẹ, kiệu...) mà một số người ăn chay theo Phật giáo kiêng;
-#     nếu cần sẽ thêm chế độ riêng (ví dụ chay_ngu_vi_tan) với nhóm rau_thom tách nhỏ.
+# Expanded 6 diets for M7 (code matches ^[a-z][a-z0-9_]*$ per kb/models.py & catalog/bundle.py).
 version: 1
 diets:
-  - code: chay
-    name_vi: "Ăn chay (không thịt, cá, hải sản, trứng; có sữa)"
-    excluded_food_groups: [thit, gia_cam, ca, hai_san, trung, gia_vi_dong_vat]
+- code: chay
+  name_vi: Ăn chay (không thịt, cá, hải sản, trứng; có sữa)
+  excluded_food_groups:
+  - thit
+  - gia_cam
+  - ca
+  - hai_san
+  - trung
+  - gia_vi_dong_vat
+- code: thuan_chay
+  name_vi: Thuần chay (không sản phẩm động vật, kể cả sữa và trứng)
+  excluded_food_groups:
+  - thit
+  - gia_cam
+  - ca
+  - hai_san
+  - trung
+  - sua
+  - gia_vi_dong_vat
+- code: giam_can
+  name_vi: Giảm cân (loại đồ ăn vặt và dầu mỡ tách rời)
+  excluded_food_groups:
+  - do_an_vat
+  - dau_mo
+- code: tang_co
+  name_vi: Tăng cơ (ưu tiên đạm thực phẩm, loại đồ ăn vặt ít dinh dưỡng)
+  excluded_food_groups:
+  - do_an_vat
+- code: it_tinh_bot
+  name_vi: Ít tinh bột (hạn chế ngũ cốc, khoai củ và đồ ăn vặt)
+  excluded_food_groups:
+  - ngu_coc
+  - cu_khoai
+  - do_an_vat
+- code: than_thien_duong_huyet
+  name_vi: Thân thiện đường huyết (hạn chế khoai củ chỉ số GI cao và đồ ngọt, đồ ăn vặt)
+  excluded_food_groups:
+  - do_an_vat
+  - cu_khoai

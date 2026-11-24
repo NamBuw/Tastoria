@@ -747,13 +747,21 @@ def test_T1_SCAN_04_confirm_scan_creates_pantry_lots(
         )
         assert add.status_code == 201
 
+    snap = api_client.get("/catalog/snapshot", headers=h)
+    assert snap.status_code == 200, snap.text
+    countable_by_id = {x["id"]: bool(x.get("countable")) for x in snap.json()["ingredients"]}
     for it in scan["items"]:
-        if it["qty_level"] is None or it["needs_check"]:
-            api_client.patch(
+        is_countable = countable_by_id.get(it["ingredient_id"], False)
+        if it["needs_check"] or (not is_countable and it["qty_level"] is None):
+            payload: dict[str, Any] = {"user_freshness": "tuoi"}
+            if not is_countable and it["qty_level"] is None:
+                payload["qty_level"] = "vua"
+            patch_r = api_client.patch(
                 f"/scans/{scan['id']}/items/{it['id']}",
                 headers={**h, "Content-Type": "application/merge-patch+json"},
-                json={"qty_level": it["qty_level"] or "vua", "user_freshness": "tuoi"},
+                json=payload,
             )
+            assert patch_r.status_code == 200, patch_r.text
 
     confirm = api_client.post(f"/scans/{scan['id']}/confirm", headers=h, json={})
     assert confirm.status_code == 200, f"confirm failed: {confirm.text}"

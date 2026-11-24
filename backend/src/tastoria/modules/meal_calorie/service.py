@@ -14,7 +14,12 @@ from typing import Any
 
 from tastoria.core.errors import ApiError, ProblemCode
 from tastoria.modules.meal_calorie.barcode import BarcodeCatalog, BarcodeUpstreamError
-from tastoria.modules.meal_calorie.dish_classifier import DishClassification, DishClassifier, load_dish_classifier
+from tastoria.modules.meal_calorie.dish_classifier import (
+    DishClassification,
+    DishClassifier,
+    load_dish_classifier,
+    load_open_vocab_index,
+)
 from tastoria.modules.meal_calorie.estimator import (
     DEFAULT_DOMAIN_SHIFT_NOTE,
     MAX_CARB_G,
@@ -238,7 +243,17 @@ class MealCalorieDeps:
                     else:
                         try:
                             sess = ref.loader()
-                            self.dish_classifier = DishClassifier(sess, serving=ref.serving)
+                            open_emb, open_meta = (
+                                load_open_vocab_index(self.dish_classifier_model_dir)
+                                if self.dish_classifier_model_dir is not None
+                                else (None, None)
+                            )
+                            self.dish_classifier = DishClassifier(
+                                sess,
+                                serving=ref.serving,
+                                open_vocab_embeddings=open_emb,
+                                open_vocab_meta=open_meta,
+                            )
                             self._dish_classifier_version_id = ref.version_id
                             return self.dish_classifier
                         except Exception as exc:  # noqa: BLE001

@@ -739,7 +739,8 @@ def _selective_stratum_curve(
         order = np.argsort(c_v)
         c_s = np.r_[0.0, c_v[order]]
         r_s = np.r_[0.0, r_v[order]]
-        return float(np.trapezoid(r_s, c_s))
+        _trapz = getattr(np, "trapezoid", None) or getattr(np, "trapz")
+        return float(_trapz(r_s, c_s))
 
     obs_covs = np.array([pt["coverage"] for pt in points], dtype=np.float64)
     obs_risks = np.array([pt["selective_error"] for pt in points], dtype=np.float64)

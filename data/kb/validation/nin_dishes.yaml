@@ -2154,4 +2154,4 @@ summary:
   median_rel_error: 0.0013
   within_10pct: 54
   within_20pct: 59
-  data_version: nut-r1+kb1:1d2c61cc+fct2007:6dbf6d58+usda:1c93c3cb
+  data_version: nut-r1+kb1:055ee335+fct2007:6dbf6d58+usda:1c93c3cb

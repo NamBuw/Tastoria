@@ -1,0 +1,62 @@
+slug: canh-ga-ham-hat-sen
+name_vi: Canh gà hầm hạt sen ngải cứu
+slot: canh
+servings: 4
+method: ham
+tags:
+- dang
+- mem
+- nhieu_nuoc
+- troi_lanh
+- bua_thuong
+ingredients:
+- name: đùi gà
+  grams: 500.0
+  role: main
+- name: hạt sen khô
+  grams: 100.0
+  role: main
+- name: ngải cứu
+  grams: 80.0
+  role: main
+- name: gừng
+  grams: 15.0
+  role: seasoning
+- name: nước mắm
+  grams: 20.0
+  role: seasoning
+- name: muối
+  grams: 4.0
+  role: seasoning
+- name: tiêu
+  grams: 1.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Sơ chế hạt sen khô và nguyên liệu phụ.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Ngâm hạt sen khô trong nước ấm 4 giờ cho nở mềm trước khi hầm.
+  kind: passive
+  minutes: 240
+  uses_burner: false
+- step_no: 3
+  text_vi: Chần sơ và đảo săn đùi gà, hạt sen khô, ngải cứu, đổ ngập nước đun sôi rồi hớt bọt.
+  kind: active
+  minutes: 8
+  uses_burner: true
+- step_no: 4
+  text_vi: Hầm nhỏ lửa cùng nguyên liệu phụ đến khi chín mềm, nêm lại vừa miệng.
+  kind: passive
+  minutes: 40
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng bac, đối chiếu định lượng thành phần FCT2007/USDA.

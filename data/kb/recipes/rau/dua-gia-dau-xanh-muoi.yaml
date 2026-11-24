@@ -1,0 +1,56 @@
+slug: dua-gia-dau-xanh-muoi
+name_vi: Dưa giá đậu xanh cà rốt hẹ muối
+slot: rau
+servings: 4
+method: muoi_chua
+tags:
+- chua
+- gion
+- thanh
+- troi_nong
+- bua_thuong
+ingredients:
+- name: dưa giá (đậu xanh)
+  grams: 450.0
+  role: main
+- name: cà rốt
+  grams: 80.0
+  role: side
+- name: hẹ
+  grams: 40.0
+  role: seasoning
+- name: muối
+  grams: 20.0
+  role: seasoning
+- name: đường
+  grams: 15.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Nhặt rửa sạch dưa giá (đậu xanh) cùng cà rốt, cắt miếng vừa ăn rồi để thật ráo nước.
+  kind: active
+  minutes: 12
+  uses_burner: false
+- step_no: 2
+  text_vi: Đun sôi nước gia vị muối chua cho tan muối đường rồi để nguội còn ấm.
+  kind: active
+  minutes: 6
+  uses_burner: true
+- step_no: 3
+  text_vi: Xếp nguyên liệu vào hũ, đổ ngập nước gia vị và nén nhẹ.
+  kind: active
+  minutes: 5
+  uses_burner: false
+- step_no: 4
+  text_vi: Ngâm giá đỗ, cà rốt và hẹ trong nước muối đường ấm qua đêm.
+  kind: passive
+  minutes: 720
+  uses_burner: false
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.dienmayxanh.com/vao-bep
+  title: Điện Máy XANH — Vào bếp (Món ngon gia đình Việt Nam)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng nam, đối chiếu định lượng thành phần FCT2007/USDA.

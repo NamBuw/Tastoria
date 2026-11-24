@@ -43,7 +43,8 @@ def test_recipe_search_filters_and_pages(kb_client: TestClient) -> None:
     canh = kb_client.get(f"{API}/recipes", params={"slot": "canh", "limit": 100}, headers=s).json()["items"]
     assert canh and all(x["slot"] == "canh" for x in canh)
     made = kb_client.get(f"{API}/recipes", params={"tag": "lam_san", "limit": 100}, headers=s).json()["items"]
-    assert {x["name_vi"] for x in made} == {"Dưa cải muối", "Cà pháo muối", "Dưa giá", "Canh măng nấu chân giò"}
+    assert len(made) == 50
+    assert {"Dưa cải muối", "Cà pháo muối", "Dưa giá", "Canh măng nấu chân giò"} <= {x["name_vi"] for x in made}
     seen, cursor = [], None
     while True:
         params = {"limit": 50} | ({"cursor": cursor} if cursor else {})
@@ -52,7 +53,7 @@ def test_recipe_search_filters_and_pages(kb_client: TestClient) -> None:
         cursor = page["next_cursor"]
         if cursor is None:
             break
-    assert len(seen) == len(set(seen)) == 171  # published only, no duplicates across pages
+    assert len(seen) == len(set(seen)) == 560  # published only, no duplicates across pages
     x = page["items"][0]
     assert x["total_minutes"] > 0 and x["kcal_per_serving"] > 0
     bad = kb_client.get(f"{API}/recipes", params={"cursor": "%%%"}, headers=s)
@@ -100,7 +101,7 @@ def test_snapshot_has_the_whole_catalog_and_an_etag(kb_client: TestClient) -> No
     r = kb_client.get(f"{API}/catalog/snapshot", headers=s)
     assert r.status_code == 200
     snap = r.json()
-    assert len(snap["recipes"]) == 171 and len(snap["ingredients"]) == 233
+    assert len(snap["recipes"]) == 560 and len(snap["ingredients"]) == 1114
     assert all(x["status"] == "published" for x in snap["recipes"])
     assert r.headers["ETag"] == f'"{snap["data_version"]}"'
     assert kb_client.get(f"{API}/catalog/snapshot", headers=s | {"If-None-Match": r.headers["ETag"]}).status_code == 304
@@ -124,7 +125,8 @@ def test_recipe_expanded_filters_macros_and_pantry_match(kb_client: TestClient, 
 
     # Filter by method_code, max_minutes, max_kcal, food_group, make_ahead
     ma = kb_client.get(f"{API}/recipes", params={"make_ahead": True, "limit": 100}, headers=h).json()["items"]
-    assert {x["name_vi"] for x in ma} == {"Dưa cải muối", "Cà pháo muối", "Dưa giá", "Canh măng nấu chân giò"}
+    assert len(ma) == 50
+    assert {"Dưa cải muối", "Cà pháo muối", "Dưa giá", "Canh măng nấu chân giò"} <= {x["name_vi"] for x in ma}
     fast_canh = kb_client.get(
         f"{API}/recipes",
         params={"slot": "canh", "max_minutes": 25, "max_kcal": 300, "food_group_code": "rau_la", "limit": 100},

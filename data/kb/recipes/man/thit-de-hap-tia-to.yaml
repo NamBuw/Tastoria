@@ -1,0 +1,52 @@
+slug: thit-de-hap-tia-to
+name_vi: Thịt dê hấp sả tía tô
+slot: man
+servings: 4
+method: hap
+tags:
+- thom_sa_gung
+- mem
+- cuoi_tuan
+ingredients:
+- name: thịt dê, nạc
+  grams: 500.0
+  role: main
+- name: tía tô
+  grams: 35.0
+  role: seasoning
+- name: sả
+  grams: 35.0
+  role: seasoning
+- name: gừng
+  grams: 25.0
+  role: seasoning
+- name: tương bần
+  grams: 40.0
+  role: seasoning
+- name: ớt
+  grams: 6.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Rửa sạch, sơ chế thịt dê, nạc và cắt miếng vừa ăn; băm nhỏ hành tỏi gia vị.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Xếp thịt dê, nạc vào xửng với hành gừng sả và gia vị.
+  kind: active
+  minutes: 4
+  uses_burner: false
+- step_no: 3
+  text_vi: Hấp cách thủy lửa vừa đến khi nguyên liệu chín mềm dậy hương thơm.
+  kind: passive
+  minutes: 14
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng bac, đối chiếu định lượng thành phần FCT2007/USDA.

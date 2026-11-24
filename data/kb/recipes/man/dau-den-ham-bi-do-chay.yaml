@@ -1,0 +1,55 @@
+slug: dau-den-ham-bi-do-chay
+name_vi: Đậu đen hầm bí đỏ chay
+slot: man
+servings: 3
+method: ham
+tags:
+- mem
+- thanh
+- nhieu_nuoc
+- bua_thuong
+ingredients:
+- name: đậu đen
+  grams: 150.0
+  role: main
+- name: bí đỏ
+  grams: 300.0
+  role: main
+- name: muối
+  grams: 4.0
+  role: seasoning
+- name: hạt nêm chay
+  grams: 8.0
+  role: seasoning
+- name: hành lá
+  grams: 15.0
+  role: seasoning
+steps:
+- step_no: 1
+  text_vi: Sơ chế đậu đen và nguyên liệu phụ.
+  kind: active
+  minutes: 8
+  uses_burner: false
+- step_no: 2
+  text_vi: Ngâm đậu đen trong nước lạnh 8 giờ để hạt nhanh mềm khi hầm.
+  kind: passive
+  minutes: 480
+  uses_burner: false
+- step_no: 3
+  text_vi: Chần sơ và đảo săn đậu đen, bí đỏ, đổ ngập nước đun sôi rồi hớt bọt.
+  kind: active
+  minutes: 8
+  uses_burner: true
+- step_no: 4
+  text_vi: Hầm nhỏ lửa cùng nguyên liệu phụ đến khi chín mềm, nêm lại vừa miệng.
+  kind: passive
+  minutes: 40
+  uses_burner: true
+sources:
+- url: https://viendinhduong.vn/vi/cong-cu-va-tien-ich/gia-tri-dinh-duong-mon-an
+  title: Viện Dinh dưỡng Quốc gia — Tra cứu giá trị dinh dưỡng món ăn
+  accessed_on: &id001 2026-11-24
+- url: https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf
+  title: Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, FCT 2007)
+  accessed_on: *id001
+notes: Công thức cơm nhà Việt Nam vùng chung, đối chiếu định lượng thành phần FCT2007/USDA.

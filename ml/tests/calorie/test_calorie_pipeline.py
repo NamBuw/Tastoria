@@ -57,7 +57,7 @@ def test_constant_baseline_and_kb_portion_scaling() -> None:
     np.testing.assert_allclose(cb.predict_median(2)[1], [200.0, 200.0, 10.0, 20.0, 10.0])
 
     kb = KBDishLookup.from_repo(REPO)
-    assert len(kb.by_slug) == 180
+    assert len(kb.by_slug) == 569
     assert kb.calibrated is True
 
     est_vua = kb.estimate(slug="thit-kho-tau", portion="vua")
