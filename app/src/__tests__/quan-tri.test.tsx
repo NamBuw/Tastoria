@@ -163,7 +163,7 @@ describe('quan-tri (AdminConsole)', () => {
       return okRes({});
     });
 
-    await renderWithProviders(<AdminConsole />);
+    const view = await renderWithProviders(<AdminConsole />);
 
     expect(screen.getByTestId('screen-admin')).toBeTruthy();
     expect(screen.getByTestId('admin-tab-models')).toBeTruthy();
@@ -180,6 +180,8 @@ describe('quan-tri (AdminConsole)', () => {
       ([p]) => p === '/admin/data-requests' || p === '/admin/audit-log',
     );
     expect(forbiddenEndpoints).toHaveLength(0);
+    view.unmount();
+    view.queryClient.clear();
   });
 
   it('renders all 7 models, candidate/rejected/retired labels, nested metrics cleanly, and keeps deployments across filter', async () => {
@@ -244,7 +246,7 @@ describe('quan-tri (AdminConsole)', () => {
       return okRes({});
     });
 
-    await renderWithProviders(<AdminConsole />);
+    const view = await renderWithProviders(<AdminConsole />);
 
     for (const modelName of [
       'detector',
@@ -270,8 +272,11 @@ describe('quan-tri (AdminConsole)', () => {
     await fireEvent.press(screen.getByRole('checkbox', { name: 'mushroom_classifier' }));
     await waitFor(() => {
       expect(screen.queryByText('detector (2.1.0)')).toBeNull();
+      expect(screen.getByText('mushroom_classifier (1.2.0)')).toBeTruthy();
+      expect(screen.getByText('v2.1.0')).toBeTruthy();
     });
-    expect(screen.getByText('v2.1.0')).toBeTruthy();
+    view.unmount();
+    view.queryClient.clear();
   });
 
   it('debounces and UUID-validates actor_user_id before calling /admin/audit-log', async () => {

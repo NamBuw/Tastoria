@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import asdict
 import hashlib
 import json
 import uuid
@@ -159,10 +160,19 @@ def test_composer_defaults_preserved_and_calibrated_params_loaded(tmp_path: Path
     assert loaded.version == "tray-p1-knee-20261118"
     assert (loaded.alpha, loaded.beta, loaded.gamma) == (16.0, 2.0, 1.0)
 
+    if COMPOSER_SERVING.is_file():
+        assert cmp.load_params(COMPOSER_SERVING) == cmp.CALIBRATED_DEFAULTS
+
+    body = {"params": asdict(cmp.CALIBRATED_DEFAULTS)}
+    canon = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    good = tmp_path / "good_serving.json"
+    good.write_text(json.dumps({**body, "artifact_sha256": hashlib.sha256(canon).hexdigest()}), encoding="utf-8")
+    assert cmp.load_params(good) == cmp.CALIBRATED_DEFAULTS
+
     bad = tmp_path / "serving.json"
-    data = json.loads(COMPOSER_SERVING.read_text(encoding="utf-8"))
-    data["params"]["alpha"] = 999.0
-    bad.write_text(json.dumps(data), encoding="utf-8")
+    bad_data = json.loads(good.read_text(encoding="utf-8"))
+    bad_data["params"]["alpha"] = 999.0
+    bad.write_text(json.dumps(bad_data), encoding="utf-8")
     with pytest.raises(ValueError, match="sha256 mismatch"):
         cmp.load_params(bad)
 
@@ -209,7 +219,8 @@ def _dummy_recipe(name_vi: str, slot: str, ing_names: list[str], method: str = "
 
 
 def test_numpy_ranker_loads_exported_artifact_and_scores_known_and_unseen() -> None:
-    assert RANKER_NPZ.exists(), f"missing {RANKER_NPZ}"
+    if not RANKER_NPZ.exists() or not RANKER_SERVING.exists():
+        pytest.skip("deploy/models/ranker artifacts not present in checkout")
     serving = json.loads(RANKER_SERVING.read_text(encoding="utf-8"))
     vid = uuid.uuid4()
     ranker: NumpyRanker = load_ranker(RANKER_NPZ, version_id=vid, serving=serving)
