@@ -1,8 +1,14 @@
-"""Composer evaluation: scenario generator, live-composer reuse, independent feasibility audit, weight rule."""
+"""Composer evaluation: scenario generator, live-composer reuse, feasibility audit, knee selection, and CP-SAT bench."""
+
+import hashlib
+import json
+from dataclasses import fields
 
 import numpy as np
 import pytest
 
+from tastoria.modules.meal import composer as cmp
+from tastoria_ml.composer_eval import cpsat_bench as CB
 from tastoria_ml.composer_eval import run as R
 from tastoria_ml.composer_eval import scenarios as S
 from tastoria_ml.recsys import kb_catalog
@@ -106,3 +112,56 @@ def test_rule_and_pareto():
     assert R.choose(table)["alpha"] == 1 and R.choose(table)["beta"] == 0
     assert R.pareto(table) == [0, 1, 2]
     assert R.choose([{**table[2]}]) is None
+
+
+def test_generate_confirmatory_distinct_from_exploratory(cat):
+    assert S.CONFIRMATORY_SEED != S.SEED
+    c1 = S.generate_confirmatory(cat, n=8)
+    c2 = S.generate_confirmatory(cat, n=8)
+    assert c1["scenarios"] == c2["scenarios"]
+    assert all(s["split"] == "confirmatory" and s["id"].startswith("c") for s in c1["scenarios"])
+    exp = S.generate(cat, n=8, seed=S.SEED)
+    assert c1["scenarios"][0]["favorites"] != exp["scenarios"][0]["favorites"]
+
+
+def test_choose_knee_enforces_tail_kcal_and_urgency_gain():
+    table = [
+        {"alpha": 0.0, "beta": 0.0, "gamma": 0.0, "urgency": 0.18, "taste_loss": 0.00, "kcal_dev": 0.08, "share_kcal_ok": 0.96},
+        {"alpha": 64.0, "beta": 0.0, "gamma": 0.5, "urgency": 0.33, "taste_loss": 0.19, "kcal_dev": 0.06, "share_kcal_ok": 0.89},
+        {"alpha": 16.0, "beta": 2.0, "gamma": 1.0, "urgency": 0.323, "taste_loss": 0.160, "kcal_dev": 0.055, "share_kcal_ok": 0.93},
+        {"alpha": 16.0, "beta": 4.0, "gamma": 0.5, "urgency": 0.325, "taste_loss": 0.165, "kcal_dev": 0.052, "share_kcal_ok": 0.93},
+        {"alpha": 4.0, "beta": 1.0, "gamma": 0.5, "urgency": 0.25, "taste_loss": 0.08, "kcal_dev": 0.04, "share_kcal_ok": 0.96},
+    ]
+    pick = R.choose_knee(table)
+    assert pick is not None
+    # Rejects alpha=64 (share_kcal_ok=0.89 < 0.92) and alpha=4 (urgency < 95% gain), picks min taste_loss
+    assert (pick["alpha"], pick["beta"], pick["gamma"]) == (16.0, 2.0, 1.0)
+
+
+def test_prepare_supports_pluggable_scorer(cat, views, scen):
+    sim = R.SimulatedAffinityRanker(cat, seed=42)
+    p = R.prepare(scen["scenarios"][0], views, cat.rice_kcal, scorer=sim)
+    for slot in ("man", "rau", "canh"):
+        vals = [o.s_prime for o in p.options[slot]]
+        assert vals and all(0.0 <= v <= 1.0 for v in vals)
+
+
+def test_cpsat_bench_smoke(cat, views):
+    rows, summary = CB.run_unit_benchmarks(cat, views, seed=123, runs_per_cell=1, stress_runs=4)
+    assert len(rows) == 16
+    assert summary["overall_all_runs"]["violations"] == 0
+    assert summary["production_1_to_3_dishes"]["sla_pass"] is True
+    assert all(r["latency_ms"] > 0 and r["status"] in {"optimal", "feasible", "relaxed", "empty"} for r in rows)
+
+
+def test_serving_json_matches_composer_params_if_present():
+    p = R.DEPLOY_COMPOSER / "serving.json"
+    if not p.exists():
+        pytest.skip("deploy/models/composer/serving.json not yet exported")
+    sv = json.loads(p.read_text(encoding="utf-8"))
+    param_fields = {f.name for f in fields(cmp.Params)}
+    assert set(sv["params"]) == param_fields
+    sha = sv["artifact_sha256"]
+    body = {k: v for k, v in sv.items() if k != "artifact_sha256"}
+    canon = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    assert sha == hashlib.sha256(canon).hexdigest()

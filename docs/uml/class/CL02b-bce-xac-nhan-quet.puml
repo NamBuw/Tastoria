@@ -32,9 +32,9 @@ class "Lô kho" as ELO <<entity>> {
   -khoảngGam
   -trạngThái
 }
-class "Giao dịch kho" as EGD <<entity>> {
-  -lýDo
-  -delta
+class "Lần quét" as ELQ <<entity>> {
+  -trạngThái
+  -xácNhậnLúc
 }
 
 BX -- CSC
@@ -42,5 +42,5 @@ BX -- CX
 CSC -- ECH
 CX -- ECH
 CX -- ELO
-CX -- EGD
+CX -- ELQ
 @enduml

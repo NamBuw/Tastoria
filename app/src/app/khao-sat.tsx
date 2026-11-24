@@ -2,14 +2,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { FlatList, Pressable, View } from 'react-native';
 
 import { api, call, isCode, type Schemas } from '@/api/client';
 import { errorText } from '@/api/errors';
 import { BrandHeader } from '@/components/Brand';
 import { SLOT_LABEL } from '@/components/domain';
 import { Button, Card, Checkbox, Chip, ErrorBox, Field, LinkButton, Loading, Notice, Row, Screen, Section, T } from '@/components/ui';
-import { radius, TOUCH, useTheme } from '@/theme';
+import { radius, space, TOUCH, useTheme } from '@/theme';
 
 const KEY = 'tastoria.survey.v1';
 type Saved = { id: string; token: string };
@@ -30,13 +30,15 @@ export default function Survey() {
     else await AsyncStorage.removeItem(KEY).catch(() => {});
   };
 
-  if (saved === undefined) return <Screen><Loading /></Screen>;
+  if (saved === undefined) return <Screen variant="focused"><Loading /></Screen>;
   if (notOpen) {
     return (
-      <Screen testID="screen-survey-closed">
+      <Screen testID="screen-survey-closed" variant="focused">
         <BrandHeader subtitle="Khảo sát gu món ăn" />
+        <T v="h1" accessibilityRole="header">
+          Khảo sát chưa mở
+        </T>
         <Notice tone="warn">
-          <T v="title">Khảo sát chưa mở</T>
           <T>Hiện không có đợt khảo sát nào đang nhận trả lời. Cảm ơn bạn đã ghé; hãy quay lại khi nhóm gửi đường dẫn mới.</T>
         </Notice>
       </Screen>
@@ -44,11 +46,13 @@ export default function Survey() {
   }
   if (thanks) {
     return (
-      <Screen testID="screen-survey-thanks">
+      <Screen testID="screen-survey-thanks" variant="focused">
         <BrandHeader subtitle="Khảo sát gu món ăn" />
+        <T v="h1" accessibilityRole="header">
+          Đã nhận phiếu. Cảm ơn bạn.
+        </T>
         <Notice tone="ok">
-          <T v="title">Đã nhận phiếu. Cảm ơn bạn.</T>
-          <T>Câu trả lời được dùng để huấn luyện phần xếp hạng gu món của Tastoria.</T>
+          <T>Câu trả lời được dùng để huấn luyện phần xếp hạng gu món của Mỹ Vị.</T>
         </Notice>
       </Screen>
     );
@@ -57,8 +61,14 @@ export default function Survey() {
     <Form
       saved={saved}
       onReset={() => store(null)}
-      onDone={async () => { await store(null); setThanks(true); }}
-      onClosed={async () => { await store(null); setNotOpen(true); }}
+      onDone={async () => {
+        await store(null);
+        setThanks(true);
+      }}
+      onClosed={async () => {
+        await store(null);
+        setNotOpen(true);
+      }}
     />
   ) : (
     <Start onStarted={store} onNotOpen={() => setNotOpen(true)} />
@@ -68,7 +78,6 @@ export default function Survey() {
 function Start({ onStarted, onNotOpen }: { onStarted: (s: Saved) => void; onNotOpen: () => void }) {
   const [agree, setAgree] = useState(false);
   const [open, setOpen] = useState(false);
-  // ?kenh=qr on the link printed as a QR code; anything else counts as a shared link (survey_respondents.channel)
   const { kenh } = useLocalSearchParams<{ kenh?: string }>();
   const channel = kenh === 'qr' ? 'qr' : 'link';
   const policy = useQuery({
@@ -80,15 +89,20 @@ function Start({ onStarted, onNotOpen }: { onStarted: (s: Saved) => void; onNotO
       call(api.POST('/survey/respondents', { body: { policy_version_id: policy.data!.id, consent: true, channel } })),
     onSuccess: (r) => onStarted({ id: r.respondent.id, token: r.respondent_token }),
     onError: (e) => {
-      // 409 survey_closed = no open form; 404 is not in the contract for this call = survey module not deployed here
       if (isCode(e, 'survey_closed') || isCode(e, 'not_found')) onNotOpen();
       if (isCode(e, 'policy_outdated')) policy.refetch();
     },
   });
   const p = policy.data;
   return (
-    <Screen testID="screen-survey-start" footer={<Button label="Bắt đầu" testID="survey-start" disabled={!agree || !p} loading={start.isPending} onPress={() => start.mutate()} />}>
+    <Screen
+      testID="screen-survey-start"
+      variant="focused"
+      footer={<Button label="Bắt đầu" testID="survey-start" disabled={!agree || !p} loading={start.isPending} onPress={() => start.mutate()} />}>
       <BrandHeader subtitle="Khảo sát gu món ăn" />
+      <T v="h1" accessibilityRole="header">
+        Khảo sát gu món ăn Việt
+      </T>
       <T>
         Phiếu gồm khoảng 45 món cơm nhà. Với mỗi món, chọn điểm từ 1 (không thích) đến 5 (rất thích), hoặc &quot;Chưa ăn bao giờ&quot;. Mất khoảng 5
         phút. Không cần tài khoản.
@@ -100,7 +114,7 @@ function Start({ onStarted, onNotOpen }: { onStarted: (s: Saved) => void; onNotO
           <T v="label">{p.purpose.name_vi}</T>
           <T tone="muted">{p.purpose.description_vi}</T>
           <T v="small" tone="muted">
-            Dữ liệu: {p.purpose.data_category} · điều khoản phiên bản {p.version}
+            Dữ liệu: {p.purpose.data_category}, điều khoản phiên bản {p.version}
           </T>
           <LinkButton label={open ? 'Ẩn điều khoản' : 'Đọc toàn văn điều khoản'} onPress={() => setOpen(!open)} />
           {open ? <T>{p.text_vi}</T> : null}
@@ -123,10 +137,12 @@ function Form({ saved, onReset, onDone, onClosed }: { saved: Saved; onReset: () 
   });
   const [favs, setFavs] = useState<string[] | null>(null);
   const [q, setQ] = useState('');
-  if (r.data && favs === null) setFavs(r.data.favorite_recipe_ids);
+  const activeFavs = favs ?? r.data?.favorite_recipe_ids ?? [];
+
   useEffect(() => {
-    if (r.data?.completed_at) onDone(); // already sent from this browser earlier
-  }, [r.data, onDone]);
+    if (r.data?.completed_at) onDone();
+  }, [r.data?.completed_at, onDone]);
+
   const rate = useMutation({
     mutationFn: ({ recipeId, body }: { recipeId: string; body: Schemas['SurveyRatingPut'] }) =>
       call(api.PUT('/survey/respondents/{id}/ratings/{recipeId}', { params: { path: { id: saved.id, recipeId } }, headers, body })),
@@ -146,9 +162,10 @@ function Form({ saved, onReset, onDone, onClosed }: { saved: Saved; onReset: () 
       if (isCode(e, 'survey_already_completed')) onDone();
     },
   });
+
   const submit = useMutation({
     mutationFn: async () => {
-      await call(api.PUT('/survey/respondents/{id}/favorites', { params: { path: { id: saved.id } }, headers, body: { recipe_ids: favs ?? [] } }));
+      await call(api.PUT('/survey/respondents/{id}/favorites', { params: { path: { id: saved.id } }, headers, body: { recipe_ids: activeFavs } }));
       return call(api.POST('/survey/respondents/{id}/complete', { params: { path: { id: saved.id } }, headers }));
     },
     onSuccess: onDone,
@@ -158,47 +175,44 @@ function Form({ saved, onReset, onDone, onClosed }: { saved: Saved; onReset: () 
     },
   });
 
-  if (r.isLoading) return <Screen><Loading /></Screen>;
+  if (r.isLoading) return <Screen variant="focused"><Loading /></Screen>;
   if (r.error) {
     return (
-      <Screen>
+      <Screen variant="focused">
+        <T v="h1" accessibilityRole="header">
+          Phiếu khảo sát
+        </T>
         <ErrorBox message={errorText(r.error)} />
         <Button label="Bắt đầu phiếu mới" onPress={onReset} />
       </Screen>
     );
   }
+
   const items = [...(r.data?.assignments ?? [])].sort((a, b) => a.display_order - b.display_order);
   const answered = items.filter((a) => a.rating != null || a.never_eaten).length;
-  const pick = (id: string) =>
-    setFavs((s) => ((s ?? []).includes(id) ? (s ?? []).filter((x) => x !== id) : (s ?? []).length >= 5 ? s : [...(s ?? []), id]));
+  const pick = (id: string) => {
+    setFavs((cur) => {
+      const base = cur ?? r.data?.favorite_recipe_ids ?? [];
+      if (base.includes(id)) return base.filter((x) => x !== id);
+      if (base.length >= 5) return base;
+      return [...base, id];
+    });
+  };
 
-  return (
-    <Screen
-      testID="screen-survey-form"
-      footer={
-        <>
-          {submit.error ? <ErrorBox message={errorText(submit.error)} /> : null}
-          <Button label={`Gửi phiếu (${answered}/${items.length} món)`} testID="survey-submit" onPress={() => submit.mutate()} loading={submit.isPending} disabled={answered < items.length} />
-        </>
-      }>
-      <T v="h2" accessibilityRole="header">
+  const listHeader = (
+    <View style={{ gap: space.sm, marginBottom: space.md }}>
+      <T v="h1" accessibilityRole="header">
         Bạn thích các món này đến đâu?
       </T>
-      <T tone="muted">1 = không thích, 5 = rất thích.</T>
+      <T tone="muted" tabular>
+        1 = không thích, 5 = rất thích. Đã chấm {answered}/{items.length} món.
+      </T>
       {rate.error ? <ErrorBox message={errorText(rate.error)} /> : null}
-      {items.map((a) => (
-        <Card key={a.recipe_id}>
-          <T v="label">
-            {a.name_vi} <T v="small" tone="muted">· {SLOT_LABEL[a.slot]}</T>
-          </T>
-          <Row gap={6}>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <Score key={n} n={n} selected={a.rating === n} onPress={() => rate.mutate({ recipeId: a.recipe_id, body: { rating: n, never_eaten: false } })} />
-            ))}
-          </Row>
-          <Chip label="Chưa ăn bao giờ" selected={!!a.never_eaten} onPress={() => rate.mutate({ recipeId: a.recipe_id, body: { rating: null, never_eaten: true } })} />
-        </Card>
-      ))}
+    </View>
+  );
+
+  const listFooter = (
+    <View style={{ marginTop: space.lg }}>
       <Section title="5 món nhà bạn hay ăn (không bắt buộc)">
         <Field label="Tìm trong danh sách" value={q} onChangeText={setQ} />
         <Row>
@@ -208,18 +222,70 @@ function Form({ saved, onReset, onDone, onClosed }: { saved: Saved; onReset: () 
               <Chip
                 key={a.recipe_id}
                 label={a.name_vi}
-                selected={(favs ?? []).includes(a.recipe_id)}
-                disabled={!(favs ?? []).includes(a.recipe_id) && (favs ?? []).length >= 5}
+                selected={activeFavs.includes(a.recipe_id)}
+                disabled={!activeFavs.includes(a.recipe_id) && activeFavs.length >= 5}
                 onPress={() => pick(a.recipe_id)}
               />
             ))}
         </Row>
       </Section>
+    </View>
+  );
+
+  return (
+    <Screen
+      testID="screen-survey-form"
+      scroll={false}
+      variant="focused"
+      footer={
+        <>
+          {submit.error ? <ErrorBox message={errorText(submit.error)} /> : null}
+          <Button
+            label={`Gửi phiếu (${answered}/${items.length} món)`}
+            testID="survey-submit"
+            onPress={() => submit.mutate()}
+            loading={submit.isPending}
+            disabled={answered < items.length}
+          />
+        </>
+      }>
+      <FlatList
+        data={items}
+        keyExtractor={(a) => a.recipe_id}
+        windowSize={5}
+        initialNumToRender={Math.max(12, items.length)}
+        ListHeaderComponent={listHeader}
+        ListFooterComponent={listFooter}
+        contentContainerStyle={{ gap: space.md, paddingBottom: space.xxl }}
+        renderItem={({ item: a }) => (
+          <Card>
+            <T v="label">
+              {a.name_vi} <T v="small" tone="muted">({SLOT_LABEL[a.slot]})</T>
+            </T>
+            <Row gap={space.sm}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <Score
+                  key={n}
+                  n={n}
+                  dishName={a.name_vi}
+                  selected={a.rating === n}
+                  onPress={() => rate.mutate({ recipeId: a.recipe_id, body: { rating: n, never_eaten: false } })}
+                />
+              ))}
+            </Row>
+            <Chip
+              label="Chưa ăn bao giờ"
+              selected={!!a.never_eaten}
+              onPress={() => rate.mutate({ recipeId: a.recipe_id, body: { rating: null, never_eaten: true } })}
+            />
+          </Card>
+        )}
+      />
     </Screen>
   );
 }
 
-function Score({ n, selected, onPress }: { n: number; selected: boolean; onPress: () => void }) {
+function Score({ n, dishName, selected, onPress }: { n: number; dishName: string; selected: boolean; onPress: () => void }) {
   const { c } = useTheme();
   return (
     <Pressable
@@ -227,6 +293,7 @@ function Score({ n, selected, onPress }: { n: number; selected: boolean; onPress
       accessibilityRole="radio"
       accessibilityState={{ selected, checked: selected }}
       accessibilityLabel={`${n} điểm`}
+      accessibilityHint={`Chấm món ${dishName}`}
       style={{
         width: TOUCH,
         height: TOUCH,
@@ -238,7 +305,7 @@ function Score({ n, selected, onPress }: { n: number; selected: boolean; onPress
         justifyContent: 'center',
       }}>
       <View>
-        <T v="title" style={{ color: selected ? c.accent : c.text }}>
+        <T v="title" tabular style={{ color: selected ? c.accent : c.text }}>
           {n}
         </T>
       </View>

@@ -48,3 +48,30 @@ def test_old_app_version_is_rejected(make_app, clean_db) -> None:
     with TestClient(app) as c:
         assert c.get("/api/v1/nothing", headers={"X-App-Version": "1.1.9"}).json()["code"] == "app_too_old"
         assert c.get("/api/v1/nothing", headers={"X-App-Version": "1.2.0"}).status_code == 404
+
+
+def test_readyz_fails_closed_when_check_missing_and_metrics_exposed(make_app, clean_db, client: TestClient) -> None:
+    # 1. Fail-closed readiness when any READINESS_CHECKS entry is removed or errors
+    app = make_app()
+    del app.state.readiness_checks["models"]
+    with TestClient(app) as c:
+        r = c.get("/readyz")
+    assert r.status_code == 503
+    assert r.json() == {"status": "not_ready", "checks": {"database": "ok", "valkey": "ok", "models": "fail"}}
+
+    # 2. /metrics exposes Prometheus counters & scan queue depth while staying hidden from OpenAPI schema
+    assert "/metrics" not in client.app.openapi()["paths"]
+    m = client.get("/metrics")
+    assert m.status_code == 200
+    assert m.headers["content-type"].startswith("text/plain")
+    assert "tastoria_http_requests_total" in m.text
+    assert "tastoria_scan_queue_depth" in m.text
+
+
+def test_production_disables_openapi_and_docs(make_app, clean_db) -> None:
+    prod_app = make_app(env="production")
+    assert prod_app.openapi_url is None and prod_app.docs_url is None
+    with TestClient(prod_app) as c:
+        assert c.get("/api/v1/openapi.json").status_code == 404
+        assert c.get("/api/v1/docs").status_code == 404
+        assert c.get("/healthz").status_code == 200

@@ -14,7 +14,7 @@
 \setlist{nosep,leftmargin=1cm}
 \renewcommand{\arraystretch}{1.15}
 \captionsetup{font=small,labelfont=bf,labelsep=period}
-\titleformat{\chapter}[display]{\centering\bfseries\large}{CHƯƠNG \thechapter}{4pt}{\Large}
+\titleformat{\chapter}[hang]{\centering\bfseries\Large}{Chương \thechapter.}{0.5em}{}
 \titlespacing*{\chapter}{0pt}{0pt}{18pt}
 \titleformat{\section}{\bfseries\large}{\thesection.}{0.5em}{}
 \titleformat{\subsection}{\bfseries}{\thesubsection.}{0.5em}{}
@@ -24,6 +24,17 @@
 \renewcommand{\listtablename}{DANH MỤC BẢNG}
 \renewcommand{\figurename}{Hình}\renewcommand{\tablename}{Bảng}
 \setlength{\headheight}{15pt}\pagestyle{fancy}\fancyhf{}
-\fancyhead[R]{\small Báo cáo theo các pha phát triển hệ thống --- Tastoria}
+\fancyhead[R]{\small Phân tích thiết kế hệ thống thông tin --- Tastoria}
 \fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0.4pt}
 \fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% ---- tiện ích trình bày (bản cấu trúc lại 11/2026)
+\usepackage{fancyvrb}
+\DeclareUrlCommand\code{\def\UrlFont{\ttfamily\small}}
+\newcommand{\vpfig}[3][0.62]{\begin{figure}[H]\centering\includegraphics[width=0.98\linewidth,height=#1\textheight,keepaspectratio]{assets/#2.pdf}\caption{#3}\label{fig:#2}\end{figure}}
+\newcommand{\vpwide}[2]{\begin{landscape}\begin{figure}[p]\centering\includegraphics[width=\linewidth,height=0.84\textheight,keepaspectratio]{assets/#1.pdf}\caption{#2}\label{fig:#1}\end{figure}\end{landscape}}
+\newcommand{\shot}[3][0.55]{\begin{figure}[H]\centering\includegraphics[width=0.98\linewidth,height=#1\textheight,keepaspectratio]{assets/#2}\caption{#3}\label{fig:#2}\end{figure}}
+\newcommand{\shots}[4]{\begin{figure}[H]\centering\includegraphics[height=0.42\textheight,keepaspectratio]{assets/#1}\hspace{6mm}\includegraphics[height=0.42\textheight,keepaspectratio]{assets/#2}\caption{#3}\label{fig:#4}\end{figure}}
+\newenvironment{tabl}[3]{\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.2}\begin{longtable}{#2}\caption{#1}\\\toprule #3\\\midrule\endfirsthead\toprule #3\\\midrule\endhead\bottomrule\endfoot}{\end{longtable}}
+\fvset{fontsize=\footnotesize,frame=single,framesep=2mm,numbers=none}
+\newcommand{\codecap}[1]{\par\noindent{\small\bfseries #1}\par\vspace{-2pt}}

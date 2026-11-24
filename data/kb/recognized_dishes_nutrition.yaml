@@ -1,0 +1,4343 @@
+version: 2
+n_dishes: 310
+dishes:
+- dish_id: banh_beo
+  name_vi: Bánh bèo
+  name_en: Steamed Savory Rice Cakes
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 248.0
+  protein_g: 6.5
+  lipid_g: 6.0
+  glucid_g: 42.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 đĩa vừa (~220g, 6–8 chén kèm tôm cháy mỡ hành)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: banh_bot_loc
+  name_vi: Bánh bột lọc
+  name_en: Clear Tapioca Shrimp Dumplings
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 275.5
+  protein_g: 8.5
+  lipid_g: 5.5
+  glucid_g: 48.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 đĩa vừa (~200g, 8 chiếc nhân tôm thịt)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 200
+- dish_id: banh_can
+  name_vi: Bánh căn
+  name_en: Mini Crispy Rice Pancakes
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 323.0
+  protein_g: 12.0
+  lipid_g: 11.0
+  glucid_g: 44.0
+  fiber_g: 1.4
+  serving_desc_vi: 1 phần (~240g, 6 cặp kèm trứng/hải sản)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 240
+- dish_id: banh_canh
+  name_vi: Bánh canh
+  name_en: Thick Tapioca Noodle Soup
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 439.5
+  protein_g: 22.0
+  lipid_g: 11.5
+  glucid_g: 62.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 tô vừa (~480g bánh canh giò/cua)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 480
+- dish_id: banh_chung
+  name_vi: Bánh chưng
+  name_en: Square Sticky Rice Cake
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 496.0
+  protein_g: 16.5
+  lipid_g: 14.0
+  glucid_g: 76.0
+  fiber_g: 3.2
+  serving_desc_vi: 1 miếng vừa (1/4 chiếc ~250g)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 250
+- dish_id: banh_cuon
+  name_vi: Bánh cuốn
+  name_en: Steamed Rice Noodle Rolls
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 335.5
+  protein_g: 14.5
+  lipid_g: 9.5
+  glucid_g: 48.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 đĩa vừa (~280g kèm chả lụa, hành phi)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 280
+- dish_id: banh_duc
+  name_vi: Bánh đúc
+  name_en: Savory Rice Pudding Cake
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 255.0
+  protein_g: 8.0
+  lipid_g: 7.0
+  glucid_g: 40.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 bát vừa (~250g bánh đúc nóng thịt băm mộc nhĩ)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 250
+- dish_id: banh_gio
+  name_vi: Bánh giò
+  name_en: Pyramid Rice Dumpling
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 315.0
+  protein_g: 11.5
+  lipid_g: 13.0
+  glucid_g: 38.0
+  fiber_g: 1.4
+  serving_desc_vi: 1 chiếc vừa (~220g)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: banh_khot
+  name_vi: Bánh khọt
+  name_en: Mini Crispy Turmeric Pancakes
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 376.0
+  protein_g: 13.0
+  lipid_g: 16.0
+  glucid_g: 45.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 đĩa vừa (~250g, 6 chiếc nhân tôm)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 250
+- dish_id: banh_mi
+  name_vi: Bánh mì kẹp
+  name_en: Vietnamese Banh Mi Sandwich
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 408.0
+  protein_g: 18.5
+  lipid_g: 14.0
+  glucid_g: 52.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 ổ vừa (~220g nhân thịt chả pate)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: banh_pia
+  name_vi: Bánh pía
+  name_en: Durian Mung Bean Pastry
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 357.0
+  protein_g: 5.5
+  lipid_g: 15.0
+  glucid_g: 50.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 chiếc vừa (~120g nhân đậu xanh sầu riêng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 120
+- dish_id: banh_tet
+  name_vi: Bánh tét
+  name_en: Cylindrical Sticky Rice Cake
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 446.0
+  protein_g: 14.5
+  lipid_g: 12.0
+  glucid_g: 70.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 khoanh vừa (~220g)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: banh_trang_nuong
+  name_vi: Bánh tráng nướng
+  name_en: Grilled Rice Paper Pizza
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 301.5
+  protein_g: 11.0
+  lipid_g: 13.5
+  glucid_g: 34.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 chiếc vừa (~150g trứng tép hành)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 150
+- dish_id: banh_xeo
+  name_vi: Bánh xèo
+  name_en: Crispy Vietnamese Sizzling Crepe
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 446.0
+  protein_g: 16.0
+  lipid_g: 22.0
+  glucid_g: 46.0
+  fiber_g: 3.0
+  serving_desc_vi: 1 cái lớn (~280g nhân tôm thịt giá đỗ)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 280
+- dish_id: bun_bo_hue
+  name_vi: Bún bò Huế
+  name_en: Hue Spicy Beef Noodle Soup
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 489.0
+  protein_g: 28.0
+  lipid_g: 17.0
+  glucid_g: 56.0
+  fiber_g: 2.6
+  serving_desc_vi: 1 tô vừa (~550g bún bò giò chả)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 550
+- dish_id: bun_cha
+  name_vi: Bún chả
+  name_en: Grilled Pork & Vermicelli
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 490.5
+  protein_g: 27.0
+  lipid_g: 18.5
+  glucid_g: 54.0
+  fiber_g: 2.5
+  serving_desc_vi: 1 suất vừa (~450g bún chả nướng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 450
+- dish_id: bun_dau_mam_tom
+  name_vi: Bún đậu mắm tôm
+  name_en: Vermicelli with Fried Tofu & Shrimp Paste
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 564.0
+  protein_g: 29.0
+  lipid_g: 24.0
+  glucid_g: 58.0
+  fiber_g: 3.0
+  serving_desc_vi: 1 mẹt 1 người (~450g bún, đậu rán, chả cốm, thịt luộc)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 450
+- dish_id: bun_mam
+  name_vi: Bún mắm
+  name_en: Fermented Fish Broth Vermicelli Soup
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 446.0
+  protein_g: 26.0
+  lipid_g: 14.0
+  glucid_g: 54.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 tô vừa (~520g bún mắm hải sản heo quay)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 520
+- dish_id: bun_rieu
+  name_vi: Bún riêu
+  name_en: Crab Paste Tomato Noodle Soup
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 421.5
+  protein_g: 23.0
+  lipid_g: 13.5
+  glucid_g: 52.0
+  fiber_g: 2.6
+  serving_desc_vi: 1 tô vừa (~500g bún riêu cua đậu phụ)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 500
+- dish_id: bun_thit_nuong
+  name_vi: Bún thịt nướng
+  name_en: Grilled Pork Vermicelli Bowl
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 467.0
+  protein_g: 25.0
+  lipid_g: 15.0
+  glucid_g: 58.0
+  fiber_g: 3.2
+  serving_desc_vi: 1 tô vừa (~420g bún thịt nướng chả giò)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 420
+- dish_id: ca_kho_to
+  name_vi: Cá kho tộ
+  name_en: Caramelized Claypot Fish
+  category: vn
+  kb_slug: ca-kho-to
+  slot: man
+  kcal_per_serving: 151.8
+  protein_g: 17.3
+  lipid_g: 5.8
+  glucid_g: 7.7
+  fiber_g: 0.3
+  serving_desc_vi: 1 phần cá kho tộ vừa (~140g)
+  source_ref: Tastoria KB / NIN FCT 2007
+  serving_g: 140
+- dish_id: canh_chua
+  name_vi: Canh chua
+  name_en: Vietnamese Sweet & Sour Soup
+  category: vn
+  kb_slug: canh-chua-ca-loc
+  slot: canh
+  kcal_per_serving: 180.1
+  protein_g: 16.8
+  lipid_g: 5.8
+  glucid_g: 14.8
+  fiber_g: 2.8
+  serving_desc_vi: 1 tô canh chua cá lóc (~300g)
+  source_ref: Tastoria KB / NIN FCT 2007
+  serving_g: 300
+- dish_id: cao_lau
+  name_vi: Cao lầu
+  name_en: Hoi An Pork & Thick Noodle Bowl
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 454.0
+  protein_g: 24.0
+  lipid_g: 14.0
+  glucid_g: 58.0
+  fiber_g: 2.5
+  serving_desc_vi: 1 tô vừa (~400g mì cao lầu thịt xá xíu)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 400
+- dish_id: chao_long
+  name_vi: Cháo lòng
+  name_en: Pork Offal Rice Congee
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 386.5
+  protein_g: 22.0
+  lipid_g: 14.5
+  glucid_g: 42.0
+  fiber_g: 0.8
+  serving_desc_vi: 1 tô vừa (~450g cháo lòng dồi)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 450
+- dish_id: com_rang
+  name_vi: Cơm rang
+  name_en: Vietnamese / Asian Fried Rice
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 490.5
+  protein_g: 17.5
+  lipid_g: 16.5
+  glucid_g: 68.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 đĩa vừa (~340g cơm chiên dương châu/trứng)
+  source_ref: Vietnam NIN / USDA FDC
+  serving_g: 340
+- dish_id: com_tam
+  name_vi: Cơm tấm
+  name_en: Broken Rice with Grilled Pork
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 591.0
+  protein_g: 28.5
+  lipid_g: 21.0
+  glucid_g: 72.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 đĩa vừa (~400g cơm tấm sườn bì chả)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 400
+- dish_id: com_vong
+  name_vi: Cốm
+  name_en: Young Green Sticky Rice Flakes
+  category: vn
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 290.2
+  protein_g: 6.5
+  lipid_g: 1.8
+  glucid_g: 62.0
+  fiber_g: 2.5
+  serving_desc_vi: 1 gói vừa (~150g cốm tươi)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 150
+- dish_id: goi_cuon
+  name_vi: Gỏi cuốn
+  name_en: Fresh Vietnamese Spring Rolls
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 237.5
+  protein_g: 13.0
+  lipid_g: 5.5
+  glucid_g: 34.0
+  fiber_g: 2.4
+  serving_desc_vi: 3 cuốn vừa (~240g tôm thịt bún rau)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 240
+- dish_id: hu_tieu
+  name_vi: Hủ tiếu
+  name_en: Southern Pork & Clear Noodle Soup
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 428.5
+  protein_g: 24.0
+  lipid_g: 12.5
+  glucid_g: 55.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 tô vừa (~480g hủ tiếu Nam Vang)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 480
+- dish_id: mi_quang
+  name_vi: Mì Quảng
+  name_en: Quang-Style Turmeric Noodles
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 472.0
+  protein_g: 26.0
+  lipid_g: 16.0
+  glucid_g: 56.0
+  fiber_g: 2.6
+  serving_desc_vi: 1 tô vừa (~450g mì Quảng tôm thịt trứng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 450
+- dish_id: nem_chua
+  name_vi: Nem chua
+  name_en: Fermented Cured Pork Roll
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 171.0
+  protein_g: 19.0
+  lipid_g: 7.0
+  glucid_g: 8.0
+  fiber_g: 0.4
+  serving_desc_vi: 1 phần (~120g, 3–4 chiếc)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 120
+- dish_id: pho
+  name_vi: Phở
+  name_en: Vietnamese Beef/Chicken Noodle Soup
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 444.0
+  protein_g: 26.0
+  lipid_g: 12.0
+  glucid_g: 58.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 tô vừa (~520g phở bò tái nạm)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 520
+- dish_id: xoi_xeo
+  name_vi: Xôi
+  name_en: Savory Vietnamese Sticky Rice
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 437.0
+  protein_g: 12.0
+  lipid_g: 13.0
+  glucid_g: 68.0
+  fiber_g: 2.6
+  serving_desc_vi: 1 gói vừa (~250g xôi xéo đậu xanh hành phi)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 250
+- dish_id: apple_pie
+  name_vi: Bánh táo nướng
+  name_en: Apple Pie
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 322.8
+  protein_g: 3.2
+  lipid_g: 14.0
+  glucid_g: 46.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 miếng vừa (~140g)
+  source_ref: USDA FDC
+  serving_g: 140
+- dish_id: baby_back_ribs
+  name_vi: Sườn nướng BBQ
+  name_en: Baby Back Ribs
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 436.0
+  protein_g: 32.0
+  lipid_g: 28.0
+  glucid_g: 14.0
+  fiber_g: 0.5
+  serving_desc_vi: 1 phần nửa dẻ sườn (~280g)
+  source_ref: USDA FDC
+  serving_g: 280
+- dish_id: baklava
+  name_vi: Bánh ngàn lớp Baklava
+  name_en: Baklava
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 370.0
+  protein_g: 5.0
+  lipid_g: 22.0
+  glucid_g: 38.0
+  fiber_g: 2.0
+  serving_desc_vi: 2 miếng (~100g)
+  source_ref: USDA FDC
+  serving_g: 100
+- dish_id: beef_carpaccio
+  name_vi: Thịt bò sống Carpaccio
+  name_en: Beef Carpaccio
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 242.0
+  protein_g: 22.0
+  lipid_g: 16.0
+  glucid_g: 2.5
+  fiber_g: 0.4
+  serving_desc_vi: 1 đĩa khai vị (~130g)
+  source_ref: USDA FDC
+  serving_g: 130
+- dish_id: beef_tartare
+  name_vi: Bò băm sống Tartare
+  name_en: Beef Tartare
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 274.0
+  protein_g: 24.0
+  lipid_g: 18.0
+  glucid_g: 4.0
+  fiber_g: 0.5
+  serving_desc_vi: 1 phần (~160g)
+  source_ref: USDA FDC
+  serving_g: 160
+- dish_id: beet_salad
+  name_vi: Salad củ dền
+  name_en: Beet Salad
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 194.0
+  protein_g: 5.5
+  lipid_g: 12.0
+  glucid_g: 16.0
+  fiber_g: 3.8
+  serving_desc_vi: 1 đĩa vừa (~200g)
+  source_ref: USDA FDC
+  serving_g: 200
+- dish_id: beignets
+  name_vi: Bánh rán Beignets
+  name_en: Beignets
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 318.0
+  protein_g: 5.5
+  lipid_g: 16.0
+  glucid_g: 38.0
+  fiber_g: 1.4
+  serving_desc_vi: 2–3 chiếc (~110g)
+  source_ref: USDA FDC
+  serving_g: 110
+- dish_id: bibimbap
+  name_vi: Cơm trộn Bibimbap
+  name_en: Bibimbap
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 549.5
+  protein_g: 24.0
+  lipid_g: 17.5
+  glucid_g: 74.0
+  fiber_g: 4.5
+  serving_desc_vi: 1 thố vừa (~450g cơm trộn Hàn Quốc)
+  source_ref: USDA FDC
+  serving_g: 450
+- dish_id: bread_pudding
+  name_vi: Bánh mì nướng Pudding
+  name_en: Bread Pudding
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 323.0
+  protein_g: 7.5
+  lipid_g: 13.0
+  glucid_g: 44.0
+  fiber_g: 1.4
+  serving_desc_vi: 1 phần (~160g)
+  source_ref: USDA FDC
+  serving_g: 160
+- dish_id: breakfast_burrito
+  name_vi: Bánh cuộn Burrito sáng
+  name_en: Breakfast Burrito
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 452.0
+  protein_g: 22.0
+  lipid_g: 20.0
+  glucid_g: 46.0
+  fiber_g: 3.5
+  serving_desc_vi: 1 cuốn vừa (~260g)
+  source_ref: USDA FDC
+  serving_g: 260
+- dish_id: bruschetta
+  name_vi: Bánh mì nướng Bruschetta
+  name_en: Bruschetta
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 210.5
+  protein_g: 5.5
+  lipid_g: 8.5
+  glucid_g: 28.0
+  fiber_g: 2.0
+  serving_desc_vi: 3 lát (~150g)
+  source_ref: USDA FDC
+  serving_g: 150
+- dish_id: caesar_salad
+  name_vi: Salad Caesar
+  name_en: Caesar Salad
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 302.0
+  protein_g: 12.0
+  lipid_g: 22.0
+  glucid_g: 14.0
+  fiber_g: 2.6
+  serving_desc_vi: 1 tô vừa (~240g)
+  source_ref: USDA FDC
+  serving_g: 240
+- dish_id: cannoli
+  name_vi: Bánh ống nhân kem Cannoli
+  name_en: Cannoli
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 260.0
+  protein_g: 5.5
+  lipid_g: 14.0
+  glucid_g: 28.0
+  fiber_g: 0.8
+  serving_desc_vi: 1 chiếc (~95g)
+  source_ref: USDA FDC
+  serving_g: 95
+- dish_id: caprese_salad
+  name_vi: Salad cà chua phô mai Caprese
+  name_en: Caprese Salad
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 240.0
+  protein_g: 13.0
+  lipid_g: 18.0
+  glucid_g: 6.5
+  fiber_g: 1.6
+  serving_desc_vi: 1 đĩa vừa (~200g)
+  source_ref: USDA FDC
+  serving_g: 200
+- dish_id: carrot_cake
+  name_vi: Bánh kem cà rốt
+  name_en: Carrot Cake
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 372.0
+  protein_g: 4.5
+  lipid_g: 18.0
+  glucid_g: 48.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 miếng vừa (~130g)
+  source_ref: USDA FDC
+  serving_g: 130
+- dish_id: ceviche
+  name_vi: Gỏi hải sản chanh Ceviche
+  name_en: Ceviche
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 172.5
+  protein_g: 22.0
+  lipid_g: 4.5
+  glucid_g: 11.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 phần (~200g)
+  source_ref: USDA FDC
+  serving_g: 200
+- dish_id: cheesecake
+  name_vi: Bánh phô mai Cheesecake
+  name_en: Cheesecake
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 361.0
+  protein_g: 6.5
+  lipid_g: 23.0
+  glucid_g: 32.0
+  fiber_g: 0.5
+  serving_desc_vi: 1 miếng vừa (~125g)
+  source_ref: USDA FDC
+  serving_g: 125
+- dish_id: cheese_plate
+  name_vi: Đĩa phô mai tổng hợp
+  name_en: Cheese Plate
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 396.0
+  protein_g: 22.0
+  lipid_g: 28.0
+  glucid_g: 14.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 đĩa (~140g)
+  source_ref: USDA FDC
+  serving_g: 140
+- dish_id: chicken_curry
+  name_vi: Cà ri gà
+  name_en: Chicken Curry
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 371.0
+  protein_g: 28.0
+  lipid_g: 19.0
+  glucid_g: 22.0
+  fiber_g: 3.2
+  serving_desc_vi: 1 tô cà ri gà (~320g)
+  source_ref: USDA FDC
+  serving_g: 320
+- dish_id: chicken_quesadilla
+  name_vi: Bánh kẹp gà Quesadilla
+  name_en: Chicken Quesadilla
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 454.0
+  protein_g: 26.0
+  lipid_g: 22.0
+  glucid_g: 38.0
+  fiber_g: 2.4
+  serving_desc_vi: 1 phần vừa (~240g)
+  source_ref: USDA FDC
+  serving_g: 240
+- dish_id: chicken_wings
+  name_vi: Cánh gà chiên / nướng
+  name_en: Chicken Wings
+  category: global
+  kb_slug: canh-ga-chien-nuoc-mam
+  slot: man
+  kcal_per_serving: 285.0
+  protein_g: 14.3
+  lipid_g: 18.4
+  glucid_g: 14.6
+  fiber_g: 0.3
+  serving_desc_vi: 5–6 cánh gà (~200g)
+  source_ref: USDA FDC
+  serving_g: 200
+- dish_id: chocolate_cake
+  name_vi: Bánh kem sô-cô-la
+  name_en: Chocolate Cake
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 399.0
+  protein_g: 5.0
+  lipid_g: 19.0
+  glucid_g: 52.0
+  fiber_g: 2.5
+  serving_desc_vi: 1 miếng vừa (~130g)
+  source_ref: USDA FDC
+  serving_g: 130
+- dish_id: chocolate_mousse
+  name_vi: Bánh Mousse sô-cô-la
+  name_en: Chocolate Mousse
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 293.0
+  protein_g: 4.5
+  lipid_g: 19.0
+  glucid_g: 26.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 ly nhỏ (~110g)
+  source_ref: USDA FDC
+  serving_g: 110
+- dish_id: churros
+  name_vi: Bánh quẩy giòn Churros
+  name_en: Churros
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 303.0
+  protein_g: 4.0
+  lipid_g: 15.0
+  glucid_g: 38.0
+  fiber_g: 1.5
+  serving_desc_vi: 3 thanh (~110g)
+  source_ref: USDA FDC
+  serving_g: 110
+- dish_id: clam_chowder
+  name_vi: Súp kem nghêu
+  name_en: Clam Chowder
+  category: global
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 292.0
+  protein_g: 13.0
+  lipid_g: 16.0
+  glucid_g: 24.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 tô vừa (~300g)
+  source_ref: USDA FDC
+  serving_g: 300
+- dish_id: club_sandwich
+  name_vi: Bánh mì kẹp Club Sandwich
+  name_en: Club Sandwich
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 470.0
+  protein_g: 26.0
+  lipid_g: 22.0
+  glucid_g: 42.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 phần sandwich 3 tầng (~280g)
+  source_ref: USDA FDC
+  serving_g: 280
+- dish_id: crab_cakes
+  name_vi: Chả cua chiên
+  name_en: Crab Cakes
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 306.0
+  protein_g: 20.0
+  lipid_g: 18.0
+  glucid_g: 16.0
+  fiber_g: 1.0
+  serving_desc_vi: 2 miếng chả cua (~180g)
+  source_ref: USDA FDC
+  serving_g: 180
+- dish_id: creme_brulee
+  name_vi: Bánh kem cháy Crème Brûlée
+  name_en: Creme Brulee
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 303.0
+  protein_g: 4.5
+  lipid_g: 21.0
+  glucid_g: 24.0
+  fiber_g: 0.2
+  serving_desc_vi: 1 hũ (~130g)
+  source_ref: USDA FDC
+  serving_g: 130
+- dish_id: croque_madame
+  name_vi: Bánh mì nướng trứng phô mai
+  name_en: Croque Madame
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 454.0
+  protein_g: 25.0
+  lipid_g: 26.0
+  glucid_g: 30.0
+  fiber_g: 1.6
+  serving_desc_vi: 1 phần (~240g)
+  source_ref: USDA FDC
+  serving_g: 240
+- dish_id: cup_cakes
+  name_vi: Bánh Cupcake
+  name_en: Cupcakes
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 264.0
+  protein_g: 3.0
+  lipid_g: 12.0
+  glucid_g: 36.0
+  fiber_g: 0.8
+  serving_desc_vi: 1 chiếc vừa (~85g)
+  source_ref: USDA FDC
+  serving_g: 85
+- dish_id: deviled_eggs
+  name_vi: Trứng nhồi sốt kem
+  name_en: Deviled Eggs
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 200.0
+  protein_g: 12.0
+  lipid_g: 16.0
+  glucid_g: 2.0
+  fiber_g: 0.2
+  serving_desc_vi: 4 nửa quả (~130g)
+  source_ref: USDA FDC
+  serving_g: 130
+- dish_id: donuts
+  name_vi: Bánh vòng Donut
+  name_en: Donuts
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 297.0
+  protein_g: 4.5
+  lipid_g: 15.0
+  glucid_g: 36.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 chiếc (~80g)
+  source_ref: USDA FDC
+  serving_g: 80
+- dish_id: dumplings
+  name_vi: Há cảo / Sủi cảo
+  name_en: Dumplings
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 299.0
+  protein_g: 14.0
+  lipid_g: 11.0
+  glucid_g: 36.0
+  fiber_g: 2.0
+  serving_desc_vi: 6 chiếc (~200g)
+  source_ref: USDA FDC
+  serving_g: 200
+- dish_id: edamame
+  name_vi: Đậu nành Nhật luộc
+  name_en: Edamame
+  category: asian
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 158.0
+  protein_g: 14.0
+  lipid_g: 6.0
+  glucid_g: 12.0
+  fiber_g: 6.0
+  serving_desc_vi: 1 chén (~150g)
+  source_ref: USDA FDC
+  serving_g: 150
+- dish_id: eggs_benedict
+  name_vi: Trứng chần Benedict
+  name_en: Eggs Benedict
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 461.0
+  protein_g: 22.0
+  lipid_g: 29.0
+  glucid_g: 28.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 phần 2 trứng (~260g)
+  source_ref: USDA FDC
+  serving_g: 260
+- dish_id: escargots
+  name_vi: Ốc bơ tỏi nướng
+  name_en: Escargots
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 242.0
+  protein_g: 16.0
+  lipid_g: 18.0
+  glucid_g: 4.0
+  fiber_g: 0.4
+  serving_desc_vi: 6 con bơ tỏi (~120g)
+  source_ref: USDA FDC
+  serving_g: 120
+- dish_id: falafel
+  name_vi: Chả đậu gà Falafel
+  name_en: Falafel
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 342.0
+  protein_g: 13.0
+  lipid_g: 18.0
+  glucid_g: 32.0
+  fiber_g: 5.0
+  serving_desc_vi: 4 viên (~160g)
+  source_ref: USDA FDC
+  serving_g: 160
+- dish_id: filet_mignon
+  name_vi: Bít tết thăn nội bò
+  name_en: Filet Mignon
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 332.0
+  protein_g: 36.0
+  lipid_g: 20.0
+  glucid_g: 2.0
+  fiber_g: 0.2
+  serving_desc_vi: 1 phần bò bít tết (~190g)
+  source_ref: USDA FDC
+  serving_g: 190
+- dish_id: fish_and_chips
+  name_vi: Cá tẩm bột chiên & khoai tây
+  name_en: Fish and Chips
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 588.0
+  protein_g: 26.0
+  lipid_g: 28.0
+  glucid_g: 58.0
+  fiber_g: 4.0
+  serving_desc_vi: 1 đĩa vừa (~340g)
+  source_ref: USDA FDC
+  serving_g: 340
+- dish_id: foie_gras
+  name_vi: Gan ngỗng áp chảo
+  name_en: Foie Gras
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 380.0
+  protein_g: 10.0
+  lipid_g: 36.0
+  glucid_g: 4.0
+  fiber_g: 0.2
+  serving_desc_vi: 1 miếng áp chảo (~90g)
+  source_ref: USDA FDC
+  serving_g: 90
+- dish_id: french_fries
+  name_vi: Khoai tây chiên
+  name_en: French Fries
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 347.0
+  protein_g: 4.5
+  lipid_g: 17.0
+  glucid_g: 44.0
+  fiber_g: 4.0
+  serving_desc_vi: 1 phần vừa (~150g)
+  source_ref: USDA FDC
+  serving_g: 150
+- dish_id: french_onion_soup
+  name_vi: Súp hành tây kiểu Pháp
+  name_en: French Onion Soup
+  category: global
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 270.0
+  protein_g: 14.0
+  lipid_g: 14.0
+  glucid_g: 22.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 tô vừa (~320g)
+  source_ref: USDA FDC
+  serving_g: 320
+- dish_id: french_toast
+  name_vi: Bánh mì nướng trứng sữa
+  name_en: French Toast
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 347.0
+  protein_g: 11.0
+  lipid_g: 15.0
+  glucid_g: 42.0
+  fiber_g: 1.8
+  serving_desc_vi: 2 lát (~190g)
+  source_ref: USDA FDC
+  serving_g: 190
+- dish_id: fried_calamari
+  name_vi: Mực chiên giòn
+  name_en: Fried Calamari
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 321.0
+  protein_g: 18.0
+  lipid_g: 17.0
+  glucid_g: 24.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 đĩa (~180g)
+  source_ref: USDA FDC
+  serving_g: 180
+- dish_id: frozen_yogurt
+  name_vi: Sữa chua dẻo lạnh
+  name_en: Frozen Yogurt
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 187.5
+  protein_g: 5.0
+  lipid_g: 3.5
+  glucid_g: 34.0
+  fiber_g: 0.5
+  serving_desc_vi: 1 ly vừa (~160g)
+  source_ref: USDA FDC
+  serving_g: 160
+- dish_id: garlic_bread
+  name_vi: Bánh mì bơ tỏi
+  name_en: Garlic Bread
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 260.0
+  protein_g: 6.0
+  lipid_g: 12.0
+  glucid_g: 32.0
+  fiber_g: 1.6
+  serving_desc_vi: 2 lát (~110g)
+  source_ref: USDA FDC
+  serving_g: 110
+- dish_id: gnocchi
+  name_vi: Mì viên khoai tây Gnocchi
+  name_en: Gnocchi
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 384.0
+  protein_g: 11.0
+  lipid_g: 12.0
+  glucid_g: 58.0
+  fiber_g: 3.0
+  serving_desc_vi: 1 đĩa vừa (~280g)
+  source_ref: USDA FDC
+  serving_g: 280
+- dish_id: greek_salad
+  name_vi: Salad Hy Lạp
+  name_en: Greek Salad
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 231.0
+  protein_g: 8.5
+  lipid_g: 17.0
+  glucid_g: 11.0
+  fiber_g: 3.2
+  serving_desc_vi: 1 tô vừa (~250g)
+  source_ref: USDA FDC
+  serving_g: 250
+- dish_id: grilled_cheese_sandwich
+  name_vi: Bánh mì kẹp phô mai nướng
+  name_en: Grilled Cheese Sandwich
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 382.0
+  protein_g: 16.0
+  lipid_g: 22.0
+  glucid_g: 30.0
+  fiber_g: 1.6
+  serving_desc_vi: 1 chiếc (~160g)
+  source_ref: USDA FDC
+  serving_g: 160
+- dish_id: grilled_salmon
+  name_vi: Cá hồi áp chảo / nướng
+  name_en: Grilled Salmon
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 306.0
+  protein_g: 34.0
+  lipid_g: 18.0
+  glucid_g: 2.0
+  fiber_g: 0.4
+  serving_desc_vi: 1 phi lê (~180g)
+  source_ref: USDA FDC
+  serving_g: 180
+- dish_id: guacamole
+  name_vi: Sốt bơ nghiền Guacamole
+  name_en: Guacamole
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 249.0
+  protein_g: 3.0
+  lipid_g: 21.0
+  glucid_g: 12.0
+  fiber_g: 8.0
+  serving_desc_vi: 1 chén (~150g)
+  source_ref: USDA FDC
+  serving_g: 150
+- dish_id: gyoza
+  name_vi: Bánh xếp áp chảo Gyoza
+  name_en: Gyoza
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 288.0
+  protein_g: 13.0
+  lipid_g: 12.0
+  glucid_g: 32.0
+  fiber_g: 1.8
+  serving_desc_vi: 6 chiếc (~180g)
+  source_ref: USDA FDC
+  serving_g: 180
+- dish_id: hamburger
+  name_vi: Bánh mì kẹp thịt Hamburger
+  name_en: Hamburger
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 464.0
+  protein_g: 26.0
+  lipid_g: 24.0
+  glucid_g: 36.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 chiếc burger vừa (~230g)
+  source_ref: USDA FDC
+  serving_g: 230
+- dish_id: hot_and_sour_soup
+  name_vi: Súp chua cay
+  name_en: Hot and Sour Soup
+  category: asian
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 156.0
+  protein_g: 9.5
+  lipid_g: 6.0
+  glucid_g: 16.0
+  fiber_g: 1.6
+  serving_desc_vi: 1 tô vừa (~300g)
+  source_ref: USDA FDC
+  serving_g: 300
+- dish_id: hot_dog
+  name_vi: Xúc xích kẹp bánh mì Hot Dog
+  name_en: Hot Dog
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 314.0
+  protein_g: 12.0
+  lipid_g: 18.0
+  glucid_g: 26.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 chiếc (~135g)
+  source_ref: USDA FDC
+  serving_g: 135
+- dish_id: huevos_rancheros
+  name_vi: Trứng ốp la kiểu Mexico
+  name_en: Huevos Rancheros
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 380.0
+  protein_g: 18.0
+  lipid_g: 20.0
+  glucid_g: 32.0
+  fiber_g: 5.0
+  serving_desc_vi: 1 đĩa (~290g)
+  source_ref: USDA FDC
+  serving_g: 290
+- dish_id: hummus
+  name_vi: Sốt đậu gà Hummus
+  name_en: Hummus
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 242.0
+  protein_g: 9.0
+  lipid_g: 14.0
+  glucid_g: 20.0
+  fiber_g: 6.0
+  serving_desc_vi: 1 chén (~140g)
+  source_ref: USDA FDC
+  serving_g: 140
+- dish_id: ice_cream
+  name_vi: Kem lạnh
+  name_en: Ice Cream
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 256.0
+  protein_g: 4.5
+  lipid_g: 14.0
+  glucid_g: 28.0
+  fiber_g: 0.6
+  serving_desc_vi: 2 viên vừa (~130g)
+  source_ref: USDA FDC
+  serving_g: 130
+- dish_id: lasagna
+  name_vi: Mì Ý nướng phô mai Lasagna
+  name_en: Lasagna
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 446.0
+  protein_g: 24.0
+  lipid_g: 22.0
+  glucid_g: 38.0
+  fiber_g: 3.0
+  serving_desc_vi: 1 phần (~300g)
+  source_ref: USDA FDC
+  serving_g: 300
+- dish_id: lobster_bisque
+  name_vi: Súp kem tôm hùm
+  name_en: Lobster Bisque
+  category: global
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 288.0
+  protein_g: 11.0
+  lipid_g: 20.0
+  glucid_g: 16.0
+  fiber_g: 0.6
+  serving_desc_vi: 1 tô vừa (~280g)
+  source_ref: USDA FDC
+  serving_g: 280
+- dish_id: lobster_roll_sandwich
+  name_vi: Bánh mì kẹp tôm hùm
+  name_en: Lobster Roll Sandwich
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 388.0
+  protein_g: 22.0
+  lipid_g: 20.0
+  glucid_g: 30.0
+  fiber_g: 1.4
+  serving_desc_vi: 1 chiếc (~200g)
+  source_ref: USDA FDC
+  serving_g: 200
+- dish_id: macaroni_and_cheese
+  name_vi: Nui sốt phô mai
+  name_en: Macaroni and Cheese
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 462.0
+  protein_g: 18.0
+  lipid_g: 22.0
+  glucid_g: 48.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 tô vừa (~280g)
+  source_ref: USDA FDC
+  serving_g: 280
+- dish_id: macarons
+  name_vi: Bánh quy Macaron
+  name_en: Macarons
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 216.0
+  protein_g: 3.5
+  lipid_g: 10.0
+  glucid_g: 28.0
+  fiber_g: 1.2
+  serving_desc_vi: 3 chiếc (~70g)
+  source_ref: USDA FDC
+  serving_g: 70
+- dish_id: miso_soup
+  name_vi: Canh tương đậu Miso
+  name_en: Miso Soup
+  category: asian
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 64.0
+  protein_g: 4.5
+  lipid_g: 2.0
+  glucid_g: 7.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 chén (~240ml)
+  source_ref: USDA FDC
+  serving_g: 240
+- dish_id: mussels
+  name_vi: Vẹm hấp sốt
+  name_en: Mussels
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 240.0
+  protein_g: 24.0
+  lipid_g: 12.0
+  glucid_g: 9.0
+  fiber_g: 0.5
+  serving_desc_vi: 1 phần (~260g kèm sốt)
+  source_ref: USDA FDC
+  serving_g: 260
+- dish_id: nachos
+  name_vi: Bánh giòn phủ phô mai Nachos
+  name_en: Nachos
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 474.0
+  protein_g: 16.0
+  lipid_g: 26.0
+  glucid_g: 44.0
+  fiber_g: 4.5
+  serving_desc_vi: 1 phần (~250g)
+  source_ref: USDA FDC
+  serving_g: 250
+- dish_id: omelette
+  name_vi: Trứng rán cuộn Omelette
+  name_en: Omelette
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 255.0
+  protein_g: 15.5
+  lipid_g: 20.0
+  glucid_g: 2.5
+  fiber_g: 0.4
+  serving_desc_vi: 1 phần 2–3 trứng (~170g)
+  source_ref: Vietnam NIN FCT 2007 / USDA FDC
+  serving_g: 170
+- dish_id: onion_rings
+  name_vi: Hành tây chiên giòn
+  name_en: Onion Rings
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 324.0
+  protein_g: 4.5
+  lipid_g: 18.0
+  glucid_g: 36.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 phần (~140g)
+  source_ref: USDA FDC
+  serving_g: 140
+- dish_id: oysters
+  name_vi: Hàu sống / nướng
+  name_en: Oysters
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 103.5
+  protein_g: 12.0
+  lipid_g: 3.5
+  glucid_g: 6.0
+  fiber_g: 0.0
+  serving_desc_vi: 6 con hàu (~160g)
+  source_ref: USDA FDC
+  serving_g: 160
+- dish_id: pad_thai
+  name_vi: Phở xào Thái Pad Thai
+  name_en: Pad Thai
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 498.0
+  protein_g: 20.0
+  lipid_g: 18.0
+  glucid_g: 64.0
+  fiber_g: 3.2
+  serving_desc_vi: 1 đĩa vừa (~360g)
+  source_ref: USDA FDC
+  serving_g: 360
+- dish_id: paella
+  name_vi: Cơm hải sản Paella
+  name_en: Paella
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 472.0
+  protein_g: 26.0
+  lipid_g: 16.0
+  glucid_g: 56.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 đĩa vừa (~360g)
+  source_ref: USDA FDC
+  serving_g: 360
+- dish_id: pancakes
+  name_vi: Bánh kếp Pancakes
+  name_en: Pancakes
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 360.0
+  protein_g: 9.0
+  lipid_g: 12.0
+  glucid_g: 54.0
+  fiber_g: 1.8
+  serving_desc_vi: 3 chiếc (~210g)
+  source_ref: USDA FDC
+  serving_g: 210
+- dish_id: panna_cotta
+  name_vi: Bánh kem sữa Panna Cotta
+  name_en: Panna Cotta
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 266.0
+  protein_g: 4.0
+  lipid_g: 18.0
+  glucid_g: 22.0
+  fiber_g: 0.0
+  serving_desc_vi: 1 phần (~130g)
+  source_ref: USDA FDC
+  serving_g: 130
+- dish_id: peking_duck
+  name_vi: Vịt quay Bắc Kinh
+  name_en: Peking Duck
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 410.0
+  protein_g: 26.0
+  lipid_g: 26.0
+  glucid_g: 18.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 phần (~220g kèm bánh tráng)
+  source_ref: USDA FDC
+  serving_g: 220
+- dish_id: pizza
+  name_vi: Bánh Pizza
+  name_en: Pizza
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 442.0
+  protein_g: 18.0
+  lipid_g: 18.0
+  glucid_g: 52.0
+  fiber_g: 2.8
+  serving_desc_vi: 2 lát vừa (~220g)
+  source_ref: USDA FDC
+  serving_g: 220
+- dish_id: pork_chop
+  name_vi: Sườn cốt lết áp chảo
+  name_en: Pork Chop
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 298.0
+  protein_g: 32.0
+  lipid_g: 18.0
+  glucid_g: 2.0
+  fiber_g: 0.0
+  serving_desc_vi: 1 miếng cốt lết (~180g)
+  source_ref: USDA FDC
+  serving_g: 180
+- dish_id: poutine
+  name_vi: Khoai tây chiên sốt phô mai
+  name_en: Poutine
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 532.0
+  protein_g: 14.0
+  lipid_g: 28.0
+  glucid_g: 56.0
+  fiber_g: 4.2
+  serving_desc_vi: 1 phần (~300g)
+  source_ref: USDA FDC
+  serving_g: 300
+- dish_id: prime_rib
+  name_vi: Thịt bò nướng tảng Prime Rib
+  name_en: Prime Rib
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 446.0
+  protein_g: 38.0
+  lipid_g: 32.0
+  glucid_g: 1.5
+  fiber_g: 0.0
+  serving_desc_vi: 1 lát (~220g)
+  source_ref: USDA FDC
+  serving_g: 220
+- dish_id: pulled_pork_sandwich
+  name_vi: Bánh mì kẹp thịt heo xé
+  name_en: Pulled Pork Sandwich
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 426.0
+  protein_g: 24.0
+  lipid_g: 18.0
+  glucid_g: 42.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 chiếc (~240g)
+  source_ref: USDA FDC
+  serving_g: 240
+- dish_id: ramen
+  name_vi: Mì nước Nhật Ramen
+  name_en: Ramen
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 498.0
+  protein_g: 22.0
+  lipid_g: 18.0
+  glucid_g: 62.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 tô vừa (~520g)
+  source_ref: USDA FDC
+  serving_g: 520
+- dish_id: ravioli
+  name_vi: Mì nhân phô mai Ravioli
+  name_en: Ravioli
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 375.0
+  protein_g: 16.0
+  lipid_g: 15.0
+  glucid_g: 44.0
+  fiber_g: 2.4
+  serving_desc_vi: 1 đĩa vừa (~260g)
+  source_ref: USDA FDC
+  serving_g: 260
+- dish_id: red_velvet_cake
+  name_vi: Bánh kem nhung đỏ
+  name_en: Red Velvet Cake
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 398.0
+  protein_g: 4.5
+  lipid_g: 20.0
+  glucid_g: 50.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 miếng vừa (~130g)
+  source_ref: USDA FDC
+  serving_g: 130
+- dish_id: risotto
+  name_vi: Cơm kem Ý Risotto
+  name_en: Risotto
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 382.0
+  protein_g: 12.0
+  lipid_g: 14.0
+  glucid_g: 52.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 đĩa vừa (~300g)
+  source_ref: USDA FDC
+  serving_g: 300
+- dish_id: samosa
+  name_vi: Bánh gối chiên Ấn Độ Samosa
+  name_en: Samosa
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 297.0
+  protein_g: 6.5
+  lipid_g: 15.0
+  glucid_g: 34.0
+  fiber_g: 3.2
+  serving_desc_vi: 2 chiếc (~140g)
+  source_ref: USDA FDC
+  serving_g: 140
+- dish_id: sashimi
+  name_vi: Cá sống Sashimi
+  name_en: Sashimi
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 162.0
+  protein_g: 26.0
+  lipid_g: 6.0
+  glucid_g: 1.0
+  fiber_g: 0.0
+  serving_desc_vi: 1 phần cá sống (~140g)
+  source_ref: USDA FDC
+  serving_g: 140
+- dish_id: scallops
+  name_vi: Sò điệp áp chảo
+  name_en: Scallops
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 210.0
+  protein_g: 24.0
+  lipid_g: 10.0
+  glucid_g: 6.0
+  fiber_g: 0.2
+  serving_desc_vi: 1 phần (~170g)
+  source_ref: USDA FDC
+  serving_g: 170
+- dish_id: seaweed_salad
+  name_vi: Salad rong biển
+  name_en: Seaweed Salad
+  category: asian
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 102.0
+  protein_g: 2.5
+  lipid_g: 4.0
+  glucid_g: 14.0
+  fiber_g: 3.0
+  serving_desc_vi: 1 chén (~120g)
+  source_ref: USDA FDC
+  serving_g: 120
+- dish_id: shrimp_and_grits
+  name_vi: Tôm sốt bột ngô
+  name_en: Shrimp and Grits
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 402.0
+  protein_g: 22.0
+  lipid_g: 18.0
+  glucid_g: 38.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 tô vừa (~320g)
+  source_ref: USDA FDC
+  serving_g: 320
+- dish_id: spaghetti_bolognese
+  name_vi: Mì Ý sốt bò băm
+  name_en: Spaghetti Bolognese
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 455.0
+  protein_g: 22.0
+  lipid_g: 15.0
+  glucid_g: 58.0
+  fiber_g: 3.8
+  serving_desc_vi: 1 đĩa vừa (~350g)
+  source_ref: USDA FDC
+  serving_g: 350
+- dish_id: spaghetti_carbonara
+  name_vi: Mì Ý sốt kem trứng thịt xông khói
+  name_en: Spaghetti Carbonara
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 512.0
+  protein_g: 20.0
+  lipid_g: 24.0
+  glucid_g: 54.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 đĩa vừa (~320g)
+  source_ref: USDA FDC
+  serving_g: 320
+- dish_id: steak
+  name_vi: Bít tết thịt bò
+  name_en: Steak
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 354.0
+  protein_g: 38.0
+  lipid_g: 22.0
+  glucid_g: 1.0
+  fiber_g: 0.0
+  serving_desc_vi: 1 miếng bít tết (~200g)
+  source_ref: USDA FDC
+  serving_g: 200
+- dish_id: strawberry_shortcake
+  name_vi: Bánh kem dâu tây
+  name_en: Strawberry Shortcake
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 310.0
+  protein_g: 4.0
+  lipid_g: 14.0
+  glucid_g: 42.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 miếng vừa (~140g)
+  source_ref: USDA FDC
+  serving_g: 140
+- dish_id: sushi
+  name_vi: Cơm cuộn Sushi
+  name_en: Sushi
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 335.0
+  protein_g: 14.0
+  lipid_g: 7.0
+  glucid_g: 54.0
+  fiber_g: 2.0
+  serving_desc_vi: 6–8 miếng (~240g)
+  source_ref: USDA FDC
+  serving_g: 240
+- dish_id: tacos
+  name_vi: Bánh kẹp giòn Tacos
+  name_en: Tacos
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 353.0
+  protein_g: 18.0
+  lipid_g: 17.0
+  glucid_g: 32.0
+  fiber_g: 3.8
+  serving_desc_vi: 2 chiếc vừa (~220g)
+  source_ref: USDA FDC
+  serving_g: 220
+- dish_id: takoyaki
+  name_vi: Bánh bạch tuộc Takoyaki
+  name_en: Takoyaki
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 297.0
+  protein_g: 11.0
+  lipid_g: 13.0
+  glucid_g: 34.0
+  fiber_g: 1.4
+  serving_desc_vi: 6 viên (~180g)
+  source_ref: USDA FDC
+  serving_g: 180
+- dish_id: tiramisu
+  name_vi: Bánh Tiramisu
+  name_en: Tiramisu
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 349.0
+  protein_g: 6.0
+  lipid_g: 21.0
+  glucid_g: 34.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 miếng vừa (~130g)
+  source_ref: USDA FDC
+  serving_g: 130
+- dish_id: tuna_tartare
+  name_vi: Cá ngừ sống Tartare
+  name_en: Tuna Tartare
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 219.0
+  protein_g: 26.0
+  lipid_g: 11.0
+  glucid_g: 4.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 phần (~150g)
+  source_ref: USDA FDC
+  serving_g: 150
+- dish_id: waffles
+  name_vi: Bánh quế Waffles
+  name_en: Waffles
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 332.0
+  protein_g: 7.5
+  lipid_g: 14.0
+  glucid_g: 44.0
+  fiber_g: 1.6
+  serving_desc_vi: 1–2 chiếc (~160g)
+  source_ref: USDA FDC
+  serving_g: 160
+- dish_id: mi_tom
+  name_vi: Mì tôm / Mì gói
+  name_en: Instant Noodles
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 354.0
+  protein_g: 7.0
+  lipid_g: 14.0
+  glucid_g: 50.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 tô/gói mì tôm (~75g mì nấu chín)
+  source_ref: Vietnam NIN / Product Label
+  serving_g: 75
+- dish_id: com_trang
+  name_vi: Cơm trắng
+  name_en: Steamed White Rice
+  category: asian
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 196.4
+  protein_g: 4.2
+  lipid_g: 0.4
+  glucid_g: 44.0
+  fiber_g: 0.6
+  serving_desc_vi: 1 bát cơm vừa (~160g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 160
+- dish_id: com_luon_nhat
+  name_vi: Cơm lươn nướng Unagi
+  name_en: Eels on Rice (Unadon)
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 554.0
+  protein_g: 26.0
+  lipid_g: 18.0
+  glucid_g: 72.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 tô vừa (~380g cơm lươn nướng)
+  source_ref: USDA / Japanese FCT
+  serving_g: 380
+- dish_id: com_pilaf
+  name_vi: Cơm rang kiểu Pilaf
+  name_en: Pilaf
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 390.0
+  protein_g: 10.0
+  lipid_g: 14.0
+  glucid_g: 56.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 đĩa vừa (~300g)
+  source_ref: USDA FDC
+  serving_g: 300
+- dish_id: com_ga_trung_oyakodon
+  name_vi: Cơm gà trứng Oyakodon
+  name_en: Chicken & Egg on Rice
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 494.0
+  protein_g: 26.0
+  lipid_g: 14.0
+  glucid_g: 66.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 tô vừa (~400g)
+  source_ref: Japanese FCT
+  serving_g: 400
+- dish_id: com_thit_chien_xu
+  name_vi: Cơm sườn chiên xù Katsudon
+  name_en: Pork Cutlet on Rice
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 624.0
+  protein_g: 28.0
+  lipid_g: 24.0
+  glucid_g: 74.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 tô vừa (~430g Katsudon)
+  source_ref: Japanese FCT
+  serving_g: 430
+- dish_id: com_ca_ri_bo
+  name_vi: Cơm cà ri bò
+  name_en: Beef Curry Rice
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 604.0
+  protein_g: 24.0
+  lipid_g: 20.0
+  glucid_g: 82.0
+  fiber_g: 3.5
+  serving_desc_vi: 1 đĩa vừa (~450g)
+  source_ref: Japanese FCT
+  serving_g: 450
+- dish_id: com_ga_sot_ca
+  name_vi: Cơm gà chiên sốt cà
+  name_en: Chicken Rice
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 495.0
+  protein_g: 22.0
+  lipid_g: 15.0
+  glucid_g: 68.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 đĩa vừa (~360g)
+  source_ref: Japanese FCT
+  serving_g: 360
+- dish_id: com_tom_chien_tendon
+  name_vi: Cơm tôm chiên giòn Tempura
+  name_en: Tempura Bowl
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 556.0
+  protein_g: 20.0
+  lipid_g: 20.0
+  glucid_g: 74.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 tô vừa (~390g)
+  source_ref: Japanese FCT
+  serving_g: 390
+- dish_id: banh_mi_nuong_bo
+  name_vi: Bánh mì nướng lát
+  name_en: Toast
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 202.0
+  protein_g: 5.0
+  lipid_g: 6.0
+  glucid_g: 32.0
+  fiber_g: 1.8
+  serving_desc_vi: 2 lát bánh mì nướng (~75g)
+  source_ref: USDA FDC
+  serving_g: 75
+- dish_id: banh_sung_bo
+  name_vi: Bánh sừng bò Croissant
+  name_en: Croissant
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 268.0
+  protein_g: 5.5
+  lipid_g: 14.0
+  glucid_g: 30.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 chiếc vừa (~65g)
+  source_ref: USDA FDC
+  serving_g: 65
+- dish_id: banh_mi_cuon_nho
+  name_vi: Bánh mì cuộn nhỏ
+  name_en: Roll Bread
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 173.5
+  protein_g: 5.5
+  lipid_g: 3.5
+  glucid_g: 30.0
+  fiber_g: 1.4
+  serving_desc_vi: 1–2 ổ nhỏ (~65g)
+  source_ref: USDA FDC
+  serving_g: 65
+- dish_id: banh_mi_nho_kho
+  name_vi: Bánh mì nho khô
+  name_en: Raisin Bread
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 202.0
+  protein_g: 5.5
+  lipid_g: 4.0
+  glucid_g: 36.0
+  fiber_g: 2.0
+  serving_desc_vi: 2 lát (~75g)
+  source_ref: USDA FDC
+  serving_g: 75
+- dish_id: banh_mi_kep_khoai
+  name_vi: Bánh mì kẹp khoai chiên
+  name_en: Chip Butty
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 426.0
+  protein_g: 8.0
+  lipid_g: 18.0
+  glucid_g: 58.0
+  fiber_g: 3.5
+  serving_desc_vi: 1 chiếc (~210g)
+  source_ref: USDA FDC
+  serving_g: 210
+- dish_id: banh_mi_sandwich
+  name_vi: Bánh mì kẹp Sandwich
+  name_en: Sandwiches
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 304.0
+  protein_g: 15.0
+  lipid_g: 12.0
+  glucid_g: 34.0
+  fiber_g: 2.4
+  serving_desc_vi: 1 phần sandwich (~180g)
+  source_ref: USDA FDC
+  serving_g: 180
+- dish_id: mi_udon
+  name_vi: Mì Udon
+  name_en: Udon Noodle
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 294.5
+  protein_g: 12.0
+  lipid_g: 2.5
+  glucid_g: 56.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 tô vừa (~450g)
+  source_ref: Japanese FCT
+  serving_g: 450
+- dish_id: mi_udon_tempura
+  name_vi: Mì Udon Tempura
+  name_en: Tempura Udon
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 419.0
+  protein_g: 16.0
+  lipid_g: 11.0
+  glucid_g: 64.0
+  fiber_g: 2.5
+  serving_desc_vi: 1 tô vừa (~480g)
+  source_ref: Japanese FCT
+  serving_g: 480
+- dish_id: mi_soba
+  name_vi: Mì kiều mạch Soba
+  name_en: Soba Noodle
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 286.5
+  protein_g: 14.0
+  lipid_g: 2.5
+  glucid_g: 52.0
+  fiber_g: 3.2
+  serving_desc_vi: 1 tô vừa (~420g)
+  source_ref: Japanese FCT
+  serving_g: 420
+- dish_id: mi_bo
+  name_vi: Mì bò nước dùng
+  name_en: Beef Noodle
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 441.0
+  protein_g: 25.0
+  lipid_g: 13.0
+  glucid_g: 56.0
+  fiber_g: 2.4
+  serving_desc_vi: 1 tô vừa (~500g)
+  source_ref: Vietnam NIN / Asian FCT
+  serving_g: 500
+- dish_id: mi_trung_sot_sanh
+  name_vi: Mì trứng sốt sệt Tenshin
+  name_en: Tenshin Noodle
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 455.0
+  protein_g: 18.0
+  lipid_g: 15.0
+  glucid_g: 62.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 tô vừa (~450g)
+  source_ref: Japanese FCT
+  serving_g: 450
+- dish_id: mi_xao
+  name_vi: Mì xào Yakisoba
+  name_en: Fried Noodle
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 440.0
+  protein_g: 16.0
+  lipid_g: 16.0
+  glucid_g: 58.0
+  fiber_g: 3.0
+  serving_desc_vi: 1 đĩa vừa (~330g)
+  source_ref: Japanese FCT
+  serving_g: 330
+- dish_id: mi_y_spaghetti
+  name_vi: Mì Ý Spaghetti
+  name_en: Spaghetti
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 410.0
+  protein_g: 16.0
+  lipid_g: 10.0
+  glucid_g: 64.0
+  fiber_g: 3.5
+  serving_desc_vi: 1 đĩa vừa (~320g)
+  source_ref: USDA FDC
+  serving_g: 320
+- dish_id: banh_xeo_nhat
+  name_vi: Bánh xèo Nhật Okonomiyaki
+  name_en: Japanese-Style Pancake
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 470.0
+  protein_g: 18.0
+  lipid_g: 22.0
+  glucid_g: 50.0
+  fiber_g: 3.5
+  serving_desc_vi: 1 chiếc vừa (~320g)
+  source_ref: Japanese FCT
+  serving_g: 320
+- dish_id: do_bo_lo_gratin
+  name_vi: Mì/rau bỏ lò phô mai Gratin
+  name_en: Gratin
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 404.0
+  protein_g: 18.0
+  lipid_g: 20.0
+  glucid_g: 38.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 phần (~280g)
+  source_ref: Japanese FCT
+  serving_g: 280
+- dish_id: rau_xao
+  name_vi: Rau củ xào thập cẩm
+  name_en: Sauteed Vegetables
+  category: asian
+  kb_slug: rau-cu-xao-thap-cam
+  slot: rau
+  kcal_per_serving: 136.8
+  protein_g: 5.1
+  lipid_g: 8.4
+  glucid_g: 10.2
+  fiber_g: 2.1
+  serving_desc_vi: 1 đĩa vừa (~200g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 200
+- dish_id: khoai_tay_chien_xu
+  name_vi: Bánh khoai tây chiên giòn Croquette
+  name_en: Croquette
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 238.0
+  protein_g: 6.5
+  lipid_g: 12.0
+  glucid_g: 26.0
+  fiber_g: 2.2
+  serving_desc_vi: 2 chiếc (~140g)
+  source_ref: Japanese FCT
+  serving_g: 140
+- dish_id: ca_tim_nuong
+  name_vi: Cà tím nướng mỡ hành / xì dầu
+  name_en: Grilled Eggplant
+  category: asian
+  kb_slug: ca-tim-xao-mo-hanh
+  slot: rau
+  kcal_per_serving: 126.6
+  protein_g: 1.5
+  lipid_g: 10.5
+  glucid_g: 6.6
+  fiber_g: 1.6
+  serving_desc_vi: 1 đĩa vừa (~160g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 160
+- dish_id: rau_cai_xao
+  name_vi: Rau cải / Cải bó xôi xào tỏi
+  name_en: Sauteed Spinach Greens
+  category: vn
+  kb_slug: cai-bo-xoi-xao-toi
+  slot: rau
+  kcal_per_serving: 73.7
+  protein_g: 3.0
+  lipid_g: 5.6
+  glucid_g: 2.1
+  fiber_g: 2.2
+  serving_desc_vi: 1 đĩa vừa (~180g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 180
+- dish_id: rau_cu_tempura
+  name_vi: Rau củ chiên giòn Tempura
+  name_en: Vegetable Tempura
+  category: asian
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 252.0
+  protein_g: 5.5
+  lipid_g: 14.0
+  glucid_g: 26.0
+  fiber_g: 3.0
+  serving_desc_vi: 1 đĩa (~160g)
+  source_ref: Japanese FCT
+  serving_g: 160
+- dish_id: sup_kem_potage
+  name_vi: Súp kem khoai ngô Potage
+  name_en: Potage Soup
+  category: global
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 180.0
+  protein_g: 5.0
+  lipid_g: 8.0
+  glucid_g: 22.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 bát (~240ml)
+  source_ref: Japanese FCT
+  serving_g: 240
+- dish_id: xuc_xich_chao
+  name_vi: Xúc xích rán / nướng
+  name_en: Sausage
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 226.0
+  protein_g: 12.0
+  lipid_g: 18.0
+  glucid_g: 4.0
+  fiber_g: 0.0
+  serving_desc_vi: 3–4 cây nhỏ (~100g)
+  source_ref: USDA FDC
+  serving_g: 100
+- dish_id: lau_ly_oden
+  name_vi: Lẩu hầm viên Oden
+  name_en: Oden
+  category: asian
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 202.5
+  protein_g: 18.0
+  lipid_g: 6.5
+  glucid_g: 18.0
+  fiber_g: 2.5
+  serving_desc_vi: 1 phần (~320g)
+  source_ref: Japanese FCT
+  serving_g: 320
+- dish_id: cha_dau_phu_chien
+  name_vi: Chả đậu phụ chiên Ganmodoki
+  name_en: Fried Tofu Fritter
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 197.0
+  protein_g: 12.0
+  lipid_g: 13.0
+  glucid_g: 8.0
+  fiber_g: 1.5
+  serving_desc_vi: 2 miếng (~140g)
+  source_ref: Japanese FCT
+  serving_g: 140
+- dish_id: thit_ham_khoai_cu
+  name_vi: Thịt hầm rau củ
+  name_en: Beef / Pork Stew
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 328.0
+  protein_g: 24.0
+  lipid_g: 16.0
+  glucid_g: 22.0
+  fiber_g: 3.2
+  serving_desc_vi: 1 tô vừa (~340g)
+  source_ref: USDA FDC
+  serving_g: 340
+- dish_id: ca_nuong_teriyaki
+  name_vi: Cá nướng sốt Teriyaki
+  name_en: Teriyaki Grilled Fish
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 244.0
+  protein_g: 24.0
+  lipid_g: 12.0
+  glucid_g: 10.0
+  fiber_g: 0.2
+  serving_desc_vi: 1 khúc (~140g)
+  source_ref: Japanese FCT
+  serving_g: 140
+- dish_id: ca_chien_gion
+  name_vi: Cá chiên giòn nguyên con / khúc
+  name_en: Fried Fish
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 254.0
+  protein_g: 22.0
+  lipid_g: 14.0
+  glucid_g: 10.0
+  fiber_g: 0.4
+  serving_desc_vi: 1 phần (~150g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 150
+- dish_id: ca_nuong_muoi_meuniere
+  name_vi: Cá hồi áp chảo bơ chanh
+  name_en: Salmon Meuniere
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 272.0
+  protein_g: 24.0
+  lipid_g: 16.0
+  glucid_g: 8.0
+  fiber_g: 0.2
+  serving_desc_vi: 1 phi lê (~150g)
+  source_ref: USDA FDC
+  serving_g: 150
+- dish_id: ca_thu_nuong
+  name_vi: Cá thu đao / cá biển nướng
+  name_en: Grilled Pacific Saury
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 218.0
+  protein_g: 22.0
+  lipid_g: 14.0
+  glucid_g: 1.0
+  fiber_g: 0.0
+  serving_desc_vi: 1 con vừa (~130g)
+  source_ref: Japanese FCT
+  serving_g: 130
+- dish_id: lau_bo_sukiyaki
+  name_vi: Lẩu bò Sukiyaki
+  name_en: Sukiyaki Hot Pot
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 388.0
+  protein_g: 28.0
+  lipid_g: 20.0
+  glucid_g: 24.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 phần (~380g)
+  source_ref: Japanese FCT
+  serving_g: 380
+- dish_id: thit_xao_chua_ngot
+  name_vi: Thịt heo / gà xào chua ngọt
+  name_en: Sweet and Sour Pork
+  category: asian
+  kb_slug: suon-xao-chua-ngot
+  slot: man
+  kcal_per_serving: 261.2
+  protein_g: 12.3
+  lipid_g: 18.0
+  glucid_g: 12.5
+  fiber_g: 0.2
+  serving_desc_vi: 1 đĩa vừa (~240g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 240
+- dish_id: ca_nuong_muoi
+  name_vi: Cá nướng muối áp chảo
+  name_en: Lightly Roasted Fish
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 164.0
+  protein_g: 22.0
+  lipid_g: 8.0
+  glucid_g: 1.0
+  fiber_g: 0.0
+  serving_desc_vi: 1 khúc cá (~130g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 130
+- dish_id: trung_hap_chawanmushi
+  name_vi: Trứng hấp Chawanmushi
+  name_en: Steamed Egg Custard
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 112.5
+  protein_g: 9.5
+  lipid_g: 6.5
+  glucid_g: 4.0
+  fiber_g: 0.2
+  serving_desc_vi: 1 chén (~180g)
+  source_ref: Japanese FCT
+  serving_g: 180
+- dish_id: hai_san_tempura
+  name_vi: Tôm rau chiên giòn Tempura
+  name_en: Tempura Platter
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 354.0
+  protein_g: 16.0
+  lipid_g: 18.0
+  glucid_g: 32.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 phần (~200g)
+  source_ref: Japanese FCT
+  serving_g: 200
+- dish_id: ga_chien_karaage
+  name_vi: Gà rán kiểu Á Karaage
+  name_en: Fried Chicken
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 306.0
+  protein_g: 22.0
+  lipid_g: 18.0
+  glucid_g: 14.0
+  fiber_g: 0.4
+  serving_desc_vi: 4–5 miếng (~160g)
+  source_ref: Japanese FCT
+  serving_g: 160
+- dish_id: thit_heo_chien_xu
+  name_vi: Thịt heo chiên xù Tonkatsu
+  name_en: Pork / Sirloin Cutlet
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 382.0
+  protein_g: 24.0
+  lipid_g: 22.0
+  glucid_g: 22.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 miếng (~180g)
+  source_ref: Japanese FCT
+  serving_g: 180
+- dish_id: ca_chien_sot_chua_ngot
+  name_vi: Cá chiên sốt chua ngọt Nanbanzuke
+  name_en: Nanbanzuke Fried Fish
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 252.0
+  protein_g: 20.0
+  lipid_g: 12.0
+  glucid_g: 16.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 phần (~170g)
+  source_ref: Japanese FCT
+  serving_g: 170
+- dish_id: ca_kho_luoc
+  name_vi: Cá kho / om xì dầu
+  name_en: Boiled Simmered Fish
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 170.5
+  protein_g: 20.0
+  lipid_g: 6.5
+  glucid_g: 8.0
+  fiber_g: 0.2
+  serving_desc_vi: 1 phần (~140g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 140
+- dish_id: bo_ham_khoai_tay
+  name_vi: Thịt bò hầm khoai tây Nikujaga
+  name_en: Seasoned Beef with Potatoes
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 302.0
+  protein_g: 18.0
+  lipid_g: 14.0
+  glucid_g: 26.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 phần (~250g)
+  source_ref: Japanese FCT
+  serving_g: 250
+- dish_id: thit_vien_ap_chao
+  name_vi: Bít tết thịt băm Hambarg
+  name_en: Hamburger Steak
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 324.0
+  protein_g: 24.0
+  lipid_g: 20.0
+  glucid_g: 12.0
+  fiber_g: 0.8
+  serving_desc_vi: 1 miếng (~180g)
+  source_ref: Japanese FCT
+  serving_g: 180
+- dish_id: ca_kho_kho
+  name_vi: Cá khô nướng / chiên
+  name_en: Dried Fish
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 128.0
+  protein_g: 22.0
+  lipid_g: 4.0
+  glucid_g: 1.0
+  fiber_g: 0.0
+  serving_desc_vi: 1 đĩa nhỏ (~70g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 70
+- dish_id: thit_lon_xao_gung
+  name_vi: Thịt lợn xào gừng hành
+  name_en: Ginger Pork Saute
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 280.0
+  protein_g: 22.0
+  lipid_g: 16.0
+  glucid_g: 12.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 đĩa vừa (~200g)
+  source_ref: Japanese FCT
+  serving_g: 200
+- dish_id: dau_phu_sot_cay
+  name_vi: Đậu phụ sốt thịt băm Tứ Xuyên
+  name_en: Mapo Tofu
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 256.0
+  protein_g: 16.0
+  lipid_g: 16.0
+  glucid_g: 12.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 đĩa vừa (~260g)
+  source_ref: Chinese / Japanese FCT
+  serving_g: 260
+- dish_id: thit_ga_xien_nuong
+  name_vi: Thịt gà xiên nướng Yakitori
+  name_en: Yakitori Chicken Skewers
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 193.0
+  protein_g: 22.0
+  lipid_g: 9.0
+  glucid_g: 6.0
+  fiber_g: 0.2
+  serving_desc_vi: 3 xiên (~140g)
+  source_ref: Japanese FCT
+  serving_g: 140
+- dish_id: bap_cai_cuon_thit
+  name_vi: Bắp cải cuộn thịt hấp / sốt
+  name_en: Cabbage Roll
+  category: asian
+  kb_slug: canh-bap-cai-cuon-thit
+  slot: canh
+  kcal_per_serving: 192.3
+  protein_g: 12.3
+  lipid_g: 13.3
+  glucid_g: 5.9
+  fiber_g: 1.7
+  serving_desc_vi: 2 cuộn (~220g)
+  source_ref: Vietnam NIN / Japanese FCT
+  serving_g: 220
+- dish_id: trung_cuon_nhat
+  name_vi: Trứng cuộn rán
+  name_en: Rolled Omelet
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 163.0
+  protein_g: 12.0
+  lipid_g: 11.0
+  glucid_g: 4.0
+  fiber_g: 0.0
+  serving_desc_vi: 1 phần (~120g)
+  source_ref: Japanese FCT
+  serving_g: 120
+- dish_id: trung_op_la
+  name_vi: Trứng ốp la
+  name_en: Egg Sunny-Side Up
+  category: asian
+  kb_slug: trung-op-la
+  slot: man
+  kcal_per_serving: 205.6
+  protein_g: 13.2
+  lipid_g: 16.5
+  glucid_g: 1.0
+  fiber_g: 0.1
+  serving_desc_vi: 2 quả trứng (~120g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 120
+- dish_id: dau_nanh_len_men_natto
+  name_vi: Đậu tương lên men Natto
+  name_en: Fermented Soybeans
+  category: asian
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 109.5
+  protein_g: 9.0
+  lipid_g: 5.5
+  glucid_g: 6.0
+  fiber_g: 3.0
+  serving_desc_vi: 1 hộp nhỏ (~50g)
+  source_ref: Japanese FCT
+  serving_g: 50
+- dish_id: dau_phu_non
+  name_vi: Đậu phụ non chần hành gừng
+  name_en: Cold Silken Tofu
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 95.0
+  protein_g: 8.5
+  lipid_g: 5.5
+  glucid_g: 2.2
+  fiber_g: 0.4
+  serving_desc_vi: 1 bìa / hộp đậu phụ non chần (~150g)
+  source_ref: USDA FDC 172449 / Vietnam NIN
+  serving_g: 150
+- dish_id: cha_gio_ran
+  name_vi: Chả giò / Nem rán giòn
+  name_en: Fried Egg Rolls
+  category: asian
+  kb_slug: nem-ran
+  slot: man
+  kcal_per_serving: 414.3
+  protein_g: 15.8
+  lipid_g: 25.3
+  glucid_g: 30.8
+  fiber_g: 0.9
+  serving_desc_vi: 4 chiếc (~180g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 180
+- dish_id: mi_lanh_hiyashi
+  name_vi: Mì lạnh trộn thanh cua trứng
+  name_en: Chilled Noodle Salad
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 386.0
+  protein_g: 18.0
+  lipid_g: 10.0
+  glucid_g: 56.0
+  fiber_g: 2.5
+  serving_desc_vi: 1 đĩa vừa (~380g)
+  source_ref: Japanese FCT
+  serving_g: 380
+- dish_id: bo_xao_ot_chuong
+  name_vi: Thịt bò xào ớt chuông
+  name_en: Stir-Fried Beef and Peppers
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 262.0
+  protein_g: 22.0
+  lipid_g: 14.0
+  glucid_g: 12.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 đĩa vừa (~220g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 220
+- dish_id: thit_kho_nhat
+  name_vi: Thịt ba chỉ kho mềm Kakuni
+  name_en: Simmered Pork Belly
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 336.0
+  protein_g: 20.0
+  lipid_g: 24.0
+  glucid_g: 10.0
+  fiber_g: 0.2
+  serving_desc_vi: 1 phần (~170g)
+  source_ref: Japanese FCT
+  serving_g: 170
+- dish_id: ga_kho_cu_cai
+  name_vi: Gà om rau củ Chikuzenni
+  name_en: Boiled Chicken and Vegetables
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 208.0
+  protein_g: 16.0
+  lipid_g: 8.0
+  glucid_g: 18.0
+  fiber_g: 3.2
+  serving_desc_vi: 1 phần (~220g)
+  source_ref: Japanese FCT
+  serving_g: 220
+- dish_id: com_ca_song
+  name_vi: Cơm tô hải sản tươi sống
+  name_en: Sashimi Rice Bowl
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 440.0
+  protein_g: 28.0
+  lipid_g: 8.0
+  glucid_g: 64.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 tô vừa (~380g)
+  source_ref: Japanese FCT
+  serving_g: 380
+- dish_id: com_tron_hai_san_chirashi
+  name_vi: Cơm trộn Sushi hải sản
+  name_en: Chirashi Sushi Bowl
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 436.5
+  protein_g: 22.0
+  lipid_g: 8.5
+  glucid_g: 68.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 tô vừa (~380g)
+  source_ref: Japanese FCT
+  serving_g: 380
+- dish_id: banh_ca_nhan_dau
+  name_vi: Bánh cá Taiyaki nhân đậu đỏ
+  name_en: Taiyaki Bean Jam Pastry
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 199.0
+  protein_g: 5.0
+  lipid_g: 3.0
+  glucid_g: 38.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 chiếc (~90g)
+  source_ref: Japanese FCT
+  serving_g: 90
+- dish_id: tom_sot_cay
+  name_vi: Tôm sốt cà chua cay
+  name_en: Shrimp with Chili Sauce
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 244.0
+  protein_g: 18.0
+  lipid_g: 12.0
+  glucid_g: 16.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 đĩa vừa (~200g)
+  source_ref: Asian FCT
+  serving_g: 200
+- dish_id: ga_quay_roast
+  name_vi: Gà quay / nướng mật ong
+  name_en: Roast Chicken
+  category: asian
+  kb_slug: ga-nuong-mat-ong
+  slot: man
+  kcal_per_serving: 287.5
+  protein_g: 16.7
+  lipid_g: 19.3
+  glucid_g: 10.8
+  fiber_g: 0.3
+  serving_desc_vi: 1 đùi / góc tư (~180g)
+  source_ref: USDA FDC
+  serving_g: 180
+- dish_id: banh_bao_hap
+  name_vi: Bánh bao nhân thịt hấp
+  name_en: Steamed Meat Bun
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 293.0
+  protein_g: 11.0
+  lipid_g: 9.0
+  glucid_g: 42.0
+  fiber_g: 1.6
+  serving_desc_vi: 1 chiếc vừa (~140g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 140
+- dish_id: com_cuon_trung_omurice
+  name_vi: Cơm chiên bọc trứng Omurice
+  name_en: Omelet Fried Rice
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 532.0
+  protein_g: 20.0
+  lipid_g: 20.0
+  glucid_g: 68.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 đĩa vừa (~380g)
+  source_ref: Japanese FCT
+  serving_g: 380
+- dish_id: com_ca_ri_thit_chien
+  name_vi: Cơm cà ri thịt chiên xù
+  name_en: Katsu Curry Rice
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 716.0
+  protein_g: 28.0
+  lipid_g: 28.0
+  glucid_g: 88.0
+  fiber_g: 3.5
+  serving_desc_vi: 1 đĩa vừa (~500g)
+  source_ref: Japanese FCT
+  serving_g: 500
+- dish_id: tom_chien_xu
+  name_vi: Tôm lăn bột chiên giòn
+  name_en: Fried Shrimp
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 311.0
+  protein_g: 18.0
+  lipid_g: 15.0
+  glucid_g: 26.0
+  fiber_g: 1.0
+  serving_desc_vi: 4 con (~160g)
+  source_ref: Vietnam NIN / Japanese FCT
+  serving_g: 160
+- dish_id: salad_khoai_tay
+  name_vi: Salad khoai tây nghiền
+  name_en: Potato Salad
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 221.0
+  protein_g: 4.0
+  lipid_g: 13.0
+  glucid_g: 22.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 phần (~150g)
+  source_ref: USDA FDC
+  serving_g: 150
+- dish_id: salad_rau_xanh
+  name_vi: Salad rau xanh trộn
+  name_en: Green Salad
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 96.0
+  protein_g: 2.5
+  lipid_g: 6.0
+  glucid_g: 8.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 đĩa vừa (~160g)
+  source_ref: USDA FDC
+  serving_g: 160
+- dish_id: salad_nui
+  name_vi: Salad nui sốt mayonnaise
+  name_en: Macaroni Salad
+  category: global
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 258.0
+  protein_g: 5.0
+  lipid_g: 14.0
+  glucid_g: 28.0
+  fiber_g: 1.6
+  serving_desc_vi: 1 phần (~150g)
+  source_ref: USDA FDC
+  serving_g: 150
+- dish_id: canh_dau_phu_rau_cu
+  name_vi: Canh đậu phụ rau củ Kenchinjiru
+  name_en: Tofu & Vegetable Soup
+  category: asian
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 123.0
+  protein_g: 7.5
+  lipid_g: 5.0
+  glucid_g: 12.0
+  fiber_g: 2.5
+  serving_desc_vi: 1 tô (~260g)
+  source_ref: Japanese FCT
+  serving_g: 260
+- dish_id: canh_miso_thit_heo
+  name_vi: Canh tương đậu thịt heo Tonjiru
+  name_en: Pork Miso Soup
+  category: asian
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 155.5
+  protein_g: 10.0
+  lipid_g: 7.5
+  glucid_g: 12.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 tô (~280g)
+  source_ref: Japanese FCT
+  serving_g: 280
+- dish_id: canh_sup_trung_trung_hoa
+  name_vi: Súp gà trứng nấm
+  name_en: Chinese Egg Drop Soup
+  category: asian
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 112.5
+  protein_g: 8.0
+  lipid_g: 4.5
+  glucid_g: 10.0
+  fiber_g: 0.6
+  serving_desc_vi: 1 bát (~260ml)
+  source_ref: Asian FCT
+  serving_g: 260
+- dish_id: com_bo_gyudon
+  name_vi: Cơm bò hành tây Gyudon
+  name_en: Beef Rice Bowl
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 546.0
+  protein_g: 24.0
+  lipid_g: 18.0
+  glucid_g: 72.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 tô vừa (~380g)
+  source_ref: Japanese FCT
+  serving_g: 380
+- dish_id: cu_nguu_bang_xao
+  name_vi: Rau củ xào mè Kinpira
+  name_en: Kinpira Sauteed Burdock
+  category: asian
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 123.5
+  protein_g: 2.5
+  lipid_g: 5.5
+  glucid_g: 16.0
+  fiber_g: 3.5
+  serving_desc_vi: 1 đĩa nhỏ (~100g)
+  source_ref: Japanese FCT
+  serving_g: 100
+- dish_id: com_nam_onigiri
+  name_vi: Cơm nắm rong biển Onigiri
+  name_en: Rice Ball
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 183.5
+  protein_g: 4.5
+  lipid_g: 1.5
+  glucid_g: 38.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 chiếc (~115g)
+  source_ref: Japanese FCT
+  serving_g: 115
+- dish_id: banh_mi_pizza_nuong
+  name_vi: Bánh mì lát nướng phô mai Pizza
+  name_en: Pizza Toast
+  category: global
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 294.0
+  protein_g: 12.0
+  lipid_g: 14.0
+  glucid_g: 30.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 lát dày (~130g)
+  source_ref: Japanese FCT
+  serving_g: 130
+- dish_id: mi_cham_tsukemen
+  name_vi: Mì chấm nước dùng đậm đà
+  name_en: Dipping Noodles
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 510.0
+  protein_g: 24.0
+  lipid_g: 14.0
+  glucid_g: 72.0
+  fiber_g: 2.5
+  serving_desc_vi: 1 phần (~460g)
+  source_ref: Japanese FCT
+  serving_g: 460
+- dish_id: com_tron_thap_cam
+  name_vi: Cơm trộn thập cẩm
+  name_en: Mixed Rice
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 335.0
+  protein_g: 12.0
+  lipid_g: 7.0
+  glucid_g: 56.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 bát lớn (~260g)
+  source_ref: Japanese FCT
+  serving_g: 260
+- dish_id: muop_dang_xao_trung
+  name_vi: Mướp đắng xào trứng thịt
+  name_en: Bitter Melon Stir-Fry (Goya Chanpuru)
+  category: asian
+  kb_slug: kho-qua-xao-trung
+  slot: rau
+  kcal_per_serving: 135.9
+  protein_g: 6.0
+  lipid_g: 10.9
+  glucid_g: 3.5
+  fiber_g: 1.2
+  serving_desc_vi: 1 đĩa vừa (~240g)
+  source_ref: Vietnam NIN / Japanese FCT
+  serving_g: 240
+- dish_id: baba_nau_chuoi_dau
+  name_vi: Ba ba nấu chuối đậu
+  name_en: Softshell Turtle Stew with Banana & Tofu
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 310.0
+  protein_g: 24.0
+  lipid_g: 14.0
+  glucid_g: 22.0
+  fiber_g: 3.5
+  serving_desc_vi: 1 bát vừa (~320g ba ba om chuối xanh đậu phụ)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 320
+- dish_id: banh_bo
+  name_vi: Bánh bò
+  name_en: Vietnamese Honeycomb Sponge Cake
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 256.0
+  protein_g: 4.5
+  lipid_g: 6.0
+  glucid_g: 46.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 đĩa nhỏ (~150g bánh bò hấp nước cốt dừa)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 150
+- dish_id: banh_cong
+  name_vi: Bánh cống
+  name_en: Soc Trang Fried Shrimp & Mung Bean Cake
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 332.0
+  protein_g: 11.0
+  lipid_g: 16.0
+  glucid_g: 36.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 phần (2 chiếc bánh cống ~180g kèm rau sống)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 180
+- dish_id: banh_da_cua
+  name_vi: Bánh đa cua
+  name_en: Hai Phong Crab Red Noodle Soup
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 407.0
+  protein_g: 21.0
+  lipid_g: 11.0
+  glucid_g: 56.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 tô vừa (~480g bánh đa đỏ riêu cua chả lá lốt)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 480
+- dish_id: banh_da_lon
+  name_vi: Bánh da lợn
+  name_en: Steamed Layer Pandan Mung Bean Cake
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 279.5
+  protein_g: 5.0
+  lipid_g: 7.5
+  glucid_g: 48.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 phần (~150g bánh da lợn nước cốt dừa)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 150
+- dish_id: banh_gai
+  name_vi: Bánh gai
+  name_en: Black Ramie Leaf Glutinous Rice Cake
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 302.0
+  protein_g: 5.5
+  lipid_g: 8.0
+  glucid_g: 52.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 chiếc vừa (~140g bánh gai nhân đậu xanh dừa)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 140
+- dish_id: banh_giay
+  name_vi: Bánh giầy
+  name_en: Round Sticky Rice Cake with Pork Roll
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 298.5
+  protein_g: 11.5
+  lipid_g: 8.5
+  glucid_g: 44.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 cặp bánh giầy kẹp giò lụa (~160g)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 160
+- dish_id: banh_hoi
+  name_vi: Bánh hỏi
+  name_en: Woven Fine Rice Vermicelli with Roast Pork
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 394.5
+  protein_g: 18.0
+  lipid_g: 14.5
+  glucid_g: 48.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 đĩa vừa (~260g bánh hỏi mỡ hành thịt quay)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 260
+- dish_id: banh_la
+  name_vi: Bánh lá
+  name_en: Leaf-Wrapped Steamed Rice Dumpling
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 247.0
+  protein_g: 8.0
+  lipid_g: 7.0
+  glucid_g: 38.0
+  fiber_g: 1.4
+  serving_desc_vi: 1 phần (2 chiếc bánh lá nhân tôm thịt ~160g)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 160
+- dish_id: banh_mi_chao
+  name_vi: Bánh mì chảo
+  name_en: Sizzling Skillet Banh Mi with Egg & Pate
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 498.0
+  protein_g: 23.0
+  lipid_g: 22.0
+  glucid_g: 52.0
+  fiber_g: 2.4
+  serving_desc_vi: 1 suất chảo (~340g gồm trứng ốp, pate, bò/xúc xích & bánh mì)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 340
+- dish_id: banh_tai_heo
+  name_vi: Bánh tai heo
+  name_en: Crispy Swirl Pig-Ear Biscuit
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 285.0
+  protein_g: 4.5
+  lipid_g: 11.0
+  glucid_g: 42.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 đĩa nhỏ (~100g bánh tai heo chiên giòn)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 100
+- dish_id: banh_tieu
+  name_vi: Bánh tiêu
+  name_en: Hollow Sesame Fried Dough Bun
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 276.5
+  protein_g: 5.5
+  lipid_g: 10.5
+  glucid_g: 40.0
+  fiber_g: 1.3
+  serving_desc_vi: 1 chiếc bánh tiêu mè lớn (~110g)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 110
+- dish_id: banh_tom_ho_tay
+  name_vi: Bánh tôm Hồ Tây
+  name_en: West Lake Crispy Sweet Potato Shrimp Fritter
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 354.5
+  protein_g: 13.5
+  lipid_g: 16.5
+  glucid_g: 38.0
+  fiber_g: 2.5
+  serving_desc_vi: 1 đĩa vừa (3 bánh tôm khoai lang ~200g kèm nước chấm đu đủ)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 200
+- dish_id: banh_troi_nuoc
+  name_vi: Bánh trôi nước
+  name_en: Glutinous Rice Balls in Ginger Syrup
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 301.0
+  protein_g: 5.5
+  lipid_g: 7.0
+  glucid_g: 54.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 chén vừa (~220g bánh trôi/chè trôi nước đậu xanh)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: banh_trung_thu
+  name_vi: Bánh trung thu
+  name_en: Vietnamese Mooncake
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 430.0
+  protein_g: 9.0
+  lipid_g: 18.0
+  glucid_g: 58.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 phần (1/2 chiếc bánh nướng thập cẩm/đậu xanh ~110g)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 110
+- dish_id: banh_u
+  name_vi: Bánh ú
+  name_en: Pyramid Alkaline/Pork Sticky Rice Dumpling
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 311.5
+  protein_g: 10.5
+  lipid_g: 9.5
+  glucid_g: 46.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 chiếc bánh ú nhân đậu thịt (~160g)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 160
+- dish_id: bo_kho
+  name_vi: Bò kho
+  name_en: Vietnamese Lemongrass Braised Beef Stew
+  category: vn
+  kb_slug: bo-kho
+  slot: man
+  kcal_per_serving: 296.9
+  protein_g: 38.2
+  lipid_g: 10.2
+  glucid_g: 13.7
+  fiber_g: 1.5
+  serving_desc_vi: 1 tô vừa (~350g bò kho cà rốt)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 350
+- dish_id: bo_la_lot
+  name_vi: Bò nướng lá lốt
+  name_en: Grilled Beef Wrapped in Betel Leaves
+  category: vn
+  kb_slug: bo-nuong-la-lot
+  slot: man
+  kcal_per_serving: 191.9
+  protein_g: 26.8
+  lipid_g: 7.2
+  glucid_g: 5.2
+  fiber_g: 0.6
+  serving_desc_vi: 1 đĩa vừa (~180g bò cuốn lá lốt nướng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 180
+- dish_id: bo_luc_lac
+  name_vi: Bò lúc lắc
+  name_en: Vietnamese Shaking Beef Cubes
+  category: vn
+  kb_slug: bo-luc-lac
+  slot: man
+  kcal_per_serving: 276.8
+  protein_g: 27.3
+  lipid_g: 15.6
+  glucid_g: 6.8
+  fiber_g: 1.8
+  serving_desc_vi: 1 đĩa vừa (~240g bò lúc lắc ớt chuông hành tây)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 240
+- dish_id: bo_ne
+  name_vi: Bò né
+  name_en: Vietnamese Sizzling Steak & Egg Skillet
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 480.0
+  protein_g: 28.0
+  lipid_g: 24.0
+  glucid_g: 38.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 chảo bò né trứng pate kèm bánh mì (~350g)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 350
+- dish_id: bun_cha_ca
+  name_vi: Bún chả cá
+  name_en: Vietnamese Fish Cake Noodle Soup
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 401.5
+  protein_g: 23.0
+  lipid_g: 9.5
+  glucid_g: 56.0
+  fiber_g: 2.4
+  serving_desc_vi: 1 tô vừa (~460g bún chả cá thu/nha trang)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 460
+- dish_id: ca_loc_nuong
+  name_vi: Cá lóc nướng trui
+  name_en: Grilled Whole Snakehead Fish with Scallion Oil
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 258.5
+  protein_g: 29.0
+  lipid_g: 10.5
+  glucid_g: 12.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 khẩu phần (~240g thịt cá lóc nướng mỡ hành đậu phộng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 240
+- dish_id: ca_muoi_xoi
+  name_vi: Cá muối xổi / Cá chiên mắm xoài
+  name_en: Crispy Salted/Fried Fish with Green Mango
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 277.5
+  protein_g: 25.0
+  lipid_g: 13.5
+  glucid_g: 14.0
+  fiber_g: 1.6
+  serving_desc_vi: 1 phần (~210g cá chiên/muối kèm xoài băm)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 210
+- dish_id: ca_sot_ca_chua
+  name_vi: Cá sốt cà chua
+  name_en: Fish Fillet in Tomato Sauce
+  category: vn
+  kb_slug: ca-thu-sot-ca-chua
+  slot: man
+  kcal_per_serving: 266.9
+  protein_g: 16.1
+  lipid_g: 18.6
+  glucid_g: 9.1
+  fiber_g: 1.4
+  serving_desc_vi: 1 khẩu phần (~220g cá sốt cà chua hành thì là)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: canh_bi_do
+  name_vi: Canh bí đỏ thịt băm
+  name_en: Pumpkin Soup with Minced Pork
+  category: vn
+  kb_slug: canh-bi-do-thit-bam
+  slot: canh
+  kcal_per_serving: 170.1
+  protein_g: 8.8
+  lipid_g: 11.8
+  glucid_g: 6.9
+  fiber_g: 0.8
+  serving_desc_vi: 1 tô canh vừa (~300g canh bí đỏ nấu thịt/tôm)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 300
+- dish_id: canh_cua
+  name_vi: Canh cua rau đay mồng tơi
+  name_en: Field Crab Soup with Jute & Malabar Spinach
+  category: vn
+  kb_slug: canh-cua-rau-day-mong-toi
+  slot: canh
+  kcal_per_serving: 60.4
+  protein_g: 7.4
+  lipid_g: 1.5
+  glucid_g: 4.3
+  fiber_g: 1.9
+  serving_desc_vi: 1 tô canh vừa (~320g canh riêu cua đồng rau đay)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 320
+- dish_id: canh_kho_hoa
+  name_vi: Canh khổ qua nhồi thịt
+  name_en: Stuffed Bitter Melon Pork Soup
+  category: vn
+  kb_slug: canh-kho-qua-nhoi-thit
+  slot: canh
+  kcal_per_serving: 195.1
+  protein_g: 12.1
+  lipid_g: 13.5
+  glucid_g: 6.4
+  fiber_g: 2.0
+  serving_desc_vi: 1 tô vừa (~300g, 2–3 khúc khổ qua nhồi thịt)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 300
+- dish_id: canh_khoai_tim
+  name_vi: Canh khoai mỡ nấu tôm
+  name_en: Purple Yam Soup with Shrimp
+  category: vn
+  kb_slug: canh-khoai-mo-tom
+  slot: canh
+  kcal_per_serving: 168.4
+  protein_g: 7.8
+  lipid_g: 1.6
+  glucid_g: 30.8
+  fiber_g: 2.1
+  serving_desc_vi: 1 tô vừa (~320g canh khoai mỡ tím nấu tôm thịt)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 320
+- dish_id: cha_ca_la_vong
+  name_vi: Chả cá Lã Vọng
+  name_en: Hanoi Turmeric Grilled Fish with Dill
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 340.5
+  protein_g: 26.0
+  lipid_g: 16.5
+  glucid_g: 22.0
+  fiber_g: 2.4
+  serving_desc_vi: 1 suất (~260g chả cá lăng nướng thì là hành lá đậu phộng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 260
+- dish_id: cha_com
+  name_vi: Chả cốm Hà Nội
+  name_en: Hanoi Green Rice Pork Patties
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 273.0
+  protein_g: 16.5
+  lipid_g: 15.0
+  glucid_g: 18.0
+  fiber_g: 1.4
+  serving_desc_vi: 1 phần (~140g, 4 miếng chả cốm chiên vàng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 140
+- dish_id: cha_lui
+  name_vi: Chả lụi Lagi
+  name_en: Grilled Pork & Shrimp Rice Paper Skewers
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 298.0
+  protein_g: 15.0
+  lipid_g: 14.0
+  glucid_g: 28.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 phần (~200g chả lụi nướng kèm rau xoài nước chấm đậu phộng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 200
+- dish_id: chao_vit
+  name_vi: Cháo vịt
+  name_en: Vietnamese Duck Rice Congee
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 376.5
+  protein_g: 22.0
+  lipid_g: 12.5
+  glucid_g: 44.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 tô vừa (~420g cháo đậu xanh thịt vịt luộc)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 420
+- dish_id: com_chay_cha_bong
+  name_vi: Cơm cháy chà bông
+  name_en: Crispy Scorched Rice with Pork Floss
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 396.5
+  protein_g: 14.0
+  lipid_g: 16.5
+  glucid_g: 48.0
+  fiber_g: 1.6
+  serving_desc_vi: 1 miếng lớn (~130g cơm cháy mỡ hành chà bông)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 130
+- dish_id: com_ga_xoi_mo
+  name_vi: Cơm gà xối mỡ
+  name_en: Crispy Fried Chicken with Seasoned Rice
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 612.0
+  protein_g: 31.0
+  lipid_g: 24.0
+  glucid_g: 68.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 đĩa đầy đủ (~420g cơm đỏ đùi gà xối mỡ dưa leo)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 420
+- dish_id: com_lam
+  name_vi: Cơm lam ống tre
+  name_en: Bamboo-Tube Roasted Sticky Rice
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 298.5
+  protein_g: 6.5
+  lipid_g: 4.5
+  glucid_g: 58.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 ống cơm lam (~180g chấm muối vừng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 180
+- dish_id: com_rang_dua_bo
+  name_vi: Cơm rang dưa bò
+  name_en: Fried Rice with Pickled Mustard Greens & Beef
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 524.0
+  protein_g: 24.5
+  lipid_g: 18.0
+  glucid_g: 66.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 đĩa vừa (~400g cơm rang dưa chua thịt bò xào)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 400
+- dish_id: cua_hap_bia
+  name_vi: Cua / Ghẹ hấp sả bia
+  name_en: Steamed Crab with Lemongrass & Beer
+  category: vn
+  kb_slug: ghe-hap-gung
+  slot: man
+  kcal_per_serving: 72.2
+  protein_g: 10.1
+  lipid_g: 0.8
+  glucid_g: 7.1
+  fiber_g: 0.3
+  serving_desc_vi: 1 khẩu phần (~220g thịt cua/ghẹ hấp sả gừng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: cut_lon_xao_me
+  name_vi: Cút lộn xào me
+  name_en: Quail Eggs Stir-Fried in Tamarind Sauce
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 264.0
+  protein_g: 16.5
+  lipid_g: 14.0
+  glucid_g: 18.0
+  fiber_g: 1.6
+  serving_desc_vi: 1 đĩa (8–10 trứng cút lộn xào sốt me đậu phộng ~180g)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 180
+- dish_id: ga_chien_nuoc_mam
+  name_vi: Gà chiên nước mắm
+  name_en: Crispy Fish-Sauce Glazed Chicken Wings
+  category: vn
+  kb_slug: canh-ga-chien-nuoc-mam
+  slot: man
+  kcal_per_serving: 285.0
+  protein_g: 14.3
+  lipid_g: 18.4
+  glucid_g: 14.6
+  fiber_g: 0.3
+  serving_desc_vi: 1 đĩa vừa (~220g cánh/đùi gà chiên nước mắm tỏi)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: ga_hap_la_chanh
+  name_vi: Gà luộc / hấp lá chanh
+  name_en: Steamed Whole Chicken with Lime Leaves
+  category: vn
+  kb_slug: ga-luoc
+  slot: man
+  kcal_per_serving: 367.3
+  protein_g: 36.8
+  lipid_g: 23.8
+  glucid_g: 1.6
+  fiber_g: 0.8
+  serving_desc_vi: 1 khẩu phần (~200g thịt gà ta hấp lá chanh)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 200
+- dish_id: goi_ca_chich
+  name_vi: Gỏi cá trích Phú Quốc
+  name_en: Phu Quoc Herring Salad with Coconut & Herbs
+  category: vn
+  kb_slug: null
+  slot: rau
+  kcal_per_serving: 283.0
+  protein_g: 22.0
+  lipid_g: 11.0
+  glucid_g: 24.0
+  fiber_g: 3.2
+  serving_desc_vi: 1 phần (~240g gỏi cá trích dừa nạo rau rừng bánh tráng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 240
+- dish_id: khau_nhuc
+  name_vi: Khâu nhục (Thịt ba chỉ hấp khoai môn)
+  name_en: Braised Steamed Pork Belly with Taro
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 424.0
+  protein_g: 21.0
+  lipid_g: 28.0
+  glucid_g: 22.0
+  fiber_g: 2.4
+  serving_desc_vi: 1 khẩu phần (~240g thịt ba chỉ khâu nhục khoai môn)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 240
+- dish_id: kho_muc_nuong
+  name_vi: Khô mực nướng
+  name_en: Grilled Dried Squid
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 183.5
+  protein_g: 34.0
+  lipid_g: 3.5
+  glucid_g: 4.0
+  fiber_g: 0.0
+  serving_desc_vi: 1 con vừa (~75g khô mực nướng chấm tương ớt)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 75
+- dish_id: kho_quet
+  name_vi: Kho quẹt tôm thịt
+  name_en: Caramelized Pork & Dried Shrimp Dip
+  category: vn
+  kb_slug: kho-quet
+  slot: man
+  kcal_per_serving: 256.8
+  protein_g: 18.1
+  lipid_g: 14.3
+  glucid_g: 13.8
+  fiber_g: 0.3
+  serving_desc_vi: 1 thố nhỏ (~150g kho quẹt tóp mỡ chấm rau củ luộc)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 150
+- dish_id: lap_xuong
+  name_vi: Lạp xưởng tươi nướng / chiên
+  name_en: Vietnamese Sweet Chinese Sausage
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 336.0
+  protein_g: 16.0
+  lipid_g: 24.0
+  glucid_g: 14.0
+  fiber_g: 0.5
+  serving_desc_vi: 1 phần (2 cây lạp xưởng ~110g)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 110
+- dish_id: luon_om_chuoi_dau
+  name_vi: Lươn om chuối đậu
+  name_en: Braised Eel with Green Banana & Tofu
+  category: vn
+  kb_slug: oc-nau-chuoi-dau
+  slot: man
+  kcal_per_serving: 424.0
+  protein_g: 27.9
+  lipid_g: 25.3
+  glucid_g: 21.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 tô vừa (~320g lươn om chuối xanh đậu phụ nghệ)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 320
+- dish_id: luon_xao_xa_ot
+  name_vi: Lươn xào sả ớt
+  name_en: Stir-Fried Eel with Lemongrass & Chili
+  category: vn
+  kb_slug: luon-xao-sa-ot
+  slot: man
+  kcal_per_serving: 238.7
+  protein_g: 16.2
+  lipid_g: 16.2
+  glucid_g: 7.7
+  fiber_g: 0.6
+  serving_desc_vi: 1 đĩa vừa (~200g lươn xào sả ớt đậm vị)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 200
+- dish_id: mam_chung
+  name_vi: Mắm chưng thịt trứng
+  name_en: Steamed Fermented Fish & Minced Pork Cake
+  category: vn
+  kb_slug: cha-trung-hap
+  slot: man
+  kcal_per_serving: 256.4
+  protein_g: 16.7
+  lipid_g: 18.2
+  glucid_g: 6.4
+  fiber_g: 0.3
+  serving_desc_vi: 1 chén chưng (~180g mắm cá lóc chưng thịt băm lòng đỏ trứng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 180
+- dish_id: mam_tep_chung_thit
+  name_vi: Mắm tép chưng thịt
+  name_en: Braised Minced Pork with Fermented Shrimp Paste
+  category: vn
+  kb_slug: mam-tep-chung-thit
+  slot: man
+  kcal_per_serving: 328.2
+  protein_g: 18.4
+  lipid_g: 24.7
+  glucid_g: 8.4
+  fiber_g: 0.3
+  serving_desc_vi: 1 khẩu phần (~150g thịt chưng mắm tép sả riềng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 150
+- dish_id: mi_xao_gion
+  name_vi: Mì xào giòn hải sản / bò
+  name_en: Crispy Fried Egg Noodles with Seafood & Vegetables
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 525.0
+  protein_g: 22.0
+  lipid_g: 21.0
+  glucid_g: 62.0
+  fiber_g: 3.5
+  serving_desc_vi: 1 đĩa vừa (~400g mì xào giòn sốt hải sản cải thìa)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 400
+- dish_id: muc_nhoi_thit
+  name_vi: Mực nhồi thịt sốt cà chua
+  name_en: Stuffed Squid with Minced Pork in Tomato Sauce
+  category: vn
+  kb_slug: muc-nhoi-thit-sot-ca
+  slot: man
+  kcal_per_serving: 349.1
+  protein_g: 30.7
+  lipid_g: 21.0
+  glucid_g: 9.5
+  fiber_g: 1.0
+  serving_desc_vi: 1 đĩa vừa (~240g mực ống nhồi thịt hấp/sốt cà chua)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 240
+- dish_id: nam_pia
+  name_vi: Nậm pịa Tây Bắc
+  name_en: Northwest Spiced Beef Offal Stew
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 224.0
+  protein_g: 21.0
+  lipid_g: 12.0
+  glucid_g: 8.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 bát vừa (~260g nậm pịa bò/dê Tây Bắc)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 260
+- dish_id: nem_nuong_nha_trang
+  name_vi: Nem nướng Nha Trang
+  name_en: Nha Trang Grilled Pork Sausage Rolls
+  category: vn
+  kb_slug: thit-nuong-sa
+  slot: man
+  kcal_per_serving: 397.2
+  protein_g: 21.0
+  lipid_g: 29.8
+  glucid_g: 11.5
+  fiber_g: 0.2
+  serving_desc_vi: 1 phần (~300g nem nướng, bánh tráng chiên, rau sống & sốt chấm)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 300
+- dish_id: nui_xao
+  name_vi: Nui xào bò / rau củ
+  name_en: Stir-Fried Macaroni with Beef & Tomatoes
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 452.5
+  protein_g: 22.5
+  lipid_g: 14.5
+  glucid_g: 58.0
+  fiber_g: 3.0
+  serving_desc_vi: 1 đĩa vừa (~360g nui xào bò sốt cà chua rau củ)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 360
+- dish_id: oc_buou_hap
+  name_vi: Ốc bươu hấp sả
+  name_en: Steamed Apple Snails with Lemongrass
+  category: vn
+  kb_slug: ngheu-hap-sa
+  slot: man
+  kcal_per_serving: 69.2
+  protein_g: 7.9
+  lipid_g: 0.6
+  glucid_g: 8.4
+  fiber_g: 0.1
+  serving_desc_vi: 1 tô vừa (~220g thịt ốc bươu hấp sả gừng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: oc_huong_xao
+  name_vi: Ốc hương xào bơ tỏi / trứng muối
+  name_en: Stir-Fried Sweet Snails with Garlic Butter
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 254.0
+  protein_g: 20.0
+  lipid_g: 14.0
+  glucid_g: 12.0
+  fiber_g: 0.8
+  serving_desc_vi: 1 đĩa vừa (~220g ốc hương xào bơ tỏi/me)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: oc_len_xao_dua
+  name_vi: Ốc len xào dừa
+  name_en: Mud Creeper Snails Simmered in Coconut Milk
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 284.0
+  protein_g: 16.5
+  lipid_g: 18.0
+  glucid_g: 14.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 đĩa vừa (~240g ốc len xào nước cốt dừa rau răm)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 240
+- dish_id: rau_muong_xao
+  name_vi: Rau muống xào tỏi
+  name_en: Stir-Fried Morning Glory with Garlic
+  category: vn
+  kb_slug: rau-muong-xao-toi
+  slot: rau
+  kcal_per_serving: 72.3
+  protein_g: 2.9
+  lipid_g: 5.6
+  glucid_g: 2.6
+  fiber_g: 0.8
+  serving_desc_vi: 1 đĩa vừa (~220g rau muống xào tỏi xanh giòn)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: sup_cua
+  name_vi: Súp cua trứng bắc thảo
+  name_en: Vietnamese Crab & Egg Drop Corn Soup
+  category: vn
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 204.5
+  protein_g: 14.5
+  lipid_g: 6.5
+  glucid_g: 22.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 chén lớn (~280g súp cua nấm tuyết trứng cút)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 280
+- dish_id: tau_hu_nhoi_thit
+  name_vi: Đậu phụ nhồi thịt sốt cà chua
+  name_en: Stuffed Tofu with Pork in Tomato Sauce
+  category: vn
+  kb_slug: dau-phu-nhoi-thit-sot-ca-chua
+  slot: man
+  kcal_per_serving: 423.7
+  protein_g: 25.6
+  lipid_g: 32.0
+  glucid_g: 8.5
+  fiber_g: 1.5
+  serving_desc_vi: 1 đĩa vừa (~260g đậu phụ nhồi thịt băm sốt cà chua)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 260
+- dish_id: tau_hu_non
+  name_vi: Tàu hũ nước đường gừng
+  name_en: Warm Sweet Tofu Pudding in Ginger Syrup
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 194.0
+  protein_g: 7.5
+  lipid_g: 4.0
+  glucid_g: 32.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 chén vừa (~240g tàu hũ non nước đường gừng trân châu)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 240
+- dish_id: thit_dong
+  name_vi: Thịt nấu đông
+  name_en: Northern Vietnamese Jellied Pork Terrine
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 258.0
+  protein_g: 20.0
+  lipid_g: 18.0
+  glucid_g: 4.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 khẩu phần (~180g thịt chân giò nấu đông mộc nhĩ)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 180
+- dish_id: thit_kho_tau
+  name_vi: Thịt kho tàu
+  name_en: Vietnamese Caramelized Braised Pork & Eggs
+  category: vn
+  kb_slug: thit-kho-tau
+  slot: man
+  kcal_per_serving: 586.6
+  protein_g: 33.7
+  lipid_g: 43.8
+  glucid_g: 14.1
+  fiber_g: 0.3
+  serving_desc_vi: 1 khẩu phần (~220g thịt ba chỉ kho trứng nước dừa)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: thit_trau_gac_bep
+  name_vi: Thịt trâu gác bếp
+  name_en: Smoked Dried Buffalo Jerky
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 209.5
+  protein_g: 36.0
+  lipid_g: 5.5
+  glucid_g: 4.0
+  fiber_g: 0.8
+  serving_desc_vi: 1 phần (~80g thịt trâu gác bếp xé sợi chấm chẩm chéo)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 80
+- dish_id: tiet_canh
+  name_vi: Tiết canh
+  name_en: Traditional Congealed Blood Pudding with Herbs
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 155.5
+  protein_g: 16.0
+  lipid_g: 7.5
+  glucid_g: 6.0
+  fiber_g: 1.2
+  serving_desc_vi: 1 bát nhỏ (~150g kèm lạc rang rau thơm)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 150
+- dish_id: trung_vit_lon
+  name_vi: Trứng vịt lộn
+  name_en: Boiled Fertilized Duck Egg with Vietnamese Coriander
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 182.0
+  protein_g: 13.6
+  lipid_g: 12.4
+  glucid_g: 4.0
+  fiber_g: 0.5
+  serving_desc_vi: 1 quả trứng vịt lộn (~90g kèm rau răm gừng)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 90
+- dish_id: xoi_gac
+  name_vi: Xôi gấc
+  name_en: Red Gac Fruit Sweet Sticky Rice
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 371.5
+  protein_g: 7.5
+  lipid_g: 9.5
+  glucid_g: 64.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 đĩa vừa (~220g xôi gấc đỏ cốt dừa)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: xoi_nep_than
+  name_vi: Xôi nếp than
+  name_en: Purple Black Glutinous Sticky Rice
+  category: vn
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 356.5
+  protein_g: 8.0
+  lipid_g: 8.5
+  glucid_g: 62.0
+  fiber_g: 3.0
+  serving_desc_vi: 1 phần (~220g xôi nếp cẩm/nếp than đậu xanh cốt dừa)
+  source_ref: Vietnam NIN / FCT 2007
+  serving_g: 220
+- dish_id: ca_ri_xanh_thai
+  name_vi: Cà ri xanh Thái
+  name_en: Thai Green Curry
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 334.5
+  protein_g: 22.0
+  lipid_g: 18.5
+  glucid_g: 20.0
+  fiber_g: 2.8
+  serving_desc_vi: 1 tô vừa (~320g cà ri xanh gà/bò cốt dừa)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 320
+- dish_id: canh_kim_chi_jjigae
+  name_vi: Canh kim chi đậu phụ Jjigae
+  name_en: Kimchi Tofu Pork Stew (Jjigae)
+  category: asian
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 239.5
+  protein_g: 18.0
+  lipid_g: 11.5
+  glucid_g: 16.0
+  fiber_g: 3.2
+  serving_desc_vi: 1 thố vừa (~350g canh kim chi thịt ba chỉ đậu phụ)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 350
+- dish_id: ga_xao_bap_cai_cay
+  name_vi: Gà xào bắp cải sốt cay Dak-galbi
+  name_en: Spicy Stir-Fried Chicken & Cabbage
+  category: asian
+  kb_slug: goi-ga-bap-cai
+  slot: man
+  kcal_per_serving: 252.4
+  protein_g: 20.8
+  lipid_g: 11.3
+  glucid_g: 17.1
+  fiber_g: 2.7
+  serving_desc_vi: 1 phần (~280g gà xào bắp cải khoai lang sốt cay)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 280
+- dish_id: rau_cu_xao_thap_cam
+  name_vi: Rau củ xào tôm thịt thập cẩm
+  name_en: Chop Suey / Stir-Fried Mixed Vegetables & Shrimp
+  category: asian
+  kb_slug: rau-cu-xao-thap-cam
+  slot: rau
+  kcal_per_serving: 136.8
+  protein_g: 5.1
+  lipid_g: 8.4
+  glucid_g: 10.2
+  fiber_g: 2.1
+  serving_desc_vi: 1 đĩa vừa (~250g bắp cải/rau củ xào tôm thịt)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 250
+- dish_id: thit_ba_chi_xao_hai_lan
+  name_vi: Thịt ba chỉ rang cháy cạnh / xào cay
+  name_en: Twice-Cooked Crispy Pork Belly
+  category: asian
+  kb_slug: thit-rang-chay-canh
+  slot: man
+  kcal_per_serving: 351.1
+  protein_g: 21.0
+  lipid_g: 27.8
+  glucid_g: 4.2
+  fiber_g: 0.2
+  serving_desc_vi: 1 đĩa vừa (~200g thịt ba chỉ rang cháy cạnh tỏi ớt)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 200
+- dish_id: canh_rau_cu_minestrone
+  name_vi: Canh súp rau củ cà chua
+  name_en: Tomato & Mixed Vegetable Soup
+  category: asian
+  kb_slug: canh-rau-cu
+  slot: canh
+  kcal_per_serving: 108.5
+  protein_g: 3.7
+  lipid_g: 0.3
+  glucid_g: 22.8
+  fiber_g: 2.8
+  serving_desc_vi: 1 tô vừa (~300g canh rau củ cà chua)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 300
+- dish_id: chao_trang
+  name_vi: Cháo trắng / Cháo gạo
+  name_en: Plain Rice Congee / Gruel
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 175.5
+  protein_g: 4.5
+  lipid_g: 1.5
+  glucid_g: 36.0
+  fiber_g: 0.8
+  serving_desc_vi: 1 tô vừa (~320g cháo trắng nóng)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 320
+- dish_id: canh_dau_phu_thanh_dam
+  name_vi: Canh đậu phụ nấm thanh đạm
+  name_en: Simmered Hot Tofu Soup (Yudofu)
+  category: asian
+  kb_slug: canh-nam-dau-hu
+  slot: canh
+  kcal_per_serving: 115.1
+  protein_g: 10.4
+  lipid_g: 6.7
+  glucid_g: 3.2
+  fiber_g: 1.5
+  serving_desc_vi: 1 tô vừa (~300g đậu phụ non nấu nấm thanh đạm)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 300
+- dish_id: trung_xao_ca_chua
+  name_vi: Trứng bác / Trứng sốt cà chua
+  name_en: Scrambled Eggs with Tomatoes
+  category: vn
+  kb_slug: trung-sot-ca-chua
+  slot: man
+  kcal_per_serving: 223.7
+  protein_g: 10.4
+  lipid_g: 17.4
+  glucid_g: 6.4
+  fiber_g: 0.8
+  serving_desc_vi: 1 đĩa vừa (~220g trứng xào/sốt cà chua hành lá)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 220
+- dish_id: khoai_tay_ca_tim_xao
+  name_vi: Khoai tây cà tím ớt chuông xào
+  name_en: Stir-Fried Potato, Eggplant & Green Pepper
+  category: asian
+  kb_slug: khoai-tay-xao-hanh-tay
+  slot: rau
+  kcal_per_serving: 175.4
+  protein_g: 2.7
+  lipid_g: 7.1
+  glucid_g: 25.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 đĩa vừa (~240g khoai tây cà tím xào tỏi)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 240
+- dish_id: vit_quay
+  name_vi: Vịt quay mật ong
+  name_en: Cantonese Roast Duck
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 338.0
+  protein_g: 27.0
+  lipid_g: 22.0
+  glucid_g: 8.0
+  fiber_g: 0.5
+  serving_desc_vi: 1 khẩu phần (~200g thịt vịt quay da giòn)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 200
+- dish_id: lau_thap_cam
+  name_vi: Lẩu thập cẩm
+  name_en: Asian Mixed Hot Pot
+  category: asian
+  kb_slug: null
+  slot: canh
+  kcal_per_serving: 351.0
+  protein_g: 26.0
+  lipid_g: 15.0
+  glucid_g: 28.0
+  fiber_g: 4.0
+  serving_desc_vi: 1 khẩu phần lẩu (~450g thịt bò, hải sản, đậu phụ & rau nấm)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 450
+- dish_id: thit_kho_mem
+  name_vi: Thịt kho đậu phụ / Thịt ba chỉ kho
+  name_en: Braised Pork Belly & Tofu
+  category: asian
+  kb_slug: thit-kho-dau-phu
+  slot: man
+  kcal_per_serving: 511.7
+  protein_g: 29.3
+  lipid_g: 40.2
+  glucid_g: 8.2
+  fiber_g: 0.7
+  serving_desc_vi: 1 khẩu phần (~220g thịt ba chỉ kho đậu phụ)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 220
+- dish_id: com_thit_bam_kho
+  name_vi: Cơm thịt băm kho trứng
+  name_en: Braised Minced Pork on Rice (Lu Rou Fan)
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 519.5
+  protein_g: 22.0
+  lipid_g: 19.5
+  glucid_g: 64.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 tô vừa (~380g cơm thịt ba chỉ băm kho trứng)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 380
+- dish_id: canh_ca_vien
+  name_vi: Canh chả cá / Cá viên
+  name_en: Fish Ball Clear Soup
+  category: asian
+  kb_slug: canh-kho-qua-cha-ca
+  slot: canh
+  kcal_per_serving: 94.7
+  protein_g: 12.7
+  lipid_g: 0.9
+  glucid_g: 8.6
+  fiber_g: 1.3
+  serving_desc_vi: 1 tô vừa (~300g canh chả cá hành ngò)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 300
+- dish_id: canh_chua_tom
+  name_vi: Canh chua tôm Thái / Việt
+  name_en: Hot and Sour Prawn Soup
+  category: asian
+  kb_slug: canh-chua-tom
+  slot: canh
+  kcal_per_serving: 115.6
+  protein_g: 7.7
+  lipid_g: 4.0
+  glucid_g: 11.8
+  fiber_g: 1.6
+  serving_desc_vi: 1 tô vừa (~320g canh chua tôm dứa cà chua)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 320
+- dish_id: goi_du_du
+  name_vi: Nộm đu đủ / Gỏi đu đủ tôm khô
+  name_en: Green Papaya Salad (Som Tam / Nom Du Du)
+  category: asian
+  kb_slug: nom-du-du
+  slot: rau
+  kcal_per_serving: 142.6
+  protein_g: 5.5
+  lipid_g: 5.6
+  glucid_g: 17.5
+  fiber_g: 3.6
+  serving_desc_vi: 1 đĩa vừa (~220g nộm đu đủ cà rốt đậu phộng)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 220
+- dish_id: com_ga_hai_nam
+  name_vi: Cơm gà Hải Nam / Cơm gà luộc
+  name_en: Hainanese Poached Chicken Rice
+  category: asian
+  kb_slug: null
+  slot: man
+  kcal_per_serving: 545.0
+  protein_g: 30.0
+  lipid_g: 18.0
+  glucid_g: 64.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 đĩa vừa (~380g cơm nấu nước dùng gà & gà luộc)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 380
+- dish_id: ca_hap_xi_dau
+  name_vi: Cá hấp gừng hành xì dầu
+  name_en: Steamed Fish with Ginger, Scallion & Soy Sauce
+  category: vn
+  kb_slug: ca-dieu-hong-hap-xi-dau
+  slot: man
+  kcal_per_serving: 160.8
+  protein_g: 20.9
+  lipid_g: 6.9
+  glucid_g: 3.6
+  fiber_g: 0.7
+  serving_desc_vi: 1 khẩu phần (~240g cá chẽm/diêu hồng hấp gừng hành)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 240
+- dish_id: bo_xao_dau_hao
+  name_vi: Bò xào dầu hào cải xanh
+  name_en: Beef in Oyster Sauce with Greens
+  category: asian
+  kb_slug: cai-lan-xao-thit-bo
+  slot: man
+  kcal_per_serving: 173.3
+  protein_g: 14.4
+  lipid_g: 10.1
+  glucid_g: 4.6
+  fiber_g: 2.8
+  serving_desc_vi: 1 đĩa vừa (~240g thịt bò xào dầu hào rau cải)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 240
+- dish_id: dau_phu_xao_rau_cu
+  name_vi: Đậu phụ sốt cà chua / xào rau cải
+  name_en: Home-Style Braised Tofu with Greens & Tomatoes
+  category: asian
+  kb_slug: dau-phu-sot-ca-chua
+  slot: man
+  kcal_per_serving: 279.5
+  protein_g: 17.2
+  lipid_g: 21.2
+  glucid_g: 5.0
+  fiber_g: 1.4
+  serving_desc_vi: 1 đĩa vừa (~250g đậu phụ chiên sốt cà chua & rau xanh)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 250
+- dish_id: ca_tim_xao_toi
+  name_vi: Cà tím xào tỏi mỡ hành
+  name_en: Braised Eggplant in Garlic Sauce
+  category: asian
+  kb_slug: ca-tim-xao-mo-hanh
+  slot: rau
+  kcal_per_serving: 126.6
+  protein_g: 1.5
+  lipid_g: 10.5
+  glucid_g: 6.6
+  fiber_g: 1.6
+  serving_desc_vi: 1 đĩa vừa (~220g cà tím xào tỏi sốt đậm đà)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 220
+- dish_id: ga_kho_gung
+  name_vi: Gà kho gừng sả
+  name_en: Three-Cup Braised Ginger Chicken
+  category: asian
+  kb_slug: ga-kho-gung
+  slot: man
+  kcal_per_serving: 231.9
+  protein_g: 17.8
+  lipid_g: 14.5
+  glucid_g: 7.6
+  fiber_g: 0.4
+  serving_desc_vi: 1 khẩu phần (~220g gà kho gừng hành)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 220
+- dish_id: tom_rang_muoi
+  name_vi: Tôm rang muối ớt / Tôm rim
+  name_en: Salt & Pepper Crispy Prawns
+  category: asian
+  kb_slug: tom-rim-thit-ba-chi
+  slot: man
+  kcal_per_serving: 282.7
+  protein_g: 20.8
+  lipid_g: 19.5
+  glucid_g: 5.9
+  fiber_g: 0.3
+  serving_desc_vi: 1 đĩa vừa (~200g tôm rang muối/rim đậm đà)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 200
+- dish_id: canh_bi_dao
+  name_vi: Canh bí đao nấu tôm thịt
+  name_en: Winter Melon Soup with Shrimp & Pork
+  category: asian
+  kb_slug: canh-bi-dao-tom
+  slot: canh
+  kcal_per_serving: 47.5
+  protein_g: 5.1
+  lipid_g: 1.4
+  glucid_g: 3.6
+  fiber_g: 1.3
+  serving_desc_vi: 1 tô vừa (~300g canh bí đao thanh mát)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 300
+- dish_id: suon_hap_xao
+  name_vi: Sườn non kho / hấp tàu xì
+  name_en: Steamed / Braised Pork Spareribs
+  category: asian
+  kb_slug: suon-ram-man
+  slot: man
+  kcal_per_serving: 182.1
+  protein_g: 12.3
+  lipid_g: 11.5
+  glucid_g: 7.2
+  fiber_g: 0.2
+  serving_desc_vi: 1 khẩu phần (~200g sườn heo non kho/hấp mềm)
+  source_ref: Vietnam NIN / USDA SR Legacy
+  serving_g: 200

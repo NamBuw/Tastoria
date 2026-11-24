@@ -19,6 +19,7 @@ from fastapi.testclient import TestClient
 from kb_helpers import API, grant, ingredient_id, key, q, user
 from PIL import Image
 from rq import SimpleWorker
+from rq.serializers import JSONSerializer
 
 from tastoria.modules.scan import queue as scan_queue
 from tastoria.modules.scan import worker as job
@@ -288,14 +289,14 @@ def test_rq_worker_runs_the_job_and_times_out_hanging_runs(kb_client, kb_db, h, 
     queue = kb_client.app.state.scan.queue
     ctx.detector.script = [[box(EGG)]]
     sid = post_scan(kb_client, h).json()["id"]
-    SimpleWorker([queue.queue], connection=queue.redis).work(burst=True)
+    SimpleWorker([queue.queue], connection=queue.redis, serializer=JSONSerializer).work(burst=True)
     assert q(kb_db, "SELECT status FROM scans WHERE id = :i", i=sid).scalar() == "done"
 
     monkeypatch.setattr(scan_queue, "JOB_TIMEOUT_S", 1)  # FR-12-10 with a 1 s limit instead of 30 s
     ctx.detector.sleep = 2.5
     sid = post_scan(kb_client, h).json()["id"]
     t0 = time.monotonic()
-    SimpleWorker([queue.queue], connection=queue.redis).work(burst=True)  # 3 attempts, each cut at 1 s
+    SimpleWorker([queue.queue], connection=queue.redis, serializer=JSONSerializer).work(burst=True)  # 3 attempts, each cut at 1 s
     assert time.monotonic() - t0 < 8
     row = q(kb_db, "SELECT status, attempts, error_code FROM scans WHERE id = :i", i=sid).one()
     assert (row.status, row.attempts, row.error_code) == ("failed", 3, "timeout")
@@ -521,15 +522,22 @@ def test_sweeper_enqueues_lost_scans_and_expires_stuck_ones(kb_client, kb_db, h,
     from tastoria.jobs.sweep import sweep
 
     lost = post_scan(kb_client, h).json()["id"]
-    stuck = post_scan(kb_client, h).json()["id"]
+    stuck_retry = post_scan(kb_client, h).json()["id"]
+    stuck_exhausted = post_scan(kb_client, h).json()["id"]
     q(kb_db, "UPDATE scans SET enqueued_at = NULL, created_at = now() - interval '2 minutes' WHERE id = :i", i=lost)
     q(kb_db, "UPDATE scans SET status = 'processing', started_at = now() - interval '2 minutes', attempts = 1 "
-             "WHERE id = :i", i=stuck)  # fmt: skip
+             "WHERE id = :i", i=stuck_retry)  # fmt: skip
+    q(kb_db, "UPDATE scans SET status = 'processing', started_at = now() - interval '2 minutes', attempts = 3 "
+             "WHERE id = :i", i=stuck_exhausted)  # fmt: skip
     counts = sweep(kb_client.app.state.sessionmaker, kb_client.app.state.scan.queue)
-    assert counts["scans_requeued"] == 1 and counts["scans_expired"] == 1
+    assert counts["scans_requeued"] == 2 and counts["scans_expired"] == 1
     assert q(kb_db, "SELECT enqueued_at IS NOT NULL FROM scans WHERE id = :i", i=lost).scalar()
-    assert q(kb_db, "SELECT status, error_code FROM scans WHERE id = :i", i=stuck).one() == ("expired", "stuck")
-    assert job.run_job(ctx, uuid.UUID(stuck)) == "skipped"
+    assert q(kb_db, "SELECT status, enqueued_at IS NOT NULL FROM scans WHERE id = :i", i=stuck_retry).one() == (
+        "queued",
+        True,
+    )
+    assert q(kb_db, "SELECT status, error_code FROM scans WHERE id = :i", i=stuck_exhausted).one() == ("expired", "stuck")
+    assert job.run_job(ctx, uuid.UUID(stuck_exhausted)) == "skipped"
 
 
 def test_account_deletion_removes_photos(kb_client, kb_db, h, ctx, storage_dir: Path) -> None:
@@ -572,3 +580,133 @@ def test_purge_cutoff_is_30_days(kb_client, kb_db, h, ctx, storage_dir) -> None:
     q(kb_db, "UPDATE scans SET created_at = now() - interval '29 days 23 hours'")
     assert purge(kb_client.app.state.sessionmaker, storage_dir)["images_purged"] == 0
     assert kb_client.get(f"{API}/scans/{s['id']}/images/1", headers=h).status_code == 200
+
+
+def test_scan_get_rate_limit_contrib_orphan_and_erase_rollback(kb_client, kb_db, h, ctx, storage_dir, monkeypatch) -> None:
+    import os
+    from datetime import timedelta
+
+    from sqlalchemy.orm import Session
+
+    from tastoria.core.clock import utcnow
+    from tastoria.core.ratelimit import MemoryRateLimiter
+    from tastoria.jobs.purge_images import purge
+    from tastoria.modules.scan.service import ScanSubjectData
+
+    # 1. Per-user scan_get rate limit (60 / 60s)
+    sid = post_scan(kb_client, h).json()["id"]
+    fresh_h = user(kb_client)
+    other_sid = post_scan(kb_client, fresh_h).json()["id"]
+    monkeypatch.setattr(kb_client.app.state, "rate_limiter", MemoryRateLimiter(enabled=True))
+    for _ in range(60):
+        assert kb_client.get(f"{API}/scans/{other_sid}", headers=fresh_h).status_code == 200
+    r429 = kb_client.get(f"{API}/scans/{other_sid}", headers=fresh_h)
+    assert r429.status_code == 429 and r429.json()["code"] == "rate_limited"
+    # Existing user h is isolated in its own bucket
+    assert kb_client.get(f"{API}/scans/{sid}", headers=h).status_code == 200
+
+    # 2. ScanSubjectData.erase_purpose defers os.replace to commit (rollback keeps contrib file intact)
+    grant(kb_client, h, "photo_contribution")
+    s = scan_done(kb_client, h, ctx, [[]])
+    contrib_key = q(kb_db, "SELECT storage_key FROM scan_images WHERE scan_id = :i", i=s["id"]).scalar()
+    uid = q(kb_db, "SELECT user_id FROM scans WHERE id = :i", i=s["id"]).scalar()
+    assert contrib_key.startswith("contrib/")
+    assert (storage_dir / contrib_key).is_file()
+
+    handler = ScanSubjectData(storage_dir)
+    with Session(kb_client.app.state.engine) as sess:
+        handler.erase_purpose(sess, uid, "photo_contribution")
+        # Not committed yet -> file must remain at original contrib path
+        assert (storage_dir / contrib_key).is_file()
+        sess.rollback()
+    assert (storage_dir / contrib_key).is_file()
+    assert q(kb_db, "SELECT contributed FROM scan_images WHERE scan_id = :i", i=s["id"]).scalar() is True
+
+    with Session(kb_client.app.state.engine) as sess:
+        handler.erase_purpose(sess, uid, "photo_contribution")
+        sess.commit()
+    moved_key = q(kb_db, "SELECT storage_key FROM scan_images WHERE scan_id = :i", i=s["id"]).scalar()
+    assert moved_key.startswith("tmp/scans/") and (storage_dir / moved_key).is_file()
+    assert not (storage_dir / contrib_key).exists()
+
+    # 3. purge_images sweeps orphan >24h scan dirs in BOTH tmp/scans and contrib
+    orphan_contrib = storage_dir / "contrib" / str(uid) / str(uuid.uuid4())
+    orphan_contrib.mkdir(parents=True, exist_ok=True)
+    (orphan_contrib / "1.jpg").write_bytes(b"orphan")
+    old_ts = (utcnow() - timedelta(days=2)).timestamp()
+    os.utime(orphan_contrib, (old_ts, old_ts))
+    res = purge(kb_client.app.state.sessionmaker, storage_dir)
+    assert res["orphan_dirs_removed"] >= 1 and not orphan_contrib.exists()
+
+
+def test_mushroom_safety_confirm_gate_and_nam_rom_mapping(kb_client, kb_db, h, ctx) -> None:
+    nam_vid = q(kb_db, "SELECT id FROM vision_classes WHERE code = 'nam'").scalar()
+    assert nam_vid is not None
+    nam_rom_id = ingredient_id(kb_db, "nấm rơm")
+    nam_kim_id = ingredient_id(kb_db, "nấm kim châm")
+
+    # 1. safety_abstained=True mushroom detection blocks confirm with 409 freshness_check_required
+    s = scan_done(kb_client, h, ctx, [[]], mode="haul")
+    sid = s["id"]
+    img_id = q(kb_db, "SELECT id FROM scan_images WHERE scan_id = :s LIMIT 1", s=sid).scalar()
+    item_id = q(
+        kb_db,
+        "INSERT INTO scan_items (id, scan_id, ingredient_id, origin, qty_level, user_action) "
+        "VALUES (gen_random_uuid(), :s, :ing, 'model', 'vua', 'kept') RETURNING id",
+        s=sid,
+        ing=nam_rom_id,
+    ).scalar()
+    q(
+        kb_db,
+        "INSERT INTO detections (scan_image_id, scan_item_id, vision_class_id, x1, y1, x2, y2, confidence, "
+        "sub_species_slug, sub_species_conf, safety_abstained) "
+        "VALUES (:im, :it, :vc, 0.1, 0.1, 0.4, 0.4, 0.85, NULL, NULL, true)",
+        im=img_id,
+        it=item_id,
+        vc=nam_vid,
+    )
+    fetched = kb_client.get(f"{API}/scans/{sid}", headers=h).json()
+    m_chip = next(i for i in fetched["items"] if i["id"] == str(item_id))
+    assert m_chip["safety_abstained"] is True and m_chip["needs_check"] is True
+
+    c_blocked = kb_client.post(f"{API}/scans/{sid}/confirm", headers=h)
+    assert c_blocked.status_code == 409 and c_blocked.json()["code"] == "freshness_check_required"
+    assert str(item_id) in c_blocked.json()["item_ids"]
+
+    # Relabeling resolves safety abstention and allows confirm
+    p = kb_client.patch(
+        f"{API}/scans/{sid}/items/{item_id}",
+        json={"ingredient_id": str(nam_kim_id)},
+        headers=h | {"Content-Type": "application/merge-patch+json"},
+    )
+    assert p.status_code == 200, p.text
+    assert p.json()["safety_abstained"] is False
+    c_ok = kb_client.post(f"{API}/scans/{sid}/confirm", headers=h)
+    assert c_ok.status_code == 200, c_ok.text
+
+    # 2. Identified sub_species_slug="nam-rom", safety_abstained=False is NOT falsely abstained and confirms 200
+    s2 = scan_done(kb_client, h, ctx, [[]], mode="haul")
+    sid2 = s2["id"]
+    img2_id = q(kb_db, "SELECT id FROM scan_images WHERE scan_id = :s LIMIT 1", s=sid2).scalar()
+    it2_id = q(
+        kb_db,
+        "INSERT INTO scan_items (id, scan_id, ingredient_id, origin, qty_level, user_action) "
+        "VALUES (gen_random_uuid(), :s, :ing, 'model', 'vua', 'kept') RETURNING id",
+        s=sid2,
+        ing=nam_rom_id,
+    ).scalar()
+    q(
+        kb_db,
+        "INSERT INTO detections (scan_image_id, scan_item_id, vision_class_id, x1, y1, x2, y2, confidence, "
+        "sub_species_slug, sub_species_conf, safety_abstained) "
+        "VALUES (:im, :it, :vc, 0.1, 0.1, 0.4, 0.4, 0.91, 'nam-rom', 0.94, false)",
+        im=img2_id,
+        it=it2_id,
+        vc=nam_vid,
+    )
+    fetched2 = kb_client.get(f"{API}/scans/{sid2}", headers=h).json()
+    m_chip2 = next(i for i in fetched2["items"] if i["id"] == str(it2_id))
+    assert m_chip2["sub_species_slug"] == "nam-rom"
+    assert m_chip2["safety_abstained"] is False
+    assert m_chip2["ingredient_name_vi"] == "nấm rơm"
+    assert kb_client.post(f"{API}/scans/{sid2}/confirm", headers=h).status_code == 200

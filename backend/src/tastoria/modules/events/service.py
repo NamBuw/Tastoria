@@ -7,12 +7,15 @@ swaps count as a negative taste signal (BR-SWAP-01).
 
 from __future__ import annotations
 
+import threading
+import time as pytime
 import uuid
 from collections import defaultdict
 from collections.abc import Iterable
+from datetime import datetime
 from typing import Any
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -20,10 +23,27 @@ from sqlalchemy.orm import Session
 from tastoria.core.clock import utcnow
 from tastoria.core.errors import ApiError, ProblemCode
 from tastoria.modules.events.models import Interaction
-from tastoria.modules.events.schemas import Event, EventBatch, EventBatchResult, RecipeSignal
+from tastoria.modules.events.schemas import Event, EventBatch, EventBatchResult, RecipeSignal, TrainingInteractionRow
 from tastoria.modules.privacy import service as privacy
 
 PURPOSE = "personalization"
+POPULARITY_TTL_S = 60.0
+_SIGNAL_TYPES = frozenset({"liked", "cooked", "disliked", "swapped"})
+_pop_lock = threading.Lock()
+_pop_cache: dict[str, tuple[float, dict[uuid.UUID, RecipeSignal]]] = {}
+
+
+def _cache_db_key(session: Session) -> str:
+    bind = session.get_bind()
+    return f"{id(bind)}:{bind.url}"
+
+
+def invalidate_popularity_cache(session: Session | None = None) -> None:
+    with _pop_lock:
+        if session is None:
+            _pop_cache.clear()
+        else:
+            _pop_cache.pop(_cache_db_key(session), None)
 
 
 def personalization_allowed(session: Session, user_id: uuid.UUID) -> bool:
@@ -61,7 +81,11 @@ def record(session: Session, user_id: uuid.UUID, events: Iterable[Event], *, con
         }
         for e in events
     ]
+    if not rows:
+        return True
     _insert(session, user_id, rows)
+    if any(r["type"] in _SIGNAL_TYPES for r in rows):
+        invalidate_popularity_cache(session)
     return True
 
 
@@ -107,6 +131,8 @@ def record_batch(session: Session, user_id: uuid.UUID, batch: EventBatch) -> Eve
                 }
             ],
         ) from None
+    if accepted and any(e.type in _SIGNAL_TYPES for e in batch.events):
+        invalidate_popularity_cache(session)
     return EventBatchResult(accepted=accepted, duplicates=len(rows) - accepted, skipped_no_consent=0)
 
 
@@ -156,13 +182,51 @@ def _signals(session: Session, user_id: uuid.UUID | None) -> dict[uuid.UUID, Rec
 
 
 def popularity(session: Session) -> dict[uuid.UUID, RecipeSignal]:
-    """Aggregate over every user who consented (only they have rows): the item-average signal of BR-CONSENT-03."""
-    return _signals(session, None)
+    """Aggregate over every user who consented (only they have rows): the item-average signal of BR-CONSENT-03.
+    Cached with a short TTL and invalidated on signal writes/erasure to avoid full-table scans per plan."""
+    key = _cache_db_key(session)
+    now = pytime.monotonic()
+    with _pop_lock:
+        cached = _pop_cache.get(key)
+    if cached is not None and now < cached[0]:
+        if not cached[1] or bool(session.execute(text("SELECT EXISTS (SELECT 1 FROM interactions LIMIT 1)")).scalar()):
+            return dict(cached[1])
+    fresh = _signals(session, None)
+    with _pop_lock:
+        _pop_cache[key] = (pytime.monotonic() + POPULARITY_TTL_S, fresh)
+    return dict(fresh)
 
 
 def personal_signals(session: Session, user_id: uuid.UUID) -> dict[uuid.UUID, RecipeSignal]:
     """The user's own history; callers read it only with a current consent (FR-15-17)."""
     return _signals(session, user_id)
+
+
+def export_interactions_since(
+    session: Session, *, user_ids: set[uuid.UUID], since_utc: datetime
+) -> list[TrainingInteractionRow]:
+    if not user_ids:
+        return []
+    rows = session.scalars(
+        select(Interaction)
+        .where(Interaction.user_id.in_(user_ids), Interaction.occurred_at >= since_utc)
+        .order_by(Interaction.occurred_at, Interaction.id)
+    )
+    return [
+        TrainingInteractionRow(
+            user_id=r.user_id,
+            recipe_id=r.recipe_id,
+            meal_plan_id=r.meal_plan_id,
+            meal_plan_item_id=r.meal_plan_item_id,
+            type=r.type,
+            position=r.position,
+            swap_reason=r.swap_reason,
+            ranker_version_id=r.ranker_version_id,
+            propensity=float(r.propensity) if r.propensity is not None else None,
+            occurred_at=r.occurred_at,
+        )
+        for r in rows
+    ]
 
 
 class EventsSubjectData:
@@ -188,7 +252,8 @@ class EventsSubjectData:
 
     def erase_purpose(self, session: Session, user_id: uuid.UUID, purpose: str) -> None:
         if purpose == PURPOSE:  # BR-CONSENT-04: withdrawing personalization deletes the behaviour data
-            session.execute(delete(Interaction).where(Interaction.user_id == user_id))
+            session.execute(text("SELECT public.erase_user_interactions(:u)"), {"u": user_id})
+            invalidate_popularity_cache(session)
 
     def erase_files(self, user_id: uuid.UUID) -> None:
         return None

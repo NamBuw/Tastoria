@@ -1,0 +1,48 @@
+@startuml
+title CL14a — Tầng giao diện: màn hình quét và kho (Expo)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Scan" as SN <<screen>> {
+  -images: list
+  +add(camera: boolean): void
+  +send(): void
+}
+class "ConfirmScan" as CF <<screen>> {
+  -scan: ScanOut
+  +confirm(): ScanConfirmResult
+  +discard(): ScanOut
+  +reload(): void
+}
+class "EditChip" as EC <<screen>> {
+  -item: ScanItemOut
+  +save(): void
+  +del(): void
+}
+class "Pantry" as PA <<screen>> {
+  -lots: PantryLotPage
+}
+class "EditLotSheet" as EL <<screen>> {
+  -lot: PantryLotOut
+  +patch(): PantryLotOut
+  +discard(): PantryLotOut
+}
+class "api/client" as CL <<module>> {
+  +call(p: Promise): T
+  +refreshSession(): AuthSession
+}
+
+CF *-- "0..*" EC
+PA *-- "0..1" EL
+SN ..> CL
+CF ..> CL
+PA ..> CL
+@enduml

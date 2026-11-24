@@ -3,46 +3,67 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
-import { api, call, type Schemas } from '@/api/client';
+import { api, ApiError, call, type Schemas } from '@/api/client';
+import { useSession } from '@/auth/session';
+import { getScopedKey } from './storage';
 
 type Session = Schemas['CookSession'];
-const KEY = (id: string) => `tastoria.cook.${id}`;
-const DONE = (id: string) => `tastoria.cook.${id}.done`;
+const KEY = (userId: string, id: string) => getScopedKey(userId, `cook.${id}`);
+const DONE = (userId: string, id: string) => getScopedKey(userId, `cook.${id}.done`);
 
 /**
- * Cook session with its schedule; the last copy is kept on the device so the timeline keeps running
- * without a connection and after a restart (UC19 13a, 13b).
+ * Cook session with its schedule; the last copy is kept on the device (scoped by userId) so the timeline
+ * keeps running on network loss (ApiError.status === 0) and after a restart (UC19 13a, 13b).
  */
 export function useCookSession(id: string) {
+  const { user, status } = useSession();
+  const userId = user?.id;
   return useQuery({
-    queryKey: ['cook', id],
+    queryKey: ['cook', id, userId ?? 'none'],
+    enabled: status === 'signedIn' && Boolean(userId && id),
     queryFn: async (): Promise<Session> => {
       try {
         const s = await call(api.GET('/cook-sessions/{id}', { params: { path: { id } } }));
-        AsyncStorage.setItem(KEY(id), JSON.stringify(s)).catch(() => {});
+        if (userId) AsyncStorage.setItem(KEY(userId, id), JSON.stringify(s)).catch(() => {});
         return s;
       } catch (e) {
-        const raw = await AsyncStorage.getItem(KEY(id)).catch(() => null);
-        if (raw) return JSON.parse(raw) as Session;
+        if (e instanceof ApiError && e.status === 0 && userId) {
+          const raw = await AsyncStorage.getItem(KEY(userId, id)).catch(() => null);
+          if (raw) return JSON.parse(raw) as Session;
+        }
         throw e;
       }
     },
   });
 }
 
-/** Steps the cook ticked as done ("Xong bước"), kept on the device. */
+/** Steps the cook ticked as done ("Xong bước"), kept per user on the device. */
 export function useDoneSteps(id: string) {
-  const [done, setDone] = useState<string[]>([]);
+  const { user } = useSession();
+  const userId = user?.id;
+  const scopeKey = `${userId ?? 'anon'}:${id}`;
+  const [doneState, setDoneState] = useState<{ scopeKey: string; steps: string[] }>({ scopeKey, steps: [] });
+  const done = doneState.scopeKey === scopeKey ? doneState.steps : [];
+
   useEffect(() => {
-    AsyncStorage.getItem(DONE(id))
-      .then((raw) => raw && setDone(JSON.parse(raw) as string[]))
+    if (!userId) return;
+    let alive = true;
+    AsyncStorage.getItem(DONE(userId, id))
+      .then((raw) => {
+        if (alive && raw) setDoneState({ scopeKey, steps: JSON.parse(raw) as string[] });
+      })
       .catch(() => {});
-  }, [id]);
+    return () => {
+      alive = false;
+    };
+  }, [userId, id, scopeKey]);
+
   const mark = (key: string) => {
-    setDone((cur) => {
-      const next = cur.includes(key) ? cur : [...cur, key];
-      AsyncStorage.setItem(DONE(id), JSON.stringify(next)).catch(() => {});
-      return next;
+    setDoneState((cur) => {
+      const base = cur.scopeKey === scopeKey ? cur.steps : [];
+      const next = base.includes(key) ? base : [...base, key];
+      if (userId) AsyncStorage.setItem(DONE(userId, id), JSON.stringify(next)).catch(() => {});
+      return { scopeKey, steps: next };
     });
   };
   return { done, mark };

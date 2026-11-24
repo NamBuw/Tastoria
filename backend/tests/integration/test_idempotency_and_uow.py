@@ -166,7 +166,7 @@ def test_uow_commit_rollback_and_hooks(tclient: TestClient, db) -> None:
     assert _count(db, "uow_fail") == 0
     assert _count(db, "uow_fail_keep") == 1  # ApiError(commit=True) keeps the writes
     assert _count(db, "uow_crash") == 0
-    assert tclient.hooks == ["ok"]  # after-commit hooks run only on success
+    assert tclient.hooks == ["ok", "fail_keep"]  # after-commit hooks run whenever commit() succeeds
 
 
 def test_commit_failure_is_not_reported_as_success(tclient: TestClient, db) -> None:

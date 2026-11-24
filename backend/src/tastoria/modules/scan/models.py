@@ -153,8 +153,12 @@ class Detection(Base):
     p_dung_som: Mapped[float | None] = mapped_column(REAL)
     p_dung_ngay: Mapped[float | None] = mapped_column(REAL)
     p_kiem_tra: Mapped[float | None] = mapped_column(REAL)
+    sub_species_slug: Mapped[str | None] = mapped_column(Text)
+    sub_species_conf: Mapped[float | None] = mapped_column(REAL)
+    safety_abstained: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=text("false"))
 
     __table_args__ = (
+        CheckConstraint("sub_species_conf IS NULL OR (sub_species_conf BETWEEN 0 AND 1)", name="sub_species_conf"),
         Index("ix_detections_scan_image_id", "scan_image_id"),
         Index("ix_detections_scan_item_id", "scan_item_id"),
     )

@@ -31,6 +31,7 @@ def clean_models(kb_engine, kb_clean):
 
     def wipe() -> None:
         with kb_engine.begin() as c:
+            c.exec_driver_sql("DELETE FROM ingredient_embeddings")
             c.exec_driver_sql("DELETE FROM model_deployments")
             c.exec_driver_sql("UPDATE scans SET detector_version_id = NULL, classifier_version_id = NULL")
             c.exec_driver_sql("UPDATE pantry_lots SET freshness_model_version_id = NULL")
@@ -178,3 +179,62 @@ def test_real_onnx_through_register_gate_deploy_worker_and_confirm(
     assert len(res.json()["created_lot_ids"]) == len([i for i in s["items"] if i["final_count"] != 0])
     with Session(kb_app.state.engine) as sess:
         assert mlops.active_version(sess, "detector").version == "yolo26n_640_none"
+
+
+def test_mlops_meal_calorie_and_mushroom_reload_and_single_query_readyz(
+    kb_client: TestClient, kb_db, kb_app, sm, storage_dir: Path, clean_models, tmp_path: Path
+) -> None:
+    import sys
+
+    unit_dir = str(Path(__file__).resolve().parents[1] / "unit")
+    if unit_dir not in sys.path:
+        sys.path.insert(0, unit_dir)
+    from test_m1_barcode_and_catalog_cache import _build_classifier_onnx
+    from test_scan_mushroom import _build_mushroom_test_onnx
+
+    from tastoria.modules.scan import runner
+
+    # 1. meal_calorie register -> gate -> deploy -> hot-reload -> redeploy evicts prior session
+    mc1 = _build_classifier_onnx(tmp_path / "mc1.onnx", 6)
+    mc2 = _build_classifier_onnx(tmp_path / "mc2.onnx", 6)
+    v1, _ = ops.register(sm, storage_dir, name="meal_calorie", version="mc_v1", artifact=mc1, metrics={}, preprocess_version=None, class_codes=None)
+    v2, _ = ops.register(sm, storage_dir, name="meal_calorie", version="mc_v2", artifact=mc2, metrics={}, preprocess_version=None, class_codes=None)
+    ok1, r1 = ops.gate(sm, storage_dir, name="meal_calorie", version="mc_v1")
+    ok2, r2 = ops.gate(sm, storage_dir, name="meal_calorie", version="mc_v2")
+    assert ok1, r1
+    assert ok2, r2
+
+    ops.deploy(sm, name="meal_calorie", version="mc_v1")
+    est1 = kb_app.state.meal_calorie.get_estimator()
+    assert est1 is not None and kb_app.state.meal_calorie._estimator_version_id == v1.id
+
+    ops.deploy(sm, name="meal_calorie", version="mc_v2")
+    est2 = kb_app.state.meal_calorie.get_estimator()
+    assert est2 is not None and kb_app.state.meal_calorie._estimator_version_id == v2.id
+    assert est2 is not est1
+
+    # 2. mushroom_classifier register -> gate -> deploy -> runner.build_context loads via MLOps & active_versions_map
+    mush_art = _build_mushroom_test_onnx(tmp_path / "mush.onnx")
+    mv, _ = ops.register(sm, storage_dir, name="mushroom_classifier", version="mush_v1", artifact=mush_art, metrics={}, preprocess_version=None, class_codes=None)
+    mok, mr = ops.gate(sm, storage_dir, name="mushroom_classifier", version="mush_v1")
+    assert mok, mr
+    ops.deploy(sm, name="mushroom_classifier", version="mush_v1")
+
+    with Session(kb_app.state.engine) as sess:
+        active_map = mlops.active_versions_map(sess)
+        assert active_map["meal_calorie"].id == v2.id
+        assert active_map["mushroom_classifier"].id == mv.id
+
+    assert kb_client.get("/readyz").json()["checks"]["models"] == "ok"
+
+    # Verify runner.build_context loads MLOps-deployed mushroom_classifier (requires a detector version too)
+    if (REPO_ROOT / "ml/runs/detect/yolo26n_640_none/weights/best.onnx").exists():
+        det_art = tmp_path / "best.onnx"
+        shutil.copyfile(REPO_ROOT / "ml/runs/detect/yolo26n_640_none/weights/best.onnx", det_art)
+        dm = json.loads((REPO_ROOT / "data/processed/cv/detector/yolo26n_640_none.json").read_text())
+        dm["serving"] = json.loads((REPO_ROOT / "data/processed/cv/detector/yolo26n_640_none_serving.json").read_text())
+        ops.register(sm, storage_dir, name="detector", version="det_m6", artifact=det_art, metrics=dm, preprocess_version="none", class_codes=None)
+        ops.gate(sm, storage_dir, name="detector", version="det_m6")
+        ops.deploy(sm, name="detector", version="det_m6")
+        ctx = runner.build_context(kb_app.state.settings, sm, kb_app.state.scan.queue)
+        assert ctx.mushroom_classifier is not None

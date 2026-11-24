@@ -106,3 +106,27 @@ def test_week_53_when_it_exists(kb_client: TestClient) -> None:
     h = user(kb_client)
     r = kb_client.get(f"{API}/journal", params={"week": "2026-W53"}, headers=h)
     assert r.status_code == 200 and r.json()["days"][0]["date"] == "2026-12-28"
+    body = r.json()
+    assert body["macros"] == {"protein_g": 0.0, "carbs_g": 0.0, "fat_g": 0.0, "fiber_g": 0.0}
+    assert body["cooked_history"] == []
+
+
+def test_journal_macros_and_cooked_history(kb_client: TestClient, kb_db) -> None:
+    h = user(kb_client, "health_profile")
+    kb_client.put(f"{API}/me/energy-target", json={"kcal_target": 2000, "kcal_source": "user"}, headers=h)
+    done = _cooked_tray(kb_client, h, kb_db)
+    tz = q(kb_db, "SELECT timezone FROM user_settings").scalar()
+    local = datetime.fromisoformat(done["session"]["completed_at"]).astimezone(ZoneInfo(tz)).date()
+    wk = kb_client.get(f"{API}/journal", params={"week": _week_of(local)}, headers=h).json()
+    day = next(d for d in wk["days"] if d["date"] == local.isoformat())
+    assert day["protein_g"] > 0 and day["carbs_g"] > 0 and day["fat_g"] > 0 and day["fiber_g"] >= 0
+    others = [d for d in wk["days"] if d["date"] != local.isoformat()]
+    assert all(d["protein_g"] is None and d["carbs_g"] is None for d in others)
+    assert wk["macros"]["protein_g"] == pytest.approx(day["protein_g"], abs=0.2)
+    assert wk["macros"]["carbs_g"] == pytest.approx(day["carbs_g"], abs=0.2)
+    assert len(wk["cooked_history"]) == 1
+    hist = wk["cooked_history"][0]
+    assert hist["cook_session_id"] == done["session"]["id"]
+    assert hist["meal_plan_id"] == done["plan"]["id"]
+    assert len(hist["dishes"]) == len(done["plan"]["items"])
+    assert hist["macros"]["protein_g"] == pytest.approx(day["protein_g"], abs=0.2)

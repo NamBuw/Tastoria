@@ -91,3 +91,59 @@ def test_paired_bootstrap_identical_arms_is_zero():
 ])
 def test_equivalence(ci, verdict):
     assert de.equivalence(ci, 0.015) == verdict
+
+
+def test_remap_pred_classes_projects_v2_to_v1_and_drops_extra():
+    src = ["thit_bo", "ca", "tom", "dau_phu", "ca_chua", "mi_tom"]
+    dst = ["ca", "tom", "ca_chua"]
+    pred = {
+        "files": np.array(["a.jpg", "b.jpg"]),
+        "hw": np.array([[100, 100], [100, 100]]),
+        "img": np.array([0, 0, 0, 1, 1], dtype=np.int32),
+        "cls": np.array([0, 1, 4, 3, 5], dtype=np.int16),
+        "boxes": np.array(
+            [
+                [0, 0, 10, 10],
+                [1, 1, 11, 11],
+                [2, 2, 12, 12],
+                [3, 3, 13, 13],
+                [4, 4, 14, 14],
+            ],
+            dtype=np.float32,
+        ),
+        "scores": np.array([0.9, 0.8, 0.7, 0.6, 0.5], dtype=np.float32),
+        "names": np.array(src),
+    }
+    out = de.remap_pred_classes(pred, src, dst)
+    assert out["cls"].tolist() == [0, 2]
+    assert out["img"].tolist() == [0, 0]
+    assert out["scores"].tolist() == pytest.approx([0.8, 0.7])
+    assert out["names"].tolist() == dst
+
+
+def test_per_image_detection_metrics_and_cluster_aggregation():
+    gt = [
+        (np.array([[0, 0, 10, 10], [20, 20, 30, 30]], float), np.array([0, 1])),
+        (np.array([[0, 0, 10, 10]], float), np.array([0])),
+        (np.zeros((0, 4), float), np.zeros(0, int)),
+    ]
+    pred = _pred([
+        (0, 0, [0, 0, 10, 10], 0.9),   # TP
+        (0, 0, [50, 50, 60, 60], 0.8), # FP
+        (0, 1, [20, 20, 30, 30], 0.2), # below conf=0.5 -> FN for img 0
+        (1, 0, [0, 0, 10, 10], 0.9),   # TP
+        (2, 0, [0, 0, 10, 10], 0.9),   # FP on empty-GT image
+    ])
+    m = de.per_image_detection_metrics(pred, gt, conf=0.5, iou=0.5)
+    assert m["tp"].tolist() == [1, 1, 0]
+    assert m["fp"].tolist() == [1, 0, 1]
+    assert m["fn"].tolist() == [1, 0, 0]
+    assert m["f1"][0] == pytest.approx(0.5)
+    assert m["f1"][1] == pytest.approx(1.0)
+    assert m["f1"][2] == pytest.approx(0.0)
+
+    agg = de.aggregate_cluster_metrics(m, np.array([0, 0, 1]))
+    assert agg["tp"].tolist() == [2, 0]
+    assert agg["fp"].tolist() == [1, 1]
+    assert agg["fn"].tolist() == [1, 0]
+    assert agg["f1"][0] == pytest.approx(4 / 6)

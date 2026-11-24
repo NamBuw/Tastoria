@@ -63,7 +63,7 @@ def test_three_dish_tray_from_the_pantry(kb_client: TestClient, kb_db, h: dict) 
     assert sorted(i["slot"] for i in p["items"]) == ["canh", "man", "rau"]
     assert all(i["kcal_per_person"] and i["servings_scale"] > 0 and 0 <= i["rank_score"] <= 1 for i in p["items"])
     assert p["e_target_kcal"] is None and p["rice_bowls_per_person"] is None  # no health consent (BR-CONSENT-02)
-    h_ = float(q(kb_db, "SELECT current_setting('tastoria.kcal_half_width', true)").scalar() or "nan")
+    h_ = float(q(kb_db, "SELECT app_param('kcal_half_width')").scalar() or "nan")
     dishes = sum(i["kcal_per_person"] for i in p["items"])
     assert p["kcal_low"] == pytest.approx(dishes * (1 - h_), abs=0.2)  # FR-15-22, h from validation (BR-NUT-06)
     assert p["kcal_high"] == pytest.approx(dishes * (1 + h_), abs=0.2)
@@ -367,3 +367,21 @@ def test_swap_without_alternative(kb_client: TestClient, kb_db, h: dict) -> None
 
 def test_ingredient_id_helper_resolves(kb_db) -> None:
     assert uuid.UUID(ingredient_id(kb_db, "tỏi"))
+
+
+def test_get_plan_status_is_readonly_and_create_is_rate_limited(kb_client: TestClient, kb_db, h: dict) -> None:
+    stock_for(kb_client, h, kb_db, MAN, RAU, CANH)
+    p = plan(kb_client, h, meal="lunch")
+    clock.shift_for_tests(36 * 3600)
+    # GET reports expired cleanly without mutating DB row status during GET
+    assert kb_client.get(f"{API}/meal-plans/{p['id']}", headers=h).json()["status"] == "expired"
+    assert kb_client.get(f"{API}/meal-plans/latest", headers=h).status_code == 404
+    assert q(kb_db, "SELECT status FROM meal_plans WHERE id = :id", id=p["id"]).scalar() == "proposed"
+    clock.shift_for_tests(0)
+
+    # POST /meal-plans per-user rate limit (20 per 60s) — 1 plan already created above
+    for _ in range(19):
+        resp = kb_client.post(f"{API}/meal-plans", json={"meal": "dinner", "max_minutes": 120}, headers=h | key())
+        assert resp.status_code == 201
+    limited = kb_client.post(f"{API}/meal-plans", json={"meal": "dinner", "max_minutes": 120}, headers=h | key())
+    assert (limited.status_code, limited.json()["code"]) == (429, "rate_limited")

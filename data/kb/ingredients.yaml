@@ -3201,29 +3201,54 @@ ingredients:
   food_group: thit
   comp_source:
     source: fct2007
-    code: '7017'
-    source_name: Thịt lợn nạc
+    code: '7018'
+    source_name: Thịt lợn nửa nạc, nửa mỡ
     match: close
-    note: FCT 7017 'Thịt lợn nạc'.
+    note: Thịt nạc vai có dắt mỡ nên dùng FCT 7018 'Thịt lợn nửa nạc, nửa mỡ' (tách riêng với thịt nạc FCT 7017).
   is_staple: false
   countable: false
   units: []
   allergens: []
   synonyms:
     vi:
-    - thịt nạc
     - nạc vai
     - thịt nạc dăm
     en:
     - pork shoulder
     - pork butt
-    - lean pork
-    - pork loin
   shelf_life:
     days: 5
     basis: foodkeeper
     foodkeeper_id: 74
     foodkeeper_name: Pork — shoulder
+    note: Ngăn mát 3–5 ngày; lấy cận trên.
+- name_vi: thịt nạc
+  food_group: thit
+  comp_source:
+    source: fct2007
+    code: '7017'
+    source_name: Thịt lợn nạc
+    match: exact
+    note: FCT 7017 'Thịt lợn nạc' (thịt nạc thăn, nạc mông tách mỡ).
+  is_staple: false
+  countable: false
+  units: []
+  allergens: []
+  synonyms:
+    vi:
+    - thịt lợn nạc
+    - thịt heo nạc
+    - thịt thăn
+    - thịt nạc thăn
+    en:
+    - lean pork
+    - pork loin
+    - pork tenderloin
+  shelf_life:
+    days: 5
+    basis: foodkeeper
+    foodkeeper_id: 67
+    foodkeeper_name: Pork — tenderloin
     note: Ngăn mát 3–5 ngày; lấy cận trên.
 - name_vi: thịt băm
   food_group: thit

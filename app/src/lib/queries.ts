@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { api, call } from '@/api/client';
+import { api, call, type Schemas } from '@/api/client';
 import { useSession } from '@/auth/session';
 
 /** Query keys in one place so mutations invalidate the right lists. */
@@ -16,7 +16,30 @@ export const qk = {
   journal: (week: string) => ['journal', week] as const,
   session: (id: string) => ['cook', id] as const,
   recipe: (id: string) => ['recipe', id] as const,
+  recipes: (params: Record<string, unknown>) => ['recipes', params] as const,
+  adminDataRequests: (filters: Record<string, unknown> = {}) => ['admin', 'data-requests', filters] as const,
+  adminAuditLog: (filters: Record<string, unknown> = {}) => ['admin', 'audit-log', filters] as const,
+  adminModels: (filters: Record<string, unknown> = {}) => ['admin', 'models', filters] as const,
+  adminSurveys: ['admin', 'surveys'] as const,
+  authSessions: ['auth', 'sessions'] as const,
 };
+
+/** Follows keyset `next_cursor` pagination cleanly past 100 items. */
+export async function fetchAllPages<T>(
+  fetchPage: (cursor?: string) => Promise<{ items: T[]; next_cursor?: string | null }>,
+  maxPages = 20,
+): Promise<{ items: T[]; next_cursor: string | null }> {
+  const all: T[] = [];
+  let cursor: string | undefined;
+  let page = 0;
+  do {
+    const res = await fetchPage(cursor);
+    all.push(...(res.items ?? []));
+    cursor = res.next_cursor ?? undefined;
+    page += 1;
+  } while (cursor && page < maxPages);
+  return { items: all, next_cursor: cursor ?? null };
+}
 
 export function useReference() {
   return useQuery({
@@ -58,13 +81,15 @@ export function useHasConsent(purpose: 'health_profile' | 'personalization' | 'p
   return q.data?.items.some((i) => i.purpose_code === purpose && i.state === 'granted') ?? false;
 }
 
-/** Lots in stock (incl. not_seen), most urgent first. */
-export function useLots() {
+/** Lots in stock (incl. not_seen), sorted by urgency (default) or created_at, following all keyset pages. */
+export function useLots(sort: 'urgency' | 'created_at' = 'urgency') {
   const { status } = useSession();
   return useQuery({
-    queryKey: qk.lots('open'),
+    queryKey: sort === 'urgency' ? qk.lots('open') : qk.lots(`open-${sort}`),
     queryFn: () =>
-      call(api.GET('/pantry/lots', { params: { query: { status: ['in_stock', 'not_seen'], sort: 'urgency', limit: 100 } } })),
+      fetchAllPages((cursor) =>
+        call(api.GET('/pantry/lots', { params: { query: { status: ['in_stock', 'not_seen'], sort, cursor, limit: 100 } } })),
+      ),
     enabled: status === 'signedIn',
   });
 }
@@ -87,5 +112,86 @@ export function useLatestPlan(meal: 'lunch' | 'dinner') {
       return call(Promise.resolve(r));
     },
     enabled: status === 'signedIn',
+  });
+}
+
+export type RecipeListParams = {
+  q?: string;
+  slot?: 'man' | 'rau' | 'canh';
+  tag?: string;
+  method_code?: string;
+  max_minutes?: number;
+  max_kcal?: number;
+  pantry_match?: boolean;
+  cursor?: string;
+  limit?: number;
+};
+
+export function useRecipes(params: RecipeListParams = {}) {
+  const { status } = useSession();
+  return useQuery({
+    queryKey: qk.recipes(params),
+    queryFn: () => call(api.GET('/recipes', { params: { query: params } })),
+    enabled: status === 'signedIn',
+  });
+}
+
+export type AdminDataRequestFilters = {
+  status?: Schemas['DataRequestStatus'][];
+  type?: Schemas['DataRequestType'][];
+  cursor?: string;
+  limit?: number;
+};
+
+export function useAdminDataRequests(filters: AdminDataRequestFilters = {}) {
+  const { status, user } = useSession();
+  return useQuery({
+    queryKey: qk.adminDataRequests(filters),
+    queryFn: () => call(api.GET('/admin/data-requests', { params: { query: filters } })),
+    enabled: status === 'signedIn' && user?.role === 'admin',
+  });
+}
+
+export type AdminAuditLogFilters = {
+  actor_user_id?: string;
+  entity?: string;
+  action?: string;
+  from?: string;
+  to?: string;
+  cursor?: string;
+  limit?: number;
+};
+
+export function useAdminAuditLog(filters: AdminAuditLogFilters = {}) {
+  const { status, user } = useSession();
+  return useQuery({
+    queryKey: qk.adminAuditLog(filters),
+    queryFn: () => call(api.GET('/admin/audit-log', { params: { query: filters } })),
+    enabled: status === 'signedIn' && user?.role === 'admin',
+  });
+}
+
+export type AdminModelFilters = {
+  name?: Schemas['ModelName'];
+  status?: 'candidate' | 'validated' | 'rejected' | 'retired';
+  cursor?: string;
+  limit?: number;
+};
+
+export function useAdminModels(filters: AdminModelFilters = {}) {
+  const { status, user } = useSession();
+  return useQuery({
+    queryKey: qk.adminModels(filters),
+    queryFn: () => call(api.GET('/admin/models', { params: { query: filters } })),
+    enabled: status === 'signedIn' && user?.role === 'ml_operator',
+  });
+}
+
+export function useAdminSurveys(cursor?: string) {
+  const { status, user } = useSession();
+  return useQuery({
+    queryKey: cursor ? [...qk.adminSurveys, cursor] : qk.adminSurveys,
+    queryFn: () => call(api.GET('/admin/surveys', { params: { query: { cursor, limit: 50 } } })),
+    enabled: status === 'signedIn' && user?.role === 'ml_operator',
   });
 }

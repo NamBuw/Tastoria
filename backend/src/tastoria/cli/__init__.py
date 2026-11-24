@@ -54,26 +54,37 @@ def _db(args: argparse.Namespace) -> int:
 
 
 def _jobs(args: argparse.Namespace) -> int:
+    from pathlib import Path
+
     from tastoria.app import build_subject_handlers
     from tastoria.core.db import make_engine, make_sessionmaker
+    from tastoria.jobs.service import drain_email_outbox, purge_exports
     from tastoria.jobs.sweep import sweep
+    from tastoria.modules.identity.mailer import make_mailer
     from tastoria.modules.privacy.service import PrivacyDeps, process_pending
     from tastoria.modules.profile.service import ProfileDeps, make_cipher
 
     settings = get_settings()
+    if args.job == "purge-exports":
+        print(json.dumps(purge_exports(Path(settings.storage_dir))))
+        return 0
     engine = make_engine(settings.database_url, pool_size=1)
     sm = make_sessionmaker(engine)
     try:
         if args.job == "sweep":
             from tastoria.modules.scan.queue import ScanQueue
 
-            print(json.dumps(sweep(sm, ScanQueue(settings.valkey_url))))
+            q = ScanQueue(settings.valkey_url)
+            try:
+                print(json.dumps(sweep(sm, q)))
+            finally:
+                q.close()
         elif args.job == "purge-images":
-            from pathlib import Path
-
             from tastoria.jobs.purge_images import purge
 
             print(json.dumps(purge(sm, Path(settings.storage_dir))))
+        elif args.job == "drain-outbox":
+            print(json.dumps(drain_email_outbox(sm, make_mailer(settings))))
         else:
             deps = PrivacyDeps(
                 settings, sm, handlers=build_subject_handlers(ProfileDeps(settings, make_cipher(settings)))
@@ -240,10 +251,45 @@ def _mlops(args: argparse.Namespace) -> int:
             print(json.dumps({"passed": ok, "reasons": reasons}, ensure_ascii=False))
             return 0 if ok else 1
         elif args.mlops_cmd == "deploy":
-            res = ops.deploy(sm, name=args.name, version=args.version, only_if_none=args.if_none)
+            res = ops.deploy(
+                sm, name=args.name, version=args.version, only_if_none=args.if_none, storage_dir=storage
+            )
             print(json.dumps(res))
             if res["changed"]:
                 print("restart api + worker to load it: docker compose restart api worker", file=sys.stderr)
+        elif args.mlops_cmd == "import-embeddings":
+            print(json.dumps(ops.import_embeddings(sm, storage, version=args.version), ensure_ascii=False))
+        elif args.mlops_cmd == "export-training-data":
+            from tastoria.modules.admin.training_export import TrainingExportDeps, export_training_data
+            from tastoria.modules.events import service as events
+            from tastoria.modules.identity import service as identity
+            from tastoria.modules.scan import service as scan
+
+            out_base = Path(args.out) if args.out else storage / "training-exports"
+            deps = TrainingExportDeps(
+                active_user_ids=identity.active_user_ids,
+                export_interactions_since=events.export_interactions_since,
+                export_contributed_scans_since=scan.export_contributed_scans_since,
+            )
+            exp_res = export_training_data(
+                sm,
+                storage,
+                since_str=args.since,
+                out_base=out_base,
+                hmac_key=settings.training_export_hmac_key,
+                hmac_key_id=settings.training_export_hmac_key_id,
+                hmac_key_file=Path(args.hmac_key_file) if args.hmac_key_file else None,
+                dsr_hmac_key=settings.dsr_hmac_key,
+                tz_name=settings.timezone,
+                deps=deps,
+            )
+            out_json = {"ok": exp_res.ok, **exp_res.report}
+            if exp_res.errors:
+                out_json["errors"] = exp_res.errors
+                for e in exp_res.errors:
+                    print(e, file=sys.stderr)
+            print(json.dumps(out_json, ensure_ascii=False, indent=2))
+            return 0 if exp_res.ok else 1
         elif args.mlops_cmd == "rollback":
             print(json.dumps(ops.rollback(sm, name=args.name)))
             print("restart api + worker to load it: docker compose restart api worker", file=sys.stderr)
@@ -280,7 +326,7 @@ def main(argv: list[str] | None = None) -> int:
     db.add_argument("revision", nargs="?", default="head")
     db.set_defaults(func=_db)
     jobs = sub.add_parser("jobs", help="background jobs")
-    jobs.add_argument("job", choices=["process-dsr", "sweep", "purge-images"])
+    jobs.add_argument("job", choices=["process-dsr", "sweep", "purge-images", "drain-outbox", "purge-exports"])
     jobs.set_defaults(func=_jobs)
     cat = sub.add_parser("catalog", help="catalog bundle (UC25)")
     cat_sub = cat.add_subparsers(dest="catalog_cmd", required=True)
@@ -314,7 +360,18 @@ def main(argv: list[str] | None = None) -> int:
     ml = sub.add_parser("mlops", help="model versions (UC29, UC30)")
     ml_sub = ml.add_subparsers(dest="mlops_cmd", required=True)
     reg = ml_sub.add_parser("register", help="register an artifact as a candidate version")
-    reg.add_argument("name", choices=["detector", "freshness", "ranker", "substitution"])
+    reg.add_argument(
+        "name",
+        choices=[
+            "detector",
+            "freshness",
+            "ranker",
+            "substitution",
+            "meal_calorie",
+            "dish_classifier",
+            "mushroom_classifier",
+        ],
+    )
     reg.add_argument("artifact")
     reg.add_argument("--version", required=True)
     reg.add_argument("--metrics", default=None, help="JSON object or file (training / evaluation report)")
@@ -333,6 +390,12 @@ def main(argv: list[str] | None = None) -> int:
     rb.add_argument("name")
     ls = ml_sub.add_parser("list", help="model versions")
     ls.add_argument("name", nargs="?", default=None)
+    ie = ml_sub.add_parser("import-embeddings", help="sync substitution .npz embeddings into pgvector")
+    ie.add_argument("version", nargs="?", default=None, help="model version (default: active substitution deployment)")
+    exp = ml_sub.add_parser("export-training-data", help="export pseudonymized training data (UC28)")
+    exp.add_argument("--since", required=True, help="ISO date YYYY-MM-DD (inclusive in Asia/Ho_Chi_Minh)")
+    exp.add_argument("--out", default=None, help="base directory (default: STORAGE_DIR/training-exports)")
+    exp.add_argument("--hmac-key-file", default=None, help="optional file containing HMAC key (must be outside --out)")
     ml.set_defaults(func=_mlops)
     wk = sub.add_parser("worker", help="scan inference worker (RQ)")
     wk.add_argument("--check", action="store_true", help="healthcheck: exit 0 when this host's worker is registered")

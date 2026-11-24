@@ -1,21 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
-import { api, ApiError, call } from '@/api/client';
-import { goTab } from '@/lib/nav';
+import { api, ApiError, call, isCode } from '@/api/client';
 import { errorText } from '@/api/errors';
+import { useSession } from '@/auth/session';
 import { fmtG, SLOT_LABEL } from '@/components/domain';
 import { Button, Card, ErrorBox, Loading, Notice, Radio, Row, Screen, Section, T } from '@/components/ui';
 import { useCatalog } from '@/lib/catalog';
 import { fmtLeft, useCookSession, useNow } from '@/lib/cooking';
-import { enqueueComplete, flush, getCompleteOutcome, onOutboxChange, type CompleteOutcome } from '@/lib/outbox';
+import { goTab } from '@/lib/nav';
+import { clearCompleteOutcome, enqueueComplete, flush, getCompleteOutcome, onOutboxChange, type CompleteOutcome } from '@/lib/outbox';
 import { space } from '@/theme';
 
 /** Nấu xong một chạm (UC20) + hoàn tác trong 10 phút (UC21). */
 export default function Finished() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { user } = useSession();
+  const router = useRouter();
   const qc = useQueryClient();
   const session = useCookSession(id);
   const catalog = useCatalog();
@@ -29,7 +32,7 @@ export default function Finished() {
   const [confirmUndo, setConfirmUndo] = useState(false);
   const now = useNow();
 
-  const readOutcome = useCallback(() => getCompleteOutcome(id).then(setOutcome), [id]);
+  const readOutcome = useCallback(() => getCompleteOutcome(id, user?.id).then(setOutcome), [id, user?.id]);
   useEffect(() => {
     readOutcome();
     return onOutboxChange(() => {
@@ -48,15 +51,18 @@ export default function Finished() {
     const feedback = Object.entries(liked)
       .filter(([, v]) => v !== null && v !== undefined)
       .map(([meal_plan_item_id, v]) => ({ meal_plan_item_id, liked: v }));
-    await enqueueComplete(id, { completed_at: new Date().toISOString(), feedback });
+    await enqueueComplete(id, { completed_at: new Date().toISOString(), feedback }, user?.id);
     await readOutcome();
   };
 
   const undo = useMutation({
     mutationFn: () => call(api.POST('/cook-sessions/{id}/undo', { params: { path: { id } } })),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await clearCompleteOutcome(id, user?.id);
+      setOutcome(null);
       qc.invalidateQueries({ queryKey: ['lots'] });
       qc.invalidateQueries({ queryKey: ['plan'] });
+      qc.invalidateQueries({ queryKey: ['journal'] });
       qc.invalidateQueries({ queryKey: ['cook', id] });
       goTab('/mam');
     },
@@ -70,9 +76,12 @@ export default function Finished() {
   const left = deadline ? new Date(deadline).getTime() - now : 0;
   const completed = !!result || s?.status === 'completed';
 
-  if (s?.status === 'reverted' && !result) {
+  if (s?.status === 'reverted') {
     return (
-      <Screen>
+      <Screen testID="screen-reverted" variant="focused">
+        <T v="h1" accessibilityRole="header">
+          Đã hoàn tác
+        </T>
         <Notice>
           <T>Bữa này đã được hoàn tác; kho đã được trả lại.</T>
         </Notice>
@@ -85,19 +94,20 @@ export default function Finished() {
     return (
       <Screen
         testID="screen-finish"
+        variant="focused"
         footer={
-          outcome?.state === 'pending' ? (
+          outcome?.state === 'pending' && outcome.authRequired ? undefined : outcome?.state === 'pending' ? (
             <>
               <Notice>
                 <T>Đã ghi, sẽ đồng bộ khi có mạng. Kho chỉ bị trừ khi máy chủ nhận được.</T>
               </Notice>
-              <Button label="Gửi lại ngay" kind="secondary" onPress={() => flush()} />
+              <Button label="Gửi lại ngay" kind="secondary" onPress={() => flush(user?.id)} />
             </>
           ) : (
             <Button label="Nấu xong, trừ kho" testID="finish-submit" onPress={finish} />
           )
         }>
-        <T v="h2" accessibilityRole="header">
+        <T v="h1" accessibilityRole="header">
           Bữa nay thế nào?
         </T>
         <T tone="muted">Không bắt buộc. Chấm từng món giúp lần sau ghép mâm hợp gu hơn (chỉ lưu khi bạn đã đồng ý cá nhân hoá).</T>
@@ -116,8 +126,20 @@ export default function Finished() {
             </Row>
           </Card>
         ))}
-        {outcome?.state === 'failed' ? (
-          <ErrorBox message={errorText(new ApiError(outcome.status, outcome.problem as never))} />
+        {outcome?.state === 'pending' && outcome.authRequired ? (
+          <View style={{ gap: space.sm }}>
+            <ErrorBox message="Phiên đăng nhập hết hạn, đăng nhập lại để đồng bộ" />
+            <Button label="Đăng nhập lại" onPress={() => router.replace('/dang-nhap')} />
+          </View>
+        ) : outcome?.state === 'failed' ? (
+          outcome.status === 401 ? (
+            <View style={{ gap: space.sm }}>
+              <ErrorBox message="Phiên đăng nhập hết hạn, đăng nhập lại để đồng bộ" />
+              <Button label="Đăng nhập lại" onPress={() => router.replace('/dang-nhap')} />
+            </View>
+          ) : (
+            <ErrorBox message={errorText(new ApiError(outcome.status, outcome.problem as never))} />
+          )
         ) : null}
       </Screen>
     );
@@ -130,13 +152,16 @@ export default function Finished() {
     byIng.set(d.ingredient_id, { min: cur.min - d.delta_g_min, max: cur.max - d.delta_g_max, lots: cur.lots + 1 });
   });
   const ingName = (iid: string) => catalog.ingredients.get(iid)?.name_vi ?? 'Nguyên liệu';
+  const undoExpired = isCode(undo.error, 'undo_window_expired');
+  const canUndo = Boolean(deadline && left > 0 && !undoExpired);
 
   return (
     <Screen
       testID="screen-finished"
+      variant="focused"
       footer={
         <>
-          {deadline && left > 0 ? (
+          {canUndo ? (
             confirmUndo ? (
               <Notice tone="warn">
                 <T>Hoàn tác trừ kho của bữa này?</T>
@@ -154,18 +179,29 @@ export default function Finished() {
               />
             )
           ) : (
-            <T v="small" tone="muted">
-              Đã quá 10 phút để hoàn tác. Sửa từng lô trong Kho nếu trừ sai.
-            </T>
+            <Notice tone="warn">
+              <T v="small">
+                Đã quá 10 phút để hoàn tác. Sửa từng lô trong Kho nếu trừ sai.
+              </T>
+              {undoExpired ? <Button label="Mở Kho bếp" kind="secondary" onPress={() => goTab('/kho')} /> : null}
+            </Notice>
           )}
-          {undo.error ? <ErrorBox message={errorText(undo.error)} /> : null}
+          {undo.error && !undoExpired ? <ErrorBox message={errorText(undo.error)} /> : null}
           <Button label="Xem nhật ký tuần" onPress={() => goTab('/nhat-ky')} />
         </>
       }>
+      <T v="h1" accessibilityRole="header">
+        Hoàn tất bữa nấu
+      </T>
       <Notice tone="ok">
         <T v="title">Đã trừ khỏi kho</T>
         <T>Mâm đã ghi vào nhật ký.</T>
       </Notice>
+      {canUndo ? (
+        <T v="small" tone="muted" tabular testID="timer-value">
+          Cửa sổ hoàn tác còn {fmtLeft(left)}
+        </T>
+      ) : null}
       {result ? (
         <Section title="Đã dùng">
           <Card>
@@ -173,9 +209,9 @@ export default function Finished() {
               [...byIng.entries()].map(([iid, v]) => (
                 <Row key={iid} style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
                   <T style={{ flexShrink: 1 }}>{ingName(iid)}</T>
-                  <T v="label">
+                  <T v="label" tabular>
                     {fmtG(v.min, v.max)}
-                    {v.lots > 1 ? ` · ${v.lots} lô` : ''}
+                    {v.lots > 1 ? `, ${v.lots} lô` : ''}
                   </T>
                 </Row>
               ))
@@ -191,7 +227,7 @@ export default function Finished() {
         <Section title="Kho thiếu so với công thức">
           <View style={{ gap: space.xs }}>
             {result.shortfalls.map((sf) => (
-              <T key={sf.ingredient_id}>
+              <T key={sf.ingredient_id} tabular>
                 {ingName(sf.ingredient_id)}: thiếu khoảng {Math.round(sf.short_g)} g
               </T>
             ))}

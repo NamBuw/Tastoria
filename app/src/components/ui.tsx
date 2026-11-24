@@ -1,5 +1,4 @@
-import { type ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import {
   AccessibilityInfo,
   ActivityIndicator,
@@ -20,31 +19,63 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Circle } from 'react-native-svg';
 
-import { font, radius, size, space, TOUCH, useTheme } from '@/theme';
+import { containerMaxWidth, font, radius, size, space, TOUCH, useLayout, useTheme } from '@/theme';
+
+import { Icon } from './domain';
 
 // ---- text ---------------------------------------------------------------------------------------
 
 type Variant = 'body' | 'small' | 'label' | 'title' | 'h1' | 'h2' | 'huge';
 const VARIANTS: Record<Variant, TextStyle> = {
-  small: { fontSize: size.xs, lineHeight: 19, fontFamily: font.regular },
-  body: { fontSize: size.sm, lineHeight: 23, fontFamily: font.regular },
-  label: { fontSize: size.sm, lineHeight: 21, fontFamily: font.semibold },
-  title: { fontSize: size.md, lineHeight: 24, fontFamily: font.semibold, letterSpacing: -0.1 },
-  h2: { fontSize: size.lg, lineHeight: 27, fontFamily: font.bold, letterSpacing: -0.3 },
-  h1: { fontSize: size.xl, lineHeight: 32, fontFamily: font.bold, letterSpacing: -0.5 },
-  huge: { fontSize: size.huge, lineHeight: 44, fontFamily: font.bold, letterSpacing: -0.8 },
+  small: { fontSize: 13, lineHeight: 19, fontFamily: font.regular },
+  body: { fontSize: 15, lineHeight: 24, fontFamily: font.regular },
+  label: { fontSize: 15, lineHeight: 22, fontFamily: font.semibold },
+  title: { fontSize: 17, lineHeight: 24, fontFamily: font.semibold, letterSpacing: -0.2 },
+  h2: { fontSize: size.lg, lineHeight: 28, fontFamily: font.displaySemibold, letterSpacing: -0.3 },
+  h1: { fontSize: size.xl, lineHeight: 32, fontFamily: font.displaySemibold, letterSpacing: -0.4 },
+  huge: { fontSize: size.huge, lineHeight: 42, fontFamily: font.displaySemibold, letterSpacing: -0.6 },
 };
+
+type Tone =
+  | 'text'
+  | 'muted'
+  | 'accent'
+  | 'danger'
+  | 'onAccent'
+  | 'herb'
+  | 'onEditorial'
+  | 'onLime'
+  | 'onStory'
+  | 'onStoryMuted'
+  | 'info'
+  | 'warn';
 
 export function T({
   v = 'body',
   tone = 'text',
+  tabular,
+  'aria-level': ariaLevel,
   style,
   ...p
-}: TextProps & { v?: Variant; tone?: 'text' | 'muted' | 'accent' | 'danger' | 'onAccent' | 'herb' }) {
+}: TextProps & { v?: Variant; tone?: Tone; tabular?: boolean; 'aria-level'?: 1 | 2 | 3 | 4 | 5 | 6 }) {
   const { c } = useTheme();
-  return <Text {...p} style={[VARIANTS[v], { color: c[tone] }, style]} />;
+  const isHeader = p.accessibilityRole === 'header';
+  const defaultLevel = isHeader ? (v === 'h1' || v === 'huge' ? 1 : v === 'h2' ? 2 : 3) : undefined;
+  const level = ariaLevel ?? defaultLevel;
+  const webAria = Platform.OS === 'web' && level ? ({ 'aria-level': level } as object) : undefined;
+  return (
+    <Text
+      {...p}
+      {...webAria}
+      style={[
+        VARIANTS[v],
+        { color: c[tone] },
+        tabular ? { fontVariant: ['tabular-nums'] } : null,
+        style,
+      ]}
+    />
+  );
 }
 
 // ---- layout -------------------------------------------------------------------------------------
@@ -55,41 +86,151 @@ export function Screen({
   footer,
   testID,
   scrollKey,
+  variant = 'workspace',
 }: {
   children: ReactNode;
   scroll?: boolean;
   footer?: ReactNode;
   testID?: string;
-  /** Changing it remounts the scroll view, i.e. scrolls back to the top. */
   scrollKey?: string;
+  variant?: 'workspace' | 'focused';
 }) {
   const { c } = useTheme();
-  const inner = <View style={styles.inner}>{children}</View>;
+  const { width, padX } = useLayout();
+  const maxWidth = containerMaxWidth(width, variant);
+  const inner = (
+    <View
+      testID="screen-inner"
+      style={[styles.inner, maxWidth ? { maxWidth } : { maxWidth: '100%' }, !scroll ? { flex: 1 } : null]}>
+      {children}
+    </View>
+  );
   return (
-    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: c.bg }} testID={testID}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: 'transparent' }} testID={testID}>
       {scroll ? (
-        <ScrollView key={scrollKey} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          key={scrollKey}
+          contentContainerStyle={[styles.scroll, { paddingHorizontal: padX }]}
+          keyboardShouldPersistTaps="handled">
           {inner}
         </ScrollView>
       ) : (
-        <View style={[styles.scroll, { flex: 1 }]}>{inner}</View>
+        <View style={[styles.scroll, { flex: 1, paddingHorizontal: padX }]}>{inner}</View>
       )}
       {footer ? (
-        <View style={[styles.footer, { backgroundColor: c.bg, borderTopColor: c.hairline }]}>
-          <View style={styles.footerInner}>{footer}</View>
+        <View style={[styles.footer, { backgroundColor: c.surface, borderTopColor: c.hairline, paddingHorizontal: padX }]}>
+          <View style={[styles.footerInner, maxWidth ? { maxWidth } : { maxWidth: '100%' }]}>{footer}</View>
         </View>
       ) : null}
     </SafeAreaView>
   );
 }
 
-export function Card({ children, style, testID }: { children: ReactNode; style?: StyleProp<ViewStyle>; testID?: string }) {
+export function Card({
+  children,
+  style,
+  testID,
+  variant = 'default',
+}: {
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
+  variant?: 'default' | 'ledger';
+}) {
   const { c } = useTheme();
   return (
     <View
       testID={testID}
-      style={[styles.card, { backgroundColor: c.surface, borderColor: c.hairline, boxShadow: `0 1px 2px ${c.shadow}, 0 6px 16px -10px ${c.shadow}` }, style]}>
+      style={[
+        styles.card,
+        {
+          backgroundColor: c.surfaceCard,
+          borderColor: variant === 'ledger' ? c.border : c.hairline,
+          borderWidth: variant === 'ledger' ? 1.5 : 1,
+        },
+        style,
+      ]}>
       {children}
+    </View>
+  );
+}
+
+/**
+ * Broadsheet double-rule + dashed-inset frame inspired by vintage Vietnamese broadsheet print.
+ * Outer 1.5px solid sepia border (#5A432B) + 4px paper gutter + 1px dashed inner hairline (#6E5438).
+ */
+export function BroadsheetLedgerFrame({
+  title,
+  rightText,
+  accentTone = 'herb',
+  testID,
+  style,
+  innerStyle,
+  children,
+}: {
+  title?: string;
+  rightText?: string;
+  accentTone?: 'herb' | 'accent' | 'border';
+  testID?: string;
+  style?: StyleProp<ViewStyle>;
+  innerStyle?: StyleProp<ViewStyle>;
+  children: ReactNode;
+}) {
+  const { c } = useTheme();
+  const titleColor = accentTone === 'herb' ? c.herb : accentTone === 'accent' ? c.accent : c.text;
+  return (
+    <View
+      testID={testID}
+      style={[
+        {
+          borderWidth: 1.5,
+          borderColor: c.border,
+          borderRadius: radius.sm,
+          backgroundColor: c.surfaceCard,
+          padding: 4,
+        },
+        style,
+      ]}>
+      <View
+        style={[
+          {
+            borderWidth: 1,
+            borderStyle: 'dashed',
+            borderColor: c.borderDashed,
+            borderRadius: radius.sm,
+            padding: space.lg,
+            gap: space.md,
+          },
+          innerStyle,
+        ]}>
+        {title ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              alignItems: 'baseline',
+              borderBottomWidth: 1,
+              borderStyle: 'dotted',
+              borderBottomColor: c.borderDashed,
+              paddingBottom: space.xs,
+              gap: space.sm,
+            }}>
+            <T
+              v="h2"
+              accessibilityRole="header"
+              style={{ color: titleColor, fontFamily: font.displaySemibold, flexShrink: 1 }}>
+              {title}
+            </T>
+            {rightText ? (
+              <T v="small" tone="muted" tabular style={{ flexShrink: 0 }}>
+                {rightText}
+              </T>
+            ) : null}
+          </View>
+        ) : null}
+        {children}
+      </View>
     </View>
   );
 }
@@ -102,7 +243,7 @@ export function Section({ title, children, right }: { title: string; children: R
   return (
     <View style={{ gap: space.md }}>
       <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap', minHeight: 32 }}>
-        <T v="h2" accessibilityRole="header" style={{ flexShrink: 1, fontSize: 19 }}>
+        <T v="h2" accessibilityRole="header" style={{ flexShrink: 1 }}>
           {title}
         </T>
         {right}
@@ -121,9 +262,11 @@ export function Button({
   onPress,
   kind = 'primary',
   big,
+  compact,
   loading,
   disabled,
   icon,
+  iconRight,
   sub,
   testID,
   style,
@@ -133,9 +276,11 @@ export function Button({
   onPress?: () => void;
   kind?: BtnKind;
   big?: boolean;
+  compact?: boolean;
   loading?: boolean;
   disabled?: boolean;
   icon?: ReactNode;
+  iconRight?: ReactNode;
   sub?: string;
   testID?: string;
   style?: StyleProp<ViewStyle>;
@@ -143,9 +288,30 @@ export function Button({
 }) {
   const { c } = useTheme();
   const off = disabled || loading;
-  const bg = kind === 'primary' ? c.accent : kind === 'danger' ? c.danger : kind === 'secondary' ? c.surface : 'transparent';
-  const fg = kind === 'primary' || kind === 'danger' ? c.onAccent : kind === 'secondary' ? c.text : c.accent;
-  const border = kind === 'secondary' ? c.border : 'transparent';
+  const bg =
+    off && (kind === 'primary' || kind === 'danger')
+      ? c.surfaceAlt
+      : kind === 'primary'
+        ? c.accent
+        : kind === 'danger'
+          ? c.danger
+          : kind === 'secondary'
+            ? c.surface
+            : 'transparent';
+  const fg =
+    off && (kind === 'primary' || kind === 'danger')
+      ? c.muted
+      : kind === 'primary' || kind === 'danger'
+        ? c.onAccent
+        : kind === 'secondary'
+          ? c.text
+          : c.accent;
+  const border =
+    off && (kind === 'primary' || kind === 'danger')
+      ? c.hairline
+      : kind === 'secondary'
+        ? c.border
+        : 'transparent';
   return (
     <Pressable
       testID={testID}
@@ -157,15 +323,32 @@ export function Button({
       style={({ pressed }) => [
         styles.btn,
         big && styles.btnBig,
-        { backgroundColor: bg, borderColor: border, opacity: off ? 0.5 : 1, transform: [{ scale: pressed && !off ? 0.98 : 1 }] },
-        kind === 'primary' && !off ? { boxShadow: `0 6px 14px -8px ${c.accent}` } : null,
+        compact && { minHeight: 38, paddingHorizontal: space.md, paddingVertical: 6 },
+        {
+          backgroundColor:
+            pressed && !off && kind === 'primary'
+              ? c.accentDisplay
+              : pressed && !off && kind === 'secondary'
+                ? c.surfaceAlt
+                : bg,
+          borderColor: border,
+          opacity: off && kind === 'secondary' ? 0.55 : 1,
+          transform: [{ scale: pressed && !off ? 0.98 : 1 }],
+        },
         style,
       ]}>
       {loading ? <ActivityIndicator color={fg} /> : icon}
       <View style={{ alignItems: big && icon ? 'flex-start' : 'center', flexShrink: 1 }}>
-        <Text style={[big ? VARIANTS.h2 : VARIANTS.label, { color: fg, textAlign: 'center' }]}>{label}</Text>
+        <Text
+          style={[
+            big ? VARIANTS.title : VARIANTS.label,
+            { color: fg, textAlign: 'center', fontSize: compact ? size.sm : size.md, lineHeight: compact ? 20 : 24 },
+          ]}>
+          {label}
+        </Text>
         {sub ? <Text style={[VARIANTS.small, { color: fg }]}>{sub}</Text> : null}
       </View>
+      {!loading ? iconRight : null}
     </Pressable>
   );
 }
@@ -178,7 +361,7 @@ export function LinkButton({ label, onPress, testID }: { label: string; onPress:
       accessibilityRole="link"
       onPress={onPress}
       style={{ minHeight: TOUCH, justifyContent: 'center', paddingHorizontal: space.xs }}>
-      <Text style={[VARIANTS.label, { color: c.accent, textDecorationLine: 'underline' }]}>{label}</Text>
+      <Text style={[VARIANTS.label, { color: c.accent }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -213,18 +396,19 @@ export function Chip({
         {
           backgroundColor: selected ? c.accentSoft : c.surface,
           borderColor: selected ? c.accent : c.hairline,
-          borderWidth: selected ? 1.5 : 1,
+          borderWidth: 1,
           opacity: disabled ? 0.5 : pressed ? 0.85 : 1,
         },
       ]}>
-      {selected ? <Text style={[VARIANTS.label, { color: c.accent }]}>✓</Text> : null}
+      {selected ? <Icon name="check" size={16} color={c.accent} /> : null}
       {left}
-      <Text style={[VARIANTS.body, { color: c.text, flexShrink: 1 }]}>{label}</Text>
+      <Text style={[selected ? VARIANTS.label : VARIANTS.body, { color: selected ? c.accent : c.text, flexShrink: 1 }]}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
 
-/** A labelled group of radios: a wrapping row, or a column with the given gap. */
 export function Segmented<V extends string | number | boolean | null>({
   options,
   value,
@@ -259,12 +443,190 @@ export function Radio({ label, selected, onPress }: { label: string; selected: b
       accessibilityState={{ selected, checked: selected }}
       style={[
         styles.chip,
-        { backgroundColor: selected ? c.accentSoft : c.surface, borderColor: selected ? c.accent : c.hairline, borderWidth: selected ? 1.5 : 1 },
+        { backgroundColor: selected ? c.accentSoft : c.surface, borderColor: selected ? c.accent : c.hairline, borderWidth: 1 },
       ]}>
       <View style={[styles.radioDot, { borderColor: selected ? c.accent : c.border }]}>
         {selected ? <View style={[styles.radioInner, { backgroundColor: c.accent }]} /> : null}
       </View>
-      <Text style={[VARIANTS.body, { color: c.text }]}>{label}</Text>
+      <Text style={[selected ? VARIANTS.label : VARIANTS.body, { color: c.text, flexShrink: 1 }]}>{label}</Text>
+    </Pressable>
+  );
+}
+
+export function UnderlineTabs<V extends string>({
+  options,
+  value,
+  onChange,
+  label,
+}: {
+  options: readonly (readonly [V, string, string?])[];
+  value: V;
+  onChange: (v: V) => void;
+  label?: string;
+}) {
+  const { c } = useTheme();
+  return (
+    <View
+      accessibilityRole="tablist"
+      accessibilityLabel={label}
+      style={{
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        borderBottomWidth: 1,
+        borderBottomColor: c.hairline,
+        gap: space.lg,
+      }}>
+      {options.map(([v, lbl, tid]) => {
+        const active = value === v;
+        return (
+          <Pressable
+            key={v}
+            testID={tid}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: active }}
+            onPress={() => onChange(v)}
+            style={({ pressed }) => ({
+              minHeight: 44,
+              justifyContent: 'center',
+              paddingVertical: space.sm,
+              paddingHorizontal: 2,
+              borderBottomWidth: 2,
+              borderBottomColor: active ? c.accent : 'transparent',
+              marginBottom: -1,
+              opacity: pressed ? 0.75 : 1,
+            })}>
+            <Text style={[active ? VARIANTS.label : VARIANTS.body, { color: active ? c.text : c.muted }]}>
+              {lbl}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+export function HairlineSegmented<V extends string | number>({
+  options,
+  value,
+  onChange,
+  label,
+  testID,
+  disabled,
+}: {
+  options: readonly (readonly [V, string])[];
+  value: V;
+  onChange: (v: V) => void;
+  label?: string;
+  testID?: string;
+  disabled?: boolean;
+}) {
+  const { c } = useTheme();
+  return (
+    <View style={{ gap: space.xs, opacity: disabled ? 0.6 : 1 }}>
+      {label ? <T v="small" tone="muted">{label}</T> : null}
+      <View
+        testID={testID}
+        accessibilityRole="radiogroup"
+        accessibilityLabel={label}
+        style={{
+          flexDirection: 'row',
+          borderWidth: 1,
+          borderColor: c.hairline,
+          borderRadius: radius.sm,
+          overflow: 'hidden',
+          backgroundColor: c.surface,
+        }}>
+        {options.map(([v, lbl], idx) => {
+          const active = value === v;
+          return (
+            <Pressable
+              key={String(v)}
+              disabled={disabled}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: active, checked: active, disabled }}
+              onPress={() => onChange(v)}
+              style={({ pressed }) => ({
+                flex: 1,
+                minHeight: 44,
+                paddingHorizontal: space.sm,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderLeftWidth: idx > 0 ? 1 : 0,
+                borderLeftColor: c.hairline,
+                backgroundColor: active ? c.accentSoft : pressed && !disabled ? c.surfaceAlt : c.surface,
+              })}>
+              <Text
+                numberOfLines={2}
+                style={[
+                  active ? VARIANTS.label : VARIANTS.body,
+                  { color: active ? c.accent : c.text, textAlign: 'center', fontVariant: ['tabular-nums'] },
+                ]}>
+                {lbl}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+export function ReceiptCheckRow({
+  label,
+  rightText,
+  checked,
+  onPress,
+  testID,
+  first,
+}: {
+  label: string;
+  rightText: string;
+  checked: boolean;
+  onPress: () => void;
+  testID?: string;
+  first?: boolean;
+}) {
+  const { c } = useTheme();
+  return (
+    <Pressable
+      testID={testID}
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked }}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        minHeight: 44,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: space.sm,
+        paddingVertical: space.xs,
+        paddingHorizontal: space.xs,
+        borderTopWidth: first ? 1 : 0,
+        borderBottomWidth: 1,
+        borderColor: c.hairline,
+        backgroundColor: checked ? c.accentSoft : pressed ? c.surfaceAlt : 'transparent',
+      })}>
+      <Row gap={space.sm} style={{ flex: 1, minWidth: 0, flexWrap: 'nowrap' }}>
+        <View
+          style={{
+            width: 18,
+            height: 18,
+            borderRadius: radius.sm,
+            borderWidth: 1.5,
+            borderColor: checked ? c.accent : c.border,
+            backgroundColor: checked ? c.accent : c.surface,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          {checked ? <Icon name="check" size={12} color={c.onAccent} /> : null}
+        </View>
+        <Text style={[checked ? VARIANTS.label : VARIANTS.body, { color: c.text, flexShrink: 1 }]}>
+          {label}
+        </Text>
+      </Row>
+      <Text style={[VARIANTS.label, { color: checked ? c.accent : c.muted, fontVariant: ['tabular-nums'] }]}>
+        {rightText}
+      </Text>
     </Pressable>
   );
 }
@@ -275,27 +637,37 @@ export function Checkbox({
   label,
   sub,
   testID,
+  disabled,
 }: {
   checked: boolean;
   onChange: (v: boolean) => void;
   label: string;
   sub?: ReactNode;
   testID?: string;
+  disabled?: boolean;
 }) {
   const { c } = useTheme();
   return (
     <Pressable
       testID={testID}
+      disabled={disabled}
       onPress={() => onChange(!checked)}
       accessibilityRole="checkbox"
-      accessibilityState={{ checked }}
-      style={{ flexDirection: 'row', gap: space.md, minHeight: TOUCH, alignItems: 'flex-start', paddingVertical: space.sm }}>
+      accessibilityState={{ checked, disabled }}
+      style={{
+        flexDirection: 'row',
+        gap: space.md,
+        minHeight: TOUCH,
+        alignItems: 'flex-start',
+        paddingVertical: space.sm,
+        opacity: disabled ? 0.55 : 1,
+      }}>
       <View
         style={[
           styles.box,
-          { borderColor: checked ? c.accent : c.border, backgroundColor: checked ? c.accent : 'transparent' },
+          { borderColor: checked ? c.accent : c.border, backgroundColor: checked ? c.accent : c.surface },
         ]}>
-        {checked ? <Text style={{ color: c.onAccent, fontFamily: font.bold, fontSize: 16 }}>✓</Text> : null}
+        {checked ? <Icon name="check" size={16} color={c.onAccent} /> : null}
       </View>
       <View style={{ flex: 1, gap: 2 }}>
         <T v="label">{label}</T>
@@ -315,16 +687,20 @@ export function Field({
   ...p
 }: TextInputProps & { label: string; error?: string; hint?: string }) {
   const { c } = useTheme();
+  const labelId = useId();
   return (
     <View style={{ gap: space.xs }}>
-      <T v="label">{label}</T>
+      <T v="label" nativeID={labelId}>
+        {label}
+      </T>
       <TextInput
         accessibilityLabel={label}
+        aria-labelledby={labelId}
         placeholderTextColor={c.muted}
         {...p}
         style={[
           styles.input,
-          { borderColor: error ? c.danger : c.border, color: c.text, backgroundColor: c.surface },
+          { borderColor: error ? c.danger : c.hairline, color: c.text, backgroundColor: c.surface },
           style,
         ]}
       />
@@ -358,29 +734,29 @@ export function Stepper({
   testID?: string;
 }) {
   const { c } = useTheme();
-  const btn = (txt: string, next: number, a11y: string) => (
+  const btn = (kind: 'plus' | 'minus', next: number, a11y: string) => (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={a11y}
       disabled={next < min || next > max}
       onPress={() => onChange(next)}
-      testID={testID ? `${testID}-${txt === '+' ? 'plus' : 'minus'}` : undefined}
+      testID={testID ? `${testID}-${kind}` : undefined}
       style={({ pressed }) => [
         styles.stepBtn,
-        { borderColor: c.border, backgroundColor: c.surface, opacity: next < min || next > max ? 0.4 : pressed ? 0.8 : 1 },
+        { borderColor: c.hairline, backgroundColor: c.surface, opacity: next < min || next > max ? 0.4 : pressed ? 0.8 : 1 },
       ]}>
-      <Text style={[VARIANTS.h2, { color: c.accent }]}>{txt}</Text>
+      <Icon name={kind} size={18} color={c.text} />
     </Pressable>
   );
   return (
     <View style={{ gap: space.xs }}>
       <T v="label">{label}</T>
       <Row gap={space.md} style={{ flexWrap: 'nowrap' }}>
-        {btn('−', value - step, `Giảm ${label.toLowerCase()}`)}
-        <T v="h2" style={{ minWidth: 64, textAlign: 'center' }} accessibilityLiveRegion="polite">
+        {btn('minus', value - step, `Giảm ${label.toLowerCase()}`)}
+        <T v="h2" tabular style={{ minWidth: 64, textAlign: 'center' }} accessibilityLiveRegion="polite">
           {format ? format(value) : value}
         </T>
-        {btn('+', value + step, `Tăng ${label.toLowerCase()}`)}
+        {btn('plus', value + step, `Tăng ${label.toLowerCase()}`)}
       </Row>
     </View>
   );
@@ -388,7 +764,6 @@ export function Stepper({
 
 // ---- states -------------------------------------------------------------------------------------
 
-/** Loading placeholder: shimmering skeleton rows shaped like the content, with a spoken label. */
 export function Loading({ label = 'Đang tải…', rows = 2 }: { label?: string; rows?: number }) {
   return (
     <View style={{ gap: space.sm }} accessibilityLiveRegion="polite" accessibilityLabel={label} accessibilityRole="progressbar">
@@ -418,19 +793,18 @@ export function Skeleton({ height = 16, width = '100%', r = radius.md }: { heigh
   return <Animated.View style={{ height, width, borderRadius: r, backgroundColor: c.surfaceAlt, opacity: o }} />;
 }
 
-/** Shared "reduce motion" flag, read once. */
 const reduceMotion = { current: false as boolean | null };
 AccessibilityInfo?.isReduceMotionEnabled?.().then((v) => (reduceMotion.current = v)).catch(() => undefined);
 
-/** One-shot entrance: content rises 8 dp and fades in once when it first mounts. */
 export function Rise({ children, delay = 0, style }: { children: ReactNode; delay?: number; style?: StyleProp<ViewStyle> }) {
   const [v] = useState(() => new Animated.Value(reduceMotion.current ? 1 : 0));
   useEffect(() => {
+    if (reduceMotion.current) return;
     Animated.timing(v, {
       toValue: 1,
-      duration: 380,
+      duration: 300,
       delay,
-      easing: Easing.out(Easing.cubic),
+      easing: Easing.bezier(0.22, 1, 0.36, 1),
       useNativeDriver: Platform.OS !== 'web',
     }).start();
   }, [v, delay]);
@@ -447,37 +821,61 @@ export function ErrorBox({ message, onRetry }: { message: string; onRetry?: () =
     <View
       accessibilityRole="alert"
       style={[styles.card, { backgroundColor: c.dangerSoft, borderColor: c.danger, gap: space.sm }]}>
-      <T>{message}</T>
+      <Row gap={space.sm} style={{ flexWrap: 'nowrap', alignItems: 'flex-start' }}>
+        <View style={{ paddingTop: 2 }}>
+          <Icon name="alert-triangle" size={18} color={c.danger} />
+        </View>
+        <T style={{ flex: 1 }}>{message}</T>
+      </Row>
       {onRetry ? <Button kind="secondary" label="Thử lại" onPress={onRetry} /> : null}
     </View>
   );
 }
 
-export function Notice({ children, tone = 'info' }: { children: ReactNode; tone?: 'info' | 'ok' | 'warn' }) {
+export function Notice({ children, tone = 'info', testID }: { children: ReactNode; tone?: 'info' | 'ok' | 'warn'; testID?: string }) {
   const { c } = useTheme();
   const bg = tone === 'ok' ? c.okSoft : tone === 'warn' ? c.warnSoft : c.surfaceAlt;
-  const bar = tone === 'ok' ? c.herb : tone === 'warn' ? c.fresh.dung_som : c.border;
+  const border = tone === 'ok' ? c.herbSoft : tone === 'warn' ? c.warnSoft : c.hairline;
   return (
-    <View style={[styles.card, { backgroundColor: bg, borderColor: 'transparent', borderLeftColor: bar, borderLeftWidth: 4, gap: space.xs }]}>
+    <View
+      testID={testID}
+      style={[styles.card, { backgroundColor: bg, borderColor: border, borderRadius: radius.md, padding: space.md, gap: space.xs }]}>
       {children}
     </View>
   );
 }
 
-/** Empty state: a small empty plate drawing, what is missing, and the next action. */
 export function Empty({ title, body, action }: { title: string; body?: string; action?: ReactNode }) {
   const { c } = useTheme();
   return (
     <View
-      style={[styles.card, { backgroundColor: 'transparent', borderColor: c.border, borderStyle: 'dashed', alignItems: 'center', paddingVertical: space.xl, gap: space.sm }]}>
-      <Svg width={72} height={72} viewBox="0 0 72 72" accessibilityElementsHidden importantForAccessibility="no">
-        <Circle cx="36" cy="36" r="30" fill={c.dish} stroke={c.glaze} strokeWidth="2.5" />
-        <Circle cx="36" cy="36" r="24" fill="none" stroke={c.glaze} strokeWidth="1" strokeDasharray="2 4" />
-        <Circle cx="36" cy="36" r="14" fill="none" stroke={c.hairline} strokeWidth="1.5" />
-      </Svg>
-      <T v="title" style={{ textAlign: 'center' }}>{title}</T>
-      {body ? <T tone="muted" style={{ textAlign: 'center', maxWidth: 320 }}>{body}</T> : null}
-      {action}
+      style={[
+        styles.card,
+        {
+          backgroundColor: c.surfaceAlt,
+          borderColor: c.hairline,
+          alignItems: 'center',
+          paddingVertical: space.xxl,
+          paddingHorizontal: space.xl,
+          gap: space.md,
+        },
+      ]}>
+      <View
+        style={{
+          width: 48,
+          height: 48,
+          borderRadius: radius.md,
+          backgroundColor: c.accentSoft,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <Icon name="tray" size={22} color={c.accent} />
+      </View>
+      <View style={{ gap: space.xs, alignItems: 'center' }}>
+        <T v="title" style={{ textAlign: 'center' }}>{title}</T>
+        {body ? <T tone="muted" style={{ textAlign: 'center', maxWidth: 360 }}>{body}</T> : null}
+      </View>
+      {action ? <View style={{ marginTop: space.xs }}>{action}</View> : null}
     </View>
   );
 }
@@ -498,15 +896,24 @@ export function Sheet({
   testID?: string;
 }) {
   const { c } = useTheme();
+  const { isTabletUp } = useLayout();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={[styles.overlay, { backgroundColor: c.overlay }]}>
+      <View style={[styles.overlay, { backgroundColor: c.overlay, justifyContent: isTabletUp ? 'center' : 'flex-end', padding: isTabletUp ? space.xl : 0 }]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel="Đóng" />
         <View
           testID={testID}
           accessibilityViewIsModal
-          style={[styles.sheet, { backgroundColor: c.bg, borderColor: c.hairline }]}>
-          <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: c.border, marginTop: -4 }} />
+            style={[
+              styles.sheet,
+              {
+                backgroundColor: c.surface,
+                borderColor: c.hairline,
+                maxWidth: isTabletUp ? 560 : undefined,
+                borderRadius: isTabletUp ? radius.lg : undefined,
+              },
+            ]}>
+          {!isTabletUp ? <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: radius.sm, backgroundColor: c.hairline, marginTop: -4 }} /> : null}
           <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
             <T v="h2" accessibilityRole="header" style={{ flexShrink: 1 }}>
               {title}
@@ -516,7 +923,7 @@ export function Sheet({
               accessibilityRole="button"
               accessibilityLabel="Đóng"
               style={{ minWidth: TOUCH, minHeight: TOUCH, alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={[VARIANTS.h2, { color: c.muted }]}>×</Text>
+              <Icon name="close" size={20} color={c.muted} />
             </Pressable>
           </Row>
           <ScrollView contentContainerStyle={{ gap: space.md, paddingBottom: space.lg }} keyboardShouldPersistTaps="handled">
@@ -539,7 +946,7 @@ export function ProgressDots({ step, total, label }: { step: number; total: numb
         {Array.from({ length: total }, (_, i) => (
           <View
             key={i}
-            style={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: i < step ? c.accent : c.surfaceAlt }}
+            style={{ flex: 1, height: 6, borderRadius: radius.sm, backgroundColor: i < step ? c.accent : c.surfaceAlt }}
           />
         ))}
       </View>
@@ -549,47 +956,50 @@ export function ProgressDots({ step, total, label }: { step: number; total: numb
 
 const styles = StyleSheet.create({
   scroll: { flexGrow: 1, paddingHorizontal: space.lg, paddingTop: space.lg, paddingBottom: space.xxl },
-  inner: { width: '100%', maxWidth: 560, alignSelf: 'center', gap: space.xl },
-  footer: { borderTopWidth: StyleSheet.hairlineWidth, paddingHorizontal: space.lg, paddingVertical: space.md },
-  footerInner: { width: '100%', maxWidth: 560, alignSelf: 'center', gap: space.sm },
-  card: { borderRadius: radius.lg, borderWidth: 1, padding: space.lg, gap: space.sm },
+  inner: { width: '100%', alignSelf: 'center', gap: space.xl },
+  footer: { borderTopWidth: 1, paddingHorizontal: space.lg, paddingVertical: space.md },
+  footerInner: { width: '100%', alignSelf: 'center', gap: space.sm },
+  card: { borderRadius: radius.md, borderWidth: 1, padding: space.lg, gap: space.sm },
   btn: {
     minHeight: TOUCH,
-    borderRadius: radius.pill,
-    borderWidth: 1.5,
-    paddingHorizontal: space.xl,
+    maxWidth: '100%',
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    paddingHorizontal: space.lg,
     paddingVertical: space.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: space.sm,
   },
-  btnBig: { minHeight: 76, borderRadius: radius.lg, justifyContent: 'flex-start', paddingHorizontal: space.lg, gap: space.md },
+  btnBig: { minHeight: 68, borderRadius: radius.md, justifyContent: 'flex-start', paddingHorizontal: space.lg, gap: space.md },
   chip: {
-    minHeight: TOUCH,
-    borderRadius: radius.pill,
+    minHeight: 40,
+    maxWidth: '100%',
+    borderRadius: radius.sm,
     borderWidth: 1,
     paddingHorizontal: space.md,
+    paddingVertical: 6,
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
-    gap: space.sm,
+    gap: space.xs,
   },
-  radioDot: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
-  radioInner: { width: 10, height: 10, borderRadius: 5 },
-  box: { width: 26, height: 26, borderRadius: 6, borderWidth: 2, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
+  radioDot: { width: 18, height: 18, borderRadius: radius.pill, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  radioInner: { width: 10, height: 10, borderRadius: radius.pill },
+  box: { width: 24, height: 24, borderRadius: radius.sm, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   input: {
-    minHeight: 52,
+    minHeight: 48,
     borderWidth: 1,
     borderRadius: radius.sm,
     paddingHorizontal: space.md,
     fontFamily: font.regular,
     fontSize: size.md,
   },
-  stepBtn: { width: TOUCH, height: TOUCH, borderRadius: TOUCH / 2, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  stepBtn: { width: TOUCH, height: TOUCH, borderRadius: radius.sm, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   overlay: { flex: 1, justifyContent: 'flex-end', alignItems: 'center' },
   sheet: {
     width: '100%',
-    maxWidth: 560,
     maxHeight: '88%',
     borderTopLeftRadius: radius.lg,
     borderTopRightRadius: radius.lg,

@@ -214,8 +214,15 @@ def test_token_opens_only_its_own_respondent(kb_client: TestClient, kb_db, form,
 
     settings = kb_app.state.settings
     forged = jwt.encode({"sub": id2, "aud": "tastoria-survey", "iss": settings.jwt_issuer, "exp": 4102444800},
-                        "another-secret-key-0123456789-abcdefghij", algorithm="HS256", headers={"kid": settings.jwt_active_kid})  # fmt: skip
+                        "another-secret-key-0123456789-abcdefghij", algorithm="HS256", headers={"kid": settings.survey_jwt_active_kid})  # fmt: skip
     assert kb_client.get(f"{API}/survey/respondents/{id2}", headers={"X-Respondent-Token": forged}).status_code == 401
+    # user JWT key cannot sign a survey respondent token (split keysets)
+    forged_user_key = jwt.encode({"sub": id2, "aud": "tastoria-survey", "iss": settings.jwt_issuer, "exp": 4102444800},
+                                 settings.jwt_keys[settings.jwt_active_kid], algorithm="HS256", headers={"kid": settings.jwt_active_kid})  # fmt: skip
+    assert (
+        kb_client.get(f"{API}/survey/respondents/{id2}", headers={"X-Respondent-Token": forged_user_key}).status_code
+        == 401
+    )
     # a user's access token is not a respondent token, and a respondent token is not a session
     s = register(kb_client)
     assert (
@@ -362,4 +369,4 @@ def test_admin_surveys_lists_counts_for_ml_operator_only(kb_client: TestClient, 
     assert len(page["items"]) == 1 and page["next_cursor"]
     nxt = kb_client.get(f"{API}/admin/surveys", params={"limit": 1, "cursor": page["next_cursor"]}, headers=bearer(s))
     assert nxt.json()["items"][0]["version"] == f2["version"] and nxt.json()["next_cursor"] is None
-    assert q(kb_db, "SELECT count(*) FROM audit_log WHERE action = 'survey.list'").scalar() == 3
+    assert q(kb_db, "SELECT count(*) FROM audit_log WHERE action = 'survey.list'").scalar() == 1

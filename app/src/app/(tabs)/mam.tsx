@@ -1,15 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, useWindowDimensions, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { api, ApiError, call, isCode, type Schemas } from '@/api/client';
 import { errorText } from '@/api/errors';
-import { fmtBowls, FreshBadge, KcalBar, SLOT_LABEL, Tray } from '@/components/domain';
-import { Button, Card, Chip, ErrorBox, Loading, Notice, Row, Screen, Section, Segmented, Sheet, Stepper, T } from '@/components/ui';
+import { recipePhotoFor } from '@/components/Brand';
+import { fmtBowls, FreshBadge, Icon, KcalBar, SLOT_LABEL } from '@/components/domain';
+import { BroadsheetLedgerFrame, Button, Card, Chip, ErrorBox, Loading, Notice, Row, Screen, Section, Segmented, Sheet, Stepper, T } from '@/components/ui';
 import { useIdempotencyKey } from '@/lib/idempotency';
 import { currentMeal, MEAL_LABEL, qk, useLatestPlan, useLots, useReference, useSettings } from '@/lib/queries';
-import { radius, space, useTheme } from '@/theme';
+import { font, radius, space, useLayout, useTheme } from '@/theme';
 
 type Plan = Schemas['MealPlan'];
 type Item = Schemas['MealPlanItem'];
@@ -21,6 +23,12 @@ const SWAP_REASONS = [
   { v: 'thieu_thoi_gian', l: 'Không đủ thời gian nấu' },
   { v: 'khac', l: 'Lý do khác' },
 ] as const;
+
+const SLOT_ORDER = { man: 0, rau: 1, canh: 2 } as const;
+
+function shouldResetIdemOnError(e: unknown): boolean {
+  return e instanceof ApiError && e.status >= 400 && e.status < 500 && !isCode(e, 'idempotency_in_progress');
+}
 
 /** Mâm cơm hôm nay (UC15–UC18 entry points). */
 export default function TrayScreen() {
@@ -35,9 +43,9 @@ export default function TrayScreen() {
       {latest.isLoading ? <Loading /> : null}
       {latest.error ? <ErrorBox message={errorText(latest.error)} onRetry={() => latest.refetch()} /> : null}
       {plan && !composing ? (
-        <PlanView plan={plan} onNew={() => setComposing(true)} />
+        <PlanView key={plan.id} plan={plan} onNew={() => setComposing(true)} />
       ) : latest.isSuccess ? (
-        <Composer meal={meal} defaultPersons={plan?.persons} onDone={() => setComposing(false)} onCancel={plan ? () => setComposing(false) : undefined} />
+        <Composer key={meal} meal={meal} defaultPersons={plan?.persons} onDone={() => setComposing(false)} onCancel={plan ? () => setComposing(false) : undefined} />
       ) : null}
     </Screen>
   );
@@ -47,8 +55,14 @@ function MealSwitch({ meal, onChange }: { meal: Meal; onChange: (m: Meal) => voi
   const { c } = useTheme();
   return (
     <View
+      testID="MealSwitch"
       accessibilityRole="radiogroup"
-      style={{ flexDirection: 'row', backgroundColor: c.surfaceAlt, borderRadius: radius.pill, padding: 4, gap: 4 }}>
+      style={{
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderBottomColor: c.hairline,
+        gap: space.xl,
+      }}>
       {(['lunch', 'dinner'] as const).map((m) => {
         const on = meal === m;
         return (
@@ -58,15 +72,15 @@ function MealSwitch({ meal, onChange }: { meal: Meal; onChange: (m: Meal) => voi
             accessibilityState={{ selected: on, checked: on }}
             onPress={() => onChange(m)}
             style={{
-              flex: 1,
               minHeight: 44,
-              borderRadius: radius.pill,
-              alignItems: 'center',
+              paddingVertical: space.sm,
+              paddingHorizontal: 2,
               justifyContent: 'center',
-              backgroundColor: on ? c.surface : 'transparent',
-              boxShadow: on ? `0 1px 3px ${c.shadow}` : undefined,
+              borderBottomWidth: 2,
+              borderBottomColor: on ? c.accent : 'transparent',
+              marginBottom: -1,
             }}>
-            <T v="label" style={{ color: on ? c.text : c.muted }}>
+            <T v={on ? 'label' : 'body'} style={{ color: on ? c.text : c.muted }}>
               {MEAL_LABEL[m]}
             </T>
           </Pressable>
@@ -78,7 +92,6 @@ function MealSwitch({ meal, onChange }: { meal: Meal; onChange: (m: Meal) => voi
 
 // ---- composer -----------------------------------------------------------------------------------
 
-/** POST /meal-plans with one Idempotency-Key per body (UC15 4c–4e). */
 function useCreatePlan(meal: Meal, onDone?: () => void) {
   const qc = useQueryClient();
   const idem = useIdempotencyKey();
@@ -90,6 +103,9 @@ function useCreatePlan(meal: Meal, onDone?: () => void) {
       qc.setQueryData(qk.latestPlan(meal), p);
       qc.invalidateQueries({ queryKey: ['plan'] });
       onDone?.();
+    },
+    onError: (e) => {
+      if (shouldResetIdemOnError(e)) idem.reset();
     },
   });
 }
@@ -105,6 +121,7 @@ function Composer({
   onDone: () => void;
   onCancel?: () => void;
 }) {
+  const { c } = useTheme();
   const settings = useSettings();
   const ref = useReference();
   const lots = useLots();
@@ -115,7 +132,6 @@ function Composer({
   const [pins, setPins] = useState<string[]>([]);
   const n = persons ?? settings.data?.default_persons ?? 2;
 
-
   const pinnable = (lots.data?.items ?? []).filter((l) => l.available);
   const err = create.error;
   const shortfalls = err instanceof ApiError ? ((err.problem?.shortfalls as Schemas['TrayShortfall'][] | undefined) ?? []) : [];
@@ -123,42 +139,55 @@ function Composer({
 
   return (
     <View style={{ gap: space.lg }}>
-      <T v="h2" accessibilityRole="header">
-        Ghép mâm {MEAL_LABEL[meal].toLowerCase()}
-      </T>
-      <Stepper label="Số người ăn" value={n} onChange={setPersons} min={1} max={6} testID="persons" />
-      <Segmented label="Thời gian nấu tối đa" options={[30, 45, 60, 90, 120].map((m) => [m, `${m} phút`] as const)} value={minutes} onChange={setMinutes} />
-      <Section title="Người ăn cùng dị ứng (bữa này)">
-        <T v="small" tone="muted">
-          Dị ứng của bạn đã được tính sẵn. Chọn thêm nhóm dị ứng của người ăn cùng, nếu có.
+      <View style={{ gap: 2 }}>
+        <T v="huge" accessibilityRole="header">
+          Ghép mâm {MEAL_LABEL[meal].toLowerCase()}
         </T>
-        <Row>
-          {(ref.data?.allergen_groups ?? []).map((g) => (
-            <Chip
-              key={g.code}
-              label={g.name_vi.replace(/ \(.*\)$/, '')}
-              selected={coeater.includes(g.code)}
-              onPress={() => setCoeater((s) => (s.includes(g.code) ? s.filter((x) => x !== g.code) : [...s, g.code]))}
-            />
-          ))}
-        </Row>
-      </Section>
-      {pinnable.length ? (
-        <Section title="Phải dùng trong bữa này (tối đa 2)">
+        <T tone="muted">
+          Tự chọn từ đồ đang có trong tủ, ưu tiên đồ gần hết hạn và cân đối 1 món mặn, 1 món rau, 1 món canh.
+        </T>
+      </View>
+
+      <Card style={{ gap: space.lg }}>
+        <Stepper label="Số người ăn" value={n} onChange={setPersons} min={1} max={6} testID="persons" />
+        <Segmented label="Thời gian nấu tối đa" options={[30, 45, 60, 90, 120].map((m) => [m, `${m} phút`] as const)} value={minutes} onChange={setMinutes} />
+      </Card>
+
+      <View style={{ borderTopWidth: 1, borderTopColor: c.hairline, paddingTop: space.lg, gap: space.lg }}>
+        <Section title="Người ăn cùng dị ứng (bữa này)">
+          <T v="small" tone="muted">
+            Dị ứng của bạn đã được loại trừ sẵn. Chọn thêm nhóm dị ứng của người ăn cùng trong bữa này nếu có.
+          </T>
           <Row>
-            {pinnable.slice(0, 12).map((l) => (
+            {(ref.data?.allergen_groups ?? []).map((g) => (
               <Chip
-                key={l.id}
-                label={l.ingredient_name_vi}
-                left={<FreshBadge value={l.freshness_label} small />}
-                selected={pins.includes(l.id)}
-                disabled={!pins.includes(l.id) && pins.length >= 2}
-                onPress={() => setPins((s) => (s.includes(l.id) ? s.filter((x) => x !== l.id) : [...s, l.id]))}
+                key={g.code}
+                label={g.name_vi.replace(/ \(.*\)$/, '')}
+                selected={coeater.includes(g.code)}
+                onPress={() => setCoeater((s) => (s.includes(g.code) ? s.filter((x) => x !== g.code) : [...s, g.code]))}
               />
             ))}
           </Row>
         </Section>
-      ) : null}
+
+        {pinnable.length ? (
+          <Section title="Phải dùng trong bữa này (tối đa 2)">
+            <Row>
+              {pinnable.slice(0, 12).map((l) => (
+                <Chip
+                  key={l.id}
+                  label={l.ingredient_name_vi}
+                  left={<FreshBadge value={l.freshness_label} small />}
+                  selected={pins.includes(l.id)}
+                  disabled={!pins.includes(l.id) && pins.length >= 2}
+                  onPress={() => setPins((s) => (s.includes(l.id) ? s.filter((x) => x !== l.id) : [...s, l.id]))}
+                />
+              ))}
+            </Row>
+          </Section>
+        ) : null}
+      </View>
+
       {isCode(err, 'no_feasible_tray') ? (
         <NoTray shortfalls={shortfalls} />
       ) : isCode(err, 'pin_unsatisfiable') ? (
@@ -218,6 +247,7 @@ function ShoppingRow({
   haveG: number;
   itemId?: string;
 }) {
+  const { c } = useTheme();
   const qc = useQueryClient();
   const add = useMutation({
     mutationFn: () =>
@@ -236,12 +266,17 @@ function ShoppingRow({
     <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
       <View style={{ flexShrink: 1 }}>
         <T>{name}</T>
-        <T v="small" tone="muted">
+        <T v="small" tone="muted" tabular>
           cần {Math.round(needG)} g, đang có {Math.round(haveG)} g
         </T>
       </View>
       {add.isSuccess ? (
-        <T v="label">Đã thêm ✓</T>
+        <Row gap={space.xs} style={{ flexWrap: 'nowrap' }}>
+          <Icon name="check" size={16} color={c.herb} />
+          <T v="label" tone="herb">
+            Đã thêm
+          </T>
+        </Row>
       ) : (
         <Button label="Thêm vào đi chợ" kind="secondary" onPress={() => add.mutate()} loading={add.isPending} testID={`shop-add-${name}`} />
       )}
@@ -253,7 +288,7 @@ function ShoppingRow({
 
 function PlanView({ plan, onNew }: { plan: Plan; onNew: () => void }) {
   const { c } = useTheme();
-  const { width } = useWindowDimensions();
+  const { isDesktop } = useLayout();
   const router = useRouter();
   const qc = useQueryClient();
   const [dish, setDish] = useState<Item | null>(null);
@@ -263,6 +298,7 @@ function PlanView({ plan, onNew }: { plan: Plan; onNew: () => void }) {
   const swapKey = useIdempotencyKey();
   const cookKey = useIdempotencyKey();
   const active = plan.items.filter((i) => i.status === 'active');
+  const ordered = [...active].sort((a, b) => SLOT_ORDER[a.slot] - SLOT_ORDER[b.slot]);
   const swappedOut = plan.items.filter((i) => i.status === 'swapped_out');
   const lots = useLots();
   const [persons, setPersons] = useState(plan.persons);
@@ -291,6 +327,7 @@ function PlanView({ plan, onNew }: { plan: Plan; onNew: () => void }) {
     },
     onError: (e) => {
       if (isCode(e, 'conflict_state')) refresh();
+      if (shouldResetIdemOnError(e)) swapKey.reset();
     },
   });
 
@@ -316,62 +353,208 @@ function PlanView({ plan, onNew }: { plan: Plan; onNew: () => void }) {
     },
     onError: (e) => {
       if (isCode(e, 'cook_session_in_progress') && typeof e.problem?.cook_session_id === 'string') {
+        cookKey.reset();
         router.push({ pathname: '/nau/[id]', params: { id: e.problem.cook_session_id } });
       } else if (isCode(e, 'conflict_state') && typeof e.problem?.over_time_minutes === 'number') {
         cookKey.reset();
         setOverTime({ over: e.problem.over_time_minutes, makespan: Number(e.problem.makespan_s ?? 0) / 60 });
+      } else if (shouldResetIdemOnError(e)) {
+        cookKey.reset();
       }
     },
   });
 
   const pinnedNames = (lots.data?.items ?? []).filter((l) => plan.pinned_lot_ids.includes(l.id)).map((l) => l.ingredient_name_vi);
-  const traySize = Math.min(width - 48, 330);
 
-  return (
-    <View style={{ gap: space.lg }} testID="plan-view">
-      <View>
-        <T v="h1" accessibilityRole="header">
-          {MEAL_LABEL[plan.meal]} cho {plan.persons} người
-        </T>
-        <T tone="muted">
-          {plan.status === 'accepted' ? 'Đã nhận mâm' : 'Chạm một món để xem, đổi món hoặc xem thiếu gì'}
-        </T>
-      </View>
-      <Tray items={active} bowls={plan.rice_bowls_per_person} size={traySize} onPressItem={(it) => {
-        setDish(active.find((a) => a.id === it.id) ?? null);
-        setMode('menu');
-      }} />
-      <View style={{ borderRadius: radius.lg, borderWidth: 1, borderColor: c.hairline, backgroundColor: c.surface, overflow: 'hidden' }}>
-        {active.map((i, n) => (
-          <View
-            key={i.id}
-            style={{ flexDirection: 'row', gap: space.md, padding: space.md, paddingHorizontal: space.lg, borderTopWidth: n ? 1 : 0, borderTopColor: c.hairline }}>
-            <T v="label" tone="accent" style={{ width: 44 }}>
-              {SLOT_LABEL[i.slot]}
-            </T>
-            <View style={{ flex: 1 }}>
-              <T v="label">{i.recipe_name_vi}</T>
-              {i.substitutions.length ? <T v="small" tone="muted">có đồ thay</T> : null}
-            </View>
-          </View>
-        ))}
-      </View>
-      {plan.reason_vi ? (
-        <View
-          testID="plan-reason"
-          style={{ backgroundColor: c.okSoft, borderRadius: radius.pill, paddingHorizontal: space.lg, paddingVertical: space.sm, alignSelf: 'flex-start' }}>
-          <T>{plan.reason_vi}</T>
-        </View>
+  const kcalPanel = (
+    <BroadsheetLedgerFrame title="Dự toán năng lượng bữa ăn" accentTone="border" innerStyle={{ padding: space.md, gap: space.sm }}>
+      <KcalBar low={plan.kcal_low} high={plan.kcal_high} target={plan.e_target_kcal} />
+      <T tabular>
+        {plan.rice_bowls_per_person
+          ? `Gợi ý ${fmtBowls(plan.rice_bowls_per_person)} bát cơm mỗi người.`
+          : 'Chưa có mục tiêu năng lượng nên chưa gợi ý số bát cơm.'}
+      </T>
+    </BroadsheetLedgerFrame>
+  );
+
+  const actionGroup = (
+    <>
+      {overTime ? (
+        <Notice tone="warn">
+          <T tabular>
+            Lịch cần {Math.round(overTime.makespan)} phút, quá {overTime.over} phút so với thời gian đã chọn. Vẫn nấu?
+          </T>
+          <Button label="Vẫn nấu" onPress={() => cook.mutate(true)} loading={cook.isPending} />
+          <Button label="Đổi món khác" kind="ghost" onPress={() => setOverTime(null)} />
+        </Notice>
+      ) : cook.error && !isCode(cook.error, 'cook_session_in_progress') ? (
+        <ErrorBox message={errorText(cook.error)} />
       ) : null}
-      <Card>
-        <KcalBar low={plan.kcal_low} high={plan.kcal_high} target={plan.e_target_kcal} />
-        <T>
-          {plan.rice_bowls_per_person
-            ? `Gợi ý ${fmtBowls(plan.rice_bowls_per_person)} bát cơm mỗi người.`
-            : 'Chưa có mục tiêu năng lượng nên chưa gợi ý số bát cơm.'}
-        </T>
+      <Button
+        label={plan.status === 'proposed' ? 'Nhận mâm và nấu' : 'Nấu cả mâm'}
+        testID="start-cooking"
+        onPress={() => cook.mutate(false)}
+        loading={cook.isPending}
+      />
+      <Button label="Ghép mâm khác" kind="secondary" onPress={onNew} testID="new-plan" />
+    </>
+  );
+
+  const traySummaryCol = (
+    <View style={{ gap: space.lg }}>
+      {kcalPanel}
+      {actionGroup}
+    </View>
+  );
+
+  const slotColumn = (
+    <View style={{ gap: space.lg }}>
+      <Card variant="ledger" style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
+        <Row
+          style={{
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingHorizontal: space.lg,
+            paddingVertical: space.md,
+            backgroundColor: c.surfaceAlt,
+            borderBottomWidth: 1,
+            borderBottomColor: c.hairline,
+          }}>
+          <T v="label" style={{ color: c.herb, fontFamily: font.displaySemibold }}>Mâm cơm {ordered.length} món</T>
+          <T v="small" tone="muted" tabular>
+            {plan.rice_bowls_per_person ? `Cơm ${fmtBowls(plan.rice_bowls_per_person)} bát / người` : 'Cơm trắng ăn kèm'}
+          </T>
+        </Row>
+        {ordered.map((i) => {
+          const dishPhoto = recipePhotoFor(i.recipe_name_vi, i.slot);
+          return (
+            <View
+              key={i.id}
+              style={{
+                gap: space.md,
+                padding: space.lg,
+                borderTopWidth: 1,
+                borderTopColor: c.hairline,
+              }}>
+              <Pressable
+                testID={`tray-dish-${i.slot}`}
+                accessibilityRole="button"
+                accessibilityLabel={`${SLOT_LABEL[i.slot]}: ${i.recipe_name_vi}`}
+                onPress={() => {
+                  setDish(i);
+                  setMode('menu');
+                }}
+                style={({ pressed }) => ({ opacity: pressed ? 0.78 : 1 })}>
+                <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }} gap={space.md}>
+                  <Row gap={space.md} style={{ flex: 1, minWidth: 0, flexWrap: 'nowrap' }}>
+                    {dishPhoto ? (
+                      <Image
+                        source={dishPhoto}
+                        contentFit="cover"
+                        style={{ width: 56, height: 56, borderRadius: radius.sm, backgroundColor: c.surfaceAlt }}
+                        accessibilityLabel={i.recipe_name_vi}
+                      />
+                    ) : (
+                      <View
+                        style={{
+                          width: 56,
+                          height: 56,
+                          borderRadius: radius.sm,
+                          backgroundColor: c.accentSoft,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <T v="label" tone="accent">
+                          {SLOT_LABEL[i.slot]}
+                        </T>
+                      </View>
+                    )}
+                    <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+                      <T v="small" tone="herb" style={{ fontFamily: font.semibold }}>
+                        Món {SLOT_LABEL[i.slot].toLowerCase()}
+                      </T>
+                      <T v="title" style={{ fontFamily: font.displaySemibold }} numberOfLines={2}>
+                        {i.recipe_name_vi}
+                      </T>
+                      {i.substitutions.length ? <T v="small" tone="muted">Có nguyên liệu thay thế</T> : null}
+                    </View>
+                  </Row>
+                  {i.kcal_per_person != null ? (
+                    <View style={{ backgroundColor: c.surfaceAlt, paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.sm }}>
+                      <T v="small" tone="text" tabular>
+                        {Math.round(i.kcal_per_person)} kcal
+                      </T>
+                    </View>
+                  ) : null}
+                </Row>
+              </Pressable>
+              <Row gap={space.xs}>
+                <Button
+                  label="Xem công thức"
+                  kind="ghost"
+                  compact
+                  onPress={() => router.push({ pathname: '/mon/[id]', params: { id: i.recipe_id, plan: plan.id, item: i.id } })}
+                  style={{ paddingHorizontal: space.sm }}
+                />
+                {plan.status === 'proposed' || plan.status === 'accepted' ? (
+                  <>
+                    <Button
+                      label="Đổi món"
+                      kind="secondary"
+                      compact
+                      onPress={() => {
+                        setDish(i);
+                        setMode('swap');
+                      }}
+                      style={{ paddingHorizontal: space.sm }}
+                    />
+                    <Button
+                      label="Thiếu gì?"
+                      kind="secondary"
+                      compact
+                      onPress={() => {
+                        setDish(i);
+                        setMode('missing');
+                      }}
+                      style={{ paddingHorizontal: space.sm }}
+                    />
+                  </>
+                ) : null}
+              </Row>
+            </View>
+          );
+        })}
       </Card>
-      <Card>
+
+      <Row gap={space.sm}>
+        {plan.reason_vi ? (
+          <View
+            testID="plan-reason"
+            style={{ backgroundColor: c.okSoft, borderRadius: radius.md, paddingHorizontal: space.md, paddingVertical: space.sm, maxWidth: '100%', flexShrink: 1 }}>
+            <T v="small" tone="herb" style={{ flexShrink: 1 }}>{plan.reason_vi}</T>
+          </View>
+        ) : null}
+        {plan.ranker_version_id != null ? (
+          <View
+            style={{
+              backgroundColor: c.infoSoft,
+              borderRadius: radius.md,
+              paddingHorizontal: space.md,
+              paddingVertical: space.sm,
+              maxWidth: '100%',
+              flexShrink: 1,
+            }}>
+            <Row gap={space.xs} style={{ flexWrap: 'nowrap', maxWidth: '100%' }}>
+              <Icon name="sliders" size={16} color={c.info} />
+              <T v="small" tone="info" style={{ fontWeight: '600', flexShrink: 1 }}>
+                Ưu tiên theo khẩu vị gia đình
+              </T>
+            </Row>
+          </View>
+        ) : null}
+      </Row>
+
+      <View style={{ borderTopWidth: 1, borderTopColor: c.hairline, paddingTop: space.md, gap: space.sm }}>
         <Stepper label="Số người ăn" value={persons} onChange={setPersons} min={1} max={6} testID="plan-persons" />
         {persons !== plan.persons ? (
           <Button
@@ -391,31 +574,40 @@ function PlanView({ plan, onNew }: { plan: Plan; onNew: () => void }) {
           />
         ) : null}
         {regroup.error ? <ErrorBox message={errorText(regroup.error)} /> : null}
-      </Card>
+      </View>
+
       {pinnedNames.length ? <T tone="muted">Đồ đã ghim: {pinnedNames.join(', ')}</T> : null}
       {swappedOut.length ? <T v="small" tone="muted">Đã đổi ra: {swappedOut.map((i) => i.recipe_name_vi).join(', ')}</T> : null}
 
       <Section title="Giờ dọn mâm">
         <Segmented options={[[0, 'Sớm nhất'], [30, 'Sau 30 phút'], [60, 'Sau 1 giờ']]} value={serveIn} onChange={setServeIn} />
       </Section>
-      {overTime ? (
-        <Notice tone="warn">
-          <T>
-            Lịch cần {Math.round(overTime.makespan)} phút, quá {overTime.over} phút so với thời gian đã chọn. Vẫn nấu?
-          </T>
-          <Button label="Vẫn nấu" onPress={() => cook.mutate(true)} loading={cook.isPending} />
-          <Button label="Đổi món khác" kind="ghost" onPress={() => setOverTime(null)} />
-        </Notice>
-      ) : cook.error && !isCode(cook.error, 'cook_session_in_progress') ? (
-        <ErrorBox message={errorText(cook.error)} />
-      ) : null}
-      <Button
-        label={plan.status === 'proposed' ? 'Nhận mâm và nấu' : 'Nấu cả mâm'}
-        testID="start-cooking"
-        onPress={() => cook.mutate(false)}
-        loading={cook.isPending}
-      />
-      <Button label="Ghép mâm khác" kind="secondary" onPress={onNew} testID="new-plan" />
+    </View>
+  );
+
+  return (
+    <View style={{ gap: space.lg }} testID="plan-view">
+      <View style={{ gap: 2 }}>
+        <T v="huge" accessibilityRole="header">
+          {MEAL_LABEL[plan.meal]} cho {plan.persons} người
+        </T>
+        <T tone="muted">
+          {plan.status === 'accepted' ? 'Đã chốt mâm, sẵn sàng chia việc nấu từng bếp.' : 'Chạm một món để xem công thức, đổi món hoặc xem đồ thiếu.'}
+        </T>
+      </View>
+
+      {isDesktop ? (
+        <View style={{ flexDirection: 'row', gap: space.xl, alignItems: 'flex-start' }}>
+          <View style={{ flex: 5, minWidth: 0 }}>{traySummaryCol}</View>
+          <View style={{ flex: 7, minWidth: 0 }}>{slotColumn}</View>
+        </View>
+      ) : (
+        <>
+          {slotColumn}
+          {kcalPanel}
+          {actionGroup}
+        </>
+      )}
 
       <Sheet
         visible={!!dish}
@@ -424,7 +616,11 @@ function PlanView({ plan, onNew }: { plan: Plan; onNew: () => void }) {
         testID="sheet-dish">
         {dish && mode === 'menu' ? (
           <>
-            {dish.kcal_per_person != null ? <T tone="muted">Khoảng {Math.round(dish.kcal_per_person)} kcal mỗi người.</T> : null}
+            {dish.kcal_per_person != null ? (
+              <T tone="muted" tabular>
+                Khoảng {Math.round(dish.kcal_per_person)} kcal mỗi người.
+              </T>
+            ) : null}
             <Button
               label="Xem công thức"
               kind="secondary"
@@ -475,6 +671,7 @@ function PlanView({ plan, onNew }: { plan: Plan; onNew: () => void }) {
 // ---- "Thiếu gì?" (UC17) -------------------------------------------------------------------------
 
 function Missing({ plan, item, onChanged }: { plan: Plan; item: Item; onChanged: (p?: Plan) => void }) {
+  const { c } = useTheme();
   const q = useQuery({
     queryKey: ['substitutes', plan.id, item.id],
     queryFn: () => call(api.GET('/meal-plans/{id}/items/{itemId}/substitutes', { params: { path: { id: plan.id, itemId: item.id } } })),
@@ -494,34 +691,71 @@ function Missing({ plan, item, onChanged }: { plan: Plan; item: Item; onChanged:
   return (
     <View style={{ gap: space.md }} testID="missing-list">
       {items.map((m) => (
-        <Card key={m.original_ingredient_id}>
+        <View
+          key={m.original_ingredient_id}
+          style={{ borderRadius: radius.md, backgroundColor: c.surfaceAlt, padding: space.md, gap: space.sm }}>
           <ShoppingRow ingredientId={m.original_ingredient_id} name={m.name_vi} needG={m.need_g} haveG={m.available_g_min} itemId={item.id} />
           {m.candidates.length ? (
-            <View style={{ gap: space.xs }}>
+            <View style={{ gap: space.sm }}>
               <T v="label">Có thể thay bằng</T>
               {m.candidates.map((cand) => (
-                <Row key={cand.substitute_ingredient_id} style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
-                  <View style={{ flexShrink: 1 }}>
-                    <T>
-                      {cand.name_vi} · {Math.round(cand.grams)} g
-                    </T>
-                    <T v="small" tone="muted">
-                      {cand.in_pantry ? `Kho có ${Math.round(cand.available_g_min ?? 0)} g` : 'Kho chưa có'}
-                    </T>
-                  </View>
-                  <Button
-                    label="Dùng thay"
-                    kind="secondary"
-                    loading={apply.isPending}
-                    onPress={() =>
-                      apply.mutate({
-                        original_ingredient_id: m.original_ingredient_id,
-                        substitute_ingredient_id: cand.substitute_ingredient_id,
-                        origin: cand.origin,
-                      })
-                    }
-                  />
-                </Row>
+                <View
+                  key={cand.substitute_ingredient_id}
+                  style={{ gap: space.xs, borderTopWidth: 1, borderTopColor: c.hairline, paddingTop: space.sm }}>
+                  <Row gap={space.xs}>
+                    {cand.origin === 'embedding' ? (
+                      <View
+                        testID="sub-origin-embedding"
+                        style={{ backgroundColor: c.infoSoft, borderRadius: radius.sm, paddingHorizontal: space.sm, paddingVertical: 2, maxWidth: '100%', flexShrink: 1 }}>
+                        <Row gap={space.xs} style={{ flexWrap: 'nowrap', maxWidth: '100%' }}>
+                          <Icon name="compass" size={14} color={c.info} />
+                          <T v="small" tone="info" style={{ fontWeight: '600', flexShrink: 1 }}>
+                            Gợi ý cùng nhóm chất
+                          </T>
+                        </Row>
+                      </View>
+                    ) : (
+                      <View
+                        testID="sub-origin-lookup"
+                        style={{ backgroundColor: c.herbSoft, borderRadius: radius.sm, paddingHorizontal: space.sm, paddingVertical: 2, maxWidth: '100%', flexShrink: 1 }}>
+                        <T v="small" tone="herb" style={{ fontWeight: '600', flexShrink: 1 }}>
+                          Gợi ý chuẩn
+                        </T>
+                      </View>
+                    )}
+                  </Row>
+                  <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+                    <View style={{ flexShrink: 1 }}>
+                      <T tabular>
+                        {cand.name_vi}, {Math.round(cand.grams)} g (tỷ lệ {Math.round(cand.ratio * 100) / 100})
+                      </T>
+                      <T v="small" tone="muted" tabular>
+                        {cand.in_pantry ? `Kho có ${Math.round(cand.available_g_min ?? 0)} g` : 'Kho chưa có'}
+                      </T>
+                    </View>
+                    <Button
+                      label="Dùng thay"
+                      kind="secondary"
+                      loading={apply.isPending}
+                      onPress={() =>
+                        apply.mutate({
+                          original_ingredient_id: m.original_ingredient_id,
+                          substitute_ingredient_id: cand.substitute_ingredient_id,
+                          origin: cand.origin,
+                        })
+                      }
+                    />
+                  </Row>
+                  {!cand.in_pantry ? (
+                    <ShoppingRow
+                      ingredientId={cand.substitute_ingredient_id}
+                      name={cand.name_vi}
+                      needG={cand.grams}
+                      haveG={cand.available_g_min ?? 0}
+                      itemId={item.id}
+                    />
+                  ) : null}
+                </View>
               ))}
             </View>
           ) : (
@@ -529,7 +763,7 @@ function Missing({ plan, item, onChanged }: { plan: Plan; item: Item; onChanged:
               Chưa có gợi ý thay thế cho nguyên liệu này.
             </T>
           )}
-        </Card>
+        </View>
       ))}
       {apply.error ? <ErrorBox message={errorText(apply.error)} /> : null}
     </View>

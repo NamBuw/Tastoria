@@ -46,6 +46,13 @@ class ProblemCode(StrEnum):
     refresh_invalid = "refresh_invalid"
     refresh_reused = "refresh_reused"
     reset_token_invalid = "reset_token_invalid"
+    email_not_verified = "email_not_verified"
+    verification_token_invalid = "verification_token_invalid"
+    mfa_required = "mfa_required"
+    mfa_invalid = "mfa_invalid"
+    mfa_not_enabled = "mfa_not_enabled"
+    session_not_found = "session_not_found"
+    refresh_retry_conflict = "refresh_retry_conflict"
     purpose_not_found = "purpose_not_found"
     purpose_not_allowed = "purpose_not_allowed"
     policy_outdated = "policy_outdated"
@@ -114,7 +121,7 @@ TITLES: dict[ProblemCode, str] = {
     ProblemCode.unauthenticated: "Chưa đăng nhập hoặc phiên đã hết hạn",
     ProblemCode.token_revoked: "Phiên đã bị thu hồi, cần làm mới",
     ProblemCode.forbidden: "Không đủ quyền",
-    ProblemCode.app_too_old: "Phiên bản app quá cũ",
+    ProblemCode.app_too_old: "Phiên bản ứng dụng quá cũ",
     ProblemCode.rate_limited: "Gửi quá nhiều yêu cầu",
     ProblemCode.conflict_state: "Trạng thái hiện tại không cho phép thao tác này",
     ProblemCode.idempotency_key_required: "Thiếu header Idempotency-Key",
@@ -131,16 +138,25 @@ TITLES: dict[ProblemCode, str] = {
     ProblemCode.refresh_invalid: "Phiên không còn hiệu lực",
     ProblemCode.refresh_reused: "Phiên đã bị thu hồi do dùng lại token",
     ProblemCode.reset_token_invalid: "Liên kết đặt lại mật khẩu không còn hiệu lực",
+    ProblemCode.email_not_verified: "Email chưa được xác minh",
+    ProblemCode.verification_token_invalid: "Liên kết xác minh email không còn hiệu lực",
+    ProblemCode.mfa_required: "Cần xác thực hai bước để tiếp tục",
+    ProblemCode.mfa_invalid: "Mã xác thực hai bước không đúng",
+    ProblemCode.mfa_not_enabled: "Tài khoản chưa bật xác thực hai bước",
+    ProblemCode.session_not_found: "Không tìm thấy phiên đăng nhập",
+    ProblemCode.refresh_retry_conflict: "Phiên đang được làm mới ở yêu cầu khác; hãy thử lại",
     ProblemCode.purpose_not_found: "Mục đích không tồn tại",
     ProblemCode.purpose_not_allowed: "Mục đích không ghi được ở đây",
     ProblemCode.policy_outdated: "Điều khoản đã có phiên bản mới",
     ProblemCode.consent_required: "Cần đồng ý mục đích xử lý dữ liệu",
     ProblemCode.reauth_failed: "Mật khẩu xác nhận không đúng",
     ProblemCode.invalid_request: "Yêu cầu dữ liệu không hợp lệ",
+    ProblemCode.reason_required: "Cần ghi rõ lý do",
+    ProblemCode.request_not_manual: "Yêu cầu này được xử lý tự động, không xử lý thủ công",
     ProblemCode.request_not_ready: "Yêu cầu chưa hoàn tất",
     ProblemCode.request_not_downloadable: "Yêu cầu này không có tệp tải về",
     ProblemCode.export_expired: "Tệp xuất đã bị dọn",
-    ProblemCode.age_below_minimum: "Tastoria chỉ tính mục tiêu năng lượng cho người từ 18 tuổi",
+    ProblemCode.age_below_minimum: "Mỹ Vị chỉ tính mục tiêu năng lượng cho người từ 18 tuổi",
     ProblemCode.age_confirmation_required: "Cần xác nhận đã đủ 18 tuổi",
     ProblemCode.profile_incomplete: "Hồ sơ thiếu chỉ số để tính",
     ProblemCode.unknown_code: "Mã không có trong danh mục",
@@ -155,9 +171,9 @@ TITLES: dict[ProblemCode, str] = {
     ProblemCode.queue_full: "Hàng đợi nhận diện đang đầy",
     ProblemCode.scan_not_editable: "Lần quét không còn sửa được",
     ProblemCode.invalid_scan_state: "Trạng thái lần quét không cho phép thao tác này",
-    ProblemCode.duplicate_item: "Nguyên liệu đã có chip trong lần quét",
-    ProblemCode.qty_level_required: "Còn chip chưa chọn mức lượng",
-    ProblemCode.freshness_check_required: "Còn chip cần kiểm tra trước khi dùng",
+    ProblemCode.duplicate_item: "Nguyên liệu đã có trong lần quét",
+    ProblemCode.qty_level_required: "Còn nguyên liệu chưa chọn mức lượng",
+    ProblemCode.freshness_check_required: "Còn nguyên liệu cần kiểm tra trước khi dùng",
     ProblemCode.image_purged: "Ảnh gốc đã được xoá theo hạn 30 ngày",
     ProblemCode.unknown_ingredient: "Nguyên liệu không có hoặc đã ngừng dùng",
     ProblemCode.qty_kind_mismatch: "Cách nhập lượng không hợp với nguyên liệu",
@@ -177,6 +193,13 @@ TITLES: dict[ProblemCode, str] = {
     ProblemCode.undo_window_expired: "Đã quá 10 phút để hoàn tác",
     ProblemCode.recipe_without_steps: "Món chưa có bước nấu",
     ProblemCode.invalid_iso_week: "Tuần không hợp lệ (ISO 8601)",
+    ProblemCode.respondent_token_invalid: "Phiếu khảo sát không còn hiệu lực",
+    ProblemCode.survey_closed: "Khảo sát hiện chưa mở hoặc đã đóng",
+    ProblemCode.survey_already_completed: "Bạn đã hoàn tất phiếu khảo sát này",
+    ProblemCode.survey_incomplete: "Còn món chưa trả lời",
+    ProblemCode.invalid_rating: "Điểm đánh giá không hợp lệ",
+    ProblemCode.invalid_favorites: "Danh sách món hay ăn không hợp lệ",
+    ProblemCode.survey_form_misconfigured: "Phiếu khảo sát đang được cấu hình lại",
     ProblemCode.internal_error: "Lỗi máy chủ",
 }
 
@@ -234,7 +257,9 @@ def problem_body(
     if errors:
         body["errors"] = errors
     if extra:
-        body.update(extra)
+        for k, v in extra.items():
+            if k not in body:
+                body[k] = v
     return body
 
 

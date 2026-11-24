@@ -1,0 +1,107 @@
+{
+  "$schema": "https://github.com/NamBuw/appnwebsite-skill/schemas/tokens-dtcg.schema.json",
+  "$description": "Tastoria W3C DTCG 3-tier design tokens (editorial-v10 Dark — Deep Espresso Charcoal #141210, Ivory Ink, Soft Peach #F0A389, Newsreader + Manrope).",
+  "primitive": {
+    "color": {
+      "espresso-950": { "$value": "#141210", "$type": "color" },
+      "espresso-900": { "$value": "#1E1B18", "$type": "color" },
+      "espresso-800": { "$value": "#26221E", "$type": "color" },
+      "espresso-700": { "$value": "#2E2A26", "$type": "color" },
+      "stone-600": { "$value": "#6E655D", "$type": "color" },
+      "oat-400": { "$value": "#B5ADA4", "$type": "color" },
+      "ivory-50": { "$value": "#F7F3EC", "$type": "color" },
+      "terracotta-600": { "$value": "#B84225", "$type": "color" },
+      "peach-300": { "$value": "#F0A389", "$type": "color" },
+      "terracotta-950": { "$value": "#2E1E19", "$type": "color" },
+      "white": { "$value": "#FFFFFF", "$type": "color" },
+      "herb-300": { "$value": "#7DC9A4", "$type": "color" },
+      "herb-950": { "$value": "#162920", "$type": "color" },
+      "info-300": { "$value": "#A5C0F5", "$type": "color" },
+      "info-950": { "$value": "#1A2336", "$type": "color" },
+      "warn-300": { "$value": "#F5C469", "$type": "color" },
+      "warn-950": { "$value": "#2D2312", "$type": "color" },
+      "danger-300": { "$value": "#F59A9A", "$type": "color" },
+      "danger-950": { "$value": "#331A1A", "$type": "color" }
+    },
+    "space": {
+      "1": { "$value": "4px", "$type": "dimension" },
+      "2": { "$value": "8px", "$type": "dimension" },
+      "3": { "$value": "12px", "$type": "dimension" },
+      "4": { "$value": "16px", "$type": "dimension" },
+      "5": { "$value": "24px", "$type": "dimension" },
+      "6": { "$value": "32px", "$type": "dimension" },
+      "7": { "$value": "48px", "$type": "dimension" },
+      "8": { "$value": "72px", "$type": "dimension" }
+    },
+    "radius": {
+      "sm": { "$value": "8px", "$type": "dimension" },
+      "md": { "$value": "12px", "$type": "dimension" },
+      "lg": { "$value": "16px", "$type": "dimension" },
+      "pill": { "$value": "9999px", "$type": "dimension" }
+    },
+    "typography": {
+      "display": { "$value": "Newsreader", "$type": "fontFamily" },
+      "body": { "$value": "Manrope", "$type": "fontFamily" },
+      "mono": { "$value": "Geist Mono", "$type": "fontFamily" }
+    }
+  },
+  "semantic": {
+    "surface": {
+      "canvas": { "$value": "{primitive.color.espresso-950}", "$type": "color" },
+      "card": { "$value": "{primitive.color.espresso-900}", "$type": "color" },
+      "elevated": { "$value": "{primitive.color.espresso-800}", "$type": "color" }
+    },
+    "text": {
+      "primary": { "$value": "{primitive.color.ivory-50}", "$type": "color" },
+      "muted": { "$value": "{primitive.color.oat-400}", "$type": "color" },
+      "brand": { "$value": "{primitive.color.peach-300}", "$type": "color" },
+      "fresh": { "$value": "{primitive.color.herb-300}", "$type": "color" }
+    },
+    "editorial": {
+      "panel": { "$value": "{primitive.color.espresso-900}", "$type": "color" },
+      "on-panel": { "$value": "{primitive.color.ivory-50}", "$type": "color" },
+      "on-panel-muted": { "$value": "{primitive.color.oat-400}", "$type": "color" }
+    },
+    "brand": {
+      "primary": { "$value": "{primitive.color.peach-300}", "$type": "color" },
+      "on-primary": { "$value": "{primitive.color.espresso-950}", "$type": "color" },
+      "primary-fill-landing": { "$value": "{primitive.color.terracotta-600}", "$type": "color" },
+      "on-primary-landing": { "$value": "{primitive.color.white}", "$type": "color" },
+      "tint": { "$value": "{primitive.color.terracotta-950}", "$type": "color" }
+    },
+    "border": {
+      "subtle": { "$value": "{primitive.color.espresso-700}", "$type": "color" },
+      "strong": { "$value": "{primitive.color.stone-600}", "$type": "color" }
+    },
+    "status": {
+      "fresh-ink": { "$value": "{primitive.color.herb-300}", "$type": "color" },
+      "fresh-soft": { "$value": "{primitive.color.herb-950}", "$type": "color" },
+      "info-ink": { "$value": "{primitive.color.info-300}", "$type": "color" },
+      "info-soft": { "$value": "{primitive.color.info-950}", "$type": "color" },
+      "warn-ink": { "$value": "{primitive.color.warn-300}", "$type": "color" },
+      "warn-soft": { "$value": "{primitive.color.warn-950}", "$type": "color" },
+      "danger-ink": { "$value": "{primitive.color.danger-300}", "$type": "color" },
+      "danger-soft": { "$value": "{primitive.color.danger-950}", "$type": "color" }
+    }
+  },
+  "component": {
+    "button": {
+      "primary-fill": { "$value": "{semantic.brand.primary}", "$type": "color" },
+      "primary-label": { "$value": "{semantic.brand.on-primary}", "$type": "color" },
+      "radius": { "$value": "{primitive.radius.pill}", "$type": "dimension" },
+      "padding-x": { "$value": "{primitive.space.5}", "$type": "dimension" },
+      "padding-y": { "$value": "{primitive.space.3}", "$type": "dimension" }
+    },
+    "card": {
+      "fill": { "$value": "{semantic.surface.card}", "$type": "color" },
+      "stroke": { "$value": "{semantic.border.subtle}", "$type": "color" },
+      "radius": { "$value": "{primitive.radius.lg}", "$type": "dimension" },
+      "padding": { "$value": "{primitive.space.5}", "$type": "dimension" }
+    },
+    "font": {
+      "heading": { "$value": "{primitive.typography.display}", "$type": "fontFamily" },
+      "body": { "$value": "{primitive.typography.body}", "$type": "fontFamily" },
+      "mono": { "$value": "{primitive.typography.mono}", "$type": "fontFamily" }
+    }
+  }
+}

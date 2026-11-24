@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Literal
 
@@ -46,6 +47,9 @@ class DetectionOut(BaseModel):
     p_dung_som: float | None
     p_dung_ngay: float | None
     p_kiem_tra: float | None
+    sub_species_slug: str | None = None
+    sub_species_conf: float | None = None
+    safety_abstained: bool = False
 
 
 class ScanItemOut(BaseModel):
@@ -64,6 +68,9 @@ class ScanItemOut(BaseModel):
     detections: list[DetectionOut]
     created_at: datetime
     updated_at: datetime
+    sub_species_slug: str | None = None
+    sub_species_conf: float | None = None
+    safety_abstained: bool = False
 
 
 class UnseenLot(BaseModel):
@@ -115,3 +122,62 @@ class ScanConfirmResult(BaseModel):
     confirmed_at: datetime
     created_lot_ids: list[uuid.UUID]
     not_seen_lot_ids: list[uuid.UUID]
+
+
+@dataclass(frozen=True)
+class TrainingImageRow:
+    image_id: uuid.UUID
+    scan_id: uuid.UUID
+    user_id: uuid.UUID
+    ordinal: int
+    shelf_group: int
+    width: int
+    height: int
+    storage_key: str
+    mode: str
+    detector_version_id: uuid.UUID | None
+    classifier_version_id: uuid.UUID | None
+    preprocess_version: str | None
+    created_at: datetime
+
+
+@dataclass(frozen=True)
+class TrainingScanItemRow:
+    item_id: uuid.UUID
+    scan_id: uuid.UUID
+    user_id: uuid.UUID
+    ingredient_id: uuid.UUID
+    origin: str
+    model_count: int | None
+    final_count: int | None
+    qty_level: str | None
+    user_action: str
+    original_ingredient_id: uuid.UUID | None
+    user_freshness: str | None
+    created_at: datetime
+
+
+@dataclass(frozen=True)
+class TrainingDetectionRow:
+    detection_id: int
+    scan_image_id: uuid.UUID
+    scan_id: uuid.UUID
+    user_id: uuid.UUID
+    scan_item_id: uuid.UUID | None
+    vision_class_id: int
+    x1: float
+    y1: float
+    x2: float
+    y2: float
+    confidence: float
+    p_tuoi: float | None
+    p_dung_som: float | None
+    p_dung_ngay: float | None
+    p_kiem_tra: float | None
+
+
+@dataclass(frozen=True)
+class TrainingScanBundle:
+    images: list[TrainingImageRow] = field(default_factory=list)
+    items: list[TrainingScanItemRow] = field(default_factory=list)
+    detections: list[TrainingDetectionRow] = field(default_factory=list)

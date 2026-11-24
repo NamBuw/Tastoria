@@ -18,12 +18,15 @@ The caller verifies the best trays with the exact CP-SAT schedule (schedule.solv
 
 from __future__ import annotations
 
+import hashlib
 import itertools
+import json
 import math
 import uuid
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from tastoria.modules.catalog.schemas import RecipeView
 from tastoria.modules.meal import schedule as sch
@@ -45,6 +48,34 @@ class Params:
     bowls_min: float = 0.5  # BR-TRAY-03
     bowls_max: float = 3.0
     bowls_share_guess: float = 1.5  # bowls assumed when splitting E_mâm into dish shares for the slot score
+
+
+CALIBRATED_DEFAULTS = Params(
+    version="tray-p1-knee-20261118",
+    alpha=16.0,
+    beta=2.0,
+    gamma=1.0,
+)
+DEFAULT_SERVING_PATH = Path(__file__).resolve().parents[5] / "deploy" / "models" / "composer" / "serving.json"
+
+
+def load_params(path: Path | None = None) -> Params:
+    """Load calibrated composer weights from `serving.json` (SHA-256 verified), falling back to CALIBRATED_DEFAULTS
+    when no explicit path is provided and the repo artifact is absent."""
+    target = Path(path) if path is not None else DEFAULT_SERVING_PATH
+    if not target.is_file():
+        if path is not None:
+            raise FileNotFoundError(f"composer serving.json not found: {target}")
+        return CALIBRATED_DEFAULTS
+    data = json.loads(target.read_text(encoding="utf-8"))
+    expected = data.get("artifact_sha256")
+    if expected:
+        body = {k: v for k, v in data.items() if k != "artifact_sha256"}
+        canon = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        actual = hashlib.sha256(canon).hexdigest()
+        if actual != expected:
+            raise ValueError(f"composer serving.json sha256 mismatch: expected {expected}, got {actual}")
+    return Params(**data["params"])
 
 
 @dataclass(frozen=True)

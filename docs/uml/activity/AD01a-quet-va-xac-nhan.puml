@@ -32,7 +32,7 @@ while (Còn chip cần sửa?) is (có)
 endwhile (không)
 :Bấm Xác nhận;
 |Hệ thống|
-:Ghi lô và giao dịch nhập kho;
+:Ghi lô mới vào kho;
 |App|
 :Hiện kho đã cập nhật;
 stop

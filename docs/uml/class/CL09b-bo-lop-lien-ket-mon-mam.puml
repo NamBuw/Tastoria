@@ -1,0 +1,43 @@
+@startuml
+title CL09b — Sau khi bỏ lớp liên kết: thành phần món và món trong mâm
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Món" as MON {
+  -tên: Chuỗi
+  -slot: Slot
+  -khẩuPhầnGốc: Số nguyên
+}
+class "Nguyên liệu" as NL {
+  -tên: Chuỗi
+  -đếmĐược: Boolean
+}
+class "Thành phần món" as TPM {
+  -lượng: Gam
+  -vaiTrò: VaiTròNL
+  -luônCó: Boolean
+}
+class "Mâm cơm" as MAM {
+  -bữa: Bữa
+  -sốNgười: Số nguyên
+  -trạngThái: TrạngTháiMâm
+}
+class "Món trong mâm" as MTM {
+  -slot: Slot
+  -hệSốKhẩuPhần: Số thực
+  -trạngThái: TrạngTháiMónMâm
+}
+
+MON *-- "1..*" TPM
+TPM "0..*" -- "1" NL : là
+MAM *-- "2..3" MTM
+MTM "0..*" -- "1" MON : là
+@enduml

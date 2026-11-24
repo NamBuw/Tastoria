@@ -11,10 +11,12 @@ export function PolicyCard({
   policy,
   checked,
   onChange,
+  disabled,
 }: {
   policy: Schemas['PolicyVersion'];
   checked: boolean;
   onChange: (v: boolean) => void;
+  disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const p = policy.purpose;
@@ -23,6 +25,7 @@ export function PolicyCard({
       <Checkbox
         testID={`consent-${p.code}`}
         checked={checked}
+        disabled={disabled}
         onChange={onChange}
         label={`${p.name_vi}${p.is_sensitive ? ' (dữ liệu nhạy cảm)' : ''}`}
         sub={

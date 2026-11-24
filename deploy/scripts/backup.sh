@@ -34,7 +34,7 @@ log "pg_dump"
 dc exec -T postgres pg_dump -U tastoria -d tastoria -Fc --no-owner > "$work/db.dump"
 [ -s "$work/db.dump" ] || die "pg_dump rỗng"
 log "tệp (volume tastoria_files)"
-dc exec -T nginx tar czf - -C /var/lib/tastoria/storage . > "$work/files.tar.gz"
+dc exec -T api tar czf - -C /var/lib/tastoria/storage . > "$work/files.tar.gz"
 {
   echo "created_utc=$ts"
   echo "image_tag=$(env_get TASTORIA_IMAGE_TAG)"

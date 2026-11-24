@@ -84,7 +84,7 @@ def main() -> int:
                 tid("add-lot-submit").click()
                 tid("sheet-add-lot").wait_for(state="detached")
                 pg.wait_for_timeout(300)
-            pg.get_by_text(f"{len(LOTS)} lô, đồ cần dùng trước ở trên").wait_for()
+            pg.get_by_text(f"Hiển thị {len(LOTS)}/{len(LOTS)} lô, ưu tiên dùng trước").wait_for()
             step = "tray"
             pg.goto(BASE + "/mam")
             tid("screen-tray").wait_for()

@@ -19,7 +19,8 @@ MAX_BYTES = 3 * 1024 * 1024  # 3 MB = 3 145 728 bytes (FR-12-02)
 MAX_PIXELS = 4096 * 4096  # FR-12-04
 JPEG_QUALITY = 90
 
-Image.MAX_IMAGE_PIXELS = MAX_PIXELS  # above it Pillow warns; the warning is raised as an error in `sanitize`
+Image.MAX_IMAGE_PIXELS = MAX_PIXELS  # above it Pillow warns; startup filter turns it into an error
+warnings.filterwarnings("error", category=Image.DecompressionBombWarning)
 
 # magic bytes -> Pillow format; the app sends JPEG, PNG/WebP from a gallery are accepted and converted
 _MAGIC = (
@@ -57,20 +58,27 @@ def sanitize(data: bytes, index: int = 0) -> CleanImage:
             415, ProblemCode.unsupported_media_type, "Tệp không phải ảnh JPEG/PNG/WebP.", errors=_field(index)
         )
     try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("error", Image.DecompressionBombWarning)
-            with Image.open(io.BytesIO(data), formats=[fmt]) as im:
-                w, h = im.size
-                if w * h > MAX_PIXELS:
-                    raise ApiError(
-                        422,
-                        ProblemCode.image_too_many_pixels,
-                        f"Ảnh {w}×{h} vượt 4096×4096 điểm ảnh.",
-                        errors=_field(index),
-                    )
-                im.load()
-                upright = ImageOps.exif_transpose(im)
-                rgb = upright.convert("RGB")
+        with Image.open(io.BytesIO(data), formats=[fmt]) as im:
+            w, h = im.size
+            if w <= 0 or h <= 0:
+                raise ApiError(
+                    415, ProblemCode.unsupported_media_type, "Không giải mã được ảnh.", errors=_field(index)
+                )
+            if w * h > MAX_PIXELS:
+                raise ApiError(
+                    422,
+                    ProblemCode.image_too_many_pixels,
+                    f"Ảnh {w}×{h} vượt 4096×4096 điểm ảnh.",
+                    errors=_field(index),
+                )
+            orientation = im.getexif().get(0x0112, 1)
+            if fmt == "JPEG":
+                im.draft("RGB", (w, h))
+            im.load()
+            upright = ImageOps.exif_transpose(im) if orientation != 1 else im
+            rgb = upright if upright.mode == "RGB" else upright.convert("RGB")
+            raw_bytes = rgb.tobytes()
+            final_size = rgb.size
     except ApiError:
         raise
     except (Image.DecompressionBombWarning, Image.DecompressionBombError) as exc:
@@ -79,7 +87,7 @@ def sanitize(data: bytes, index: int = 0) -> CleanImage:
         raise ApiError(
             415, ProblemCode.unsupported_media_type, "Không giải mã được ảnh.", errors=_field(index)
         ) from exc
-    clean = Image.frombytes("RGB", rgb.size, rgb.tobytes())  # fresh buffer: no info dict, no metadata
+    clean = Image.frombytes("RGB", final_size, raw_bytes)  # fresh buffer: no info dict, no metadata
     buf = io.BytesIO()
     clean.save(buf, "JPEG", quality=JPEG_QUALITY, optimize=True)
     return CleanImage(buf.getvalue(), clean.width, clean.height)

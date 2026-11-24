@@ -1,0 +1,25 @@
+@startuml
+title DFD01b — Mức 1, quá trình 2.0 Quét và xác nhận nguyên liệu
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+
+usecase "2.0\nQuét và xác nhận nguyên liệu" as P
+rectangle "Người dùng" as E1
+database "D3 Lần quét và ảnh" as D3
+database "D9 Phiên bản mô hình" as D9
+database "D2 Danh mục món và nguyên liệu" as D2
+database "D4 Kho nguyên liệu (lô, giao dịch)" as D4
+E1 --> P : 1–2 ảnh, chế độ quét, chip đã sửa, xác nhận
+P --> E1 : chip nguyên liệu, trạng thái quét
+D3 --> P : ảnh, khung, chip
+P --> D3 : lần quét, ảnh, chip
+D9 --> P : mô hình đang triển khai, bản đồ lớp
+D2 --> P : lớp thị giác, quy đổi lượng
+D4 --> P : lô đang có (chế độ toàn tủ)
+P --> D4 : lô mới, lô not_seen
+@enduml

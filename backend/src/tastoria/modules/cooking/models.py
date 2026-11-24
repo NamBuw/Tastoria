@@ -40,6 +40,7 @@ class CookSession(Base):
             postgresql_where=text("status IN ('in_progress', 'completed')"),
         ),
         Index("ix_cook_sessions_meal_plan_id", "meal_plan_id"),
+        Index("ix_cook_sessions_meal_plan_status_completed", "meal_plan_id", "status", text("completed_at DESC")),
     )
 
 

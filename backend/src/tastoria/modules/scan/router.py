@@ -6,13 +6,14 @@ import json
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, File, Form, Path, Query, Request, Response, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Path, Query, Request, Response, UploadFile
 from fastapi.responses import JSONResponse
 
 from tastoria.core import idempotency
 from tastoria.core.auth import CurrentUser
 from tastoria.core.db import Uow
 from tastoria.core.errors import ApiError, ProblemCode
+from tastoria.core.ratelimit import enforce_rate_limit
 from tastoria.modules.scan import service
 from tastoria.modules.scan.images import MAX_BYTES
 from tastoria.modules.scan.schemas import (
@@ -49,10 +50,19 @@ def _read(upload: UploadFile, index: int) -> bytes:
     return data
 
 
+def _limit_scan_create(request: Request, user: CurrentUser) -> None:
+    enforce_rate_limit(request, bucket="scan_create", subject=str(user.id), limit=20, window_s=60)
+
+
+def _limit_scan_get(request: Request, user: CurrentUser) -> None:
+    enforce_rate_limit(request, bucket="scan_get", subject=str(user.id), limit=60, window_s=60)
+
+
 @router.post("", operation_id="scan_create_scan", status_code=202, responses={202: {"model": ScanAccepted}})
 def create_scan(
     request: Request,
     user: CurrentUser,
+    _: Annotated[None, Depends(_limit_scan_create)],
     uow: Uow,
     mode: Annotated[ScanMode, Form()],
     images: Annotated[list[UploadFile], File()],
@@ -76,14 +86,15 @@ def create_scan(
 
 
 @router.get("/{id}", operation_id="scan_get_scan", responses={200: {"model": ScanOut}})
-def get_scan(
+async def get_scan(
     id: uuid.UUID,
     request: Request,
     user: CurrentUser,
+    _: Annotated[None, Depends(_limit_scan_get)],
     uow: Uow,
     wait: Annotated[int, Query(ge=0, le=10)] = 0,
 ) -> JSONResponse:
-    out = service.get_scan(uow.session, _deps(request), user, id, wait)
+    out = await service.get_scan_async(uow.session, _deps(request), user, id, wait)
     body = out.model_dump(mode="json", exclude={"unseen_lots"} if out.unseen_lots is None else None)
     headers = {"Retry-After": "1"} if out.status in service.PENDING else None
     return JSONResponse(body, headers=headers)

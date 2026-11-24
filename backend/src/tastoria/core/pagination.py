@@ -23,6 +23,14 @@ def encode(key: list[Any]) -> str:
     return base64.urlsafe_b64encode(raw).decode().rstrip("=")
 
 
+def _invalid_cursor() -> ApiError:
+    return ApiError(
+        400,
+        ProblemCode.validation_error,
+        errors=[{"pointer": "#/query/cursor", "code": "invalid_cursor", "message": "Con trỏ trang không hợp lệ."}],
+    )
+
+
 def decode(cursor: str | None) -> list[Any] | None:
     if cursor is None:
         return None
@@ -33,11 +41,7 @@ def decode(cursor: str | None) -> list[Any] | None:
             raise ValueError
         return key
     except (ValueError, json.JSONDecodeError):
-        raise ApiError(
-            400,
-            ProblemCode.validation_error,
-            errors=[{"pointer": "#/query/cursor", "code": "invalid_cursor", "message": "Con trỏ trang không hợp lệ."}],
-        ) from None
+        raise _invalid_cursor() from None
 
 
 def encode_created(created_at: datetime, id_: uuid.UUID) -> str:
@@ -48,11 +52,27 @@ def decode_created(cursor: str | None) -> tuple[datetime, uuid.UUID] | None:
     key = decode(cursor)
     if key is None:
         return None
+    if len(key) != 2 or not isinstance(key[0], str) or not isinstance(key[1], str):
+        raise _invalid_cursor()
     try:
-        return datetime.fromisoformat(key[0]), uuid.UUID(key[1])
-    except (IndexError, TypeError, ValueError):
-        raise ApiError(
-            400,
-            ProblemCode.validation_error,
-            errors=[{"pointer": "#/query/cursor", "code": "invalid_cursor", "message": "Con trỏ trang không hợp lệ."}],
-        ) from None
+        dt = datetime.fromisoformat(key[0])
+        if dt.tzinfo is None or dt.utcoffset() is None:
+            raise ValueError("naive datetime")
+        return dt, uuid.UUID(key[1])
+    except ValueError:
+        raise _invalid_cursor() from None
+
+
+def decode_created_int(cursor: str | None) -> tuple[datetime, int] | None:
+    key = decode(cursor)
+    if key is None:
+        return None
+    if len(key) != 2 or not isinstance(key[0], str) or not isinstance(key[1], int) or isinstance(key[1], bool):
+        raise _invalid_cursor()
+    try:
+        dt = datetime.fromisoformat(key[0])
+        if dt.tzinfo is None or dt.utcoffset() is None:
+            raise ValueError("naive datetime")
+        return dt, key[1]
+    except ValueError:
+        raise _invalid_cursor() from None

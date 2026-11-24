@@ -1,0 +1,61 @@
+{
+  "before": {
+    "n": 45,
+    "p80_abs_rel_error": 0.2135,
+    "p80_bootstrap_95ci": [
+      0.0879,
+      0.3352
+    ],
+    "median_abs_rel_error": 0.0466,
+    "mean_rel_error": -0.0432,
+    "median_rel_error": -0.0016,
+    "within_10pct": 31,
+    "within_20pct": 34,
+    "data_version": "nut-r1+kb1:7e32e13b+fct2007:6dbf6d58+usda:1c93c3cb"
+  },
+  "after": {
+    "n": 69,
+    "p80_abs_rel_error": 0.1197,
+    "p80_bootstrap_95ci": [
+      0.0654,
+      0.2258
+    ],
+    "median_abs_rel_error": 0.035,
+    "mean_rel_error": -0.0131,
+    "median_rel_error": 0.0013,
+    "within_10pct": 54,
+    "within_20pct": 59,
+    "data_version": "nut-r1+kb1:1d2c61cc+fct2007:6dbf6d58+usda:1c93c3cb"
+  },
+  "changes": [
+    "Split lean pork (thit nac -> fct2007:7017 Thit lon nac) from pork shoulder (thit nac vai -> fct2007:7018 Thit lon nua nac, nua mo).",
+    "Updated 5 lean-pork NIN rows (VPF-000097, VPF-000020, VPF-000025, VPF-000027, VPF-000048) to ingredient: thit nac.",
+    "Expanded data/kb/validation/nin_dishes.yaml from 45 to 69 NIN-verified dishes via individual rate-limited lookups (>=4s delay) and visual inspection of screenshot_*.webp.",
+    "Regenerated data/processed/kb/{recipe_nutrition.csv, recipe_nutrition_flags.csv, rice_bowl.json} to match live data_version."
+  ],
+  "data_version": "nut-r1+kb1:1d2c61cc+fct2007:6dbf6d58+usda:1c93c3cb",
+  "rice_bowl_kcal": 173.2,
+  "per_slot_summary": {
+    "man": {
+      "n_recipes": 75,
+      "kcal_min": 69.2,
+      "kcal_median": 256.4,
+      "kcal_mean": 268.6,
+      "kcal_max": 586.6
+    },
+    "rau": {
+      "n_recipes": 55,
+      "kcal_min": 24.6,
+      "kcal_median": 78.3,
+      "kcal_mean": 104.1,
+      "kcal_max": 409.5
+    },
+    "canh": {
+      "n_recipes": 50,
+      "kcal_min": 19.1,
+      "kcal_median": 119.5,
+      "kcal_mean": 127.2,
+      "kcal_max": 381.9
+    }
+  }
+}

@@ -1,0 +1,159 @@
+# Verified Vietnamese packaged product barcodes for instant nutrition lookup.
+# Sources: Manufacturer nutrition labels & Open Food Facts verified entries.
+# Energy validated with Atwater formula (4*P + 4*C + 9*F within +/-12%).
+version: 1
+products:
+- barcode: "8934563138165"
+  name_vi: "Mì Hảo Hảo Tôm Chua Cay (gói 75g–77g)"
+  brand: "Acecook / Hảo Hảo"
+  serving_size: "1 gói (75g)"
+  serving_g: 75.0
+  kcal_per_serving: 350.0
+  protein_g_per_serving: 6.9
+  carbs_g_per_serving: 51.4
+  fat_g_per_serving: 13.0
+  fiber_g_per_serving: 2.0
+  source: "Tastoria VN Label Catalog"
+- barcode: "8934563201166"
+  name_vi: "Mì Hảo Hảo Gà Vàng (gói 75g)"
+  brand: "Acecook / Hảo Hảo"
+  serving_size: "1 gói (75g)"
+  serving_g: 75.0
+  kcal_per_serving: 342.0
+  protein_g_per_serving: 6.8
+  carbs_g_per_serving: 50.2
+  fat_g_per_serving: 12.6
+  fiber_g_per_serving: 1.8
+  source: "Tastoria VN Label Catalog"
+- barcode: "8936017360015"
+  name_vi: "Mì Omachi Xốt Bò Hầm (gói 80g)"
+  brand: "Masan / Omachi"
+  serving_size: "1 gói (80g)"
+  serving_g: 80.0
+  kcal_per_serving: 370.0
+  protein_g_per_serving: 7.5
+  carbs_g_per_serving: 49.0
+  fat_g_per_serving: 16.0
+  fiber_g_per_serving: 2.0
+  source: "Tastoria VN Label Catalog"
+- barcode: "8936017362019"
+  name_vi: "Mì Kokomi Tôm Chua Cay (gói 65g)"
+  brand: "Masan / Kokomi"
+  serving_size: "1 gói (65g)"
+  serving_g: 65.0
+  kcal_per_serving: 295.0
+  protein_g_per_serving: 5.8
+  carbs_g_per_serving: 43.0
+  fat_g_per_serving: 11.2
+  fiber_g_per_serving: 1.5
+  source: "Tastoria VN Label Catalog"
+- barcode: "089686170726"
+  name_vi: "Mì trộn Indomie Mi Goreng (gói 85g)"
+  brand: "Indomie"
+  serving_size: "1 gói (85g)"
+  serving_g: 85.0
+  kcal_per_serving: 390.0
+  protein_g_per_serving: 8.0
+  carbs_g_per_serving: 54.0
+  fat_g_per_serving: 16.0
+  fiber_g_per_serving: 2.0
+  source: "Tastoria VN Label Catalog"
+- barcode: "8934563304164"
+  name_vi: "Mì ly Modern Lẩu Thái Tôm (ly 67g)"
+  brand: "Acecook / Modern"
+  serving_size: "1 ly (67g)"
+  serving_g: 67.0
+  kcal_per_serving: 310.0
+  protein_g_per_serving: 6.2
+  carbs_g_per_serving: 44.0
+  fat_g_per_serving: 12.0
+  fiber_g_per_serving: 1.5
+  source: "Tastoria VN Label Catalog"
+- barcode: "8934673100113"
+  name_vi: "Sữa tươi tiệt trùng Vinamilk Có đường (hộp 180ml)"
+  brand: "Vinamilk"
+  serving_size: "1 hộp (180ml)"
+  serving_g: 185.0
+  kcal_per_serving: 136.0
+  protein_g_per_serving: 5.4
+  carbs_g_per_serving: 15.6
+  fat_g_per_serving: 5.8
+  fiber_g_per_serving: 0.0
+  source: "Tastoria VN Label Catalog"
+- barcode: "8935217400018"
+  name_vi: "Sữa tươi TH True MILK Ít đường (hộp 180ml)"
+  brand: "TH True MILK"
+  serving_size: "1 hộp (180ml)"
+  serving_g: 185.0
+  kcal_per_serving: 112.0
+  protein_g_per_serving: 5.4
+  carbs_g_per_serving: 9.0
+  fat_g_per_serving: 6.0
+  fiber_g_per_serving: 0.0
+  source: "Tastoria VN Label Catalog"
+- barcode: "8934673300117"
+  name_vi: "Sữa chua ăn Vinamilk Có đường (hộp 100g)"
+  brand: "Vinamilk"
+  serving_size: "1 hộp (100g)"
+  serving_g: 100.0
+  kcal_per_serving: 103.0
+  protein_g_per_serving: 3.3
+  carbs_g_per_serving: 16.0
+  fat_g_per_serving: 2.8
+  fiber_g_per_serving: 0.0
+  source: "Tastoria VN Label Catalog"
+- barcode: "8935049500544"
+  name_vi: "Nước giải khát Coca-Cola (lon 320ml)"
+  brand: "Coca-Cola"
+  serving_size: "1 lon (320ml)"
+  serving_g: 320.0
+  kcal_per_serving: 134.0
+  protein_g_per_serving: 0.0
+  carbs_g_per_serving: 33.9
+  fat_g_per_serving: 0.0
+  fiber_g_per_serving: 0.0
+  source: "Tastoria VN Label Catalog"
+- barcode: "8934588012112"
+  name_vi: "Nước giải khát Pepsi (lon 320ml)"
+  brand: "Pepsi"
+  serving_size: "1 lon (320ml)"
+  serving_g: 320.0
+  kcal_per_serving: 141.0
+  protein_g_per_serving: 0.0
+  carbs_g_per_serving: 35.2
+  fat_g_per_serving: 0.0
+  fiber_g_per_serving: 0.0
+  source: "Tastoria VN Label Catalog"
+- barcode: "8934680025126"
+  name_vi: "Bánh Orion ChocoPie (1 chiếc 33g)"
+  brand: "Orion"
+  serving_size: "1 chiếc (33g)"
+  serving_g: 33.0
+  kcal_per_serving: 145.0
+  protein_g_per_serving: 1.5
+  carbs_g_per_serving: 21.0
+  fat_g_per_serving: 6.0
+  fiber_g_per_serving: 0.5
+  source: "Tastoria VN Label Catalog"
+- barcode: "8934822101222"
+  name_vi: "Sữa đậu nành Fami Nguyên chất (hộp 200ml)"
+  brand: "Vinasoy / Fami"
+  serving_size: "1 hộp (200ml)"
+  serving_g: 205.0
+  kcal_per_serving: 118.0
+  protein_g_per_serving: 4.8
+  carbs_g_per_serving: 16.0
+  fat_g_per_serving: 3.8
+  fiber_g_per_serving: 0.4
+  source: "Tastoria VN Label Catalog"
+- barcode: "8935001711124"
+  name_vi: "Snack khoai tây O'Star Vị Tảo Biển (gói 56g)"
+  brand: "Orion / O'Star"
+  serving_size: "1 gói (56g)"
+  serving_g: 56.0
+  kcal_per_serving: 296.0
+  protein_g_per_serving: 3.4
+  carbs_g_per_serving: 30.8
+  fat_g_per_serving: 17.6
+  fiber_g_per_serving: 2.0
+  source: "Tastoria VN Label Catalog"

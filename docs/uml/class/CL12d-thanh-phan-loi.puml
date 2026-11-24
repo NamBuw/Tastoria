@@ -1,0 +1,47 @@
+@startuml
+title CL12d — Thành phần lõi: giao dịch, lũy đẳng, xác thực, lỗi
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "UnitOfWork" as UW <<class>> {
+  -session: Session
+  +after_commit(fn: Callable): None
+  +run_after_commit(): None
+}
+class "core.idempotency" as ID <<module>> {
+  +begin(user_id: UUID, idem: IdempotencyRequest): JSONResponse
+  +finish(user_id: UUID, idem: IdempotencyRequest, status: int, body: object): JSONResponse
+  +purge_expired(): int
+}
+class "IdempotencyRequest" as IR <<dataclass>> {
+  -key: str
+  -request_sha256: bytes
+}
+class "AuthUser" as AU <<dataclass>> {
+  -id: UUID
+  -role: str
+  -email: str
+}
+class "core.auth" as AT <<module>> {
+  +current_user(request: Request, uow: UnitOfWork): AuthUser
+}
+class "ApiError" as ER <<exception>> {
+  -status: int
+  -code: ProblemCode
+  -commit: bool
+}
+
+ID ..> IR
+ID ..> UW
+AT ..> AU
+AT ..> UW
+UW ..> ER
+@enduml

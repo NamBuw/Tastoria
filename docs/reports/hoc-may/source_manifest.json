@@ -1,0 +1,1639 @@
+{
+  "schema_version": "1.0",
+  "sources": [
+    {
+      "evidence_id": "E001",
+      "source_type": "preprint",
+      "title": "Scientific Agent Skills: A Library of Procedural Knowledge for Research Agents",
+      "authors": [
+        "T. Kassis",
+        "Vinayak Agarwal",
+        "Yu-Huan He",
+        "Darshil Patel",
+        "Aubrey M. Brueckner"
+      ],
+      "year": 2026,
+      "identifiers": {
+        "doi": "10.48550/arXiv.2609.00065",
+        "url": "https://arxiv.org/abs/2609.00065"
+      },
+      "locator": "Semantic Scholar API record; arXiv:2609.00065 XML record; 163 procedural skills across 16 research areas",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E002",
+      "source_type": "journal_article",
+      "title": "TRIPOD+AI statement: updated guidance for reporting clinical prediction models that use regression or machine learning methods",
+      "authors": [
+        "Gary S Collins",
+        "Karel G M Moons",
+        "Paula Dhiman",
+        "Richard D Riley",
+        "Andrew L Beam",
+        "Ben Van Calster",
+        "Marzyeh Ghassemi",
+        "Xiaoxuan Liu",
+        "Johannes B Reitsma",
+        "Maarten van Smeden",
+        "Anne-Laure Boulesteix",
+        "Jennifer Catherine Camaradou",
+        "Leo Anthony Celi",
+        "Spiros Denaxas",
+        "Alastair K Denniston",
+        "Ben Glocker",
+        "Robert M Golub",
+        "Hugh Harvey",
+        "Georg Heinze",
+        "Michael M Hoffman",
+        "André Pascal Kengne",
+        "Emily Lam",
+        "Naomi Lee",
+        "Elizabeth W Loder",
+        "Lena Maier-Hein",
+        "Bilal A Mateen",
+        "Melissa D McCradden",
+        "Lauren Oakden-Rayner",
+        "Johan Ordish",
+        "Richard Parnell",
+        "Sherri Rose",
+        "Karandeep Singh",
+        "Laure Wynants",
+        "Patricia Logullo"
+      ],
+      "year": 2024,
+      "identifiers": {
+        "doi": "10.1136/bmj-2023-078378"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1136/bmj-2023-078378; pp. e078378; TRIPOD+AI 27-item checklist for prediction models",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E003",
+      "source_type": "journal_article",
+      "title": "STARD 2015: an updated list of essential items for reporting diagnostic accuracy studies",
+      "authors": [
+        "Patrick M Bossuyt",
+        "Johannes B Reitsma",
+        "David E Bruns",
+        "Constantine A Gatsonis",
+        "Paul P Glasziou",
+        "Les Irwig",
+        "Jeroen G Lijmer",
+        "David Moher",
+        "Drummond Rennie",
+        "Henrica C W de Vet",
+        "Herbert Y Kressel",
+        "Nader Rifai",
+        "Robert M Golub",
+        "Douglas G Altman",
+        "Lotty Hooft",
+        "Daniël A Korevaar",
+        "Jérémie F Cohen"
+      ],
+      "year": 2015,
+      "identifiers": {
+        "doi": "10.1136/bmj.h5527"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1136/bmj.h5527; pp. h5527; STARD 2015 30-item diagnostic accuracy checklist",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E004",
+      "source_type": "journal_article",
+      "title": "The STARD-AI reporting guideline for diagnostic accuracy studies using artificial intelligence",
+      "authors": [
+        "Viknesh Sounderajah",
+        "Ahmad Guni",
+        "Xiaoxuan Liu",
+        "Gary S. Collins",
+        "Alan Karthikesalingam",
+        "Sheraz R. Markar",
+        "Robert M. Golub",
+        "Alastair K. Denniston",
+        "Shravya Shetty",
+        "David Moher",
+        "Patrick M. Bossuyt",
+        "Ara Darzi",
+        "Hutan Ashrafian",
+        "Amish Acharya",
+        "Bilal A. Mateen",
+        "Christopher Kelly",
+        "Daniel Ting",
+        "Darren Treanor",
+        "Dominic King",
+        "Felix Greaves",
+        "Hugh Harvey",
+        "Jeffrey De Fauw",
+        "Jérémie F. Cohen",
+        "Jonathan Godwin",
+        "Jonathan Pearson-Stuttard",
+        "Karel Moons",
+        "Leanne Harling",
+        "Lena Maier-Hein",
+        "Lotty Hooft",
+        "Matthew DF McInnes",
+        "Melissa McCradden",
+        "Nader Rifai",
+        "Nenad Tomasev",
+        "Pasha Normahani",
+        "Penny Whiting",
+        "Ravi Aggarwal",
+        "Sebastian Vollmer",
+        "Trishan Panch",
+        "Ben Glocker",
+        "David Taylor",
+        "Diana Samuel",
+        "Johan Ordish",
+        "Karandeep Singh",
+        "Leo Celi",
+        "Sherri Rose",
+        "Suchi Saria"
+      ],
+      "year": 2025,
+      "identifiers": {
+        "doi": "10.1038/s41591-025-03953-8"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1038/s41591-025-03953-8; pp. 3283-3289; STARD-AI 2025 reporting guideline for AI diagnostic accuracy",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E005",
+      "source_type": "journal_article",
+      "title": "A Simple Sequentially Rejective Multiple Test Procedure",
+      "authors": [
+        "S. Holm"
+      ],
+      "year": 1979,
+      "identifiers": {
+        "doi": "10.2307/4615733"
+      },
+      "locator": "Semantic Scholar API record; Step-down sequentially rejective Holm-Bonferroni FWER procedure",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E006",
+      "source_type": "journal_article",
+      "title": "Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing",
+      "authors": [
+        "Yoav Benjamini",
+        "Yosef Hochberg"
+      ],
+      "year": 1995,
+      "identifiers": {
+        "doi": "10.1111/j.2517-6161.1995.tb02031.x"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1111/j.2517-6161.1995.tb02031.x; pp. 289-300; Benjamini-Hochberg step-up FDR control",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E007",
+      "source_type": "journal_article",
+      "title": "Individual Comparisons by Ranking Methods",
+      "authors": [
+        "Frank Wilcoxon"
+      ],
+      "year": 1945,
+      "identifiers": {
+        "doi": "10.2307/3001968"
+      },
+      "locator": "Crossref DOI 10.2307/3001968; pp. 80; Paired signed-rank non-parametric test",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E008",
+      "source_type": "journal_article",
+      "title": "Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages",
+      "authors": [
+        "Quinn McNemar"
+      ],
+      "year": 1947,
+      "identifiers": {
+        "doi": "10.1007/bf02295996"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1007/bf02295996; pp. 153-157; Correlated proportions discordant test",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E009",
+      "source_type": "book",
+      "title": "An Introduction to the Bootstrap",
+      "authors": [
+        "Bradley Efron",
+        "R.J. Tibshirani"
+      ],
+      "year": 1994,
+      "identifiers": {
+        "doi": "10.1201/9780429246593"
+      },
+      "locator": "Crossref DOI 10.1201/9780429246593; Non-parametric bootstrap confidence intervals and hypothesis testing",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E010",
+      "source_type": "journal_article",
+      "title": "Approximate Statistical Tests for Comparing Supervised Classification Learning Algorithms",
+      "authors": [
+        "Thomas G. Dietterich"
+      ],
+      "year": 1998,
+      "identifiers": {
+        "doi": "10.1162/089976698300017197"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1162/089976698300017197; pp. 1895-1923; McNemar and paired comparison tests for supervised classifiers",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E011",
+      "source_type": "journal_article",
+      "title": "A Coefficient of Agreement for Nominal Scales",
+      "authors": [
+        "Jacob Cohen"
+      ],
+      "year": 1960,
+      "identifiers": {
+        "doi": "10.1177/001316446002000104"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1177/001316446002000104; pp. 37-46; Nominal inter-rater agreement kappa",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E012",
+      "source_type": "journal_article",
+      "title": "Weighted kappa: Nominal scale agreement provision for scaled disagreement or partial credit.",
+      "authors": [
+        "Jacob Cohen"
+      ],
+      "year": 1968,
+      "identifiers": {
+        "doi": "10.1037/h0026256"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1037/h0026256; pp. 213-220; Quadratic weighted kappa for ordinal scales",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E013",
+      "source_type": "journal_article",
+      "title": "VERIFICATION OF FORECASTS EXPRESSED IN TERMS OF PROBABILITY",
+      "authors": [
+        "GLENN W. BRIER"
+      ],
+      "year": 1950,
+      "identifiers": {
+        "doi": "10.1175/1520-0493(1950)078<0001:vofeit>2.0.co;2"
+      },
+      "locator": "Crossref DOI 10.1175/1520-0493(1950)078<0001:vofeit>2.0.co;2; pp. 1-3; Proper quadratic scoring rule for probabilistic forecasts",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E014",
+      "source_type": "conference_paper",
+      "title": "You Only Look Once: Unified, Real-Time Object Detection",
+      "authors": [
+        "Joseph Redmon",
+        "Santosh Divvala",
+        "Ross Girshick",
+        "Ali Farhadi"
+      ],
+      "year": 2016,
+      "identifiers": {
+        "doi": "10.1109/cvpr.2016.91"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1109/cvpr.2016.91; pp. 779-788; Unified single-stage real-time object detection",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E015",
+      "source_type": "conference_paper",
+      "title": "Microsoft COCO: Common Objects in Context",
+      "authors": [
+        "Tsung-Yi Lin",
+        "Michael Maire",
+        "Serge Belongie",
+        "James Hays",
+        "Pietro Perona",
+        "Deva Ramanan",
+        "Piotr Dollár",
+        "C. Lawrence Zitnick"
+      ],
+      "year": 2014,
+      "identifiers": {
+        "doi": "10.1007/978-3-319-10602-1_48"
+      },
+      "locator": "Crossref DOI 10.1007/978-3-319-10602-1_48; pp. 740-755; COCO AP@[.5:.95] and small/medium/large size stratification",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E016",
+      "source_type": "conference_paper",
+      "title": "Grounding DINO: Marrying DINO with Grounded Pre-training for Open-Set Object Detection",
+      "authors": [
+        "Shilong Liu",
+        "Zhaoyang Zeng",
+        "Tianhe Ren",
+        "Feng Li",
+        "Hao Zhang",
+        "Jie Yang",
+        "Qing Jiang",
+        "Chunyuan Li",
+        "Jianwei Yang",
+        "Hang Su",
+        "Jun Zhu",
+        "Lei Zhang"
+      ],
+      "year": 2025,
+      "identifiers": {
+        "doi": "10.1007/978-3-031-72970-6_3"
+      },
+      "locator": "Crossref DOI 10.1007/978-3-031-72970-6_3; pp. 38-55; Open-set text-grounded object detection",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E017",
+      "source_type": "conference_paper",
+      "title": "Soft-NMS — Improving Object Detection with One Line of Code",
+      "authors": [
+        "Navaneeth Bodla",
+        "Bharat Singh",
+        "Rama Chellappa",
+        "Larry S. Davis"
+      ],
+      "year": 2017,
+      "identifiers": {
+        "doi": "10.1109/iccv.2017.593"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1109/iccv.2017.593; pp. 5562-5570; Soft non-maximum suppression for crowded object detection",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E018",
+      "source_type": "conference_paper",
+      "title": "Slicing Aided Hyper Inference and Fine-Tuning for Small Object Detection",
+      "authors": [
+        "Fatih Cagatay Akyon",
+        "Sinan Onur Altinuc",
+        "Alptekin Temizel"
+      ],
+      "year": 2022,
+      "identifiers": {
+        "doi": "10.1109/icip46576.2022.9897990"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1109/icip46576.2022.9897990; pp. 966-970; Slicing aided hyper inference for small objects",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E019",
+      "source_type": "journal_article",
+      "title": "Is Underwater Image Enhancement All Object Detectors Need?",
+      "authors": [
+        "Yu-Dong Wang",
+        "Ji-Chang Guo",
+        "Wanru He",
+        "Huan Gao",
+        "Hui-Hui Yue",
+        "Zenan Zhang",
+        "Chongyi Li"
+      ],
+      "year": 2023,
+      "identifiers": {
+        "doi": "10.1109/JOE.2023.3302888",
+        "url": "https://arxiv.org/abs/2311.18814"
+      },
+      "locator": "Semantic Scholar API record; arXiv:2311.18814 XML record; Benchmark showing raw images outperform enhancement preprocessors across 7 detectors",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E020",
+      "source_type": "conference_paper",
+      "title": "LVIS: A Dataset for Large Vocabulary Instance Segmentation",
+      "authors": [
+        "Agrim Gupta",
+        "Piotr Dollar",
+        "Ross Girshick"
+      ],
+      "year": 2019,
+      "identifiers": {
+        "doi": "10.1109/cvpr.2019.00550"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1109/cvpr.2019.00550; pp. 5351-5359; Large Vocabulary Instance Segmentation dataset (1,203 classes)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E021",
+      "source_type": "preprint",
+      "title": "RPC: A Large-Scale Retail Product Checkout Dataset",
+      "authors": [
+        "Xiu-Shen Wei",
+        "Quan Cui",
+        "Lei Yang",
+        "Peng Wang",
+        "Ling-Qiao Liu"
+      ],
+      "year": 2019,
+      "identifiers": {
+        "doi": "10.48550/arXiv.1901.07249",
+        "url": "https://arxiv.org/abs/1901.07249"
+      },
+      "locator": "Semantic Scholar API record; arXiv:1901.07249 XML record; RPC large-scale retail product checkout benchmark",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E022",
+      "source_type": "journal_article",
+      "title": "The Open Images Dataset V4",
+      "authors": [
+        "Alina Kuznetsova",
+        "Hassan Rom",
+        "Neil Alldrin",
+        "Jasper Uijlings",
+        "Ivan Krasin",
+        "Jordi Pont-Tuset",
+        "Shahab Kamali",
+        "Stefan Popov",
+        "Matteo Malloci",
+        "Alexander Kolesnikov",
+        "Tom Duerig",
+        "Vittorio Ferrari"
+      ],
+      "year": 2020,
+      "identifiers": {
+        "doi": "10.1007/s11263-020-01316-z"
+      },
+      "locator": "Crossref DOI 10.1007/s11263-020-01316-z; pp. 1956-1981; Open Images dataset boxable annotations and IsGroupOf metadata",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E023",
+      "source_type": "preprint",
+      "title": "Roboflow100-VL: A Multi-Domain Object Detection Benchmark for Vision-Language Models",
+      "authors": [
+        "Peter Robicheaux",
+        "Matvei Popov",
+        "Anish Madan",
+        "Isaac Robinson",
+        "Joseph Nelson",
+        "Deva Ramanan",
+        "Neehar Peri"
+      ],
+      "year": 2025,
+      "identifiers": {
+        "doi": "10.48550/arXiv.2505.20612",
+        "url": "https://arxiv.org/abs/2505.20612"
+      },
+      "locator": "arXiv:2505.20612 XML record; RF100-VL multi-domain benchmark showing <2% zero-shot VLM/Grounding DINO on hard domains",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E024",
+      "source_type": "conference_paper",
+      "title": "Searching for MobileNetV3",
+      "authors": [
+        "Andrew Howard",
+        "Mark Sandler",
+        "Bo Chen",
+        "Weijun Wang",
+        "Liang-Chieh Chen",
+        "Mingxing Tan",
+        "Grace Chu",
+        "Vijay Vasudevan",
+        "Yukun Zhu",
+        "Ruoming Pang",
+        "Hartwig Adam",
+        "Quoc Le"
+      ],
+      "year": 2019,
+      "identifiers": {
+        "doi": "10.1109/iccv.2019.00140"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1109/iccv.2019.00140; pp. 1314-1324; MobileNetV3-Small lightweight CNN backbone",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E025",
+      "source_type": "preprint",
+      "title": "EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks",
+      "authors": [
+        "M. Tan",
+        "Quoc V. Le"
+      ],
+      "year": 2019,
+      "identifiers": {
+        "doi": "10.48550/arXiv.1905.11946",
+        "url": "https://arxiv.org/abs/1905.11946"
+      },
+      "locator": "Semantic Scholar API record; arXiv:1905.11946 XML record; Compound scaling for EfficientNet-B0",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E026",
+      "source_type": "conference_paper",
+      "title": "Deep Residual Learning for Image Recognition",
+      "authors": [
+        "Kaiming He",
+        "Xiangyu Zhang",
+        "Shaoqing Ren",
+        "Jian Sun"
+      ],
+      "year": 2016,
+      "identifiers": {
+        "doi": "10.1109/cvpr.2016.90"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1109/cvpr.2016.90; pp. 770-778; Deep residual learning (ResNet-18)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E027",
+      "source_type": "preprint",
+      "title": "On Calibration of Modern Neural Networks",
+      "authors": [
+        "Chuan Guo",
+        "Geoff Pleiss",
+        "Yu Sun",
+        "Kilian Q. Weinberger"
+      ],
+      "year": 2017,
+      "identifiers": {
+        "doi": "10.48550/arXiv.1706.04599",
+        "url": "https://arxiv.org/abs/1706.04599"
+      },
+      "locator": "Semantic Scholar API record; arXiv:1706.04599 XML record; ECE reliability diagrams and Temperature Scaling calibration",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E028",
+      "source_type": "report",
+      "title": "Probabilistic Outputs for Support vector Machines and Comparisons to Regularized Likelihood Methods",
+      "authors": [
+        "J. Platt"
+      ],
+      "year": 1999,
+      "identifiers": {
+        "url": "https://www.semanticscholar.org/paper/42e5ed832d4310ce4378c44d05570439df28a393"
+      },
+      "locator": "Semantic Scholar API record; Platt sigmoid probability calibration for SVM outputs",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E029",
+      "source_type": "journal_article",
+      "title": "Multiresolution gray-scale and rotation invariant texture classification with local binary patterns",
+      "authors": [
+        "T. Ojala",
+        "M. Pietikainen",
+        "T. Maenpaa"
+      ],
+      "year": 2002,
+      "identifiers": {
+        "doi": "10.1109/tpami.2002.1017623"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1109/tpami.2002.1017623; pp. 971-987; Uniform rotation-invariant Local Binary Patterns (LBP)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E030",
+      "source_type": "journal_article",
+      "title": "Textural Features for Image Classification",
+      "authors": [
+        "Robert M. Haralick",
+        "K. Shanmugam",
+        "Its'Hak Dinstein"
+      ],
+      "year": 1973,
+      "identifiers": {
+        "doi": "10.1109/tsmc.1973.4309314"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1109/tsmc.1973.4309314; pp. 610-621; Gray-Level Co-occurrence Matrix (GLCM) texture features",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E031",
+      "source_type": "conference_paper",
+      "title": "What Else Can Fool Deep Learning? Addressing Color Constancy Errors on Deep Neural Network Performance",
+      "authors": [
+        "M. Afifi",
+        "Michael S. Brown"
+      ],
+      "year": 2019,
+      "identifiers": {
+        "doi": "10.1109/ICCV.2019.00033",
+        "url": "https://arxiv.org/abs/1912.06960"
+      },
+      "locator": "Semantic Scholar API record; arXiv:1912.06960 XML record; White-balance errors degrade CNNs; color constancy augmentation",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E032",
+      "source_type": "journal_article",
+      "title": "Improving quality inspection of food products by computer vision––a review",
+      "authors": [
+        "Tadhg Brosnan",
+        "Da-Wen Sun"
+      ],
+      "year": 2004,
+      "identifiers": {
+        "doi": "10.1016/s0260-8774(03)00183-3"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1016/s0260-8774(03)00183-3; pp. 3-16; Computer vision inspection of agricultural food quality",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E033",
+      "source_type": "journal_article",
+      "title": "Fruits and vegetables quality evaluation using computer vision: A review",
+      "authors": [
+        "Anuja Bhargava",
+        "Atul Bansal"
+      ],
+      "year": 2021,
+      "identifiers": {
+        "doi": "10.1016/j.jksuci.2018.06.002"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1016/j.jksuci.2018.06.002; pp. 243-257; Fruits and vegetables quality evaluation review",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E034",
+      "source_type": "journal_article",
+      "title": "Predicting sensory evaluation of spinach freshness using machine learning model and digital images",
+      "authors": [
+        "Kento Koyama",
+        "Marin Tanaka",
+        "Byeong-Hyo Cho",
+        "Yusaku Yoshikawa",
+        "Shige Koseki"
+      ],
+      "year": 2021,
+      "identifiers": {
+        "doi": "10.1371/journal.pone.0248769"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1371/journal.pone.0248769; pp. e0248769; Spinach freshness chronological sensory scoring and color+SVM baseline",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E035",
+      "source_type": "conference_paper",
+      "title": "Local Vegetable Freshness Classification Based on Chronological Monitoring Using Transfer Learning Approach",
+      "authors": [
+        "Mahedi Hasan Abeer",
+        "Meherun Nessa Lamia",
+        "Jannatul Feardous Nafsi",
+        "Fabia Chowdhury",
+        "Mahi Sarwar Anol",
+        "Md. Sazzadur Ahamed"
+      ],
+      "year": 2023,
+      "identifiers": {
+        "doi": "10.1007/978-3-031-38296-3_5"
+      },
+      "locator": "Crossref DOI 10.1007/978-3-031-38296-3_5; pp. 50-66; Chronological vegetable freshness classification via transfer learning",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E036",
+      "source_type": "preprint",
+      "title": "BPR: Bayesian Personalized Ranking from Implicit Feedback",
+      "authors": [
+        "Steffen Rendle",
+        "Christoph Freudenthaler",
+        "Zeno Gantner",
+        "Lars Schmidt-Thieme"
+      ],
+      "year": 2009,
+      "identifiers": {
+        "doi": "10.48550/arXiv.1205.2618",
+        "url": "https://arxiv.org/abs/1205.2618"
+      },
+      "locator": "Semantic Scholar API record; arXiv:1205.2618 XML record; Bayesian Personalized Ranking (BPR) pairwise optimization from implicit feedback",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E037",
+      "source_type": "conference_paper",
+      "title": "Revisiting BPR: A Replicability Study of a Common Recommender System Baseline",
+      "authors": [
+        "Aleksandr Milogradskii",
+        "Oleg Lashinin",
+        "Alexander P",
+        "Marina Ananyeva",
+        "Sergey Kolesnikov"
+      ],
+      "year": 2024,
+      "identifiers": {
+        "doi": "10.1145/3640457.3688073"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1145/3640457.3688073; pp. 267-277; BPR replicability study showing sensitivity to sampling and regularization",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E038",
+      "source_type": "conference_paper",
+      "title": "Collaborative Filtering for Implicit Feedback Datasets",
+      "authors": [
+        "Yifan Hu",
+        "Yehuda Koren",
+        "Chris Volinsky"
+      ],
+      "year": 2008,
+      "identifiers": {
+        "doi": "10.1109/icdm.2008.22"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1109/icdm.2008.22; pp. 263-272; Weighted ALS collaborative filtering for implicit feedback",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E039",
+      "source_type": "conference_paper",
+      "title": "Embarrassingly Shallow Autoencoders for Sparse Data",
+      "authors": [
+        "Harald Steck"
+      ],
+      "year": 2019,
+      "identifiers": {
+        "doi": "10.1145/3308558.3313710"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1145/3308558.3313710; pp. 3251-3257; Closed-form item-item autoencoder EASE^R",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E040",
+      "source_type": "conference_paper",
+      "title": "Item-based collaborative filtering recommendation algorithms",
+      "authors": [
+        "Badrul Sarwar",
+        "George Karypis",
+        "Joseph Konstan",
+        "John Riedl"
+      ],
+      "year": 2001,
+      "identifiers": {
+        "doi": "10.1145/371920.372071"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1145/371920.372071; pp. 285-295; Item-based collaborative filtering cosine similarity",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E041",
+      "source_type": "preprint",
+      "title": "Metadata Embeddings for User and Item Cold-start Recommendations",
+      "authors": [
+        "Maciej Kula"
+      ],
+      "year": 2015,
+      "identifiers": {
+        "doi": "10.48550/arXiv.1507.08439",
+        "url": "https://arxiv.org/abs/1507.08439"
+      },
+      "locator": "Semantic Scholar API record; arXiv:1507.08439 XML record; Hybrid collaborative+content LightFM embeddings for cold start",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E042",
+      "source_type": "conference_paper",
+      "title": "Generating Personalized Recipes from Historical User Preferences",
+      "authors": [
+        "Bodhisattwa Prasad Majumder",
+        "Shuyang Li",
+        "Jianmo Ni",
+        "Julian McAuley"
+      ],
+      "year": 2019,
+      "identifiers": {
+        "doi": "10.18653/v1/d19-1613"
+      },
+      "locator": "Crossref DOI 10.18653/v1/d19-1613; pp. 5975-5981; Food.com recipes and user review interactions dataset (EMNLP 2019)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E043",
+      "source_type": "conference_paper",
+      "title": "Performance of recommender algorithms on top-n recommendation tasks",
+      "authors": [
+        "Paolo Cremonesi",
+        "Yehuda Koren",
+        "Roberto Turrin"
+      ],
+      "year": 2010,
+      "identifiers": {
+        "doi": "10.1145/1864708.1864721"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1145/1864708.1864721; pp. 39-46; RMSE optimization does not guarantee top-N accuracy (pp. 39-46; TopPop claim requires full ACM PDF)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E044",
+      "source_type": "conference_paper",
+      "title": "Are we really making much progress? A worrying analysis of recent neural recommendation approaches",
+      "authors": [
+        "Maurizio Ferrari Dacrema",
+        "P. Cremonesi",
+        "D. Jannach"
+      ],
+      "year": 2019,
+      "identifiers": {
+        "doi": "10.1145/3298689.3347058",
+        "url": "https://arxiv.org/abs/1907.06902"
+      },
+      "locator": "Semantic Scholar API record; arXiv:1907.06902 XML record; 7/18 neural recommenders reproduced; 6/7 beaten by tuned simple baselines",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E045",
+      "source_type": "conference_paper",
+      "title": "Exploring Data Splitting Strategies for the Evaluation of Recommendation Models",
+      "authors": [
+        "Zai-Qiao Meng",
+        "Richard Mccreadie",
+        "C. Macdonald",
+        "I. Ounis"
+      ],
+      "year": 2020,
+      "identifiers": {
+        "doi": "10.1145/3383313.3418479",
+        "url": "https://arxiv.org/abs/2007.13237"
+      },
+      "locator": "Semantic Scholar API record; arXiv:2007.13237 XML record; Data splitting strategy alters model rankings",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E046",
+      "source_type": "journal_article",
+      "title": "A Critical Study on Data Leakage in Recommender System Offline Evaluation",
+      "authors": [
+        "Yi-Tong Ji",
+        "Aixin Sun",
+        "Jie Zhang",
+        "Chenliang Li"
+      ],
+      "year": 2023,
+      "identifiers": {
+        "doi": "10.1145/3569930",
+        "url": "https://arxiv.org/abs/2010.11060"
+      },
+      "locator": "Semantic Scholar API record; arXiv:2010.11060 XML record; ACM TOIS Vol. 41, pp. 1-27; leave-last-one-out leaks future data vs global time cutoff",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E047",
+      "source_type": "conference_paper",
+      "title": "On Sampled Metrics for Item Recommendation",
+      "authors": [
+        "Walid Krichene",
+        "Steffen Rendle"
+      ],
+      "year": 2020,
+      "identifiers": {
+        "doi": "10.1145/3394486.3403226"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1145/3394486.3403226; pp. 1748-1757; Sampled top-K metrics distort rankings vs full-catalog evaluation",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E048",
+      "source_type": "preprint",
+      "title": "Distributed Representations of Words and Phrases and their Compositionality",
+      "authors": [
+        "Tomas Mikolov",
+        "Ilya Sutskever",
+        "Kai Chen",
+        "Greg Corrado",
+        "Jeffrey Dean"
+      ],
+      "year": 2013,
+      "identifiers": {
+        "doi": "10.48550/arXiv.1310.4546",
+        "url": "https://arxiv.org/abs/1310.4546"
+      },
+      "locator": "arXiv:1310.4546 XML record; Skip-gram distributed representations (Word2Vec)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E049",
+      "source_type": "conference_paper",
+      "title": "Recipe recommendation using ingredient networks",
+      "authors": [
+        "Chun-Yuen Teng",
+        "Yu-Ru Lin",
+        "Lada A. Adamic"
+      ],
+      "year": 2012,
+      "identifiers": {
+        "doi": "10.1145/2380718.2380757"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1145/2380718.2380757; pp. 298-307; Ingredient complement vs substitution networks",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E050",
+      "source_type": "conference_paper",
+      "title": "Exploiting Food Embeddings for Ingredient Substitution",
+      "authors": [
+        "Chantal Pellegrini",
+        "Ege Özsoy",
+        "Monika Wintergerst",
+        "Georg Groh"
+      ],
+      "year": 2021,
+      "identifiers": {
+        "doi": "10.5220/0010202000670077"
+      },
+      "locator": "Crossref DOI 10.5220/0010202000670077; pp. 67-77; Food2Vec and FoodBERT ingredient substitution embeddings",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E051",
+      "source_type": "preprint",
+      "title": "Learning to Substitute Ingredients in Recipes",
+      "authors": [
+        "Bahare Fatemi",
+        "Quentin Duval",
+        "Rohit Girdhar",
+        "Michal Drozdzal",
+        "Adriana Romero-Soriano"
+      ],
+      "year": 2023,
+      "identifiers": {
+        "doi": "10.48550/arXiv.2302.07960",
+        "url": "https://arxiv.org/abs/2302.07960"
+      },
+      "locator": "Semantic Scholar API record; arXiv:2302.07960 XML record; GISMo & Recipe1MSubs benchmark (MRR, Hit@1/3/10)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E052",
+      "source_type": "conference_paper",
+      "title": "Towards Automatic Meal Plan Recommendations for Balanced Nutrition",
+      "authors": [
+        "David Elsweiler",
+        "Morgan Harvey"
+      ],
+      "year": 2015,
+      "identifiers": {
+        "doi": "10.1145/2792838.2799665"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1145/2792838.2799665; pp. 313-316; Automated daily meal plan generation for sampled user profiles (pp. 313-316; ACM paywall caveat)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E053",
+      "source_type": "conference_paper",
+      "title": "Investigating the Healthiness of Internet-Sourced Recipes",
+      "authors": [
+        "Christoph Trattner",
+        "David Elsweiler"
+      ],
+      "year": 2017,
+      "identifiers": {
+        "doi": "10.1145/3038912.3052573"
+      },
+      "locator": "Semantic Scholar API record; Crossref DOI 10.1145/3038912.3052573; pp. 489-498; Nutritional healthiness vs preference accuracy trade-off in recipe recommendation",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E054",
+      "source_type": "journal_article",
+      "title": "A Food Recommender System Considering Nutritional Information and User Preferences",
+      "authors": [
+        "Raciel Yera Toledo",
+        "Ahmad A. Alzahrani",
+        "Luis Martinez"
+      ],
+      "year": 2019,
+      "identifiers": {
+        "doi": "10.1109/access.2019.2929413"
+      },
+      "locator": "Crossref DOI 10.1109/access.2019.2929413; pp. 96695-96711; Multi-criteria food recommendation with nutritional constraints",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E055",
+      "source_type": "conference_paper",
+      "title": "MealRec+: A Meal Recommendation Dataset with Meal-Course Affiliation for Personalization and Healthiness",
+      "authors": [
+        "Ming Li",
+        "Lin Li",
+        "Xiao-Hui Tao",
+        "J. Huang"
+      ],
+      "year": 2024,
+      "identifiers": {
+        "doi": "10.1145/3626772.3657857",
+        "url": "https://arxiv.org/abs/2404.05386"
+      },
+      "locator": "Semantic Scholar API record; arXiv:2404.05386 XML record; MealRec+ meal-course recommendation dataset and healthiness vs preference trade-off",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E056",
+      "source_type": "journal_article",
+      "title": "Identifying Ingredient Substitutions Using a Knowledge Graph of Food",
+      "authors": [
+        "Sola S. Shirai",
+        "Oshani Seneviratne",
+        "Minor E. Gordon",
+        "Ching-Hua Chen",
+        "Deborah L. McGuinness"
+      ],
+      "year": 2021,
+      "identifiers": {
+        "doi": "10.3389/frai.2020.621766",
+        "pmcid": "PMC7861309",
+        "pmid": "33733228"
+      },
+      "locator": "Crossref DOI 10.3389/frai.2020.621766; NCBI PMCID PMC7861309 (DIISH food knowledge graph substitution)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E057",
+      "source_type": "conference_paper",
+      "title": "A New Dataset and Empirical Evaluation for Vietnamese Food Recommendation System",
+      "authors": [
+        "An Tran",
+        "Thanh Dang",
+        "Hong Dang",
+        "Tin Huynh"
+      ],
+      "year": 2024,
+      "identifiers": {
+        "url": "https://aclanthology.org/2024.paclic-1.4/"
+      },
+      "locator": "ACL Anthology 2024.paclic-1.4 BibTeX & landing page (HTTP 200)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E058",
+      "source_type": "conference_paper",
+      "title": "WSABIE: Scaling Up to Large Vocabulary Image Annotation",
+      "authors": [
+        "Jason Weston",
+        "Samy Bengio",
+        "Nicolas Usunier"
+      ],
+      "year": 2011,
+      "identifiers": {
+        "url": "https://ijcai.org/proceedings/2011/459"
+      },
+      "locator": "IJCAI 2011 proceedings page (HTTP 200) & OpenAlex W21006490",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E059",
+      "source_type": "report",
+      "title": "From RankNet to LambdaRank to LambdaMART: An Overview",
+      "authors": [
+        "Christopher J. C. Burges"
+      ],
+      "year": 2010,
+      "identifiers": {
+        "url": "https://www.microsoft.com/en-us/research/publication/from-ranknet-to-lambdarank-to-lambdamart-an-overview/"
+      },
+      "locator": "Microsoft Research Technical Report MSR-TR-2010-82 page (HTTP 200) & OpenAlex W2115584760",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E060",
+      "source_type": "dataset",
+      "title": "Vegetable Object Detection Dataset from Bangladesh",
+      "authors": [
+        "Sabrina Jahan",
+        "Mohammad Rifat Ahmmad Rashid",
+        "B M Shahria Alam",
+        "Ishraque Manzur",
+        "Tawhidur Rahman",
+        "Raiyan Gani",
+        "Karib Shams",
+        "Md Miskat Hossain",
+        "Mahamudul Hasan"
+      ],
+      "year": 2025,
+      "identifiers": {
+        "doi": "10.17632/gnc4s3z2mf.3"
+      },
+      "locator": "DataCite DOI 10.17632/gnc4s3z2mf.3 (Mendeley Data V3, HTTP 200)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E061",
+      "source_type": "dataset",
+      "title": "AgriFreshNET Freshness and Shelf-Life Image Dataset",
+      "authors": [
+        "Fouzia Risdin",
+        "Hafsha Salauddin",
+        "Tasniya Aziza Tufa",
+        "Md Jakir Hossain"
+      ],
+      "year": 2026,
+      "identifiers": {
+        "doi": "10.17632/42m5tb7yv9.1"
+      },
+      "locator": "DataCite DOI 10.17632/42m5tb7yv9.1 (Mendeley Data V1, HTTP 200)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E062",
+      "source_type": "dataset",
+      "title": "Local Spinach Leaf Dataset",
+      "authors": [
+        "Md Nahid Hasan",
+        "Sonjoy Prosad Shaha",
+        "Amatul Bushra Akhi"
+      ],
+      "year": 2024,
+      "identifiers": {
+        "doi": "10.17632/skf6w2s2h2.3"
+      },
+      "locator": "DataCite DOI 10.17632/skf6w2s2h2.3 (Mendeley Data V3, HTTP 200)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E063",
+      "source_type": "software",
+      "title": "Ultralytics YOLO26 Documentation",
+      "authors": [
+        "Ultralytics"
+      ],
+      "year": 2026,
+      "identifiers": {
+        "url": "https://docs.ultralytics.com/models/yolo26/"
+      },
+      "locator": "Official Ultralytics YOLO26 model documentation (HTTP 200)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E064",
+      "source_type": "software",
+      "title": "Ultralytics YOLO11 Documentation",
+      "authors": [
+        "Ultralytics"
+      ],
+      "year": 2024,
+      "identifiers": {
+        "url": "https://docs.ultralytics.com/models/yolo11/"
+      },
+      "locator": "Official Ultralytics YOLO11 model documentation (HTTP 200)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E065",
+      "source_type": "software",
+      "title": "OR-Tools CP-SAT Solver Documentation",
+      "authors": [
+        "Google"
+      ],
+      "year": 2025,
+      "identifiers": {
+        "url": "https://developers.google.com/optimization/cp/cp_solver"
+      },
+      "locator": "Official Google OR-Tools CP-SAT solver documentation (HTTP 200)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E066",
+      "source_type": "dataset",
+      "title": "Open Images V7 Dataset Description",
+      "authors": [
+        "Google"
+      ],
+      "year": 2022,
+      "identifiers": {
+        "url": "https://storage.googleapis.com/openimages/web/factsfigures_v7.html"
+      },
+      "locator": "Official Open Images V7 facts & figures page (HTTP 200)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E067",
+      "source_type": "dataset",
+      "title": "Kitchen Fruit and Vegetable Detection Dataset",
+      "authors": [
+        "Oriol Morros Vilaseca"
+      ],
+      "year": 2026,
+      "identifiers": {
+        "url": "https://huggingface.co/datasets/omorros/kitchen-fruit-vegetable-detection"
+      },
+      "locator": "Hugging Face dataset card CC BY 4.0 (HTTP 200)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    },
+    {
+      "evidence_id": "E068",
+      "source_type": "software",
+      "title": "ONNX Runtime High-Performance Inference Engine",
+      "authors": [
+        "Microsoft"
+      ],
+      "year": 2025,
+      "identifiers": {
+        "url": "https://onnxruntime.ai/"
+      },
+      "locator": "Official ONNX Runtime documentation landing page (HTTP 200)",
+      "confidentiality": "public",
+      "verification": {
+        "status": "verified",
+        "source_opened": true,
+        "verified_by": "teamwork_worker_m1_1_1",
+        "verified_on": "2026-11-18"
+      }
+    }
+  ]
+}

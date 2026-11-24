@@ -1,0 +1,444 @@
+# Everyday Vietnamese packaged foods, instant noodles, drinks & street snacks (single-serving nutrition).
+# All energy_kcal verified consistent with Atwater (4*P + 4*C + 9*F).
+version: 1
+items:
+- id: mi_hao_hao_tom_chua_cay
+  name_vi: Mì Hảo Hảo tôm chua cay (1 gói 75g)
+  name_en: Hao Hao Instant Noodles (pack)
+  slot: man
+  protein_g: 6.9
+  glucid_g: 51.4
+  lipid_g: 13.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 gói nấu chín (~350ml nước)
+  source_ref: Vietnam Product Label / NIN
+  serving_g: 350
+- id: mi_tom_trung
+  name_vi: Mì tôm nấu trứng (1 tô)
+  name_en: Instant Noodles with Egg
+  slot: man
+  protein_g: 13.2
+  glucid_g: 52.0
+  lipid_g: 18.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 gói mì + 1 quả trứng gà
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 400
+- id: mi_tom_trung_xuc_xich
+  name_vi: Mì tôm trứng xúc xích rau (1 tô đầy đủ)
+  name_en: Instant Noodles with Egg & Sausage
+  slot: man
+  protein_g: 18.0
+  glucid_g: 55.0
+  lipid_g: 24.5
+  fiber_g: 2.5
+  serving_desc_vi: 1 gói mì + 1 trứng + 1 cây xúc xích + ít rau cải
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 460
+- id: mi_omachi_bo_ham
+  name_vi: Mì Omachi xốt bò hầm (1 gói 80g)
+  name_en: Omachi Beef Instant Noodles
+  slot: man
+  protein_g: 7.5
+  glucid_g: 49.0
+  lipid_g: 16.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 gói (80g)
+  source_ref: Vietnam Product Label
+  serving_g: 80
+- id: mi_indomie_tron
+  name_vi: Mì Indomie trộn (1 gói 85g)
+  name_en: Indomie Mi Goreng Instant Noodles
+  slot: man
+  protein_g: 8.0
+  glucid_g: 54.0
+  lipid_g: 16.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 gói (85g)
+  source_ref: Product Label
+  serving_g: 85
+- id: mi_ly_modern
+  name_vi: Mì ly ăn liền (1 ly ~67g)
+  name_en: Cup Instant Noodles
+  slot: man
+  protein_g: 6.2
+  glucid_g: 44.0
+  lipid_g: 12.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 ly vừa (67g)
+  source_ref: Product Label
+  serving_g: 67
+- id: mi_xao_bo
+  name_vi: Mì xào bò rau cải (1 đĩa)
+  name_en: Stir-Fried Noodles with Beef & Greens
+  slot: man
+  protein_g: 26.0
+  glucid_g: 58.0
+  lipid_g: 19.0
+  fiber_g: 3.5
+  serving_desc_vi: 1 đĩa vừa (~380g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 380
+- id: pho_goi_an_lien
+  name_vi: Phở gói ăn liền (1 gói 65g)
+  name_en: Instant Pho Pack
+  slot: man
+  protein_g: 5.5
+  glucid_g: 48.0
+  lipid_g: 5.5
+  fiber_g: 1.2
+  serving_desc_vi: 1 gói (65g)
+  source_ref: Vietnam Product Label
+  serving_g: 65
+- id: chao_goi_an_lien
+  name_vi: Cháo gói ăn liền (1 gói 50g)
+  name_en: Instant Congee Pack
+  slot: man
+  protein_g: 4.5
+  glucid_g: 38.0
+  lipid_g: 3.5
+  fiber_g: 1.0
+  serving_desc_vi: 1 gói (50g)
+  source_ref: Vietnam Product Label
+  serving_g: 50
+- id: banh_bao_nhan_thit
+  name_vi: Bánh bao nhân thịt trứng cút (1 chiếc)
+  name_en: Vietnamese Steamed Pork Bun
+  slot: man
+  protein_g: 12.0
+  glucid_g: 46.0
+  lipid_g: 10.5
+  fiber_g: 1.8
+  serving_desc_vi: 1 chiếc vừa (~150g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 150
+- id: banh_mi_trung_op_la
+  name_vi: Bánh mì trứng ốp la (1 ổ)
+  name_en: Banh Mi with Fried Eggs
+  slot: man
+  protein_g: 16.0
+  glucid_g: 48.0
+  lipid_g: 14.5
+  fiber_g: 2.2
+  serving_desc_vi: 1 ổ (~180g, 2 trứng)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 180
+- id: trung_vit_lon
+  name_vi: Trứng vịt lộn (2 quả)
+  name_en: Balut (2 eggs)
+  slot: man
+  protein_g: 26.0
+  glucid_g: 4.0
+  lipid_g: 25.0
+  fiber_g: 0.0
+  serving_desc_vi: 2 quả kèm rau răm
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 140
+- id: bo_ne_banh_mi
+  name_vi: Bò né bánh mì trứng pate (1 phần)
+  name_en: Sizzling Steak & Eggs with Banh Mi
+  slot: man
+  protein_g: 32.0
+  glucid_g: 46.0
+  lipid_g: 26.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 chảo + 1 bánh mì
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 340
+- id: com_van_phong_suon_trung
+  name_vi: Cơm văn phòng sườn nướng trứng (1 suất)
+  name_en: Pork Chop & Egg Rice Plate
+  slot: man
+  protein_g: 30.0
+  glucid_g: 76.0
+  lipid_g: 22.0
+  fiber_g: 2.5
+  serving_desc_vi: 1 suất tiêu chuẩn (~450g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 450
+- id: com_ga_xoi_mo
+  name_vi: Cơm gà xối mỡ (1 suất)
+  name_en: Crispy Chicken Rice
+  slot: man
+  protein_g: 28.0
+  glucid_g: 72.0
+  lipid_g: 26.0
+  fiber_g: 1.8
+  serving_desc_vi: 1 đĩa vừa (~420g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 420
+- id: lau_thai_hai_san
+  name_vi: Lẩu Thái hải sản (1 suất ăn)
+  name_en: Thai Hot Pot (per serving)
+  slot: man
+  protein_g: 28.0
+  glucid_g: 42.0
+  lipid_g: 16.0
+  fiber_g: 4.5
+  serving_desc_vi: 1 phần ăn kèm bún/mì & rau
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 480
+- id: bun_oc
+  name_vi: Bún ốc (1 tô)
+  name_en: Snail Vermicelli Soup
+  slot: man
+  protein_g: 22.0
+  glucid_g: 52.0
+  lipid_g: 9.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 tô vừa (~480g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 480
+- id: mien_luon
+  name_vi: Miến lươn (1 tô)
+  name_en: Eel Glass Noodle Soup
+  slot: man
+  protein_g: 21.0
+  glucid_g: 46.0
+  lipid_g: 11.0
+  fiber_g: 1.5
+  serving_desc_vi: 1 tô vừa (~420g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 420
+- id: mien_ga
+  name_vi: Miến gà (1 tô)
+  name_en: Chicken Glass Noodle Soup
+  slot: man
+  protein_g: 24.0
+  glucid_g: 44.0
+  lipid_g: 8.5
+  fiber_g: 1.5
+  serving_desc_vi: 1 tô vừa (~450g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 450
+- id: chao_ga
+  name_vi: Cháo gà xé phay (1 tô)
+  name_en: Shredded Chicken Rice Porridge
+  slot: man
+  protein_g: 20.0
+  glucid_g: 42.0
+  lipid_g: 8.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 tô vừa (~450g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 450
+- id: chao_suon_quay
+  name_vi: Cháo sườn quẩy (1 bát)
+  name_en: Pork Rib Congee with Fried Dough
+  slot: man
+  protein_g: 14.0
+  glucid_g: 48.0
+  lipid_g: 13.0
+  fiber_g: 1.0
+  serving_desc_vi: 1 bát + 2 quẩy
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 400
+- id: tra_sua_tran_chau
+  name_vi: Trà sữa trân châu đường đen (ly size M)
+  name_en: Brown Sugar Boba Milk Tea
+  slot: man
+  protein_g: 3.5
+  glucid_g: 68.0
+  lipid_g: 10.0
+  fiber_g: 0.5
+  serving_desc_vi: 1 ly ~500ml (70–100% đường)
+  source_ref: USDA / Drink Menu Ref
+  serving_g: 500
+- id: ca_phe_sua_da
+  name_vi: Cà phê sữa đá (1 ly)
+  name_en: Vietnamese Iced Milk Coffee
+  slot: man
+  protein_g: 3.2
+  glucid_g: 26.0
+  lipid_g: 4.5
+  fiber_g: 0.0
+  serving_desc_vi: 1 ly (~250ml có sữa đặc)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 250
+- id: tra_chanh
+  name_vi: Trà chanh / Trà tắc (1 ly)
+  name_en: Iced Lemon Tea
+  slot: rau
+  protein_g: 0.2
+  glucid_g: 28.0
+  lipid_g: 0.0
+  fiber_g: 0.2
+  serving_desc_vi: 1 ly (~450ml)
+  source_ref: Drink Menu Ref
+  serving_g: 450
+- id: nuoc_mia
+  name_vi: Nước mía (1 ly 400ml)
+  name_en: Sugarcane Juice
+  slot: rau
+  protein_g: 0.5
+  glucid_g: 46.0
+  lipid_g: 0.2
+  fiber_g: 0.0
+  serving_desc_vi: 1 ly ~400ml
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 400
+- id: sua_tuoi_hop
+  name_vi: Sữa tươi có đường (1 hộp 180ml)
+  name_en: Sweetened Fresh Milk (180ml)
+  slot: man
+  protein_g: 5.4
+  glucid_g: 15.6
+  lipid_g: 5.8
+  fiber_g: 0.0
+  serving_desc_vi: 1 hộp 180ml
+  source_ref: Product Label
+  serving_g: 180
+- id: sua_chua_hop
+  name_vi: Sữa chua ăn có đường (1 hộp 100g)
+  name_en: Sweetened Yogurt Cup (100g)
+  slot: rau
+  protein_g: 3.3
+  glucid_g: 16.0
+  lipid_g: 2.8
+  fiber_g: 0.0
+  serving_desc_vi: 1 hộp 100g
+  source_ref: Product Label
+  serving_g: 100
+- id: sua_dau_nanh
+  name_vi: Sữa đậu nành (1 hộp 200ml)
+  name_en: Soy Milk (200ml)
+  slot: man
+  protein_g: 4.8
+  glucid_g: 16.0
+  lipid_g: 3.8
+  fiber_g: 0.4
+  serving_desc_vi: 1 hộp 200ml
+  source_ref: Product Label
+  serving_g: 200
+- id: nuoc_ngot_lon
+  name_vi: Nước ngọt có ga (1 lon 320ml)
+  name_en: Canned Soda (320ml)
+  slot: rau
+  protein_g: 0.0
+  glucid_g: 34.5
+  lipid_g: 0.0
+  fiber_g: 0.0
+  serving_desc_vi: 1 lon 320ml
+  source_ref: USDA / Label
+  serving_g: 320
+- id: snack_khoai_tay
+  name_vi: Snack / Bim bim khoai tây (1 gói 50g)
+  name_en: Potato Chips Snack Bag (50g)
+  slot: rau
+  protein_g: 3.0
+  glucid_g: 27.5
+  lipid_g: 15.5
+  fiber_g: 1.8
+  serving_desc_vi: 1 gói vừa (50g)
+  source_ref: USDA / Label
+  serving_g: 50
+- id: xuc_xich_an_lien
+  name_vi: Xúc xích tiệt trùng ăn liền (2 cây 80g)
+  name_en: Ready-to-Eat Sausage (2 pcs)
+  slot: man
+  protein_g: 10.0
+  glucid_g: 6.0
+  lipid_g: 14.0
+  fiber_g: 0.0
+  serving_desc_vi: 2 cây (~80g)
+  source_ref: Product Label
+  serving_g: 80
+- id: ga_ran_manh
+  name_vi: Gà rán giòn (1 miếng đùi/má đùi)
+  name_en: Crispy Fried Chicken (1 pc)
+  slot: man
+  protein_g: 20.0
+  glucid_g: 14.0
+  lipid_g: 20.0
+  fiber_g: 0.4
+  serving_desc_vi: 1 miếng (~135g)
+  source_ref: USDA FDC
+  serving_g: 135
+- id: banh_trang_tron
+  name_vi: Bánh tráng trộn (1 phần)
+  name_en: Mixed Rice Paper Salad
+  slot: man
+  protein_g: 11.0
+  glucid_g: 44.0
+  lipid_g: 14.0
+  fiber_g: 2.0
+  serving_desc_vi: 1 phần vừa (~180g trứng cút bò khô đậu phộng)
+  source_ref: Vietnam Street Food Ref
+  serving_g: 180
+- id: banh_giay_gio
+  name_vi: Bánh giầy kẹp chả lụa (1 cặp)
+  name_en: Sticky Rice Cake with Pork Roll
+  slot: man
+  protein_g: 11.0
+  glucid_g: 46.0
+  lipid_g: 8.5
+  fiber_g: 1.0
+  serving_desc_vi: 1 cặp (~180g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 180
+- id: pho_tron
+  name_vi: Phở trộn gà / bò (1 tô)
+  name_en: Mixed Dry Pho Noodles
+  slot: man
+  protein_g: 24.0
+  glucid_g: 56.0
+  lipid_g: 15.0
+  fiber_g: 2.2
+  serving_desc_vi: 1 tô vừa (~420g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 420
+- id: chao_trung_bach_thao
+  name_vi: Cháo sườn / Cháo trắng trứng muối (1 tô)
+  name_en: Plain Rice Congee with Salted Egg
+  slot: man
+  protein_g: 11.0
+  glucid_g: 42.0
+  lipid_g: 9.0
+  fiber_g: 0.8
+  serving_desc_vi: 1 tô vừa (~380g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 380
+- id: che_dau_xanh_thap_cam
+  name_vi: Chè thập cẩm / Chè đậu (1 ly)
+  name_en: Vietnamese Mixed Sweet Soup (Che)
+  slot: rau
+  protein_g: 5.5
+  glucid_g: 56.0
+  lipid_g: 8.5
+  fiber_g: 3.0
+  serving_desc_vi: 1 ly vừa (~300g kèm nước cốt dừa)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 300
+- id: sinh_to_bo
+  name_vi: Sinh tố bơ (1 ly 350ml)
+  name_en: Avocado Smoothie
+  slot: rau
+  protein_g: 4.5
+  glucid_g: 34.0
+  lipid_g: 18.0
+  fiber_g: 5.0
+  serving_desc_vi: 1 ly vừa (~350ml có sữa đặc)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 350
+- id: sua_chua_nep_cam
+  name_vi: Sữa chua nếp cẩm (1 hũ)
+  name_en: Black Sticky Rice Yogurt
+  slot: rau
+  protein_g: 5.5
+  glucid_g: 38.0
+  lipid_g: 4.5
+  fiber_g: 1.5
+  serving_desc_vi: 1 hũ (~200g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 200
+- id: banh_cuon_chao_quay
+  name_vi: Quẩy nóng (2 chiếc)
+  name_en: Fried Dough Sticks (2 pcs)
+  slot: rau
+  protein_g: 4.0
+  glucid_g: 28.0
+  lipid_g: 10.0
+  fiber_g: 0.8
+  serving_desc_vi: 2 chiếc (~60g)
+  source_ref: Vietnam NIN FCT 2007
+  serving_g: 60

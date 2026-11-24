@@ -1,0 +1,23 @@
+@startuml
+title DFD01i — Mức 1, quá trình 9.0 Xử lý yêu cầu dữ liệu
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+
+usecase "9.0\nXử lý yêu cầu dữ liệu" as P
+rectangle "Quản trị viên" as E3
+database "D10 Yêu cầu dữ liệu và kiểm toán" as D10
+database "D1 Tài khoản, hồ sơ và đồng ý" as D1
+rectangle "Người dùng" as E1
+E3 --> P : quyết định xử lý
+P --> E3 : hàng đợi yêu cầu, nhật ký kiểm toán
+D10 --> P : yêu cầu đang chờ
+P --> D10 : trạng thái yêu cầu, kiểm toán
+D1 --> P : dữ liệu của chủ thể
+P --> D1 : xoá, xoá theo mục đích
+P --> E1 : tệp dữ liệu cá nhân
+@enduml

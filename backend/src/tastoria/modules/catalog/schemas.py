@@ -105,6 +105,11 @@ class RecipeSummary(BaseModel):
     method_code: str
     total_minutes: int
     kcal_per_serving: float | None
+    protein_g: float | None = None
+    carbs_g: float | None = None
+    fat_g: float | None = None
+    fiber_g: float | None = None
+    pantry_match_ratio: float | None = None
     tag_codes: list[str]
 
 
@@ -238,6 +243,10 @@ class RecipeView:
     kcal_per_serving: float | None
     make_ahead: MakeAheadView | None = None
     created_at: datetime | None = None
+    protein_g: float | None = None
+    carbs_g: float | None = None
+    fat_g: float | None = None
+    fiber_g: float | None = None
 
     @property
     def allergen_codes(self) -> frozenset[str]:
@@ -281,3 +290,20 @@ class VisionClassView:
     countable: bool
     has_freshness_model: bool
     default_ingredient_id: uuid.UUID | None
+
+
+@dataclass(frozen=True)
+class RecipeExportRef:
+    id: uuid.UUID
+    name_vi: str
+    slot: str
+    method_code: str
+    status: str
+
+
+@dataclass(frozen=True)
+class IngredientExportRef:
+    id: uuid.UUID
+    name_vi: str
+    food_group_code: str
+    is_staple: bool

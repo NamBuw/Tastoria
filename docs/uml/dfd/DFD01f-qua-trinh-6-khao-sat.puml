@@ -1,0 +1,23 @@
+@startuml
+title DFD01f — Mức 1, quá trình 6.0 Khảo sát gu
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+
+usecase "6.0\nKhảo sát gu" as P
+rectangle "Người tham gia khảo sát" as E2
+rectangle "Người vận hành mô hình" as E5
+database "D8 Khảo sát gu" as D8
+database "D2 Danh mục món và nguyên liệu" as D2
+E2 --> P : đồng ý, điểm 1–5 từng món
+P --> E2 : món cần chấm
+E5 --> P : phiếu khảo sát, lệnh xuất
+P --> E5 : bản xuất điểm
+D8 --> P : phiếu, phân công món
+P --> D8 : người tham gia, điểm
+D2 --> P : món đã xuất bản
+@enduml

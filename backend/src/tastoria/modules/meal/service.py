@@ -15,17 +15,20 @@ installed by tastoria.app (MealDeps.has_live_cook_session).
 
 from __future__ import annotations
 
+import logging
+import threading
 import uuid
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
+from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
 from fastapi import Request
-from sqlalchemy import delete, select, tuple_
+from sqlalchemy import delete, select, text, tuple_
 from sqlalchemy.orm import Session
 
 from tastoria.core import pagination
@@ -45,8 +48,10 @@ from tastoria.modules.meal.models import (
     MealPlanItemSubstitution,
     MealPlanPin,
 )
-from tastoria.modules.meal.ranker import BaselineRanker, RankContext, Ranker, percentiles
+from tastoria.modules.meal.ranker import BaselineRanker, RankContext, Ranker, load_ranker, percentiles
 from tastoria.modules.meal.schemas import (
+    CookedDishInfo,
+    CookedMealDetail,
     CookPlan,
     MealPlanCreate,
     MealPlanItemOut,
@@ -60,10 +65,14 @@ from tastoria.modules.meal.schemas import (
     SubstitutionCreate,
     SubstitutionOut,
 )
+from tastoria.modules.mlops import service as mlops
+from tastoria.modules.mlops.schemas import MlopsError
 from tastoria.modules.pantry import service as pantry
 from tastoria.modules.pantry.schemas import LotView, Need
 from tastoria.modules.profile import service as profile
 from tastoria.modules.substitute import service as substitute
+
+log = logging.getLogger("tastoria.meal")
 
 STRUCTURE_3 = (("man", "rau", "canh"),)
 STRUCTURE_2 = (("man", "rau"), ("man", "canh"))
@@ -71,12 +80,20 @@ MEAL_END = {"lunch": time(15, 0), "dinner": None}  # FR-15-39: 15:00 / 24:00 loc
 STIR_FRY = catalog.STIR_FRY_METHOD
 VERIFY_MAX = 30  # trays whose exact schedule is tried before giving up on time
 
+_RANKER_CACHE: dict[uuid.UUID, Ranker] = {}
+_RANKER_LOCK = threading.Lock()
+
 
 @dataclass(frozen=True)
 class MealDeps:
-    ranker: Ranker = field(default_factory=BaselineRanker)
+    ranker: Ranker | None = None
     has_live_cook_session: Callable[[Session, uuid.UUID], bool] = lambda s, plan_id: False
     params: cmp.Params = field(default_factory=cmp.Params)
+    storage_dir: Path | None = None
+
+
+def load_composer_params(path: str | None = None) -> cmp.Params:
+    return cmp.load_params(Path(path) if path else None)
 
 
 def meal_deps(request: Request) -> MealDeps:
@@ -185,7 +202,31 @@ def _context(
     )
 
 
-def _scores(session: Session, deps: MealDeps, ctx: _Plan, recipes: Sequence[RecipeView]) -> dict[uuid.UUID, float]:
+def _resolve_ranker(session: Session, deps: MealDeps) -> Ranker:
+    if deps.ranker is not None:
+        return deps.ranker
+    if deps.storage_dir is None:
+        return BaselineRanker()
+    v = mlops.active_version(session, "ranker")
+    if v is None:
+        return BaselineRanker()
+    with _RANKER_LOCK:
+        cached = _RANKER_CACHE.get(v.id)
+        if cached is not None:
+            return cached
+        try:
+            path = mlops.artifact_path(deps.storage_dir, v, verify=True)
+            ranker = load_ranker(path, version_id=v.id, serving=v.metrics.get("serving"))
+        except (MlopsError, OSError, KeyError, ValueError) as exc:
+            log.error("failed to load deployed ranker %s: %s; falling back to baseline", v.version, exc)
+            return BaselineRanker()
+        _RANKER_CACHE[v.id] = ranker
+        return ranker
+
+
+def _scores(
+    session: Session, deps: MealDeps, ctx: _Plan, recipes: Sequence[RecipeView]
+) -> tuple[dict[uuid.UUID, float], uuid.UUID | None]:
     """ŝ' per slot (design v2 §6.1): the ranker's scores turned into the user's percentile within each slot."""
     favs = list(catalog.recipes_by_ids(session, ctx.favorites).values())
     rank_ctx = RankContext(
@@ -194,11 +235,12 @@ def _scores(session: Session, deps: MealDeps, ctx: _Plan, recipes: Sequence[Reci
         popularity=events.popularity(session),
         personal=events.personal_signals(session, ctx.user_id) if ctx.consented else None,  # FR-15-17
     )
-    raw = deps.ranker.score(rank_ctx, recipes)
+    ranker = _resolve_ranker(session, deps)
+    raw = ranker.score(rank_ctx, recipes)
     out: dict[uuid.UUID, float] = {}
     for slot in ("man", "rau", "canh"):
         out.update(percentiles({r.id: raw[r.id] for r in recipes if r.slot == slot}))
-    return out
+    return out, ranker.version_id
 
 
 def _lots(ctx: _Plan) -> list[cmp.Lot]:
@@ -273,51 +315,100 @@ def _meal_end(plan: MealPlan, tz: str) -> datetime:
     return meal_end(plan.meal, plan.created_at, tz)
 
 
+def _live_cook_plan_ids(session: Session, deps: MealDeps, plan_ids: Sequence[uuid.UUID]) -> set[uuid.UUID]:
+    ids = list(dict.fromkeys(plan_ids))
+    if not ids:
+        return set()
+    fn = deps.has_live_cook_session
+    if getattr(fn, "__module__", None) == "tastoria.modules.cooking.service":
+        return set(
+            session.execute(
+                text(
+                    "SELECT DISTINCT meal_plan_id FROM cook_sessions "
+                    "WHERE meal_plan_id = ANY(:ids) AND status = 'in_progress'"
+                ),
+                {"ids": ids},
+            ).scalars()
+        )
+    return {pid for pid in ids if fn(session, pid)}
+
+
+def _lock_user_sweep(session: Session, user_id: uuid.UUID) -> None:
+    session.execute(text("SELECT pg_advisory_xact_lock(hashtext(:k))"), {"k": f"meal_sweep:{user_id}"})
+
+
+def _effective_statuses(
+    session: Session, deps: MealDeps, plans: Sequence[MealPlan], tz: str, now: datetime
+) -> dict[uuid.UUID, str]:
+    """Compute effective plan status without mutating DB or taking row locks (for read paths)."""
+    past_accepted = [
+        p.id for p in plans if p.status == "accepted" and now >= _meal_end(p, tz)
+    ]
+    live = _live_cook_plan_ids(session, deps, past_accepted)
+    out: dict[uuid.UUID, str] = {}
+    for p in plans:
+        if p.status in ("proposed", "accepted") and now >= _meal_end(p, tz):
+            if p.status == "proposed":
+                out[p.id] = "expired"
+            else:
+                out[p.id] = "accepted" if p.id in live else "abandoned"
+        else:
+            out[p.id] = p.status
+    return out
+
+
 def _settle(session: Session, deps: MealDeps, plans: Iterable[MealPlan], tz: str) -> None:
     """Past the meal's end a proposed plan is expired and an accepted one without a live cook session is abandoned."""
+    plan_list = list(plans)
     now = utcnow()
-    for p in plans:
-        if p.status not in ("proposed", "accepted") or now < _meal_end(p, tz):
-            continue
-        if p.status == "proposed":
-            p.status, p.updated_at = "expired", now
-        elif not deps.has_live_cook_session(session, p.id):
-            p.status, p.updated_at = "abandoned", now
-    session.flush()
+    eff = _effective_statuses(session, deps, plan_list, tz, now)
+    changed = False
+    for p in plan_list:
+        nxt = eff[p.id]
+        if nxt != p.status:
+            p.status, p.updated_at = nxt, now
+            changed = True
+    if changed:
+        session.flush()
 
 
 def _sweep(session: Session, deps: MealDeps, user_id: uuid.UUID, tz: str) -> None:
-    _settle(
-        session,
-        deps,
+    _lock_user_sweep(session, user_id)
+    rows = list(
         session.scalars(
             select(MealPlan)
             .where(MealPlan.user_id == user_id, MealPlan.status.in_(("proposed", "accepted")))
+            .order_by(MealPlan.id)
             .with_for_update()
-        ),
-        tz,
+        )
     )
+    _settle(session, deps, rows, tz)
 
 
 def _supersede(session: Session, deps: MealDeps, user_id: uuid.UUID, meal: str, tz: str, keep: uuid.UUID) -> None:
     """A new plan for the same meal (same day's lunch or dinner) replaces the open one (FR-15-37, FR-15-38)."""
+    _lock_user_sweep(session, user_id)
     now = utcnow()
     target = meal_end(meal, now, tz)
-    for p in session.scalars(
-        select(MealPlan)
-        .where(
-            MealPlan.user_id == user_id,
-            MealPlan.meal == meal,
-            MealPlan.id != keep,
-            MealPlan.status.in_(("proposed", "accepted")),
+    rows = list(
+        session.scalars(
+            select(MealPlan)
+            .where(
+                MealPlan.user_id == user_id,
+                MealPlan.meal == meal,
+                MealPlan.id != keep,
+                MealPlan.status.in_(("proposed", "accepted")),
+            )
+            .order_by(MealPlan.id)
+            .with_for_update()
         )
-        .with_for_update()
-    ):
-        if _meal_end(p, tz) != target:
-            continue
+    )
+    candidates = [p for p in rows if _meal_end(p, tz) == target]
+    live = _live_cook_plan_ids(session, deps, [p.id for p in candidates if p.status == "accepted"])
+    for p in candidates:
         if p.status == "proposed":
             p.status, p.updated_at = "expired", now
-        elif not deps.has_live_cook_session(session, p.id):
+        elif p.id not in live:
             p.status, p.updated_at = "abandoned", now
     session.flush()
 
@@ -388,7 +479,7 @@ def _num(v: Decimal | None) -> float | None:
     return float(v) if v is not None else None
 
 
-def plan_out(session: Session, plan: MealPlan) -> MealPlanOut:
+def plan_out(session: Session, plan: MealPlan, *, status_override: str | None = None) -> MealPlanOut:
     items = _items(session, [plan.id]).get(plan.id, [])
     subs = _subs_of(session, [i.id for i in items])
     names = {r.id: r.name_vi for r in catalog.recipes_by_ids(session, [i.recipe_id for i in items]).values()}
@@ -403,7 +494,7 @@ def plan_out(session: Session, plan: MealPlan) -> MealPlanOut:
         meal=plan.meal,
         persons=plan.persons,
         max_minutes=plan.max_minutes,
-        status=plan.status,  # type: ignore[arg-type]
+        status=status_override or plan.status,  # type: ignore[arg-type]
         e_target_kcal=_num(plan.e_target_kcal),
         kcal_low=_num(plan.kcal_low),
         kcal_high=_num(plan.kcal_high),
@@ -494,12 +585,11 @@ def create_plan(session: Session, deps: MealDeps, user: AuthUser, body: MealPlan
             ],
         )
     ctx = _context(session, user.id, body.meal, body.persons, body.max_minutes, body.coeater_allergen_codes)
-    _sweep(session, deps, user.id, ctx.tz)
 
     allowed = [
         r for r in catalog.published_recipes(session) if catalog.recipe_allowed(r, ctx.banned, ctx.excluded_groups)
     ]
-    s_prime = _scores(session, deps, ctx, allowed)
+    s_prime, ranker_vid = _scores(session, deps, ctx, allowed)
     options: dict[str, list[cmp.Option]] = defaultdict(list)
     for r in allowed:
         options[r.slot].append(_option(r, s_prime[r.id], ctx.persons))
@@ -530,7 +620,7 @@ def create_plan(session: Session, deps: MealDeps, user: AuthUser, body: MealPlan
         kcal_high=None,
         rice_bowls_per_person=Decimal(str(best.bowls)) if best.bowls is not None else None,
         reason_vi=_reason(session, ctx, best, second, two_dish),
-        ranker_version_id=deps.ranker.version_id,
+        ranker_version_id=ranker_vid,
         params_version=deps.params.version,
         created_at=now,
         updated_at=now,
@@ -558,6 +648,7 @@ def create_plan(session: Session, deps: MealDeps, user: AuthUser, body: MealPlan
         items.append(it)
     session.add_all(items)
     session.flush()
+    _sweep(session, deps, user.id, ctx.tz)
     _supersede(session, deps, user.id, ctx.meal, ctx.tz, keep=plan.id)
     events.record(
         session,
@@ -605,24 +696,26 @@ def _dishes_kcal(tray: cmp.Tray) -> float | None:
 
 def get_plan(session: Session, deps: MealDeps, user: AuthUser, plan_id: uuid.UUID) -> MealPlanOut:
     plan = _owned_plan(session, user.id, plan_id)
-    _settle(session, deps, [plan], _tz(session, user.id))
-    return plan_out(session, plan)
+    eff = _effective_statuses(session, deps, [plan], _tz(session, user.id), utcnow())[plan.id]
+    return plan_out(session, plan, status_override=eff)
 
 
 def latest_plan(session: Session, deps: MealDeps, user: AuthUser, meal: str | None) -> MealPlanOut:
     tz = _tz(session, user.id)
-    _sweep(session, deps, user.id, tz)
     z = ZoneInfo(tz)
-    start = datetime.combine(utcnow().astimezone(z).date(), time(0, 0), z)
+    now = utcnow()
+    start = datetime.combine(now.astimezone(z).date(), time(0, 0), z)
     q = select(MealPlan).where(
         MealPlan.user_id == user.id, MealPlan.status.in_(("proposed", "accepted")), MealPlan.created_at >= start
     )
     if meal:
         q = q.where(MealPlan.meal == meal)
-    plan = session.scalars(q.order_by(MealPlan.created_at.desc(), MealPlan.id.desc()).limit(1)).first()
+    candidates = list(session.scalars(q.order_by(MealPlan.created_at.desc(), MealPlan.id.desc())))
+    eff = _effective_statuses(session, deps, candidates, tz, now)
+    plan = next((p for p in candidates if eff[p.id] in ("proposed", "accepted")), None)
     if plan is None:
         raise ApiError(404, ProblemCode.not_found)
-    return plan_out(session, plan)
+    return plan_out(session, plan, status_override=eff[plan.id])
 
 
 def list_plans(
@@ -637,21 +730,43 @@ def list_plans(
     limit: int,
 ) -> MealPlanSummaryPage:
     tz = _tz(session, user.id)
-    _sweep(session, deps, user.id, tz)
     z = ZoneInfo(tz)
+    now = utcnow()
     q = select(MealPlan).where(MealPlan.user_id == user.id)
     if statuses:
-        q = q.where(MealPlan.status.in_(statuses))
+        db_statuses = set(statuses)
+        if "expired" in db_statuses:
+            db_statuses.add("proposed")
+        if "abandoned" in db_statuses:
+            db_statuses.add("accepted")
+        q = q.where(MealPlan.status.in_(db_statuses))
     if date_from:
         q = q.where(MealPlan.created_at >= datetime.combine(date_from, time(0, 0), z))
     if date_to:
         q = q.where(MealPlan.created_at < datetime.combine(date_to + timedelta(days=1), time(0, 0), z))
     after = pagination.decode_created(cursor)
-    if after is not None:
-        q = q.where(tuple_(MealPlan.created_at, MealPlan.id) < after)
-    rows = list(session.scalars(q.order_by(MealPlan.created_at.desc(), MealPlan.id.desc()).limit(limit + 1)))
-    page = rows[:limit]
-    items = _items(session, [p.id for p in page])
+    wanted_set = set(statuses)
+    matched: list[tuple[MealPlan, str]] = []
+    chunk_size = max(limit + 1, 50) if statuses else (limit + 1)
+    while len(matched) < limit + 1:
+        chunk_q = q
+        if after is not None:
+            chunk_q = chunk_q.where(tuple_(MealPlan.created_at, MealPlan.id) < after)
+        rows = list(session.scalars(chunk_q.order_by(MealPlan.created_at.desc(), MealPlan.id.desc()).limit(chunk_size)))
+        if not rows:
+            break
+        eff = _effective_statuses(session, deps, rows, tz, now)
+        for p in rows:
+            st = eff[p.id]
+            if not wanted_set or st in wanted_set:
+                matched.append((p, st))
+                if len(matched) >= limit + 1:
+                    break
+        if len(rows) < chunk_size:
+            break
+        after = (rows[-1].created_at, rows[-1].id)
+    page = matched[:limit]
+    items = _items(session, [p.id for p, _ in page])
     names = {
         r.id: r.name_vi
         for r in catalog.recipes_by_ids(session, [i.recipe_id for v in items.values() for i in v]).values()
@@ -661,13 +776,13 @@ def list_plans(
             id=p.id,
             meal=p.meal,
             persons=p.persons,
-            status=p.status,  # type: ignore[arg-type]
+            status=st,  # type: ignore[arg-type]
             recipe_names_vi=[names[i.recipe_id] for i in items.get(p.id, []) if i.status == "active"],
             created_at=p.created_at,
         )
-        for p in page
+        for p, st in page
     ]
-    nxt = pagination.encode_created(page[-1].created_at, page[-1].id) if len(rows) > limit else None
+    nxt = pagination.encode_created(page[-1][0].created_at, page[-1][0].id) if len(matched) > limit else None
     return MealPlanSummaryPage(items=out, next_cursor=nxt)
 
 
@@ -677,7 +792,7 @@ def accept_plan(session: Session, deps: MealDeps, user: AuthUser, plan_id: uuid.
     if plan.status == "proposed":
         plan.status, plan.updated_at = "accepted", utcnow()
     elif plan.status != "accepted":  # FR-15-32 / FR-15-33
-        raise ApiError(409, ProblemCode.conflict_state, extra={"status": plan.status})
+        raise ApiError(409, ProblemCode.conflict_state, extra={"plan_status": plan.status})
     session.flush()
     return plan_out(session, plan)
 
@@ -693,17 +808,22 @@ def _open_item(
     item_id: uuid.UUID,
     *,
     allow_cooking: bool = False,
+    lock: bool = True,
 ) -> tuple[MealPlan, MealPlanItem]:
-    plan = _owned_plan(session, user.id, plan_id, lock=True)
-    item = session.scalars(
-        select(MealPlanItem).where(MealPlanItem.id == item_id, MealPlanItem.meal_plan_id == plan.id).with_for_update()
-    ).one_or_none()
+    plan = _owned_plan(session, user.id, plan_id, lock=lock)
+    item_q = select(MealPlanItem).where(MealPlanItem.id == item_id, MealPlanItem.meal_plan_id == plan.id)
+    item = session.scalars(item_q.with_for_update() if lock else item_q).one_or_none()
     if item is None:
         raise ApiError(404, ProblemCode.not_found)
-    _settle(session, deps, [plan], _tz(session, user.id))
-    if plan.status not in ("proposed", "accepted") or item.status != "active":
-        raise ApiError(409, ProblemCode.conflict_state, extra={"status": plan.status, "item_status": item.status})
-    if not allow_cooking and plan.status == "accepted" and deps.has_live_cook_session(session, plan.id):
+    tz = _tz(session, user.id)
+    if lock:
+        _settle(session, deps, [plan], tz)
+        status = plan.status
+    else:
+        status = _effective_statuses(session, deps, [plan], tz, utcnow())[plan.id]
+    if status not in ("proposed", "accepted") or item.status != "active":
+        raise ApiError(409, ProblemCode.conflict_state, extra={"plan_status": status, "item_status": item.status})
+    if not allow_cooking and status == "accepted" and deps.has_live_cook_session(session, plan.id):
         raise ApiError(409, ProblemCode.conflict_state, "Đang nấu mâm này.")
     return plan, item
 
@@ -731,16 +851,18 @@ def _plan_ctx(session: Session, plan: MealPlan) -> _Plan:
 def swap_item(
     session: Session, deps: MealDeps, user: AuthUser, plan_id: uuid.UUID, item_id: uuid.UUID, reason: str
 ) -> MealPlanOut:
-    plan, item = _open_item(session, deps, user, plan_id, item_id)
+    # Run read-only checks & CP-SAT composition without holding FOR UPDATE row locks across solver execution.
+    plan, item = _open_item(session, deps, user, plan_id, item_id, lock=False)
     ctx = _plan_ctx(session, plan)
     all_items = _items(session, [plan.id])[plan.id]
     active = [i for i in all_items if i.status == "active"]
+    active_ids_before = [i.id for i in active]
     excluded = {i.recipe_id for i in all_items if i.status == "swapped_out"} | {item.recipe_id}  # BR-SWAP-01
     recipes = catalog.recipes_by_ids(session, [i.recipe_id for i in active])
     allowed = [
         r for r in catalog.published_recipes(session) if catalog.recipe_allowed(r, ctx.banned, ctx.excluded_groups)
     ]
-    s_prime = _scores(session, deps, ctx, allowed)
+    s_prime, _ = _scores(session, deps, ctx, allowed)
     subs = _plan_subs(session, active)
     fixed = [
         _option(
@@ -770,6 +892,13 @@ def swap_item(
             extra={"shortfalls": [], "unmet_pinned_lot_ids": []},
         )
     new_opt = next(d for d in best.dishes if d.slot == item.slot and d.recipe.id not in {f.recipe.id for f in fixed})
+    # Acquire row locks only for the state transition and re-verify active set before mutating.
+    plan, item = _open_item(session, deps, user, plan_id, item_id, lock=True)
+    current_all = _items(session, [plan.id])[plan.id]
+    current_active = [i for i in current_all if i.status == "active"]
+    if [i.id for i in current_active] != active_ids_before:
+        raise ApiError(409, ProblemCode.conflict_state, "Mâm vừa thay đổi, vui lòng thử lại.")
+    active = current_active
     now = utcnow()
     item.status, item.swap_reason = "swapped_out", reason
     session.flush()
@@ -834,7 +963,7 @@ def list_substitutes(
     item_id: uuid.UUID,
     ingredient_id: uuid.UUID | None,
 ) -> SubstituteListOut:
-    plan, item = _open_item(session, deps, user, plan_id, item_id, allow_cooking=True)
+    plan, item = _open_item(session, deps, user, plan_id, item_id, allow_cooking=True, lock=False)
     ctx = _plan_ctx(session, plan)
     active = [i for i in _items(session, [plan.id])[plan.id] if i.status == "active"]
     recipes = catalog.recipes_by_ids(session, [i.recipe_id for i in active])
@@ -1032,17 +1161,23 @@ def item_owned(session: Session, user_id: uuid.UUID, item_id: uuid.UUID) -> bool
     )
 
 
-def plan_for_cooking(session: Session, deps: MealDeps, user_id: uuid.UUID, plan_id: uuid.UUID) -> CookPlan:
-    plan = _owned_plan(session, user_id, plan_id, lock=True)
+def plan_for_cooking(
+    session: Session, deps: MealDeps, user_id: uuid.UUID, plan_id: uuid.UUID, *, lock: bool = True
+) -> CookPlan:
+    plan = _owned_plan(session, user_id, plan_id, lock=lock)
     tz = _tz(session, user_id)
-    _settle(session, deps, [plan], tz)
+    if lock:
+        _settle(session, deps, [plan], tz)
+        status = plan.status
+    else:
+        status = _effective_statuses(session, deps, [plan], tz, utcnow())[plan.id]
     active = [i for i in _items(session, [plan.id])[plan.id] if i.status == "active"]
     recipes = catalog.recipes_by_ids(session, [i.recipe_id for i in active])
     pins = tuple(session.scalars(select(MealPlanPin.lot_id).where(MealPlanPin.meal_plan_id == plan.id)))
     return CookPlan(
         plan.id,
         plan.user_id,
-        plan.status,
+        status,
         plan.persons,
         plan.max_minutes,
         profile.get_meal_constraints(session, user_id).burners,
@@ -1090,6 +1225,97 @@ def plan_status(session: Session, plan_id: uuid.UUID) -> str | None:
 
 def rice_bowl_kcal(session: Session) -> float | None:
     return catalog.rice_bowl_kcal(session)
+
+
+def cooked_meal_details(session: Session, plan_ids: Iterable[uuid.UUID]) -> dict[uuid.UUID, CookedMealDetail]:
+    wanted = list(dict.fromkeys(plan_ids))
+    if not wanted:
+        return {}
+    plans = {p.id: p for p in session.scalars(select(MealPlan).where(MealPlan.id.in_(wanted)))}
+    items_by_plan = _items(session, wanted)
+    active_items = [it for lst in items_by_plan.values() for it in lst if it.status == "active"]
+    recipe_ids = {it.recipe_id for it in active_items}
+    recipes = catalog.recipes_by_ids(session, recipe_ids)
+    rec_macros = catalog.recipe_macros(session, recipe_ids)
+    subs = _subs_of(session, [it.id for it in active_items])
+    sub_ing_ids = [
+        s.original_ingredient_id for rows in subs.values() for s in rows
+    ] + [
+        s.substitute_ingredient_id for rows in subs.values() for s in rows
+    ]
+    ing_nut = catalog.ingredient_nutrition(session, sub_ing_ids) if sub_ing_ids else {}
+    rice = catalog.rice_bowl_macros(session)
+
+    out: dict[uuid.UUID, CookedMealDetail] = {}
+    for pid, plan in plans.items():
+        active = [it for it in items_by_plan.get(pid, []) if it.status == "active"]
+        dishes: list[CookedDishInfo] = []
+        dish_kcal_sum = 0.0
+        has_dish_kcal = False
+        protein = 0.0
+        carbs = 0.0
+        fat = 0.0
+        fiber = 0.0
+        for it in active:
+            rec = recipes.get(it.recipe_id)
+            rm = rec_macros.get(it.recipe_id, {})
+            dk = float(it.kcal_per_person) if it.kcal_per_person is not None else rm.get("energy_kcal")
+            if dk is not None:
+                dish_kcal_sum += dk
+                has_dish_kcal = True
+            dp = rm.get("protein_g", 0.0)
+            dc = rm.get("glucid_g", 0.0)
+            df = rm.get("lipid_g", 0.0)
+            dfib = rm.get("fiber_g", 0.0)
+            item_subs = subs.get(it.id, [])
+            if item_subs and rec is not None:
+                lines = {ln.ingredient.id: ln for ln in rec.lines}
+                for s in item_subs:
+                    ln = lines.get(s.original_ingredient_id)
+                    if ln is None or ln.is_optional:
+                        continue
+                    orig_nut = ing_nut[s.original_ingredient_id].per_100g_purchased
+                    sub_nut = ing_nut[s.substitute_ingredient_id].per_100g_purchased
+                    sf = float(s.grams) / plan.persons
+                    of = ln.grams / rec.servings
+                    dp += (sf * sub_nut.get("protein_g", 0.0) - of * orig_nut.get("protein_g", 0.0)) / 100
+                    dc += (sf * sub_nut.get("glucid_g", 0.0) - of * orig_nut.get("glucid_g", 0.0)) / 100
+                    df += (sf * sub_nut.get("lipid_g", 0.0) - of * orig_nut.get("lipid_g", 0.0)) / 100
+                    dfib += (sf * sub_nut.get("fiber_g", 0.0) - of * orig_nut.get("fiber_g", 0.0)) / 100
+            protein += max(0.0, dp)
+            carbs += max(0.0, dc)
+            fat += max(0.0, df)
+            fiber += max(0.0, dfib)
+            dishes.append(
+                CookedDishInfo(
+                    recipe_id=it.recipe_id,
+                    name_vi=rec.name_vi if rec else "",
+                    slot=it.slot,  # type: ignore[arg-type]
+                    kcal_per_person=round(dk, 1) if dk is not None else None,
+                )
+            )
+        bowls = float(plan.rice_bowls_per_person) if plan.rice_bowls_per_person is not None else None
+        total_kcal: float | None = dish_kcal_sum if has_dish_kcal else None
+        if bowls is not None and rice:
+            if total_kcal is not None:
+                total_kcal += bowls * rice["energy_kcal"]
+            protein += bowls * rice["protein_g"]
+            carbs += bowls * rice["carbs_g"]
+            fat += bowls * rice["fat_g"]
+            fiber += bowls * rice["fiber_g"]
+        out[pid] = CookedMealDetail(
+            meal_plan_id=pid,
+            meal=plan.meal,  # type: ignore[arg-type]
+            persons=plan.persons,
+            rice_bowls_per_person=bowls,
+            kcal_per_person=round(total_kcal, 1) if total_kcal is not None else None,
+            protein_g=round(protein, 1),
+            carbs_g=round(carbs, 1),
+            fat_g=round(fat, 1),
+            fiber_g=round(fiber, 1),
+            dishes=tuple(dishes),
+        )
+    return out
 
 
 class MealSubjectData:

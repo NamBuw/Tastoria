@@ -40,11 +40,12 @@ class RequestContextMiddleware:
         rid = incoming if _RID_OK.match(incoming) else uuid.uuid4().hex
         set_request_id(rid)
         started = time.perf_counter()
-        status_holder = {"status": 500}
+        status_holder = {"status": 500, "started": False}
 
         async def send_wrapper(message: Message) -> None:
             if message["type"] == "http.response.start":
                 status_holder["status"] = message["status"]
+                status_holder["started"] = True
                 message.setdefault("headers", [])
                 message["headers"].append((b"x-request-id", rid.encode()))
             await send(message)
@@ -61,6 +62,8 @@ class RequestContextMiddleware:
             await self.app(scope, receive, send_wrapper)
         except Exception:
             log.exception("unhandled error")
+            if status_holder["started"]:
+                raise
             resp = problem_response(500, ProblemCode.internal_error, instance=path)
             await resp(scope, receive, send_wrapper)
         finally:

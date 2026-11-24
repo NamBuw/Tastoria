@@ -27,12 +27,12 @@ export default function ForgotPassword() {
   };
 
   return (
-    <Screen testID="screen-forgot">
+    <Screen testID="screen-forgot" variant="focused">
       <BrandHeader />
       <T v="h2" accessibilityRole="header">
         Quên mật khẩu
       </T>
-      <T tone="muted">Nhập email đã đăng ký. Nếu email có tài khoản, Tastoria gửi một liên kết đặt lại mật khẩu, dùng được trong 30 phút.</T>
+      <T tone="muted">Nhập email đã đăng ký. Nếu email có tài khoản, Mỹ Vị gửi một liên kết đặt lại mật khẩu, dùng được trong 30 phút.</T>
       <Field
         label="Email"
         value={email}

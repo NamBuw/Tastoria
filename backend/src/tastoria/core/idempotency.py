@@ -64,7 +64,13 @@ def header_key(request: Request) -> str:
         raise ApiError(
             400,
             ProblemCode.validation_error,
-            errors=[{"pointer": "#/header/Idempotency-Key", "code": "pattern", "message": "16–64 ký tự [A-Za-z0-9_-]"}],
+            errors=[
+                {
+                    "pointer": "#/header/Idempotency-Key",
+                    "code": "pattern",
+                    "message": "Từ 16 đến 64 ký tự [A-Za-z0-9_-]",
+                }
+            ],
         )
     return key
 
@@ -94,10 +100,12 @@ def begin(session: Session, user_id: uuid.UUID, idem: IdempotencyRequest) -> JSO
         return None
     if bytes(row.request_sha256) != idem.request_sha256:
         raise ApiError(422, ProblemCode.idempotency_key_reused)
+    replay_headers = {str(k): str(v) for k, v in (row.response_headers or {}).items()}
+    replay_headers["Idempotent-Replayed"] = "true"
     return JSONResponse(
         row.response_body,
         status_code=row.status_code,
-        headers={"Idempotent-Replayed": "true"},
+        headers=replay_headers,
         media_type=PROBLEM_MEDIA_TYPE if row.status_code >= 400 else None,  # a stored 422 (SD03) stays a problem
     )
 
@@ -111,6 +119,7 @@ def finish(
     headers: dict[str, str] | None = None,
 ) -> JSONResponse:
     body = jsonable_encoder(payload)
+    stored_headers = {str(k): str(v) for k, v in (headers or {}).items()}
     session.add(
         IdempotencyKey(
             user_id=user_id,
@@ -118,6 +127,7 @@ def finish(
             request_sha256=idem.request_sha256,
             status_code=status_code,
             response_body=body,
+            response_headers=stored_headers,
             created_at=utcnow(),
         )
     )

@@ -1,0 +1,36 @@
+@startuml
+title CL12c — Tầng service: nấu, hoàn tất và hoàn tác
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "cooking.service" as CK <<module>> {
+  +create_session(body: CookSessionCreate): CookSessionOut
+  +complete_session(cook_session_id: UUID, body: CookCompleteRequest): CookCompletion
+  +undo_session(cook_session_id: UUID): CookSessionOut
+  +abandon_session(cook_session_id: UUID): CookSessionOut
+}
+class "meal.service" as MS <<module>> {
+  +plan_for_cooking(user_id: UUID, plan_id: UUID): CookPlan
+  +consumption(plan: CookPlan): list[Need]
+  +set_cooked(plan_id: UUID, cooked: bool): None
+}
+class "pantry.service" as PS <<module>> {
+  +deduct(user_id: UUID, cook_session_id: UUID, needs: list[Need]): tuple
+  +reverse(user_id: UUID, cook_session_id: UUID): list[Deduction]
+}
+class "events.service" as EV <<module>> {
+  +record(user_id: UUID, events: list[Event]): bool
+}
+
+CK ..> MS
+CK ..> PS
+CK ..> EV
+@enduml

@@ -56,6 +56,7 @@ class MealPlan(Base):
     __table_args__ = (
         UniqueConstraint("id", "user_id", name="uq_meal_plans_id_user_id"),
         Index("ix_meal_plans_user_id_created_at", "user_id", text("created_at DESC")),
+        Index("ix_meal_plans_user_status_created", "user_id", "status", text("created_at DESC"), text("id DESC")),
     )
 
 

@@ -1,9 +1,11 @@
+import { Image } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Defs, Ellipse, G, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 
 import type { Schemas } from '@/api/client';
-import { font, space, useTheme, type Palette } from '@/theme';
+import { font, radius, space, TOUCH, useTheme } from '@/theme';
 
+import { recipePhotoFor } from './Brand';
 import { T } from './ui';
 
 // ---- freshness ----------------------------------------------------------------------------------
@@ -18,23 +20,41 @@ export const FRESH_LABEL: Record<Freshness, string> = {
   chua_ro: 'chưa rõ độ tươi',
 };
 
-/** Colour dot ALWAYS with its text label (WCAG 1.4.1). */
-export function FreshBadge({ value, small }: { value: Freshness; small?: boolean }) {
+/** Accessible status badge combining indicator and plain text (WCAG 1.4.1). */
+export function FreshBadge({
+  value,
+  small,
+  testID = 'fresh-badge',
+}: {
+  value: Freshness;
+  small?: boolean;
+  testID?: string;
+}) {
   const { c } = useTheme();
   const color = c.fresh[value];
   return (
     <View
-      style={[styles.badge, { backgroundColor: c.freshSoft[value], paddingHorizontal: small ? 8 : 10, paddingVertical: small ? 2 : 4 }]}
+      testID={testID}
+      style={[
+        styles.badge,
+        {
+          backgroundColor: c.freshSoft[value],
+          paddingHorizontal: small ? 8 : 10,
+          paddingVertical: small ? 3 : 4,
+        },
+      ]}
       accessibilityLabel={`Độ tươi: ${FRESH_LABEL[value]}`}>
       <View
         style={[
           styles.dot,
           value === 'kiem_tra' || value === 'chua_ro'
-            ? { borderWidth: 2, borderColor: color, backgroundColor: 'transparent' }
+            ? { borderWidth: 1.5, borderColor: color, backgroundColor: 'transparent' }
             : { backgroundColor: color },
         ]}
       />
-      <Text style={{ fontFamily: font.medium, fontSize: small ? 13 : 15, color }}>{FRESH_LABEL[value]}</Text>
+      <Text style={{ fontFamily: font.semibold, fontSize: small ? 12 : 14, lineHeight: small ? 16 : 20, color, flexShrink: 1 }}>
+        {FRESH_LABEL[value]}
+      </Text>
     </View>
   );
 }
@@ -46,7 +66,7 @@ export function fmtG(min: number, max: number): string {
   const a = r(min);
   const b = r(max);
   if (a === b) return `${a} g`;
-  return `${a}–${b} g`;
+  return `${a} đến ${b} g`;
 }
 
 export const SLOT_LABEL: Record<'man' | 'rau' | 'canh', string> = { man: 'Mặn', rau: 'Rau', canh: 'Canh' };
@@ -55,60 +75,10 @@ export const SLOT_LABEL: Record<'man' | 'rau' | 'canh', string> = { man: 'Mặn'
 
 type TrayItem = Pick<Schemas['MealPlanItem'], 'id' | 'slot' | 'recipe_name_vi'>;
 
-/** One dish drawn from above in a 100×100 box: Bát Tràng plate/bowl with a simple food shape per slot. */
-function DishArt({ slot, c }: { slot: 'man' | 'rau' | 'canh'; c: Palette }) {
-  const leaf = c.herb;
-  if (slot === 'canh')
-    return (
-      <G>
-        <Circle cx="50" cy="50" r="47" fill={c.dish} stroke={c.glaze} strokeWidth="3" />
-        <Circle cx="50" cy="50" r="40" fill="none" stroke={c.glaze} strokeWidth="1.2" strokeDasharray="3 5" />
-        <Circle cx="50" cy="50" r="33" fill="#D9B45A" opacity={0.55} />
-        <Circle cx="50" cy="50" r="33" fill="none" stroke="#B88B2E" strokeWidth="1" opacity={0.6} />
-        <Ellipse cx="40" cy="44" rx="9" ry="4.5" fill={leaf} transform="rotate(-30 40 44)" />
-        <Ellipse cx="58" cy="56" rx="8" ry="4" fill={leaf} transform="rotate(25 58 56)" />
-        <Ellipse cx="55" cy="38" rx="6" ry="3" fill={leaf} opacity={0.85} transform="rotate(60 55 38)" />
-        <Circle cx="44" cy="60" r="4" fill="#C77A55" />
-        <Circle cx="62" cy="44" r="3.2" fill="#C77A55" />
-        <Circle cx="36" cy="54" r="2" fill="#FFFFFF" opacity={0.6} />
-      </G>
-    );
-  if (slot === 'rau')
-    return (
-      <G>
-        <Circle cx="50" cy="50" r="47" fill={c.dish} stroke={c.glaze} strokeWidth="3" />
-        <Circle cx="50" cy="50" r="38" fill="none" stroke={c.glaze} strokeWidth="1" opacity={0.5} />
-        {[0, 45, 90, 135, 180, 225, 270, 315].map((a, i) => (
-          <Ellipse
-            key={a}
-            cx="50"
-            cy={i % 2 ? 33 : 30}
-            rx="8"
-            ry="17"
-            fill={i % 2 ? leaf : '#4E9A5C'}
-            transform={`rotate(${a} 50 50)`}
-          />
-        ))}
-        <Circle cx="50" cy="50" r="9" fill="#9CCB7A" />
-      </G>
-    );
-  return (
-    <G>
-      <Ellipse cx="50" cy="50" rx="47" ry="47" fill={c.dish} stroke={c.glaze} strokeWidth="3" />
-      <Path d="M50 9 l3 5 -3 5 -3 -5z M50 81 l3 5 -3 5 -3 -5z M9 50 l5 -3 5 3 -5 3z M81 50 l5 -3 5 3 -5 3z" fill={c.glaze} />
-      <Rect x="30" y="32" width="18" height="14" rx="5" fill="#9A5A2E" transform="rotate(-12 39 39)" />
-      <Rect x="50" y="30" width="17" height="13" rx="5" fill="#B06A35" transform="rotate(14 58 36)" />
-      <Rect x="34" y="50" width="17" height="14" rx="5" fill="#B06A35" transform="rotate(8 42 57)" />
-      <Rect x="53" y="49" width="16" height="14" rx="5" fill="#8C4E26" transform="rotate(-10 61 56)" />
-      <Circle cx="48" cy="47" r="2.2" fill={leaf} />
-      <Circle cx="60" cy="45" r="1.8" fill={leaf} />
-      <Circle cx="44" cy="62" r="1.8" fill={leaf} />
-      <Circle cx="52" cy="58" r="1.5" fill="#D9472F" />
-    </G>
-  );
-}
-
-/** Top-down lacquered round tray (mâm): rice bowl in the centre, 2–3 dishes around (v1 §5.2 motif). */
+/**
+ * Editorial 3-dish meal tray (mâm cơm): interactive tactile slots paired with
+ * verified food photography when available and clean slot typography otherwise.
+ */
 export function Tray({
   items,
   bowls,
@@ -125,66 +95,85 @@ export function Tray({
   const { c } = useTheme();
   const order = { man: 0, rau: 1, canh: 2 } as const;
   const sorted = [...items].sort((a, b) => order[a.slot] - order[b.slot]);
-  const angles = sorted.length === 3 ? [-90, 150, 30] : sorted.length === 2 ? [180, 0] : [-90];
-  const k = S / 100;
-  const dishD = 31; // in tray units
-  const R = 27.5;
-  const pos = sorted.map((_, i) => {
-    const a = (angles[i] * Math.PI) / 180;
-    return { x: 50 + R * Math.cos(a), y: 50 + R * Math.sin(a) };
-  });
+
   return (
     <View
-      style={{ width: S, height: S, alignSelf: 'center' }}
-      accessibilityLabel={`Mâm: ${sorted.map((i) => `${SLOT_LABEL[i.slot]} ${i.recipe_name_vi}`).join(', ')}, cơm ở giữa`}>
-      <Svg width={S} height={S} viewBox="0 0 100 100" accessibilityElementsHidden importantForAccessibility="no">
-        <Defs>
-          <RadialGradient id="lacq" cx="42%" cy="38%" r="70%">
-            <Stop offset="0" stopColor={c.trayGrain} />
-            <Stop offset="1" stopColor={c.tray} />
-          </RadialGradient>
-        </Defs>
-        <Circle cx="50" cy="51.2" r="49" fill="#000" opacity={0.12} />
-        <Circle cx="50" cy="50" r="49" fill={c.trayRim} />
-        <Circle cx="50" cy="50" r="46" fill="url(#lacq)" />
-        <Circle cx="50" cy="50" r="44.2" fill="none" stroke={c.trayRim} strokeWidth="0.5" opacity={0.7} />
-        {[36, 30, 22].map((r) => (
-          <Circle key={r} cx="50" cy="50" r={r} fill="none" stroke="#000" strokeWidth="0.35" opacity={0.08} />
-        ))}
-        <Path d="M20 26 A40 40 0 0 1 46 9" stroke="#FFFFFF" strokeWidth="1.6" fill="none" opacity={0.18} strokeLinecap="round" />
-        {sorted.map((it, i) => (
-          <G key={it.id}>
-            <Circle cx={pos[i].x + 0.8} cy={pos[i].y + 1.6} r={dishD / 2} fill="#000" opacity={0.22} />
-            <G transform={`translate(${pos[i].x - dishD / 2} ${pos[i].y - dishD / 2}) scale(${dishD / 100})`}>
-              <DishArt slot={it.slot} c={c} />
-            </G>
-          </G>
-        ))}
-        {/* rice bowl */}
-        <Circle cx="50.6" cy="51.4" r="11.5" fill="#000" opacity={0.22} />
-        <Circle cx="50" cy="50" r="11.5" fill={c.dish} stroke={c.glaze} strokeWidth="1" />
-        <Circle cx="50" cy="50" r="9.5" fill="none" stroke={c.glaze} strokeWidth="0.4" strokeDasharray="1 1.6" />
-        <Circle cx="50" cy="50" r="8" fill={c.rice} />
-        {[
-          [47, 47], [52, 46], [49, 51], [54, 50], [46, 53], [51, 54], [50, 48.5],
-        ].map(([x, y], j) => (
-          <Ellipse key={j} cx={x} cy={y} rx="1.1" ry="0.55" fill="#E4DED0" transform={`rotate(${j * 40} ${x} ${y})`} />
-        ))}
-      </Svg>
-      {!compact && bowls ? (
-        <View pointerEvents="none" style={[styles.tag, { left: S / 2 - 46, width: 92, top: S / 2 + 12 * k, backgroundColor: c.surface }]}>
-          <Text style={{ fontFamily: font.semibold, fontSize: 12, color: c.text }}>Cơm {fmtBowls(bowls)} bát</Text>
-        </View>
-      ) : null}
-      {sorted.map((it, i) => {
-        const d = dishD * k;
-        const left = pos[i].x * k - d / 2;
-        const top = pos[i].y * k - d / 2;
-        const tag = compact ? null : (
-          <View pointerEvents="none" style={[styles.tag, { backgroundColor: c.surface, bottom: -10, alignSelf: 'center' }]}>
-            <Text style={{ fontFamily: font.semibold, fontSize: 12, color: c.accent }}>{SLOT_LABEL[it.slot]}</Text>
+      style={{
+        width: '100%',
+        maxWidth: Math.max(S, 320),
+        alignSelf: 'center',
+        borderRadius: radius.lg,
+        borderWidth: 1.5,
+        borderColor: c.border,
+        backgroundColor: c.surfaceAlt,
+        overflow: 'hidden',
+      }}
+      accessibilityLabel={`Mâm: ${sorted.map((i) => `${SLOT_LABEL[i.slot]} ${i.recipe_name_vi}`).join(', ')}${bowls ? `, cơm ${fmtBowls(bowls)} bát` : ''}`}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: compact ? space.md : space.lg,
+          paddingVertical: space.sm,
+          borderBottomWidth: 1,
+          borderBottomColor: c.hairline,
+          backgroundColor: c.surface,
+        }}>
+        <T v="label">Mâm cơm {sorted.length} món</T>
+        <T v="small" tone="muted" tabular>
+          {bowls ? `Cơm ${fmtBowls(bowls)} bát / người` : 'Cơm trắng ăn kèm'}
+        </T>
+      </View>
+
+      {sorted.map((it, idx) => {
+        const photo = recipePhotoFor(it.recipe_name_vi, it.slot);
+        const content = (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: space.md,
+              paddingHorizontal: compact ? space.md : space.lg,
+              paddingVertical: compact ? space.sm : space.md,
+              borderTopWidth: idx > 0 ? 1 : 0,
+              borderTopColor: c.hairline,
+              minHeight: TOUCH,
+            }}>
+            {photo ? (
+              <Image
+                source={photo}
+                contentFit="cover"
+                style={{ width: compact ? 44 : 52, height: compact ? 44 : 52, borderRadius: radius.sm, backgroundColor: c.surface }}
+                accessibilityLabel={it.recipe_name_vi}
+              />
+            ) : (
+              <View
+                style={{
+                  width: compact ? 44 : 52,
+                  height: compact ? 44 : 52,
+                  borderRadius: radius.sm,
+                  backgroundColor: c.accentSoft,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <T v="small" tone="accent" style={{ fontFamily: font.semibold }}>
+                  {SLOT_LABEL[it.slot]}
+                </T>
+              </View>
+            )}
+            <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+              <T v="small" tone="accent" style={{ fontFamily: font.semibold }}>
+                Món {SLOT_LABEL[it.slot].toLowerCase()}
+              </T>
+              <T v={compact ? 'body' : 'title'} numberOfLines={2}>
+                {it.recipe_name_vi}
+              </T>
+            </View>
+            {onPressItem ? <Icon name="chevron-right" size={18} color={c.muted} /> : null}
           </View>
         );
+
         return onPressItem ? (
           <Pressable
             key={it.id}
@@ -192,13 +181,14 @@ export function Tray({
             accessibilityRole="button"
             accessibilityLabel={`${SLOT_LABEL[it.slot]}: ${it.recipe_name_vi}. Chạm để xem, đổi món hoặc xem thiếu gì`}
             onPress={() => onPressItem(it)}
-            style={({ pressed }) => [styles.hit, { left, top, width: d, height: d, borderRadius: d / 2, transform: [{ scale: pressed ? 0.96 : 1 }] }]}>
-            {tag}
+            style={({ pressed }) => ({
+              backgroundColor: pressed ? c.surface : 'transparent',
+              transform: [{ scale: pressed ? 0.99 : 1 }],
+            })}>
+            {content}
           </Pressable>
         ) : (
-          <View key={it.id} style={[styles.hit, { left, top, width: d, height: d }]}>
-            {tag}
-          </View>
+          <View key={it.id}>{content}</View>
         );
       })}
     </View>
@@ -238,12 +228,12 @@ export function KcalBar({
     <View style={{ gap: 6 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space.sm }}>
         <T v="label">Calo mỗi người (xấp xỉ)</T>
-        <T v="label">
-          {Math.round(low)}–{Math.round(high)} kcal
+        <T v="label" tabular testID="kcal-value">
+          {Math.round(low)} đến {Math.round(high)} kcal
         </T>
       </View>
       <View
-        style={{ height: 12, borderRadius: 6, backgroundColor: c.surfaceAlt, overflow: 'hidden' }}
+        style={{ height: 8, borderRadius: radius.sm, backgroundColor: c.surfaceAlt, overflow: 'hidden' }}
         accessibilityLabel={`Khoảng ${Math.round(low)} đến ${Math.round(high)} kcal mỗi người${
           target ? `, mục tiêu bữa ${Math.round(target)} kcal` : ''
         }`}>
@@ -254,12 +244,12 @@ export function KcalBar({
             width: `${Math.max(2, ((high - low) / max) * 100)}%`,
             top: 0,
             bottom: 0,
-            backgroundColor: c.herb,
-            borderRadius: 6,
+            backgroundColor: c.accent,
+            borderRadius: radius.sm,
           }}
         />
         {target ? (
-          <View style={{ position: 'absolute', left: pct(target), top: -2, bottom: -2, width: 3, backgroundColor: c.text }} />
+          <View style={{ position: 'absolute', left: pct(target), top: -2, bottom: -2, width: 2.5, backgroundColor: c.text }} />
         ) : null}
       </View>
       <T v="small" tone="muted">
@@ -271,61 +261,89 @@ export function KcalBar({
   );
 }
 
-// ---- icons (thin, rounded strokes) ---------------------------------------------------------------
+// ---- icons (clean monoline stroke paths: 24x24 viewBox, strokeWidth 1.8) -----------------------
 
-type IconName = 'home' | 'box' | 'tray' | 'cart' | 'book' | 'gear' | 'camera' | 'bag' | 'clock';
+export type IconName =
+  | 'home'
+  | 'box'
+  | 'tray'
+  | 'cart'
+  | 'book'
+  | 'gear'
+  | 'camera'
+  | 'bag'
+  | 'clock'
+  | 'check'
+  | 'close'
+  | 'plus'
+  | 'minus'
+  | 'arrow-right'
+  | 'arrow-left'
+  | 'arrow-up-right'
+  | 'chevron-left'
+  | 'chevron-right'
+  | 'compass'
+  | 'shield'
+  | 'sliders'
+  | 'search'
+  | 'trash'
+  | 'edit'
+  | 'eye'
+  | 'eye-off'
+  | 'flame'
+  | 'menu'
+  | 'alert-triangle';
 
 export function Icon({ name, color, size: s = 24 }: { name: IconName; color: string; size?: number }) {
   const p = { stroke: color, strokeWidth: 1.8, fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   return (
     <Svg width={s} height={s} viewBox="0 0 24 24" accessibilityElementsHidden importantForAccessibility="no">
       {name === 'home' && <Path {...p} d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z" />}
-      {name === 'box' && (
-        <>
-          <Rect {...p} x="4" y="3" width="16" height="18" rx="2" />
-          <Path {...p} d="M4 10h16M8 6.5v1M8 13v2" />
-        </>
-      )}
-      {name === 'tray' && (
-        <>
-          <Circle {...p} cx="12" cy="12" r="9" />
-          <Circle {...p} cx="12" cy="12" r="2.5" />
-          <Circle {...p} cx="12" cy="6.5" r="2" />
-          <Circle {...p} cx="7.5" cy="15" r="2" />
-          <Circle {...p} cx="16.5" cy="15" r="2" />
-        </>
-      )}
+      {name === 'box' && <Path {...p} d="M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM4 10h16M8 6.5v1M8 13v2" />}
+      {name === 'tray' && <Path {...p} d="M3 13a9 9 0 0 1 18 0M4 13h16M10 4.5a2 2 0 0 1 4 0M6 17h12" />}
       {name === 'cart' && <Path {...p} d="M4 5h2l2 10h10l2-7H7M10 19.5a.5.5 0 1 0 0 .01M17 19.5a.5.5 0 1 0 0 .01" />}
       {name === 'book' && <Path {...p} d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h10M9 8h5" />}
       {name === 'gear' && (
-        <>
-          <Circle {...p} cx="12" cy="12" r="3" />
-          <Path
-            {...p}
-            d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"
-          />
-        </>
+        <Path
+          {...p}
+          d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+        />
       )}
-      {name === 'camera' && (
-        <>
-          <Path {...p} d="M4 8h3l2-3h6l2 3h3v11H4z" />
-          <Circle {...p} cx="12" cy="13" r="3.5" />
-        </>
-      )}
+      {name === 'camera' && <Path {...p} d="M4 8h3l2-3h6l2 3h3v11H4zM12 10a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />}
       {name === 'bag' && <Path {...p} d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2" />}
-      {name === 'clock' && (
-        <>
-          <Circle {...p} cx="12" cy="12" r="8.5" />
-          <Path {...p} d="M12 7.5V12l3 2" />
-        </>
+      {name === 'clock' && <Path {...p} d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM12 7.5V12l3 2" />}
+      {name === 'check' && <Path {...p} d="M5 12.5l5 5 9-10" />}
+      {name === 'close' && <Path {...p} d="M6 6l12 12M18 6l-12 12" />}
+      {name === 'plus' && <Path {...p} d="M12 5v14M5 12h14" />}
+      {name === 'minus' && <Path {...p} d="M5 12h14" />}
+      {name === 'arrow-right' && <Path {...p} d="M5 12h14M13 6l6 6-6 6" />}
+      {name === 'arrow-left' && <Path {...p} d="M19 12H5M11 6l-6 6 6 6" />}
+      {name === 'arrow-up-right' && <Path {...p} d="M7 17L17 7M9 7h8v8" />}
+      {name === 'chevron-left' && <Path {...p} d="M15 6l-6 6 6 6" />}
+      {name === 'chevron-right' && <Path {...p} d="M9 6l6 6-6 6" />}
+      {name === 'compass' && <Path {...p} d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM15.5 8.5l-2 5.5-5.5 2 2-5.5z" />}
+      {name === 'shield' && <Path {...p} d="M12 3l7 3v5.5c0 4.5-3 7.8-7 9.5-4-1.7-7-5-7-9.5V6z" />}
+      {name === 'sliders' && <Path {...p} d="M4 7h16M4 17h16M9 4v6M15 14v6" />}
+      {name === 'search' && <Path {...p} d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4" />}
+      {name === 'trash' && <Path {...p} d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5" />}
+      {name === 'edit' && <Path {...p} d="M4 20h4l10-10-4-4L4 16v4zM13.5 6.5l4 4" />}
+      {name === 'eye' && <Path {...p} d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6zM12 9.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6z" />}
+      {name === 'eye-off' && (
+        <Path
+          {...p}
+          d="M3 3l18 18M10.6 10.6a2.8 2.8 0 0 0 3.8 3.8M9.9 5.3A9.7 9.7 0 0 1 12 5c6 0 9.5 7 9.5 7a16.4 16.4 0 0 1-3.2 4.2M6.2 7.2A16.7 16.7 0 0 0 2.5 12s3.5 7 9.5 7a9.7 9.7 0 0 0 4.3-1"
+        />
       )}
+      {name === 'flame' && (
+        <Path {...p} d="M12 3s5 4.2 5 9.5a5 5 0 1 1-10 0c0-2.4 1.1-4.3 2.3-5.8.2 1.8 1.2 2.8 2.2 2.8 0-2.7.5-4.8.5-6.5z" />
+      )}
+      {name === 'menu' && <Path {...p} d="M4 7h16M4 12h16M4 17h16" />}
+      {name === 'alert-triangle' && <Path {...p} d="M12 4L3 19h18zM12 10v4M12 16.8h.01" />}
     </Svg>
   );
 }
 
 const styles = StyleSheet.create({
-  badge: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 999, alignSelf: 'flex-start' },
-  dot: { width: 10, height: 10, borderRadius: 5 },
-  hit: { position: 'absolute', alignItems: 'center', justifyContent: 'flex-end' },
-  tag: { position: 'absolute', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 999, alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.25)' },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: radius.sm, alignSelf: 'flex-start', maxWidth: '100%', flexShrink: 1 },
+  dot: { width: 8, height: 8, borderRadius: radius.pill },
 });

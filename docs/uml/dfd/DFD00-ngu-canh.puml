@@ -1,0 +1,31 @@
+@startuml
+title DFD00 — Sơ đồ ngữ cảnh của Tastoria
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+
+usecase "0\nHệ thống Tastoria" as P
+rectangle "Người dùng" as E1
+rectangle "Người tham gia khảo sát" as E2
+rectangle "Quản trị viên" as E3
+rectangle "Người biên soạn công thức" as E4
+rectangle "Người vận hành mô hình" as E5
+rectangle "Dịch vụ email" as E6
+rectangle "Kho sao lưu ngoài" as E7
+E1 --> P : ảnh tủ lạnh, hồ sơ, yêu cầu mâm, nấu xong
+P --> E1 : chip, kho, mâm, lịch nấu, nhật ký
+E2 --> P : điểm gu món
+P --> E2 : phiếu khảo sát
+E3 --> P : quyết định xử lý yêu cầu
+P --> E3 : hàng đợi yêu cầu, nhật ký kiểm toán
+E4 --> P : bộ công thức, cặp thay thế
+P --> E4 : kết quả kiểm tra khi nhập
+E5 --> P : tệp mô hình, lệnh triển khai, đợt khảo sát
+P --> E5 : kết quả kiểm định, bản xuất khảo sát
+P --> E6 : thư đặt lại mật khẩu
+P --> E7 : bản sao lưu mã hoá
+@enduml

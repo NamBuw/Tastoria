@@ -1,0 +1,36 @@
+@startuml
+title SD11 — Xác nhận quét qua các tầng (UC13)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+boundary "ConfirmScan (app)" as CF
+control "scan.router" as SR
+control "scan.service" as SS
+control "pantry.service" as PS
+entity "PostgreSQL" as DB
+
+CF -> SR : POST /scans/{id}/confirm
+SR -> SS : confirm(scan_id, body)
+SS -> DB : khoá Scan (SELECT … FOR UPDATE)
+alt status = confirmed
+  SS --> SR : _replay(): kết quả lần trước
+else status ≠ done
+  SS --> SR : ApiError 409 invalid_scan_state
+else status = done
+  SS -> SS : kiểm chip kiem_tra, qty_level
+  SS -> PS : apply_scan(user_id, mode, items)
+  PS -> DB : thêm PantryLot (initial_g), lô vắng → not_seen
+  SS -> DB : Scan.status = confirmed
+  SS --> SR : ScanConfirmResult
+end
+SR -> DB : UnitOfWork commit
+SR --> CF : 200 ScanConfirmResult
+@enduml

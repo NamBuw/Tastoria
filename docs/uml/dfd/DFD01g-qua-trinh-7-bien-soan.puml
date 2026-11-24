@@ -1,0 +1,18 @@
+@startuml
+title DFD01g — Mức 1, quá trình 7.0 Biên soạn danh mục
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+
+usecase "7.0\nBiên soạn danh mục" as P
+rectangle "Người biên soạn công thức" as E4
+database "D2 Danh mục món và nguyên liệu" as D2
+E4 --> P : bộ YAML công thức, nguyên liệu, cặp thay thế
+P --> E4 : số thay đổi, lỗi kiểm tra
+D2 --> P : phiên bản món hiện có
+P --> D2 : món, nguyên liệu, dinh dưỡng, cặp thay thế
+@enduml

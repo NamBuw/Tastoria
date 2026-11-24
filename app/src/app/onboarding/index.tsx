@@ -60,6 +60,7 @@ export default function ConsentStep() {
   return (
     <Screen
       testID="screen-consent"
+      variant="focused"
       footer={
         <>
           <Button label="Tiếp tục" testID="consent-continue" onPress={() => submit(false)} loading={busy} disabled={loading || !!failed} />
@@ -68,7 +69,7 @@ export default function ConsentStep() {
       }>
       <BrandHeader subtitle="Hồ sơ 60 giây" />
       <T v="h2" accessibilityRole="header">
-        Bạn đồng ý cho Tastoria dùng dữ liệu nào?
+        Bạn đồng ý cho Mỹ Vị dùng dữ liệu nào?
       </T>
       <T tone="muted">
         Mỗi mục là một mục đích riêng, không bắt buộc. Không tích mục nào bạn vẫn dùng được quét tủ lạnh và ghép mâm. Đổi lại

@@ -98,3 +98,57 @@ def test_boxes_in_the_padding_are_dropped_and_partial_ones_clipped() -> None:
 
 def test_nothing_above_threshold() -> None:
     assert decode(_head([(100, 100, 10, 10, 0, 0.1)]), IDENT, conf=0.25, iou=0.7) == []
+
+
+def test_agnostic_iou_suppresses_conflicting_cross_class_box_on_same_object() -> None:
+    out = _head([
+        (100, 100, 50, 50, 0, 0.85),
+        (102, 100, 50, 50, 1, 0.62),  # IoU > 0.65 with box 0, different class
+    ])
+    kept_default = decode(out, IDENT, conf=0.25, iou=0.45)
+    assert [(b.class_index, round(b.confidence, 2)) for b in kept_default] == [(0, 0.85), (1, 0.62)]
+    kept_agnostic = decode(out, IDENT, conf=0.25, iou=0.45, agnostic_iou=0.65)
+    assert [(b.class_index, round(b.confidence, 2)) for b in kept_agnostic] == [(0, 0.85)]
+
+
+def test_agnostic_iou_keeps_adjacent_or_nested_different_class_boxes() -> None:
+    # Nested small item (20x20 -> area 400) inside large item (100x100 -> area 10000): IoU = 0.04 <= 0.65
+    # Adjacent box shifted right: IoU < 0.65
+    out = _head([
+        (200, 200, 100, 100, 0, 0.90),
+        (200, 200, 20, 20, 1, 0.70),  # nested different class
+        (230, 200, 100, 100, 2, 0.60),  # shifted IoU = 70*100 / (20000 - 7000) = 0.538 <= 0.65
+    ])
+    boxes = decode(out, IDENT, conf=0.25, iou=0.45, agnostic_iou=0.65)
+    assert [b.class_index for b in boxes] == [0, 1, 2]
+
+
+def test_class_conf_applies_per_class_threshold_and_disables_dead_class_without_stealing_anchor() -> None:
+    # Anchor 0: disabled class 0 (0.85) must not mask enabled class 1 (0.45 >= 0.35)
+    # Anchor 1: class 2 (0.50) below per-class threshold 0.60 must be dropped even though fallback conf=0.35
+    out = np.zeros((4 + 3, 2), np.float32)
+    out[:4, 0] = (100, 100, 40, 40)
+    out[4 + 0, 0] = 0.85
+    out[4 + 1, 0] = 0.45
+    out[:4, 1] = (300, 300, 40, 40)
+    out[4 + 2, 1] = 0.50
+    boxes = decode(
+        out[None],
+        IDENT,
+        conf=0.35,
+        iou=0.45,
+        class_conf={0: 1.0, 1: 0.35, 2: 0.60},
+    )
+    assert [(b.class_index, round(b.confidence, 2)) for b in boxes] == [(1, 0.45)]
+
+
+def test_resolve_class_conf_maps_codes_and_ignores_unknown() -> None:
+    from tastoria.modules.scan.runner import resolve_class_conf
+
+    class_map = {0: 10, 1: 20, 2: 30}
+    code_by_vid = {10: "ca_chua", 20: "ca_rot", 30: "thit_bo"}
+    raw = {"ca_chua": 0.47, "ca_rot": 0.33, "2": 1.0, "unknown_cls": 0.5}
+    resolved = resolve_class_conf(raw, class_map, code_by_vid)
+    assert resolved == {0: 0.47, 1: 0.33, 2: 1.0}
+    assert resolve_class_conf(None, class_map, code_by_vid) is None
+    assert resolve_class_conf({}, class_map, code_by_vid) is None

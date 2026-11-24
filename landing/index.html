@@ -1,47 +1,936 @@
 <!doctype html>
 <html lang="vi">
+
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tastoria — Taste and write your story</title>
-<meta name="description" content="Nguyên liệu quen. Câu chuyện mới. Cùng Tastoria khám phá món Việt, lên mâm từ đồ sẵn có và lưu lại hành trình vào bếp.">
-<meta name="theme-color" content="#f3512c">
-<link rel="icon" href="/gioi-thieu/img/brand-mark.svg?v=3" type="image/svg+xml">
-<link rel="preload" href="/gioi-thieu/fonts/be-vietnam-pro-700Bold.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/gioi-thieu/img/bun-dau.jpg" as="image">
-<link rel="stylesheet" href="/gioi-thieu/style.css?v=0.1.4">
-<script src="/gioi-thieu/story.js?v=0.1.4.1" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" id="theme-color-meta" content="#E3CFA6">
+  <title>Mỹ Vị: Cơm nhà Việt Nam và dinh dưỡng bữa ăn mỗi ngày</title>
+  <meta name="description"
+    content="Chụp ảnh bữa ăn để xem năng lượng, tinh bột, đạm, chất béo và chất xơ của từng món Việt, bật tắt mỡ hành và nước chấm, rồi xếp mâm cơm nhà từ đồ sẵn trong tủ lạnh.">
+  <meta property="og:title" content="Mỹ Vị: Cơm nhà Việt Nam và dinh dưỡng bữa ăn mỗi ngày">
+  <meta property="og:description"
+    content="Xem dinh dưỡng bữa ăn Việt và gợi ý mâm cơm nhà từ những nguyên liệu còn sẵn trong tủ lạnh.">
+  <meta property="og:image" content="https://tastoria.ctslab.net/gioi-thieu/img/vietnamese-table.jpg">
+  <link rel="icon" href="/gioi-thieu/img/icon.svg?v=editorial-v24" type="image/svg+xml">
+  <link rel="preload" href="/gioi-thieu/fonts/newsreader-vietnamese-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/gioi-thieu/fonts/be-vietnam-pro-vietnamese-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/gioi-thieu/fonts/be-vietnam-pro-vietnamese-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/gioi-thieu/img/paper-bg-light.webp?v=editorial-v24" as="image">
+  <link rel="preload" href="/gioi-thieu/img/vietnamese-table.jpg" as="image">
+  <link rel="stylesheet" href="/gioi-thieu/style.css?v=editorial-v24">
+  <script src="/gioi-thieu/story.js?v=editorial-v24" defer></script>
+  <script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Mỹ Vị có thu phí khi dùng các tính năng chính không?","acceptedAnswer":{"@type":"Answer","text":"Không. Toàn bộ tính năng chụp bữa ăn, nhận diện nguyên liệu tủ lạnh, quét mã vạch sản phẩm đóng gói và gợi ý mâm cơm gia đình đều dùng được trọn vẹn trên trình duyệt và Android."}},{"@type":"Question","name":"Vì sao phở và bún thịt nướng hay có sự chênh lệch năng lượng giữa các nơi bán?","acceptedAnswer":{"@type":"Answer","text":"Sự khác biệt thường nằm ở lượng bánh phở, thịt và phần gia vị đi kèm. Một muỗng canh mỡ hành thêm khoảng 70 đến 90 kcal, một chén nước mắm pha thêm khoảng 30 đến 60 kcal so với phần ăn không chan."}},{"@type":"Question","name":"Khi hệ thống chưa chắc chắn giữa hai món gần giống thì xử lý thế nào?","acceptedAnswer":{"@type":"Answer","text":"Khi hai món có hình dáng gần nhau, ví dụ đậu phụ non và bánh đúc, màn hình hiện ngay hai lựa chọn để bạn chạm đổi đúng món trong một giây trước khi lưu vào nhật ký."}},{"@type":"Question","name":"Ảnh chụp tủ lạnh và bữa ăn được quản lý quyền riêng tư ra sao?","acceptedAnswer":{"@type":"Answer","text":"Ảnh chụp cá nhân được lưu trữ bảo mật phục vụ nhật ký của bạn. Bạn có thể tắt quyền đóng góp dữ liệu hoặc yêu cầu xóa toàn bộ dữ liệu bất kỳ lúc nào trong phần Cài đặt."}},{"@type":"Question","name":"Đi chợ có cần kết nối mạng để xem và cập nhật danh sách cần mua không?","acceptedAnswer":{"@type":"Answer","text":"Cần kết nối mạng để tải danh sách đi chợ từ tài khoản và lưu ngay trạng thái đã mua giữa các thiết bị; khi mua xong, bạn bấm chuyển thẳng thành nguyên liệu trong Kho bếp. Riêng lúc hoàn tất buổi nấu ở bếp, ứng dụng có lưu tạm thao tác khi mất mạng và tự gửi lại ngay khi có sóng."}},{"@type":"Question","name":"Có lọc được món gây dị ứng cho trẻ nhỏ hoặc người lớn tuổi không?","acceptedAnswer":{"@type":"Answer","text":"Có. Đồ ăn kiêng và thành phần gây dị ứng khai báo trong hồ sơ gia đình luôn bị loại trừ trước khi hệ thống xếp mâm cơm."}},{"@type":"Question","name":"Cài ứng dụng Android bằng tệp APK như thế nào?","acceptedAnswer":{"@type":"Answer","text":"Bạn bấm liên kết tải tệp cài Android (.apk) ở cuối trang rồi mở trực tiếp trên điện thoại Android để cài bản đã ký số."}},{"@type":"Question","name":"Tôi có thể tải về hoặc xóa sạch dữ liệu cá nhân không?","acceptedAnswer":{"@type":"Answer","text":"Có. Mục Cài đặt hỗ trợ xuất toàn bộ hồ sơ dưới dạng tệp nén ZIP, rút đồng ý xử lý dữ liệu và xóa vĩnh viễn tài khoản."}}]}
+  </script>
 </head>
+
 <body>
-<a class="skip" href="#main">Đến nội dung chính</a>
-<header class="header wrap">
- <a class="wordmark" href="/" aria-label="Tastoria, trang chủ"><img src="/gioi-thieu/img/brand-mark.svg" width="44" height="44" alt="">tastoria<span class="wordmark-period">.</span></a>
- <nav aria-label="Điều hướng chính"><a href="#kham-pha">Khám phá</a><a href="#can-bep">Bếp của bạn</a><a href="#nhat-ky">Chuyện bếp</a></nav>
- <div class="auth-links"><a class="login-link" href="/dang-nhap">Đăng nhập</a><a class="button small" href="/dang-ky">Đăng ký <span aria-hidden="true">↗</span></a></div>
-</header>
-<main id="main">
- <section class="hero" aria-labelledby="hero-title">
-  <div class="hero-top wrap"><p class="eyebrow"><span class="status-dot"></span> NGUYÊN LIỆU QUEN. CÂU CHUYỆN MỚI.</p></div>
-  <div class="hero-layout wrap">
-   <div class="hero-copy"><h1 id="hero-title" aria-label="Taste and write your story."><span>Taste<span class="dot">.</span></span><span class="headline-small">and write</span><span class="headline-last">your story<span class="dot">.</span></span></h1><p class="hero-vietnamese">Nấu một bữa ngon.<br>Kể một chuyện của riêng mình.</p><p class="hero-description">Từ những gì đang có trong tủ lạnh đến mâm cơm khiến bạn muốn về nhà.</p><a class="button lime" href="/bep">Khám phá căn bếp của bạn <span aria-hidden="true">↗</span></a><p class="hero-footnote">Bắt đầu từ nguyên liệu. Kết thúc bằng một bữa ngon.</p></div>
-   <figure class="hero-visual" id="food-stage"><div class="food-fallback"><img src="/gioi-thieu/img/bun-dau.jpg" width="1600" height="1067" fetchpriority="high" alt="Mâm bún đậu với nem rán, thịt luộc, dưa chuột và bún trắng, ảnh của Quang Nguyen Vinh."></div><figcaption>CHUYỆN NGON #01 <span>Mâm nhà mình.</span></figcaption></figure>
+  <a class="skip-link" href="#main">Xuống phần nội dung chính</a>
+  <div id="top-sentinel" class="scroll-sentinel" aria-hidden="true"></div>
+
+  <header class="site-masthead" id="site-header">
+    <div class="masthead-grid">
+      <div class="masthead-crest-col">
+        <a class="crest-plaque" href="#main" aria-label="Mỹ Vị trang chủ">
+          <img class="brand-mark" src="/gioi-thieu/img/icon.svg?v=editorial-v24" width="26" height="26" alt="">
+          <span class="crest-title">Mỹ Vị</span>
+          <span class="crest-sub">CƠM NHÀ</span>
+          <svg class="crest-seal" viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="32" cy="32" r="29" fill="#FAF2E0" stroke="#9E2F1E" stroke-width="2" />
+            <circle cx="32" cy="32" r="23" fill="none" stroke="#9E2F1E" stroke-width="1" stroke-dasharray="2 2" />
+            <text x="32" y="25" text-anchor="middle" font-size="8" font-weight="800" fill="#9E2F1E">CƠM NHÀ</text>
+            <text x="32" y="36" text-anchor="middle" font-size="10" font-weight="700" fill="#19120B">MỸ VỊ</text>
+            <text x="32" y="46" text-anchor="middle" font-size="7" font-weight="700" fill="#9E2F1E">VIỆT NAM</text>
+          </svg>
+        </a>
+        <button type="button" id="mobile-menu-toggle" class="menu-trigger" aria-label="Mở mục lục điều hướng"
+          aria-expanded="false" aria-controls="mobile-drawer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+            aria-hidden="true">
+            <line class="menu-line menu-line-top" x1="4" y1="7" x2="20" y2="7" />
+            <line class="menu-line menu-line-mid" x1="4" y1="12" x2="20" y2="12" />
+            <line class="menu-line menu-line-bottom" x1="4" y1="17" x2="20" y2="17" />
+          </svg>
+          <span>MỤC LỤC</span>
+        </button>
+      </div>
+
+      <div class="masthead-center">
+        <div class="masthead-super">
+          <span class="masthead-kicker">THỜI BÁO</span>
+          <span class="masthead-edition">ẤN BẢN CƠM NHÀ, ẨM THỰC VIỆT</span>
+        </div>
+        <a class="wordmark-banner" href="#main">
+          <span class="wordmark-text">MỸ VỊ</span>
+        </a>
+        <div class="masthead-ribbon">ẨM THỰC VÀ DINH DƯỠNG CƠM NHÀ</div>
+        <div class="masthead-double-rule" aria-hidden="true"></div>
+        <div class="masthead-tagline">ẨM THỰC VIỆT TRONG TỪNG BỮA CƠM GIA ĐÌNH</div>
+        <nav id="primary-nav" class="primary-nav" aria-label="Điều hướng chính">
+          <a href="#van-de">Câu chuyện</a>
+          <a href="#can-bep">Tính bữa ăn</a>
+          <a href="#cach-dung">Cách dùng</a>
+          <a href="#hoi-dap">Hỏi đáp</a>
+        </nav>
+      </div>
+
+      <aside class="masthead-earbox" aria-label="Truy cập ứng dụng Mỹ Vị">
+        <div class="earbox-title">MỸ VỊ</div>
+        <div class="earbox-meta">Xem dinh dưỡng từng bữa ăn và gợi ý nấu cơm nhà từ đồ sẵn có.</div>
+        <div class="earbox-actions">
+          <a class="earbox-cta" href="/bep">Vào ứng dụng</a>
+          <a class="nav-quiet" href="/dang-nhap">Đăng nhập</a>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <div id="mobile-drawer" class="mobile-drawer" hidden>
+    <div class="drawer-head">
+      <span class="dish-title-serif">Mục lục Mỹ Vị</span>
+      <button type="button" class="drawer-close" data-drawer-close aria-label="Đóng mục lục">Đóng ×</button>
+    </div>
+    <nav class="drawer-nav" aria-label="Điều hướng mục lục">
+      <a class="heading-5" href="#van-de">1. Câu chuyện cơm nhà</a>
+      <a class="heading-5" href="#can-bep">2. Tính dinh dưỡng bữa ăn</a>
+      <a class="heading-5" href="#cach-dung">3. Cách dùng mỗi ngày</a>
+      <a class="heading-5" href="#khoa-hoc">4. Món Việt quen thuộc</a>
+      <a class="heading-5" href="#hoi-dap">5. Câu hỏi thường gặp</a>
+      <a class="heading-5" href="/khao-sat">6. Khẩu vị gia đình</a>
+    </nav>
+    <div class="drawer-actions">
+      <a class="btn btn-primary btn-block button-md" href="/bep">Vào ứng dụng</a>
+      <a class="btn btn-outline btn-block button-md" href="/dang-nhap">Đăng nhập</a>
+    </div>
   </div>
-  <div class="hero-bottom wrap"><a href="#kham-pha">CUỘN ĐỂ NẾM MỘT CHÚT CẢM HỨNG <span aria-hidden="true">↓</span></a><span>Ảnh thật. Vị thật. Chuyện của bạn.</span></div>
- </section>
- <section class="discovery section" id="kham-pha">
-  <div class="wrap section-heading reveal"><div><p class="eyebrow">01 / MỞ VỊ GIÁC</p><h2>Một chút quen.<br><span>Một trời cảm hứng.</span></h2></div><p>Không cần những nguyên liệu xa lạ.<br>Chỉ cần một cách nhìn mới<br>về bữa ăn mỗi ngày.</p></div>
-  <div class="gallery-stage wrap"><div class="food-gallery">
-   <article class="food-card card-one" tabindex="0"><div class="food-card-image"><img src="/gioi-thieu/img/fresh-bowl.jpg" width="1200" height="1797" loading="lazy" alt="Bát bún nhiều rau xanh, cà rốt và đậu phụ, ảnh chụp của cottonbro studio."></div><div class="food-card-label"><div><span>TƯƠI MỘT CHÚT</span><h3>Một bữa nhiều xanh.</h3></div><span aria-hidden="true">01</span></div></article>
-   <article class="food-card card-two" tabindex="0"><div class="food-card-image"><img src="/gioi-thieu/img/vietnamese-table.jpg" width="1400" height="933" loading="lazy" alt="Mọi người cùng gắp món trên mâm, ảnh chụp của Jakub Kapusnak."></div><div class="food-card-label"><div><span>GẦN NHAU MỘT CHÚT</span><h3>Có nhau, ngon hơn.</h3></div><span aria-hidden="true">02</span></div></article>
-   <article class="food-card card-three" tabindex="0"><div class="food-card-image"><img src="/gioi-thieu/img/pho.jpg" width="1600" height="1067" loading="lazy" alt="Bát món nóng với thịt, khoai và rau thơm, ảnh chụp của Tranmautritam."></div><div class="food-card-label"><div><span>ẤM MỘT CHÚT</span><h3>Vị ngon ở lại.</h3></div><span aria-hidden="true">03</span></div></article>
-  </div><p class="gallery-caption">Những lát cắt ẩm thực để lấy cảm hứng · Không phải thực đơn được gợi ý cho bạn.</p></div>
- </section>
- <section class="kitchen section" id="can-bep"><div class="wrap kitchen-grid">
-  <div class="kitchen-copy reveal"><p class="eyebrow">02 / BẾP CỦA BẠN</p><h2>Tủ lạnh có gì,<br><span>mình nấu đó.</span></h2><p>Mớ rau sáng nay. Vài quả trứng còn lại.<br>Một bữa ngon có thể bắt đầu từ rất ít.</p><ol class="steps"><li><span>01</span><div><h3>Nhìn vào tủ lạnh.</h3><p>Chụp ảnh hoặc thêm nguyên liệu bằng tay.</p></div></li><li><span>02</span><div><h3>Gom thành một mâm.</h3><p>Gợi ý món Việt từ kho, ưu tiên đồ cần dùng sớm.</p></div></li><li><span>03</span><div><h3>Nấu và thưởng thức.</h3><p>Theo các bước nấu. Lưu bữa ngon vào nhật ký.</p></div></li></ol><a href="/bep" class="text-link">Mở kho bếp của mình <span aria-hidden="true">↗</span></a></div>
-  <div class="recipe-demo reveal"><div class="demo-top"><span>SỔ TAY BẾP NHỎ</span><span>THỬ MỘT CHÚT ↓</span></div><h3>Hôm nay bạn có…</h3><div class="ingredient-options" role="group" aria-label="Chọn nguyên liệu minh hoạ"><button type="button" data-ingredient="egg" aria-pressed="true"><span aria-hidden="true">01</span>Trứng</button><button type="button" data-ingredient="tofu" aria-pressed="false"><span aria-hidden="true">02</span>Đậu phụ</button><button type="button" data-ingredient="greens" aria-pressed="false"><span aria-hidden="true">03</span>Rau xanh</button></div><div class="demo-result" aria-live="polite"><span class="result-label">MỘT Ý TƯỞNG NHO NHỎ</span><h4 id="recipe-name">Trứng sốt cà chua</h4><p id="recipe-description">Trứng mềm, cà chua chín và một chút hành. Một món quen để bắt đầu bữa cơm.</p></div><a class="button" href="/bep">Lên mâm từ kho của bạn <span aria-hidden="true">↗</span></a><p class="demo-note">Ví dụ minh hoạ, chưa dựa trên kho hay hồ sơ của bạn.</p></div>
- </div></section>
- <section class="story-section" id="nhat-ky"><div class="story-photo"><img src="/gioi-thieu/img/vietnamese-table.jpg" width="1400" height="933" loading="lazy" alt="Khoảnh khắc cùng nhau thưởng thức một mâm cơm Việt."><span class="photo-credit">Ảnh: Jakub Kapusnak / Foodiesfeed</span></div><div class="story-content reveal"><p class="eyebrow">03 / GIỮ LẠI ĐIỀU NGON</p><h2>Có những bữa ăn,<br>mình nhớ<br><span>rất lâu.</span></h2><p>Lần đầu nấu món mẹ hay làm. Một bữa cơm sau ngày dài. Hay đơn giản là hôm nay, mình đã vào bếp.</p><p>Nhật ký Tastoria giữ lại hành trình ấy — từng mâm cơm, từng ngày.</p><a class="button lime" href="/nhat-ky">Viết tiếp chuyện bếp <span aria-hidden="true">↗</span></a></div></section>
- <section class="invitation section"><div class="wrap reveal"><p class="eyebrow">BỮA NGON TIẾP THEO BẮT ĐẦU TỪ BẠN.</p><h2>Let's make<br><span>something tasty.</span></h2><div class="invitation-actions"><a class="button" href="/bep">Cùng vào bếp <span aria-hidden="true">↗</span></a><a id="android-download" class="text-link" href="/tai-ve/tastoria-0.1.4.apk" download>Tải Android · APK 0.1.4 <span aria-hidden="true">↓</span></a></div></div><div class="invitation-outline" aria-hidden="true">tastoria.</div></section>
- <section class="faq wrap section"><div><p class="eyebrow">TRƯỚC KHI VÀO BẾP</p><h2>Thêm một<br>chút thông tin.</h2></div><div><details><summary>Tôi có cần tài khoản để xem Tastoria?</summary><p>Bạn có thể khám phá trang này và làm khảo sát mà không đăng nhập. Khi muốn dùng kho nguyên liệu, lên mâm hoặc lưu nhật ký, hãy tạo tài khoản để giữ dữ liệu riêng của mình.</p></details><details><summary>Tôi có bắt buộc chụp ảnh tủ lạnh không?</summary><p>Không. Bạn có thể nhập nguyên liệu bằng tay. Nếu dùng ảnh, hãy kiểm tra và sửa kết quả nhận diện trước khi lưu vào kho.</p></details><details><summary>Ảnh và dữ liệu của tôi được quản lý thế nào?</summary><p>Bạn chọn đồng ý riêng cho từng mục đích. Ảnh quét được giữ 30 ngày, trừ khi bạn đồng ý góp ảnh. Bạn có thể rút đồng ý, tải dữ liệu hoặc xoá tài khoản trong Cài đặt.</p></details><details><summary>Tôi có thể góp gu món ăn của mình?</summary><p>Có. <a href="/khao-sat">Khảo sát gu món ăn</a> không cần tài khoản. Tastoria hiện là dự án thử nghiệm về nhận diện nguyên liệu và gợi ý mâm cơm Việt.</p></details></div></section>
-</main>
-<footer class="footer"><div class="wrap"><div class="footer-top"><a class="wordmark" href="/"><img src="/gioi-thieu/img/brand-mark.svg" width="48" height="48" alt="">tastoria.</a><p>Taste and write your story.</p><a href="#main" class="back-top" aria-label="Về đầu trang">↑</a></div><div class="footer-bottom"><span>Dành cho những căn bếp Việt.</span><a href="/khao-sat">Góp một chút gu</a><details class="credits"><summary>Nguồn ảnh & cảm hứng</summary><p>Ảnh chụp: <a href="https://www.pexels.com/photo/bowl-with-yummy-vietnamese-meal-5118734/">Quang Nguyen Vinh</a>, <a href="https://www.pexels.com/photo/healthy-food-in-a-bowl-3297807/">cottonbro studio</a>, <a href="https://www.pexels.com/photo/food-on-bowl-98874/">Tranmautritam</a> / Pexels; <a href="https://www.foodiesfeed.com/free-food-photo/feasting-on-vietnamese-traditional-food">Jakub Kapusnak / Foodiesfeed</a>. Không sử dụng ảnh món ăn do AI tạo.</p></details></div></div></footer>
-</body></html>
+
+  <main id="main">
+    <!-- 1. Broadsheet Front Page Lead Story (2/3 Lead + Stamp, 1/3 Món Quen Hôm Nay) -->
+    <section class="band-paper" id="hero" aria-labelledby="hero-title">
+      <div class="wrap frontpage-grid">
+        <div class="lead-story-col">
+          <div class="lead-top-split">
+            <div class="broadsheet-stamp">
+              <span class="stamp-eyebrow">BẠN ĐỌC CHÚ Ý</span>
+              <svg class="stamp-arrow-svg" viewBox="0 0 210 162" role="img"
+                aria-label="Mỹ Vị cơm nhà mỗi ngày">
+                <polygon class="stamp-arrow-poly" points="26,6 184,6 192,98 206,98 105,156 4,98 18,98" />
+                <polygon class="stamp-arrow-inner" points="32,12 178,12 185,103 195,103 105,149 15,103 25,103" />
+                <text class="stamp-arrow-title" x="105" y="48" text-anchor="middle">MỸ VỊ</text>
+                <text class="stamp-arrow-title" x="105" y="76" text-anchor="middle">CƠM NHÀ</text>
+                <text class="stamp-arrow-sub" x="105" y="100" text-anchor="middle">MỖI NGÀY</text>
+              </svg>
+            </div>
+
+            <div class="hero-copy">
+              <span class="editorial-kicker">Cơm nhà Việt Nam và dinh dưỡng mỗi ngày</span>
+              <h1 id="hero-title" class="heading-1">Hiểu rõ bữa cơm mình ăn mỗi ngày</h1>
+              <p class="body-2 hero-sub">
+                Chụp ảnh bữa ăn để biết lượng năng lượng, tinh bột, đạm, chất béo và chất xơ của từng món quen thuộc.
+                Khi băn khoăn tối nay nấu gì, xem ngay gợi ý mâm cơm từ những nguyên liệu còn sẵn trong tủ lạnh.
+              </p>
+              <div class="hero-cta-row">
+                <a class="btn btn-primary button-md" href="/bep">Vào ứng dụng</a>
+              </div>
+            </div>
+          </div>
+
+          <figure class="hero-proof-frame">
+            <div class="hero-proof-media">
+              <img src="/gioi-thieu/img/vietnamese-table.jpg" width="1400" height="933" fetchpriority="high"
+                alt="Mâm bún thịt nướng ăn kèm nem rán, rau sống, giá đỗ và chén nước mắm pha trên bàn">
+              <svg class="editorial-seal-svg" viewBox="0 0 100 100" aria-hidden="true">
+                <circle class="seal-ring-outer" cx="50" cy="50" r="46" />
+                <circle class="seal-ring-inner" cx="50" cy="50" r="39" />
+                <text class="seal-text-top" x="50" y="32" text-anchor="middle">MỸ VỊ</text>
+                <text class="seal-text-mid" x="50" y="54" text-anchor="middle">CƠM NHÀ</text>
+                <text class="seal-text-bot" x="50" y="72" text-anchor="middle">VIỆT NAM</text>
+              </svg>
+            </div>
+            <figcaption class="hero-proof-ledger">
+              <div class="hero-proof-top">
+                <strong class="hero-proof-title">Mâm bún thịt nướng và nem rán</strong>
+                <span class="editorial-num hero-proof-kcal">474 đến 710 kcal</span>
+              </div>
+              <span class="caption-2 hero-proof-sub">
+                Mỗi phần gồm bún tươi, thịt vai nướng than, nem rán giòn, rau sống và chén nước mắm pha (~480g), đã tính mỡ hành 80 kcal, mật độ 123 kcal/100g.
+              </span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <aside class="spotlight-col" aria-label="Món quen hôm nay và Một vòng bếp Việt">
+          <div class="spotlight-head">
+            <h2 class="spotlight-title">MÓN QUEN HÔM NAY</h2>
+            <span class="spotlight-kicker">Giá trị dinh dưỡng tham khảo theo khẩu phần vừa</span>
+          </div>
+
+          <div class="spotlight-card">
+            <div class="spotlight-photo">
+              <img src="/gioi-thieu/img/bun-thit-nuong.webp?v=editorial-v24" width="700" height="700"
+                alt="Tô bún thịt nướng chả giò kèm rau thơm, dưa leo và đồ chua">
+            </div>
+            <div class="spotlight-dish-row">
+              <strong class="spotlight-dish-name">Bún thịt nướng chả giò</strong>
+              <span class="editorial-num spotlight-dish-kcal">467 kcal</span>
+            </div>
+            <p class="spotlight-body">
+              Khoảng năng lượng 374 đến 560 kcal cho tô vừa (~420g): Tinh bột 58.0g (50%), Chất đạm 25.0g (21%), Chất béo
+              15.0g (29%) và Chất xơ 3.2g. Nếu chan thêm nước mắm pha và mỡ hành, tổng bữa tăng thêm khoảng 125 kcal.
+            </p>
+          </div>
+
+          <div class="spotlight-mini">
+            <img class="spotlight-mini-img" src="/gioi-thieu/img/beef-pho.webp?v=editorial-v24" width="700" height="700"
+              alt="Tô phở bò tái nạm hành lá">
+            <div class="spotlight-mini-copy">
+              <strong class="title-4">Phở bò tái nạm (~520g)</strong>
+              <span class="caption-2 tabular-nums">355 đến 533 kcal, 85 kcal/100g</span>
+              <span class="caption-4">Đạm 26.0g, Tinh bột 58.0g, Béo 12.0g</span>
+            </div>
+          </div>
+
+          <div class="spotlight-mini">
+            <img class="spotlight-mini-img" src="/gioi-thieu/img/silken-tofu.webp?v=editorial-v24" width="700" height="700"
+              alt="Đậu phụ non chần hành gừng">
+            <div class="spotlight-mini-copy">
+              <strong class="title-4">Đậu phụ non chần (~150g)</strong>
+              <span class="caption-2 tabular-nums">76 đến 114 kcal, 63 kcal/100g</span>
+              <span class="caption-4">Đạm 8.5g, Tinh bột 2.2g, Béo 5.5g</span>
+            </div>
+          </div>
+
+          <div class="vn-rule-ornament" aria-hidden="true">
+            <svg class="vn-rule-glyph" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="16" cy="16" r="3" />
+              <path d="M16 3v7M16 22v7M3 16h7M22 16h7M6.8 6.8l5 5M20.2 20.2l5 5M25.2 6.8l-5 5M11.8 20.2l-5 5" />
+            </svg>
+          </div>
+
+          <article class="culinary-column" aria-labelledby="bep-viet-heading">
+            <div class="culinary-col-head">
+              <h2 id="bep-viet-heading" class="culinary-col-title">MỘT VÒNG BẾP VIỆT</h2>
+              <svg class="seal-trien-red" viewBox="0 0 48 48" aria-hidden="true">
+                <rect x="3" y="3" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2" />
+                <rect x="6.5" y="6.5" width="35" height="35" fill="none" stroke="currentColor" stroke-width="1" />
+                <text x="24" y="22" text-anchor="middle" font-size="9.5" font-weight="800" fill="currentColor">MỸ VỊ</text>
+                <text x="24" y="34" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor">CƠM NHÀ</text>
+              </svg>
+            </div>
+            <p class="culinary-col-p">
+              Mâm cơm Việt truyền thống giữ nhịp cân bằng tự nhiên qua ba vị trí <strong>Mặn, rau, canh</strong>,
+              nương theo thổ nhưỡng Bắc, Trung, Nam: bát nước dùng phở thơm quế hồi, đĩa rau luộc xanh, chén nước mắm
+              pha tỏi ớt hay chút mắm tôm đánh bông.
+            </p>
+            <p class="culinary-col-p">
+              Chính những muỗng mỡ hành, tóp mỡ và đồ chua kèm thêm đó làm nên hồn cốt món Việt. Mỹ Vị tách riêng
+              từng phần gia vị để bữa ăn vừa trọn vị nhà vừa rõ từng gam dưỡng chất.
+            </p>
+            <figure class="culinary-landmark">
+              <img src="/gioi-thieu/img/hoan-kiem-the-huc.webp?v=editorial-v24" width="800" height="600" loading="lazy"
+                alt="Cầu Thê Húc đỏ thắm bắc qua mặt nước xanh Hồ Hoàn Kiếm, Hà Nội">
+              <figcaption>Cầu Thê Húc, Hồ Hoàn Kiếm, nét văn hóa ngàn năm gắn liền mâm cơm đất Bắc.</figcaption>
+            </figure>
+          </article>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 2. Feature Double-Rule Box (HƯƠNG VỊ BỮA CƠM NHÀ) -->
+    <section class="band-paper" id="van-de" aria-labelledby="problem-heading" data-reveal>
+      <div class="wrap">
+        <div class="broadsheet-frame">
+          <div class="broadsheet-cutin">
+            <span class="broadsheet-cutin-label">HƯƠNG VỊ BỮA CƠM NHÀ</span>
+          </div>
+
+          <div class="feature-split">
+            <div class="feature-story">
+              <h2 id="problem-heading" class="heading-2">Một tô phở hay mẹt bún mang nhiều tầng hương vị hơn một con số ước lượng</h2>
+              <p class="body-3">
+                Ẩm thực Việt nấu tinh tế ở nước dùng, đồ chua, mỡ hành và chén nước chấm pha đường. Khi bỏ qua phần
+                gia vị kèm theo, con số dinh dưỡng ước tính dễ chênh lệch khá nhiều so với bữa ăn thực tế trên bàn.
+              </p>
+
+              <div class="feature-photo-pair">
+                <figure class="feature-photo-card">
+                  <img src="/gioi-thieu/img/beef-pho.webp?v=editorial-v24" width="700" height="700" loading="lazy"
+                    alt="Tô phở bò tái nạm với nước dùng trong ninh xương quế hồi, bò viên, giá đỗ và hành lá">
+                  <figcaption>Phở bò tái nạm (~520g): nước dùng quế hồi, bánh phở mềm, 355 đến 533 kcal, mật độ 85 kcal/100g.</figcaption>
+                </figure>
+                <figure class="feature-photo-card">
+                  <img src="/gioi-thieu/img/bun-dau.jpg" width="1600" height="1067" loading="lazy"
+                    alt="Mẹt bún đậu mắm tôm gồm bún lá, đậu rán vàng, thịt luộc, nem rán và rau thơm">
+                  <figcaption>Bún đậu mắm tôm (~450g): mẹt lá chuối bún lá, đậu mơ rán vàng, 451 đến 677 kcal, đạm 29.0g.</figcaption>
+                </figure>
+              </div>
+            </div>
+
+            <aside class="feature-aside-plate" aria-label="Gia vị bản địa và nhịp cơm nhà">
+              <div class="spice-callout">
+                <img class="spice-engraving" src="/gioi-thieu/img/hoa-hoi-1833.webp?v=editorial-v24" width="420" height="700"
+                  loading="lazy" alt="Tranh khắc thực vật cổ điển năm 1833 vẽ nhành hoa hồi Lạng Sơn">
+                <div class="spice-callout-copy">
+                  <strong class="spice-callout-title">Gia vị bản địa từ thảo mộc Việt</strong>
+                  <p class="spice-callout-desc">
+                    Hoa hồi Lạng Sơn, thảo quả, quế chi và hành phi tạo nên tầng hương riêng cho phở, bò kho và nước
+                    chấm pha. Mỹ Vị tính cả gia vị nền lẫn dầu mỡ đi kèm để bữa cơm vừa ngon miệng vừa rõ dưỡng chất.
+                  </p>
+                </div>
+              </div>
+              <p class="body-6 feature-aside-note">
+                Từ tô phở sáng sớm đến mâm cơm chiều có đĩa rau xanh, bát canh thanh và món mặn đậm đà, mỗi gia vị
+                thêm bớt đều được ghi nhận nhẹ nhàng theo thói quen ăn uống của gia đình bạn.
+              </p>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Dual-Mode Broadsheet Workbench (#can-bep) -->
+    <section class="band-paper" id="can-bep" aria-labelledby="wb-heading" data-reveal>
+      <div class="wrap">
+        <div class="broadsheet-frame">
+          <div class="broadsheet-cutin">
+            <span class="broadsheet-cutin-label">TÍNH DINH DƯỠNG BỮA ĂN</span>
+          </div>
+
+          <div class="section-head-split">
+            <div class="section-intro">
+              <span class="editorial-kicker">Cơm nhà mỗi ngày</span>
+              <h2 id="wb-heading" class="heading-2">Xem dinh dưỡng bữa ăn và xếp mâm cơm</h2>
+              <p class="body-3">
+                Chuyển qua lại giữa bảng phân tích tinh bột, đạm, chất béo, chất xơ từng món Việt, hoặc chọn nguyên liệu đang có trong tủ lạnh để xếp mâm cơm gia đình.
+              </p>
+            </div>
+            <svg class="margin-engraving" viewBox="0 0 96 72" fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M16 42h52c-2 13-13 21-26 21S18 55 16 42Z" />
+              <path d="M28 66h28" />
+              <path d="M46 10L78 34M56 7L84 30" />
+              <path d="M24 36c6-7 16-7 22 0" />
+            </svg>
+          </div>
+
+          <div class="wb-tablist" role="tablist" aria-label="Chọn công cụ thử nghiệm">
+            <button type="button" class="wb-tab button-sm" role="tab" id="wb-tab-calorie" data-wb-mode="calorie"
+              aria-selected="true" tabindex="0">Xem dinh dưỡng món</button>
+            <button type="button" class="wb-tab button-sm" role="tab" id="wb-tab-tray" data-wb-mode="tray"
+              aria-selected="false" tabindex="-1">Xếp mâm từ tủ lạnh</button>
+          </div>
+
+          <!-- Tab 1: Calorie Breakdown & Macro Pie Ledger -->
+          <div id="wb-panel-calorie" class="workbench-panel" role="tabpanel" aria-labelledby="wb-tab-calorie">
+            <div class="workbench" data-testid="landing-calorie-workbench">
+              <div class="workbench-controls">
+                <fieldset class="control-block">
+                  <legend class="body-4">Chọn món ăn Việt</legend>
+                  <div class="dish-index-grid">
+                    <button type="button" class="dish-idx-btn" data-cal-dish="bun_thit_nuong" aria-pressed="true">
+                      <span class="dish-idx-name">Bún thịt nướng chả giò</span>
+                      <span class="dish-idx-meta tabular-nums">467 kcal, 1 tô (~420g)</span>
+                    </button>
+                    <button type="button" class="dish-idx-btn" data-cal-dish="pho" aria-pressed="false">
+                      <span class="dish-idx-name">Phở bò tái nạm</span>
+                      <span class="dish-idx-meta tabular-nums">444 kcal, 1 tô (~520g)</span>
+                    </button>
+                    <button type="button" class="dish-idx-btn" data-cal-dish="dau_phu_non" aria-pressed="false">
+                      <span class="dish-idx-name">Đậu phụ non chần hành gừng</span>
+                      <span class="dish-idx-meta tabular-nums">95 kcal, 1 phần (~150g)</span>
+                    </button>
+                    <button type="button" class="dish-idx-btn" data-cal-dish="ca_kho_to" aria-pressed="false">
+                      <span class="dish-idx-name">Cá kho tộ</span>
+                      <span class="dish-idx-meta tabular-nums">152 kcal, 1 phần (~140g)</span>
+                    </button>
+                  </div>
+                </fieldset>
+
+                <fieldset class="control-block">
+                  <legend class="body-4">Cỡ khẩu phần</legend>
+                  <div class="segmented-3">
+                    <button type="button" class="seg-btn body-5 tabular-nums" data-cal-scale="nho" aria-pressed="false">Phần nhỏ (0.75×)</button>
+                    <button type="button" class="seg-btn body-5 tabular-nums" data-cal-scale="vua" aria-pressed="true">Phần vừa (1.0×)</button>
+                    <button type="button" class="seg-btn body-5 tabular-nums" data-cal-scale="lon" aria-pressed="false">Phần lớn (1.35×)</button>
+                  </div>
+                </fieldset>
+
+                <fieldset class="control-block">
+                  <legend class="body-4">Điều chỉnh gia vị và tinh bột</legend>
+                  <div class="receipt-list">
+                    <button type="button" class="receipt-row body-5" data-cal-mod="mo_hanh" aria-pressed="false">
+                      <span class="receipt-left">
+                        <span class="receipt-check" aria-hidden="true">
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3.5 8.5 6.5 11.5 12.5 4.5" />
+                          </svg>
+                        </span>
+                        <span class="receipt-label">Thêm mỡ hành</span>
+                      </span>
+                      <span class="receipt-delta tabular-nums">+80 kcal</span>
+                    </button>
+                    <button type="button" class="receipt-row body-5" data-cal-mod="nuoc_mam" aria-pressed="false">
+                      <span class="receipt-left">
+                        <span class="receipt-check" aria-hidden="true">
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3.5 8.5 6.5 11.5 12.5 4.5" />
+                          </svg>
+                        </span>
+                        <span class="receipt-label">Chan nước mắm pha</span>
+                      </span>
+                      <span class="receipt-delta tabular-nums">+45 kcal</span>
+                    </button>
+                    <button type="button" class="receipt-row body-5" data-cal-mod="it_tinh_bot" aria-pressed="false">
+                      <span class="receipt-left">
+                        <span class="receipt-check" aria-hidden="true">
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3.5 8.5 6.5 11.5 12.5 4.5" />
+                          </svg>
+                        </span>
+                        <span class="receipt-label">Ít cơm hoặc ít bún</span>
+                      </span>
+                      <span class="receipt-delta tabular-nums">giảm 95 kcal</span>
+                    </button>
+                  </div>
+                </fieldset>
+              </div>
+
+              <div class="menu-ledger" id="wb-calorie-live" aria-live="polite">
+                <div class="ledger-top-grid">
+                  <div class="ledger-photo">
+                    <img id="cal-dish-photo" src="/gioi-thieu/img/bun-thit-nuong.webp?v=editorial-v24" width="700" height="700"
+                      alt="Tô bún thịt nướng chả giò kèm rau tía tô, dưa leo và đồ chua">
+                  </div>
+                  <div class="ledger-head-info">
+                    <div class="ledger-header">
+                      <span class="caption-3 ledger-stamp" id="cal-provenance">Tham chiếu Viện Dinh dưỡng Quốc gia</span>
+                      <span class="ledger-rice tabular-nums caption-1" id="cal-serving-desc">1 tô vừa (~420g)</span>
+                    </div>
+                    <h3 class="dish-title-serif" id="cal-dish-title">Bún thịt nướng chả giò</h3>
+                    <p class="caption-1 cal-mod-summary" id="cal-mod-summary">Chưa bật thêm gia vị kèm.</p>
+                  </div>
+                </div>
+
+                <div class="cal-readout">
+                  <div class="cal-range-row">
+                    <div class="editorial-num cal-range-value" id="cal-range-text">374 đến 560 kcal</div>
+                    <span class="cal-density-badge tabular-nums" id="cal-density-text">111 kcal/100g, nhẹ bụng</span>
+                  </div>
+                  <div class="tabular-nums caption-1 cal-point-sub" id="cal-point-text">Mức trung vị 467 kcal, đã tính Phần vừa (1.0×)</div>
+                </div>
+
+                <!-- Pure-SVG Donut Chart + Macro Energy Table -->
+                <div class="nf-pie-split">
+                  <div class="nf-pie-box">
+                    <svg id="cal-macro-pie" class="macro-pie-svg" data-testid="macro-pie-chart" viewBox="0 0 120 120" role="img"
+                      aria-label="Phân bổ năng lượng: Tinh bột 50%, Chất đạm 21%, Chất béo 29%"></svg>
+                  </div>
+
+                  <table class="nf-macro-table" aria-label="Chi tiết năng lượng đa lượng">
+                    <thead>
+                      <tr>
+                        <th scope="col">Dưỡng chất</th>
+                        <th scope="col">Khối lượng</th>
+                        <th scope="col">Năng lượng</th>
+                        <th scope="col">Tỷ lệ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="macro-name-cell"><span class="macro-swatch sw-carb" aria-hidden="true"></span>Tinh bột (Carb)</span>
+                        </td>
+                        <td class="tabular-nums" id="cal-carbs">58.0g</td>
+                        <td class="tabular-nums" id="cal-carbs-kcal">232 kcal</td>
+                        <td class="tabular-nums pct-carb" id="cal-carbs-pct">50%</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="macro-name-cell"><span class="macro-swatch sw-protein" aria-hidden="true"></span>Chất đạm (Protein)</span>
+                        </td>
+                        <td class="tabular-nums" id="cal-protein">25.0g</td>
+                        <td class="tabular-nums" id="cal-protein-kcal">100 kcal</td>
+                        <td class="tabular-nums pct-protein" id="cal-protein-pct">21%</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="macro-name-cell"><span class="macro-swatch sw-lipid" aria-hidden="true"></span>Chất béo (Lipid)</span>
+                        </td>
+                        <td class="tabular-nums" id="cal-fat">15.0g</td>
+                        <td class="tabular-nums" id="cal-fat-kcal">135 kcal</td>
+                        <td class="tabular-nums pct-lipid" id="cal-fat-pct">29%</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Fiber Coverage (25g/ngày chuẩn Viện Dinh dưỡng Quốc gia và WHO) -->
+                <div class="nf-fiber-block">
+                  <div class="nf-fiber-head">
+                    <span class="nf-fiber-title"><span class="macro-swatch sw-fiber" aria-hidden="true"></span>Chất xơ (Fiber)</span>
+                    <span class="nf-fiber-val tabular-nums"><span id="cal-fiber">3.2g</span> (<span id="cal-fiber-dv">13%</span> nhu cầu ngày 25g)</span>
+                  </div>
+                  <svg class="fiber-bar-svg" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true">
+                    <rect class="fiber-track-bg" x="0" y="0" width="100" height="6" />
+                    <rect class="fiber-track-fill" id="cal-fiber-bar" x="0" y="0" width="13" height="6" />
+                  </svg>
+                  <p class="nf-fiber-warn" id="cal-fiber-note" data-status="ok">Đạt 13% nhu cầu chất xơ cả ngày (25g); ăn kèm đủ rau sống sẽ giữ no lâu hơn.</p>
+                </div>
+
+                <!-- Macro Balance Assessment (Viện Dinh dưỡng Quốc gia và WHO) -->
+                <div class="nf-amdr-block">
+                  <div class="nf-amdr-head">
+                    <span class="nf-amdr-ref">Chuẩn cân đối Viện Dinh dưỡng Quốc gia và WHO: Tinh bột 45 đến 65%, Đạm 15 đến 25%, Béo 20 đến 30%</span>
+                    <span class="nf-amdr-status" id="cal-amdr-status" data-status="ok">Đạt chuẩn cân đối</span>
+                  </div>
+                  <p class="nf-amdr-insight" id="cal-amdr-insight">Tỷ lệ Tinh bột, Đạm và Béo nằm trong ngưỡng khuyến nghị của Viện Dinh dưỡng Quốc gia (45 đến 65%, 15 đến 25%, 20 đến 30%).</p>
+                </div>
+
+                <p class="caption-2 cal-note-box" id="cal-disambig-note">
+                  Chén nước mắm pha ngọt và mỡ hành tăng thêm 125 kcal nếu chan hết vào tô.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Fridge to 3-Dish Tray Simulator -->
+          <div id="wb-panel-tray" class="workbench-panel" role="tabpanel" aria-labelledby="wb-tab-tray" hidden>
+            <div class="workbench" id="bo-gia-lap" data-testid="landing-tray-simulator">
+              <div class="workbench-controls">
+                <fieldset class="control-block">
+                  <legend class="body-4">Nguyên liệu đang có sẵn</legend>
+                  <div class="dish-index-grid">
+                    <button type="button" class="dish-idx-btn" data-ingredient="egg" aria-pressed="true">
+                      <span class="dish-idx-name">Trứng gà</span>
+                      <span class="dish-idx-meta">Sắp hết hạn, ưu tiên dùng</span>
+                    </button>
+                    <button type="button" class="dish-idx-btn" data-ingredient="tomato" aria-pressed="true">
+                      <span class="dish-idx-name">Cà chua</span>
+                      <span class="dish-idx-meta">Làm sốt hoặc nấu canh</span>
+                    </button>
+                    <button type="button" class="dish-idx-btn" data-ingredient="greens" aria-pressed="true">
+                      <span class="dish-idx-name">Rau muống hoặc cải</span>
+                      <span class="dish-idx-meta">Dùng sớm cho bữa cơm</span>
+                    </button>
+                    <button type="button" class="dish-idx-btn" data-ingredient="tofu" aria-pressed="false">
+                      <span class="dish-idx-name">Đậu phụ</span>
+                      <span class="dish-idx-meta">Kho, rán hoặc nấu canh</span>
+                    </button>
+                    <button type="button" class="dish-idx-btn" data-ingredient="pork" aria-pressed="false">
+                      <span class="dish-idx-name">Thịt ba chỉ</span>
+                      <span class="dish-idx-meta">Kho hoặc nướng bún</span>
+                    </button>
+                    <button type="button" class="dish-idx-btn" data-ingredient="fish" aria-pressed="false">
+                      <span class="dish-idx-name">Cá đồng hoặc cá lóc</span>
+                      <span class="dish-idx-meta">Kho tộ hoặc om dưa</span>
+                    </button>
+                  </div>
+                </fieldset>
+
+                <fieldset class="control-block">
+                  <legend class="body-4">Số người ăn</legend>
+                  <div class="segmented-2">
+                    <button type="button" class="seg-btn body-5 tabular-nums" data-servings="2" aria-pressed="true">2 người</button>
+                    <button type="button" class="seg-btn body-5 tabular-nums" data-servings="4" aria-pressed="false">4 người</button>
+                  </div>
+                </fieldset>
+
+                <fieldset class="control-block">
+                  <legend class="body-4">Thời gian tối đa</legend>
+                  <div class="segmented-3">
+                    <button type="button" class="seg-btn body-5 tabular-nums" data-max-minutes="25" aria-pressed="false">25 phút</button>
+                    <button type="button" class="seg-btn body-5 tabular-nums" data-max-minutes="45" aria-pressed="true">45 phút</button>
+                    <button type="button" class="seg-btn body-5 tabular-nums" data-max-minutes="70" aria-pressed="false">70 phút</button>
+                  </div>
+                </fieldset>
+              </div>
+
+              <div class="menu-ledger" aria-live="polite">
+                <div class="ledger-photo-wide">
+                  <img id="sim-dish-photo" src="/gioi-thieu/img/tomato-egg.webp?v=editorial-v24" width="700" height="700"
+                    alt="Ảnh món Trứng sốt cà chua">
+                </div>
+                <div class="ledger-header">
+                  <span class="caption-3 ledger-stamp">Gợi ý tối nay</span>
+                  <span class="ledger-rice tabular-nums caption-1" id="sim-slot-rice">Cơm 3 bát</span>
+                </div>
+                <h3 class="dish-title-serif" id="recipe-name">Trứng sốt cà chua</h3>
+                <p class="body-6 ledger-desc" id="recipe-description">
+                  Ưu tiên 2 món cần dùng sớm, ăn kèm Rau muống xào tỏi và Canh đậu phụ cà chua cho 2 người.
+                </p>
+
+                <ul class="ledger-slots">
+                  <li><span class="body-6">Món mặn</span><strong class="body-4" id="sim-slot-man">Trứng sốt cà chua</strong></li>
+                  <li><span class="body-6">Món rau</span><strong class="body-4" id="sim-slot-rau">Rau muống xào tỏi</strong></li>
+                  <li><span class="body-6">Món canh</span><strong class="body-4" id="sim-slot-canh">Canh đậu phụ cà chua</strong></li>
+                </ul>
+
+                <dl class="ledger-metrics">
+                  <div>
+                    <dt class="caption-4">Nấu khoảng</dt>
+                    <dd class="tabular-nums title-3"><span id="sim-minutes">26</span> phút</dd>
+                  </div>
+                  <div>
+                    <dt class="caption-4">Calo mỗi người</dt>
+                    <dd class="tabular-nums title-3"><span id="sim-kcal">612</span> kcal</dd>
+                  </div>
+                  <div>
+                    <dt class="caption-4">Đồ dùng sớm</dt>
+                    <dd class="tabular-nums title-3"><span id="sim-urgency">2</span> món</dd>
+                  </div>
+                </dl>
+
+                <div class="sim-schedule-wrap" id="sim-schedule-wrap">
+                  <span class="caption-3 sim-schedule-title">Lịch bật bếp song song</span>
+                  <ol class="sim-schedule-list" id="sim-schedule"></ol>
+                </div>
+
+                <p class="caption-1 ledger-hint" id="sim-hint" hidden></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Scroll-Activated Tagline Reveal -->
+    <section class="tagline-band" id="thong-diep" aria-labelledby="tagline-heading">
+      <img class="trong-dong-watermark" src="/gioi-thieu/img/trong-dong-dong-son.webp?v=editorial-v24" width="240"
+        height="240" loading="lazy" alt="" aria-hidden="true">
+      <div class="wrap">
+        <div class="tagline-inner" id="tagline-reveal">
+          <span class="editorial-kicker">Nhẹ đầu trước mỗi bữa cơm</span>
+          <h2 id="tagline-heading" class="heading-2 tagline-copy">
+            <span data-tagline-line>Không cần cân từng gam trước khi ăn.</span>
+            <span data-tagline-line>Chụp một tấm, biết mình nạp gì và nấu gọn phần còn lại.</span>
+          </h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. How It Works (3-Step Ledger) + 4-Tab App Walkthrough -->
+    <section class="band-paper" id="cach-dung" aria-labelledby="how-heading" data-reveal>
+      <div class="wrap">
+        <div class="section-intro">
+          <span class="editorial-kicker">Ba bước trên bàn ăn và trong bếp</span>
+          <h2 id="how-heading" class="heading-2">Cách Mỹ Vị đồng hành mỗi ngày</h2>
+          <p class="body-3">Không phải mở nhiều trang tìm công thức rồi phát hiện thiếu đồ, cũng không phải gõ từng muỗng gia vị vào bảng tính.</p>
+        </div>
+
+        <ol class="steps-ledger">
+          <li class="step-row">
+            <span class="editorial-num step-num">01</span>
+            <h3 class="heading-5">Chụp bữa ăn hoặc mở cửa tủ lạnh</h3>
+            <p class="body-3">
+              Ảnh món ăn đối chiếu qua danh mục món Việt và bảng thành phần thực phẩm; ảnh tủ lạnh giúp nhận diện rau củ,
+              thịt cá và các loại nấm để bạn kiểm tra nhanh.
+            </p>
+          </li>
+          <li class="step-row">
+            <span class="editorial-num step-num">02</span>
+            <h3 class="heading-5">Chạm chỉnh những phần dễ thay đổi</h3>
+            <p class="body-3">
+              Bật tắt mỡ hành, nước mắm pha, chọn phần nhỏ, vừa, lớn hoặc chạm đổi ngay khi hai món có hình dáng gần nhau.
+            </p>
+          </li>
+          <li class="step-row">
+            <span class="editorial-num step-num">03</span>
+            <h3 class="heading-5">Lưu nhật ký hoặc xếp mâm cơm tối nay</h3>
+            <p class="body-3">
+              Ghi một chạm vào Nhật ký dinh dưỡng, hoặc xếp mâm mặn, rau, canh bỏ qua thành phần dị ứng kèm thứ tự nấu ăn khớp giờ.
+            </p>
+          </li>
+        </ol>
+
+        <div class="screens-grid">
+          <div class="screens-index">
+            <div class="section-intro">
+              <h3 class="heading-3">Giao diện thực tế trong ứng dụng</h3>
+              <p class="body-3">Chữ rõ, vùng chạm rộng rãi dễ thao tác khi đang nấu ăn trong bếp.</p>
+            </div>
+
+            <div class="chapter-list" role="tablist" aria-label="Chọn màn hình Mỹ Vị để xem trước">
+              <button type="button" class="chapter-tab" role="tab" id="screen-tab-quet" data-screen-tab="quet"
+                aria-selected="true" tabindex="0">
+                <span class="chapter-num editorial-num title-4">01</span>
+                <span class="chapter-text">
+                  <strong class="title-3">Chụp nguyên liệu trong tủ lạnh</strong>
+                  <span class="body-6">Nhận diện rau, thịt, cá, đậu và nấm để bạn chạm sửa tên hoặc số gam trước khi lưu.</span>
+                </span>
+              </button>
+              <button type="button" class="chapter-tab" role="tab" id="screen-tab-kho" data-screen-tab="kho"
+                aria-selected="false" tabindex="-1">
+                <span class="chapter-num editorial-num title-4">02</span>
+                <span class="chapter-text">
+                  <strong class="title-3">Xem đồ nào cần nấu trước</strong>
+                  <span class="body-6">Chia theo từng đợt đi chợ để dễ nhìn món nào còn tươi, món nào nên dùng sớm.</span>
+                </span>
+              </button>
+              <button type="button" class="chapter-tab" role="tab" id="screen-tab-mam" data-screen-tab="mam"
+                aria-selected="false" tabindex="-1">
+                <span class="chapter-num editorial-num title-4">03</span>
+                <span class="chapter-text">
+                  <strong class="title-3">Đổi từng món trong mâm cơm</strong>
+                  <span class="body-6">Đổi riêng món mặn, món rau hay canh, thiếu nguyên liệu tự đẩy sang danh sách đi chợ.</span>
+                </span>
+              </button>
+              <button type="button" class="chapter-tab" role="tab" id="screen-tab-nau" data-screen-tab="nau"
+                aria-selected="false" tabindex="-1">
+                <span class="chapter-num editorial-num title-4">04</span>
+                <span class="chapter-text">
+                  <strong class="title-3">Xem thứ tự nấu từng bếp</strong>
+                  <span class="body-6">Chỉ rõ lúc nào rửa rau, lúc nào bật bếp hầm để mâm cơm nóng cùng lúc.</span>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <figure class="screen-mat">
+            <div class="screen-frame">
+              <img id="device-preview-img" data-screen="quet" src="/gioi-thieu/img/quet-light.webp?v=editorial-v24"
+                width="780" height="1688" loading="lazy"
+                alt="Màn hình nhận diện nguyên liệu tủ lạnh trên ứng dụng Mỹ Vị">
+            </div>
+            <figcaption class="screen-caption">
+              <h4 class="heading-5" id="device-title">Nhận diện nguyên liệu từ ảnh chụp</h4>
+              <p class="body-6" id="device-desc">
+                Khung chọn hiện trực tiếp trên ảnh chụp để bạn chạm đổi tên hoặc chỉnh số gam trước khi lưu.
+              </p>
+              <dl class="screen-facts" id="device-metrics">
+                <div>
+                  <dt class="caption-4">Phân loại</dt>
+                  <dd class="body-4">Rau, thịt, cá, đậu, nấm</dd>
+                </div>
+                <div>
+                  <dt class="caption-4">Chỉnh sửa</dt>
+                  <dd class="body-4">Chạm sửa trực tiếp</dd>
+                </div>
+              </dl>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Culinary Nutrition Showcase -->
+    <section class="band-paper" id="khoa-hoc" aria-labelledby="proof-heading" data-reveal>
+      <div class="wrap">
+        <div class="broadsheet-frame">
+          <div class="broadsheet-cutin">
+            <span class="broadsheet-cutin-label">DINH DƯỠNG MÓN VIỆT QUEN THUỘC</span>
+          </div>
+
+          <div class="section-head-split">
+            <div class="section-intro">
+              <span class="editorial-kicker">Tham chiếu minh bạch</span>
+              <h2 id="proof-heading" class="heading-2">Số liệu có nguồn, ảnh của riêng bạn</h2>
+              <p class="body-3">
+                Mọi con số dinh dưỡng trên Mỹ Vị đều gắn nguồn Viện Dinh dưỡng Quốc gia hoặc bảng thực phẩm USDA.
+              </p>
+            </div>
+            <svg class="margin-engraving" viewBox="0 0 96 72" fill="none" stroke="currentColor" stroke-width="1.4"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="48" cy="36" r="6" />
+              <path d="M48 8v22M48 42v22M20 36h22M54 36h22M28 16l15 15M53 41l15 15M68 16L53 31M43 41L28 56" />
+              <circle cx="48" cy="8" r="2.5" /><circle cx="48" cy="64" r="2.5" />
+              <circle cx="20" cy="36" r="2.5" /><circle cx="76" cy="36" r="2.5" />
+            </svg>
+          </div>
+
+          <div class="vn-rule-ornament" aria-hidden="true">
+            <svg class="vn-rule-glyph" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M16 5c3 5 3 11 0 16c-3-5-3-11 0-16Z" />
+              <path d="M16 21c4-6 10-7 11-3c-1 5-6 7-11 3Z" />
+              <path d="M16 21c-4-6-10-7-11-3c1 5 6 7 11 3Z" />
+              <path d="M8 25h16" />
+            </svg>
+          </div>
+
+          <div class="showcase-featured">
+            <figure class="dish-card">
+              <div class="dish-card-media">
+                <img src="/gioi-thieu/img/beef-pho.webp?v=editorial-v24" width="700" height="700" loading="lazy"
+                  alt="Tô phở bò tái nạm hành lá">
+              </div>
+              <figcaption class="dish-card-meta">
+                <strong class="dish-card-title">Phở bò tái nạm</strong>
+                <span class="tabular-nums caption-1">355 đến 533 kcal, Đạm 26.0g, Tinh bột 58.0g</span>
+              </figcaption>
+            </figure>
+            <figure class="dish-card">
+              <div class="dish-card-media">
+                <img src="/gioi-thieu/img/bun-thit-nuong.webp?v=editorial-v24" width="700" height="700" loading="lazy"
+                  alt="Bún thịt nướng chả giò ăn kèm tía tô, dưa leo và đồ chua">
+              </div>
+              <figcaption class="dish-card-meta">
+                <strong class="dish-card-title">Bún thịt nướng chả giò</strong>
+                <span class="tabular-nums caption-1">374 đến 560 kcal, Đạm 25.0g, Tinh bột 58.0g</span>
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="showcase-strip">
+            <figure class="dish-card">
+              <div class="dish-card-media">
+                <img src="/gioi-thieu/img/caramel-pork.webp?v=editorial-v24" width="700" height="700" loading="lazy"
+                  alt="Thịt ba chỉ kho tiêu màu cánh gián rắc hành lá trên cơm trắng">
+              </div>
+              <figcaption class="dish-card-meta">
+                <strong class="dish-card-title">Thịt kho tiêu</strong>
+                <span class="tabular-nums caption-2">374 kcal, Đạm 20.9g</span>
+              </figcaption>
+            </figure>
+            <figure class="dish-card">
+              <div class="dish-card-media">
+                <img src="/gioi-thieu/img/morning-glory.webp?v=editorial-v24" width="700" height="700" loading="lazy"
+                  alt="Rau muống xào tỏi xanh mướt cùng ớt lát">
+              </div>
+              <figcaption class="dish-card-meta">
+                <strong class="dish-card-title">Rau muống xào tỏi</strong>
+                <span class="tabular-nums caption-2">72 kcal, Đạm 2.9g</span>
+              </figcaption>
+            </figure>
+            <figure class="dish-card">
+              <div class="dish-card-media">
+                <img src="/gioi-thieu/img/tomato-egg.webp?v=editorial-v24" width="700" height="700" loading="lazy"
+                  alt="Trứng sốt cà chua chín đỏ rắc hành lá">
+              </div>
+              <figcaption class="dish-card-meta">
+                <strong class="dish-card-title">Trứng sốt cà chua</strong>
+                <span class="tabular-nums caption-2">224 kcal, Đạm 10.4g</span>
+              </figcaption>
+            </figure>
+            <figure class="dish-card">
+              <div class="dish-card-media">
+                <img src="/gioi-thieu/img/caramel-trout.webp?v=editorial-v24" width="700" height="700" loading="lazy"
+                  alt="Cá kho tộ màu cánh gián rắc hành lá và ngò rí">
+              </div>
+              <figcaption class="dish-card-meta">
+                <strong class="dish-card-title">Cá kho tộ</strong>
+                <span class="tabular-nums caption-2">152 kcal, Đạm 17.3g</span>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Open-Ledger 2-Column FAQ -->
+    <section class="band-paper" id="hoi-dap" aria-labelledby="faq-heading" data-reveal>
+      <div class="wrap faq-split">
+        <div class="faq-aside">
+          <span class="editorial-kicker">Giải đáp rõ ràng</span>
+          <h2 id="faq-heading" class="heading-2">Câu hỏi thường gặp</h2>
+          <p class="body-3">
+            Những thắc mắc thường gặp về cách xem dinh dưỡng món Việt, gợi ý mâm cơm, danh sách đi chợ và quyền riêng tư ảnh chụp.
+          </p>
+        </div>
+
+        <div class="faq-ledger-grid">
+          <article class="faq-entry">
+            <h3 class="title-2">Mỹ Vị có thu phí khi dùng các tính năng chính không?</h3>
+            <p class="body-6">
+              Không. Toàn bộ tính năng chụp bữa ăn, nhận diện nguyên liệu tủ lạnh, quét mã vạch sản phẩm đóng gói và gợi ý mâm cơm gia đình đều dùng được trọn vẹn trên trình duyệt và Android.
+            </p>
+          </article>
+          <article class="faq-entry">
+            <h3 class="title-2">Vì sao phở và bún thịt nướng hay có sự chênh lệch năng lượng giữa các nơi bán?</h3>
+            <p class="body-6">
+              Sự khác biệt thường nằm ở lượng bánh phở, thịt và phần gia vị đi kèm. Một muỗng canh mỡ hành thêm khoảng 70 đến 90 kcal, một chén nước mắm pha thêm khoảng 30 đến 60 kcal so với phần ăn không chan.
+            </p>
+          </article>
+          <article class="faq-entry">
+            <h3 class="title-2">Khi hệ thống chưa chắc chắn giữa hai món gần giống thì xử lý thế nào?</h3>
+            <p class="body-6">
+              Khi hai món có hình dáng gần nhau, ví dụ đậu phụ non và bánh đúc, màn hình hiện ngay hai lựa chọn để bạn chạm đổi đúng món trong một giây trước khi lưu vào nhật ký.
+            </p>
+          </article>
+          <article class="faq-entry">
+            <h3 class="title-2">Ảnh chụp tủ lạnh và bữa ăn được quản lý quyền riêng tư ra sao?</h3>
+            <p class="body-6">
+              Ảnh chụp cá nhân được lưu trữ bảo mật phục vụ nhật ký của bạn. Bạn có thể tắt quyền đóng góp dữ liệu hoặc yêu cầu xóa toàn bộ dữ liệu bất kỳ lúc nào trong phần Cài đặt.
+            </p>
+          </article>
+          <article class="faq-entry">
+            <h3 class="title-2">Đi chợ có cần kết nối mạng để xem và cập nhật danh sách cần mua không?</h3>
+            <p class="body-6">
+              Cần kết nối mạng để tải danh sách đi chợ từ tài khoản và lưu ngay trạng thái đã mua giữa các thiết bị; khi mua xong, bạn bấm chuyển thẳng thành nguyên liệu trong Kho bếp. Riêng lúc hoàn tất buổi nấu ở bếp, ứng dụng có lưu tạm thao tác khi mất mạng và tự gửi lại ngay khi có sóng.
+            </p>
+          </article>
+          <article class="faq-entry">
+            <h3 class="title-2">Có lọc được món gây dị ứng cho trẻ nhỏ hoặc người lớn tuổi không?</h3>
+            <p class="body-6">
+              Có. Đồ ăn kiêng và thành phần gây dị ứng khai báo trong hồ sơ gia đình luôn bị loại trừ trước khi hệ thống xếp mâm cơm.
+            </p>
+          </article>
+          <article class="faq-entry">
+            <h3 class="title-2">Cài ứng dụng Android bằng tệp APK như thế nào?</h3>
+            <p class="body-6">
+              Bạn bấm liên kết tải tệp cài Android (.apk) ở cuối trang rồi mở trực tiếp trên điện thoại Android để cài bản đã ký số.
+            </p>
+          </article>
+          <article class="faq-entry">
+            <h3 class="title-2">Tôi có thể tải về hoặc xóa sạch dữ liệu cá nhân không?</h3>
+            <p class="body-6">
+              Có. Mục Cài đặt hỗ trợ xuất toàn bộ hồ sơ dưới dạng tệp nén ZIP, rút đồng ý xử lý dữ liệu và xóa vĩnh viễn tài khoản.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Final Photographic CTA -->
+    <section class="band-paper" id="tai-ve" aria-labelledby="cta-heading" data-reveal>
+      <div class="wrap">
+        <div class="cta-banner">
+          <div class="cta-photo">
+            <img src="/gioi-thieu/img/seabass-ginger.webp?v=editorial-v24" width="700" height="700" loading="lazy"
+              alt="Cá áp chảo sốt xì dầu cùng hành lá, gừng và ớt tươi">
+          </div>
+          <div class="cta-content">
+            <h2 id="cta-heading" class="heading-2">Tối nay nấu gì và ăn bao nhiêu, xem ngay trên bàn ăn</h2>
+            <p class="body-3">
+              Mở trực tiếp trên trình duyệt hoặc tải tệp cài Android về máy để mang đi chợ mỗi ngày.
+            </p>
+            <div class="cta-actions">
+              <a class="btn btn-primary button-md" href="/bep">Vào ứng dụng</a>
+              <a class="btn btn-outline button-md" id="android-download"
+                data-apk-href="/tai-ve/tastoria-0.1.4.apk" data-apk-label="Tải bản Android (.apk)" aria-disabled="true">
+                <span>Đang kiểm tra bản Android...</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <a class="wordmark" href="#main">
+          <img class="brand-mark" src="/gioi-thieu/img/icon.svg?v=editorial-v24" width="24" height="24" alt="">
+          <span class="footer-colophon-title">MỸ VỊ</span>
+        </a>
+        <p class="body-6 footer-note">Xem dinh dưỡng bữa ăn Việt và gợi ý mâm cơm nhà từ những nguyên liệu sẵn có trong tủ lạnh.</p>
+        <p class="caption-5 footer-credits">
+          Ảnh ẩm thực và tư liệu mở: Foodiesfeed CC0, Pexels (Jakub Kapusnak, Quang Nguyen Vinh, cottonbro studio, Tranmautritam), Wikimedia Commons (Cầu Thê Húc CC BY-SA 4.0, Trống đồng Đông Sơn CC0, Hoa hồi 1833 PD, Giấy cổ Caleb Kimbrough CC BY 2.0).
+        </p>
+      </div>
+
+      <nav class="footer-nav" aria-label="Liên kết cuối trang">
+        <a class="title-4" href="/bep">Vào ứng dụng</a>
+        <a class="title-4" href="/gioi-thieu/rieng-tu.html">Chính sách riêng tư</a>
+        <a class="title-4" href="/gioi-thieu/dieu-khoan.html">Điều khoản sử dụng</a>
+        <a class="title-4" href="/cai-dat">Cài đặt và Dữ liệu</a>
+        <a class="title-4" href="#main">Lên đầu trang</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script id="kb-snapshot"
+    type="application/json">[{"slug":"dau-phu-sot-ca-chua","name_vi":"Đậu phụ sốt cà chua","slot":"man","total_minutes":26,"method_code":"om","kcal_per_serving":280,"protein_g":17.2,"carb_g":5.0,"lipid_g":21.2,"fiber_g":1.4,"serving_g":267,"keys":["tofu","tomato"],"tags":["chua_ngot","mem","sot_sanh","bua_thuong","com_hop"],"ingredients":["đậu phụ","cà chua","hành lá","muối","nước tương","hạt nêm chay","đường","dầu ăn"]},{"slug":"thit-kho-tieu","name_vi":"Thịt kho tiêu","slot":"man","total_minutes":70,"method_code":"kho","kcal_per_serving":374,"protein_g":20.9,"carb_g":7.3,"lipid_g":29.0,"fiber_g":0.6,"serving_g":151,"keys":["pork"],"tags":["dam_da","cay","kho_rao","bua_thuong","com_hop"],"ingredients":["thịt ba chỉ","hành tím","tỏi","ớt","nước mắm","đường","tiêu","dầu ăn"]},{"slug":"trung-chien-hanh","name_vi":"Trứng chiên hành lá","slot":"man","total_minutes":10,"method_code":"chien","kcal_per_serving":169,"protein_g":9.9,"carb_g":1.0,"lipid_g":14.0,"fiber_g":0.2,"serving_g":120,"keys":["egg"],"tags":["mem","nau_nhanh","bua_thuong","com_hop"],"ingredients":["trứng gà","hành lá","nước mắm","tiêu","dầu ăn"]},{"slug":"trung-sot-ca-chua","name_vi":"Trứng sốt cà chua","slot":"man","total_minutes":20,"method_code":"om","kcal_per_serving":224,"protein_g":10.4,"carb_g":6.4,"lipid_g":17.4,"fiber_g":0.8,"serving_g":220,"keys":["egg","tomato"],"tags":["chua_ngot","mem","sot_sanh","bua_thuong","nau_nhanh"],"ingredients":["trứng gà","cà chua","hành tím","hành lá","nước mắm","đường"]},{"slug":"rau-muong-xao-toi","name_vi":"Rau muống xào tỏi","slot":"rau","total_minutes":14,"method_code":"xao","kcal_per_serving":72,"protein_g":2.9,"carb_g":2.6,"lipid_g":5.6,"fiber_g":0.8,"serving_g":220,"keys":["greens"],"tags":["thom_toi","thanh","bua_thuong","nau_nhanh","chay"],"ingredients":["rau muống","tỏi","ớt","muối","dầu ăn"]},{"slug":"bi-dao-xao-tom-kho","name_vi":"Bí đao xào tôm khô","slot":"rau","total_minutes":28,"method_code":"xao","kcal_per_serving":98,"protein_g":8.2,"carb_g":3.6,"lipid_g":5.6,"fiber_g":1.2,"serving_g":182,"keys":["greens","fish"],"tags":["thanh","mem","bua_thuong","com_hop"],"ingredients":["bí đao","tôm khô","tỏi","nước mắm","dầu ăn","hành lá","hành tím","đường"]},{"slug":"ca-kho-to","name_vi":"Cá kho tộ","slot":"man","total_minutes":60,"method_code":"kho","kcal_per_serving":152,"protein_g":17.3,"carb_g":7.7,"lipid_g":5.8,"fiber_g":0.3,"serving_g":140,"keys":["fish"],"tags":["dam_da","cay","kho_rao","bua_thuong","com_hop"],"ingredients":["cá lóc","nước mắm","đường","hành tím","tiêu","ớt"]},{"slug":"dau-phu-non-sot-nam","name_vi":"Đậu phụ non sốt nấm","slot":"man","total_minutes":20,"method_code":"om","kcal_per_serving":180,"protein_g":13.4,"carb_g":5.9,"lipid_g":12.2,"fiber_g":1.6,"serving_g":180,"keys":["tofu"],"tags":["thanh","mem","sot_sanh","bua_thuong","nau_nhanh","chay"],"ingredients":["đậu phụ non","nấm rơm","nước tương","hành lá","ngò rí"]},{"slug":"dau-phu-tam-hanh","name_vi":"Đậu phụ rán tẩm hành","slot":"man","total_minutes":19,"method_code":"chien","kcal_per_serving":328,"protein_g":17.3,"carb_g":2.7,"lipid_g":27.5,"fiber_g":0.9,"serving_g":180,"keys":["tofu"],"tags":["dam_da","beo","mem","troi_nong","bua_thuong","nau_nhanh","chay"],"ingredients":["đậu phụ","hành lá","nước tương","muối","đường","dầu ăn"]},{"slug":"ca-chep-om-dua","name_vi":"Cá chép om dưa","slot":"man","total_minutes":49,"method_code":"om","kcal_per_serving":266,"protein_g":26.6,"carb_g":5.2,"lipid_g":15.5,"fiber_g":2.8,"serving_g":280,"keys":["fish","mustard","pork","tomato"],"tags":["chua","nhieu_nuoc","troi_lanh","cuoi_tuan"],"ingredients":["cá chép","dưa cải chua","cà chua","hành tím","thì là","nước mắm"]},{"slug":"bun_thit_nuong","name_vi":"Bún thịt nướng chả giò","slot":"man","total_minutes":30,"method_code":"nuong","kcal_per_serving":467,"protein_g":25.0,"carb_g":58.0,"lipid_g":15.0,"fiber_g":3.2,"serving_g":420,"keys":["pork","greens"],"tags":["dam_da","cuoi_tuan"],"ingredients":["thịt nạc vai","chả giò","bún tươi","tía tô","dưa leo","đồ chua"]},{"slug":"bap-cai-xao-ca-chua","name_vi":"Bắp cải xào cà chua","slot":"rau","total_minutes":17,"method_code":"xao","kcal_per_serving":94,"protein_g":2.4,"carb_g":9.0,"lipid_g":5.5,"fiber_g":2.3,"serving_g":202,"keys":["greens","tomato"],"tags":["chua_ngot","mem","bua_thuong","nau_nhanh"],"ingredients":["bắp cải","cà chua","hành lá","hành tím","muối","đường","dầu ăn"]},{"slug":"xa-lach-tron-dau-giam","name_vi":"Xà lách trộn dầu giấm","slot":"rau","total_minutes":13,"method_code":"tron","kcal_per_serving":103,"protein_g":1.6,"carb_g":7.2,"lipid_g":7.3,"fiber_g":0.8,"serving_g":180,"keys":["tomato"],"tags":["chua_ngot","gion","troi_nong","nau_nhanh","it_dau","chay"],"ingredients":["xà lách","cà chua","hành tây","giấm","đường","muối"]},{"slug":"canh-bi-do-thit-bam","name_vi":"Canh bí đỏ thịt băm","slot":"canh","total_minutes":27,"method_code":"nau_canh","kcal_per_serving":170,"protein_g":8.8,"carb_g":6.9,"lipid_g":11.8,"fiber_g":0.8,"serving_g":194,"keys":["pork","greens"],"tags":["thanh","mem","nhieu_nuoc","bua_thuong"],"ingredients":["bí đỏ","thịt băm","hành tím","nước mắm","tiêu","dầu ăn","hành lá"]},{"slug":"canh-dau-phu-ca-chua","name_vi":"Canh đậu phụ cà chua","slot":"canh","total_minutes":17,"method_code":"nau_canh","kcal_per_serving":121,"protein_g":8.8,"carb_g":4.2,"lipid_g":7.7,"fiber_g":1.0,"serving_g":300,"keys":["tofu","tomato"],"tags":["chua_ngot","mem","nhieu_nuoc","bua_thuong","nau_nhanh","it_dau","chay"],"ingredients":["đậu phụ","cà chua","hành lá","muối","hạt nêm chay","dầu ăn"]},{"slug":"canh-nam-dau-hu","name_vi":"Canh nấm đậu hũ","slot":"canh","total_minutes":19,"method_code":"nau_canh","kcal_per_serving":115,"protein_g":10.4,"carb_g":3.2,"lipid_g":6.7,"fiber_g":1.5,"serving_g":300,"keys":["tofu","greens"],"tags":["thanh","nhieu_nuoc","bua_thuong","nau_nhanh","it_dau","chay"],"ingredients":["nấm rơm","đậu phụ","cải ngọt","hành lá","muối","hạt nêm chay"]},{"slug":"canh-mong-toi-muop","name_vi":"Canh mồng tơi nấu mướp","slot":"canh","total_minutes":15,"method_code":"nau_canh","kcal_per_serving":19,"protein_g":1.8,"carb_g":2.6,"lipid_g":0.1,"fiber_g":1.9,"serving_g":280,"keys":["greens"],"tags":["thanh","mem","nhieu_nuoc","troi_nong","bua_thuong","nau_nhanh","it_dau","chay"],"ingredients":["mồng tơi","mướp","muối","hạt nêm chay","hành lá"]},{"slug":"canh-ca-ro-nau-cai","name_vi":"Canh cá rô đồng nấu rau cải","slot":"canh","total_minutes":47,"method_code":"nau_canh","kcal_per_serving":136,"protein_g":15.0,"carb_g":2.0,"lipid_g":7.5,"fiber_g":1.5,"serving_g":300,"keys":["fish","mustard"],"tags":["thom_sa_gung","nhieu_nuoc","troi_lanh","cuoi_tuan","it_dau"],"ingredients":["cá rô đồng","cải bẹ xanh","gừng","hành tím","nước mắm","muối"]},{"slug":"canh-rau-ngot-nam","name_vi":"Canh rau ngót nấu nấm","slot":"canh","total_minutes":18,"method_code":"nau_canh","kcal_per_serving":56,"protein_g":4.7,"carb_g":3.5,"lipid_g":2.6,"fiber_g":1.9,"serving_g":280,"keys":["greens"],"tags":["thanh","nhieu_nuoc","bua_thuong","nau_nhanh","it_dau","chay"],"ingredients":["rau ngót","nấm rơm","muối","hạt nêm chay","dầu ăn"]},{"slug":"canh-chua-chay","name_vi":"Canh chua chay","slot":"canh","total_minutes":26,"method_code":"nau_canh","kcal_per_serving":231,"protein_g":11.0,"carb_g":13.0,"lipid_g":14.8,"fiber_g":2.4,"serving_g":320,"keys":["tofu","tomato"],"tags":["chua_ngot","nhieu_nuoc","troi_nong","bua_thuong","it_dau","chay"],"ingredients":["đậu phụ","cà chua","dứa","đậu bắp","giá đỗ","me chua"]},{"slug":"canh-rong-bien-dau-hu","name_vi":"Canh rong biển đậu hũ","slot":"canh","total_minutes":25,"method_code":"nau_canh","kcal_per_serving":75,"protein_g":8.5,"carb_g":1.0,"lipid_g":4.1,"fiber_g":0.4,"serving_g":280,"keys":["tofu"],"tags":["thanh","mem","nhieu_nuoc","bua_thuong","it_dau","chay"],"ingredients":["rong biển khô","đậu phụ","muối","nước tương","hành lá","dầu vừng"]},{"slug":"canh-rau-cu","name_vi":"Canh rau củ","slot":"canh","total_minutes":31,"method_code":"nau_canh","kcal_per_serving":109,"protein_g":3.7,"carb_g":22.8,"lipid_g":0.3,"fiber_g":2.8,"serving_g":300,"keys":["greens"],"tags":["thanh","mem","nhieu_nuoc","bua_thuong","it_dau","chay"],"ingredients":["cà rốt","khoai tây","su su","bắp cải","hành lá","muối"]}]</script>
+</body>
+
+</html>

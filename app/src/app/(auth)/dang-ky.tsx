@@ -1,11 +1,11 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 
+import { isCode } from '@/api/client';
 import { errorText, fieldErrors } from '@/api/errors';
 import { useSession } from '@/auth/session';
 import { AuthField, AuthLink, AuthShell } from '@/components/AuthShell';
 import { Button, ErrorBox } from '@/components/ui';
-import { isCode } from '@/api/client';
 
 const MIN = 10;
 
@@ -21,11 +21,11 @@ export default function Register() {
   const mismatch = again.length > 0 && again !== password;
 
   const submit = async () => {
+    if (busy) return;
     setBusy(true);
     setErr(null);
     try {
       await register(email.trim(), password);
-      router.replace('/onboarding');
     } catch (e) {
       setErr(e);
     } finally {
@@ -34,7 +34,7 @@ export default function Register() {
   };
 
   return (
-    <AuthShell testID="screen-register" title="Mở bếp của bạn." subtitle="Một tài khoản để lưu nguyên liệu, lên mâm và viết tiếp chuyện bếp.">
+    <AuthShell testID="screen-register" title="Tạo tài khoản mới" subtitle="Tạo tài khoản để lưu nguyên liệu trong kho, lên mâm cơm và theo dõi bữa ăn.">
       <AuthField
         label="Email"
         testID="register-email"
@@ -70,7 +70,7 @@ export default function Register() {
         <AuthLink label="Đăng nhập bằng email này" onPress={() => router.replace('/dang-nhap')} />
       ) : null}
       <Button
-        style={{ minHeight: 56, borderRadius: 12 }}
+        style={{ minHeight: 56 }}
         label="Tạo tài khoản"
         testID="register-submit"
         onPress={submit}

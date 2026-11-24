@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse, Response
 
 from tastoria.core.auth import CurrentUser
 from tastoria.core.db import Uow
+from tastoria.core.ratelimit import client_ip, enforce_rate_limit
 from tastoria.modules.privacy import service
 from tastoria.modules.privacy.schemas import (
     ConsentDecisionBatch,
@@ -65,9 +66,19 @@ def withdraw_consent(
 
 
 @router.post("/me/data-requests", status_code=202, operation_id="privacy_create_data_request")
-def create_data_request(body: DataRequestCreate, user: CurrentUser, uow: Uow, deps: Deps) -> JSONResponse:
+def create_data_request(
+    body: DataRequestCreate, request: Request, user: CurrentUser, uow: Uow, deps: Deps
+) -> JSONResponse:
+    enforce_rate_limit(request, bucket="privacy_data_request", subject=str(user.id), limit=10, window_s=300)
     res = service.create_data_request(
-        uow, deps, user_id=user.id, type_=body.type, note=body.note, password=body.password
+        uow,
+        deps,
+        user_id=user.id,
+        type_=body.type,
+        note=body.note,
+        password=body.password,
+        throttle=getattr(request.app.state, "login_throttle", None),
+        client_ip=client_ip(request, deps.settings),
     )
     headers = {"Location": f"/api/v1/me/data-requests/{res.request.id}"}
     if res.created:

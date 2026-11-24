@@ -2,15 +2,15 @@
 operations the admin CLI runs (UC24).
 
 Respondents have no account. POST /survey/respondents returns a `respondent_token`: an HS256 JWT signed with the
-API's active JWT key, audience `tastoria-survey`, `sub` = respondent id, valid RESPONDENT_TOKEN_TTL (UC23 open
-question 1: signed, not stored, so survey_respondents needs no token column). Access tokens of users (audience
+survey's active JWT key (`survey_jwt_keys`), audience `tastoria-survey`, `sub` = respondent id, valid RESPONDENT_TOKEN_TTL
+(UC23 open question 1: signed, not stored, so survey_respondents needs no token column). Access tokens of users (audience
 `tastoria-app`) are not accepted here and respondent tokens are not accepted by identity. A token opens only the
 respondent in its `sub`; any other id answers 401 respondent_token_invalid (openapi ProblemCode catalogue).
 
 Assignment (step 6): every anchor of the form + `n_random` published non-anchor recipes, split over the slots in
 proportion to the published recipes per slot (largest remainder), least-shown first within a slot so each recipe
 collects about the same number of ratings, then the whole list shuffled into display_order (design.py). Creating
-a respondent locks the form row, so concurrent starts are serialised and the balance holds exactly.
+a respondent reads the open form without locking the form row, avoiding global serialization under concurrent starts.
 """
 
 from __future__ import annotations
@@ -87,8 +87,8 @@ def issue_token(settings: Settings, respondent_id: uuid.UUID) -> str:
         "iat": int(now.timestamp()),
         "exp": int((now + RESPONDENT_TOKEN_TTL).timestamp()),
     }
-    kid = settings.jwt_active_kid
-    return jwt.encode(claims, settings.jwt_keys[kid], algorithm="HS256", headers={"kid": kid})
+    kid = settings.survey_jwt_active_kid
+    return jwt.encode(claims, settings.survey_jwt_keys[kid], algorithm="HS256", headers={"kid": kid})
 
 
 def _token_invalid() -> ApiError:
@@ -101,7 +101,7 @@ def verify_token(settings: Settings, token: str | None, respondent_id: uuid.UUID
         raise _token_invalid()
     try:
         kid = jwt.get_unverified_header(token).get("kid")
-        key = settings.jwt_keys.get(kid) if isinstance(kid, str) else None
+        key = settings.survey_jwt_keys.get(kid) if isinstance(kid, str) else None
         if key is None:
             raise _token_invalid()
         claims = jwt.decode(
@@ -110,7 +110,7 @@ def verify_token(settings: Settings, token: str | None, respondent_id: uuid.UUID
             algorithms=["HS256"],
             audience=TOKEN_AUDIENCE,
             issuer=settings.jwt_issuer,
-            options={"require": ["sub", "exp", "aud"]},
+            options={"require": ["sub", "exp", "aud", "iss"]},
             leeway=0,
         )
     except jwt.PyJWTError:
@@ -126,7 +126,7 @@ def _open_form(session: Session, version: str | None) -> SurveyForm:
     q = select(SurveyForm).where(SurveyForm.is_open.is_(True))
     if version is not None:
         q = q.where(SurveyForm.version == version)
-    form = session.scalars(q.with_for_update()).first()
+    form = session.scalars(q).first()
     if form is None:
         raise ApiError(409, ProblemCode.survey_closed)
     return form
@@ -163,7 +163,7 @@ def create_respondent(session: Session, settings: Settings, body: SurveyResponde
     current = privacy.current_policy(session, PURPOSE)
     if current is None or current.id != body.policy_version_id:  # FR-23-04
         raise ApiError(409, ProblemCode.policy_outdated)
-    form = _open_form(session, body.form_version)  # row lock: serialises assignment of this form
+    form = _open_form(session, body.form_version)  # read open form without global row lock
 
     anchors = _anchor_ids(session, form.id)
     if len(anchors) != form.n_anchor:
@@ -200,11 +200,14 @@ def create_respondent(session: Session, settings: Settings, body: SurveyResponde
     )
 
 
-def _respondent(session: Session, settings: Settings, respondent_id: uuid.UUID, token: str | None) -> SurveyRespondent:
+def _respondent(
+    session: Session, settings: Settings, respondent_id: uuid.UUID, token: str | None, *, for_update: bool = False
+) -> SurveyRespondent:
     verify_token(settings, token, respondent_id)
-    resp = session.scalars(
-        select(SurveyRespondent).where(SurveyRespondent.id == respondent_id).with_for_update()
-    ).first()
+    q = select(SurveyRespondent).where(SurveyRespondent.id == respondent_id)
+    if for_update:
+        q = q.with_for_update()
+    resp = session.scalars(q).first()
     if resp is None:
         raise ApiError(404, ProblemCode.not_found)
     return resp
@@ -266,7 +269,7 @@ def _out(session: Session, resp: SurveyRespondent, form: SurveyForm | None = Non
 def get_respondent(
     session: Session, settings: Settings, respondent_id: uuid.UUID, token: str | None
 ) -> SurveyRespondentOut:
-    return _out(session, _respondent(session, settings, respondent_id, token))
+    return _out(session, _respondent(session, settings, respondent_id, token, for_update=False))
 
 
 def put_rating(
@@ -277,7 +280,7 @@ def put_rating(
     recipe_id: uuid.UUID,
     body: SurveyRatingPut,
 ) -> SurveyRatingOut:
-    resp = _respondent(session, settings, respondent_id, token)
+    resp = _respondent(session, settings, respondent_id, token, for_update=True)
     _writable(session, resp)
     if session.get(SurveyAssignment, (resp.id, recipe_id)) is None:  # FR-23-09
         raise ApiError(404, ProblemCode.not_found, "Món này không nằm trong phiếu của bạn.")
@@ -317,7 +320,7 @@ def put_rating(
 def set_favorites(
     session: Session, settings: Settings, respondent_id: uuid.UUID, token: str | None, body: FavoriteSet
 ) -> FavoriteSet:
-    resp = _respondent(session, settings, respondent_id, token)
+    resp = _respondent(session, settings, respondent_id, token, for_update=True)
     _writable(session, resp)
     ids = body.recipe_ids
     if len(ids) > MAX_FAVORITES or len(set(ids)) != len(ids) or catalog.not_published_recipe_ids(session, ids):
@@ -329,7 +332,7 @@ def set_favorites(
 
 
 def complete(session: Session, settings: Settings, respondent_id: uuid.UUID, token: str | None) -> SurveyRespondentOut:
-    resp = _respondent(session, settings, respondent_id, token)
+    resp = _respondent(session, settings, respondent_id, token, for_update=True)
     if resp.completed_at is not None:  # UC23 14b: idempotent, keeps the first completed_at
         return _out(session, resp)
     form = session.get(SurveyForm, resp.form_id)
@@ -407,7 +410,9 @@ def create_form(session: Session, *, n_anchor: int, n_random: int, seed: int | N
     anchors = design.pick_stratified(by_slot, n_anchor, counts, random.Random(seed))
     version = _next_version(session, today)
 
-    previous = session.scalars(select(SurveyForm).where(SurveyForm.is_open.is_(True)).with_for_update()).all()
+    previous = session.scalars(
+        select(SurveyForm).where(SurveyForm.is_open.is_(True)).order_by(SurveyForm.id).with_for_update()
+    ).all()
     for f in previous:
         f.is_open = False
     session.flush()
@@ -437,7 +442,7 @@ def form_versions(session: Session) -> list[str]:
 
 def set_open(session: Session, version: str | None, is_open: bool) -> tuple[SurveyForm, list[str]]:
     """Close a form (default: the open one) or reopen one; reopening closes any other open form (≤ 1 open)."""
-    forms = session.scalars(select(SurveyForm).with_for_update()).all()
+    forms = session.scalars(select(SurveyForm).order_by(SurveyForm.id).with_for_update()).all()
     if version is None:
         target = next((f for f in forms if f.is_open), None)
         if target is None:

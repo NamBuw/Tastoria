@@ -13,6 +13,7 @@ and served by nginx through X-Accel-Redirect after the ownership check.
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import logging
@@ -26,13 +27,14 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from fastapi import Response
-from sqlalchemy import select, text, update
+from sqlalchemy import event, select, text, update
 from sqlalchemy.orm import Session, sessionmaker
 
 from tastoria.core.auth import AuthUser
 from tastoria.core.clock import utcnow
 from tastoria.core.config import Settings
 from tastoria.core.errors import ApiError, ProblemCode
+from tastoria.core.health import metrics
 from tastoria.modules.catalog import service as catalog
 from tastoria.modules.catalog.schemas import IngredientView
 from tastoria.modules.mlops import service as mlops
@@ -42,7 +44,7 @@ from tastoria.modules.privacy import service as privacy
 from tastoria.modules.scan import images as img
 from tastoria.modules.scan.aggregate import Probs, u_img
 from tastoria.modules.scan.models import Detection, Scan, ScanImage, ScanItem
-from tastoria.modules.scan.queue import MAX_QUEUED, ScanQueue
+from tastoria.modules.scan.queue import MAX_ATTEMPTS, MAX_QUEUED, ScanQueue
 from tastoria.modules.scan.schemas import (
     DetectionOut,
     ScanAccepted,
@@ -53,6 +55,10 @@ from tastoria.modules.scan.schemas import (
     ScanItemOut,
     ScanItemPatch,
     ScanOut,
+    TrainingDetectionRow,
+    TrainingImageRow,
+    TrainingScanBundle,
+    TrainingScanItemRow,
     UnseenLot,
 )
 
@@ -64,6 +70,17 @@ RETENTION_DAYS = 30  # BR-RETAIN-01
 STUCK_S = 60  # ST01: sweeper threshold
 MAX_AGE_S = 300  # FR-34-11: a scan not finished 5 minutes after creation is expired
 PENDING = ("queued", "processing")
+
+# Non-default mushroom species mapped from ScanItem.ingredient_id when vision_class == "nam".
+# Default generic `nam` maps to "nấm rơm" (safety_abstained=True until detections gains sub_species_* columns).
+_MUSHROOM_SUB_SPECIES_BY_NAME_VI: dict[str, str] = {
+    "nấm hương tươi": "nam-huong-tuoi",
+    "nấm kim châm": "nam-kim-cham",
+    "nấm đùi gà": "nam-dui-ga",
+    "nấm sò": "nam-so",
+    "nấm mỡ": "nam-mo",
+}
+MUSHROOM_ABSTAINED_LABEL_VI = "Nấm (chưa rõ loại, chỉ dùng nấm rõ nguồn gốc mua tại chợ hoặc siêu thị)"
 
 
 @dataclass
@@ -142,7 +159,7 @@ def create_scan(
     contribute: bool | None,
 ) -> tuple[ScanAccepted, uuid.UUID]:
     if not 1 <= len(raws) <= MAX_IMAGES:
-        raise _validation("/images", "count", "Gửi 1–2 ảnh.")
+        raise _validation("/images", "count", "Gửi 1 đến 2 ảnh.")
     groups = list(shelf_groups) if shelf_groups else [1] * len(raws)
     if len(groups) != len(raws) or any(g not in (1, 2) for g in groups):
         raise _validation("/shelf_groups", "shelf_groups", "Mỗi ảnh một số ngăn, 1 hoặc 2.")
@@ -226,14 +243,49 @@ def _items_out(session: Session, scan: Scan) -> list[ScanItemOut]:
         .order_by(Detection.confidence.desc(), Detection.id)
     ).all()
     classes = catalog.vision_classes(session)
+    names = catalog.ingredients_by_ids(session, [i.ingredient_id for i in items])
+    item_by_id = {it.id: it for it in items}
+    item_sub_slug: dict[uuid.UUID, str | None] = {}
+    for it in items:
+        ing = names[it.ingredient_id]
+        if it.origin == "model" and it.original_ingredient_id is None:
+            item_sub_slug[it.id] = _MUSHROOM_SUB_SPECIES_BY_NAME_VI.get(ing.name_vi)
+        else:
+            item_sub_slug[it.id] = None
+
     by_item: dict[uuid.UUID, list[DetectionOut]] = {}
     probs_of: dict[uuid.UUID, Probs] = {}
     for d, ordinal in dets:
+        vcode = classes[d.vision_class_id].code
+        it_parent = item_by_id.get(d.scan_item_id) if d.scan_item_id else None
+        is_model_nam = bool(
+            vcode == "nam"
+            and it_parent is not None
+            and it_parent.origin == "model"
+            and it_parent.original_ingredient_id is None
+        )
+        if is_model_nam:
+            if d.sub_species_slug is not None:
+                det_sub_slug: str | None = d.sub_species_slug
+                det_sub_conf: float | None = d.sub_species_conf
+                det_abstained = bool(d.safety_abstained)
+            elif bool(d.safety_abstained):
+                det_sub_slug = None
+                det_sub_conf = None
+                det_abstained = True
+            else:
+                det_sub_slug = item_sub_slug.get(d.scan_item_id) if d.scan_item_id else None
+                det_sub_conf = d.sub_species_conf
+                det_abstained = det_sub_slug is None
+        else:
+            det_sub_slug = None
+            det_sub_conf = None
+            det_abstained = False
         by_item.setdefault(d.scan_item_id, []).append(
             DetectionOut(
                 id=d.id,
                 image_ordinal=ordinal,
-                vision_class_code=classes[d.vision_class_id].code,
+                vision_class_code=vcode,
                 x1=d.x1,
                 y1=d.y1,
                 x2=d.x2,
@@ -243,22 +295,48 @@ def _items_out(session: Session, scan: Scan) -> list[ScanItemOut]:
                 p_dung_som=d.p_dung_som,
                 p_dung_ngay=d.p_dung_ngay,
                 p_kiem_tra=d.p_kiem_tra,
+                sub_species_slug=det_sub_slug,
+                sub_species_conf=det_sub_conf,
+                safety_abstained=det_abstained,
             )
         )
         if d.p_tuoi is not None:
             p = (d.p_tuoi, d.p_dung_som, d.p_dung_ngay, d.p_kiem_tra)
             if d.scan_item_id not in probs_of or u_img(p) > u_img(probs_of[d.scan_item_id]):  # type: ignore[arg-type]
                 probs_of[d.scan_item_id] = p  # type: ignore[assignment]
-    names = catalog.ingredients_by_ids(session, [i.ingredient_id for i in items])
     out = []
     for it in items:
         fr = pantry.image_freshness(probs_of.get(it.id))
         predicted = fr[1] if fr else None
+        item_dets = by_item.get(it.id, [])
+        has_nam_det = any(dt.vision_class_code == "nam" for dt in item_dets)
+        is_model_nam_item = bool(has_nam_det and it.origin == "model" and it.original_ingredient_id is None)
+        if is_model_nam_item:
+            nam_dets = [dt for dt in item_dets if dt.vision_class_code == "nam"]
+            any_abstained = any(bool(dt.safety_abstained) for dt in nam_dets)
+            nam_det = next((dt for dt in nam_dets if dt.sub_species_slug is not None), None)
+            if any_abstained:
+                sub_slug: str | None = None
+                sub_conf: float | None = None
+                abstained = True
+            elif nam_det is not None:
+                sub_slug = nam_det.sub_species_slug
+                sub_conf = nam_det.sub_species_conf
+                abstained = bool(nam_det.safety_abstained)
+            else:
+                sub_slug = None
+                sub_conf = None
+                abstained = True
+        else:
+            sub_slug = None
+            sub_conf = None
+            abstained = False
+        ing_label = MUSHROOM_ABSTAINED_LABEL_VI if abstained else names[it.ingredient_id].name_vi
         out.append(
             ScanItemOut(
                 id=it.id,
                 ingredient_id=it.ingredient_id,
-                ingredient_name_vi=names[it.ingredient_id].name_vi,
+                ingredient_name_vi=ing_label,
                 origin=it.origin,  # type: ignore[arg-type]
                 model_count=it.model_count,
                 final_count=it.final_count,
@@ -267,10 +345,13 @@ def _items_out(session: Session, scan: Scan) -> list[ScanItemOut]:
                 original_ingredient_id=it.original_ingredient_id,
                 predicted_freshness=predicted,  # type: ignore[arg-type]
                 user_freshness=it.user_freshness,  # type: ignore[arg-type]
-                needs_check=predicted == "kiem_tra" and it.user_freshness is None,
-                detections=by_item.get(it.id, []),
+                needs_check=bool((predicted == "kiem_tra" or abstained) and it.user_freshness is None),
+                detections=item_dets,
                 created_at=it.created_at,
                 updated_at=it.updated_at,
+                sub_species_slug=sub_slug,
+                sub_species_conf=sub_conf,
+                safety_abstained=abstained,
             )
         )
     return out
@@ -348,6 +429,38 @@ def get_scan(session: Session, deps: ScanDeps, user: AuthUser, scan_id: uuid.UUI
     return scan_out(session, scan)
 
 
+async def get_scan_async(session: Session, deps: ScanDeps, user: AuthUser, scan_id: uuid.UUID, wait: int) -> ScanOut:
+    """Async GET /scans/{id}?wait= (P0-7): releases DB connection then awaits Valkey async PubSub without blocking AnyIO."""
+
+    def _initial() -> ScanOut | None:
+        scan = _owned(session, user.id, scan_id)
+        if scan.status in PENDING and wait > 0:
+            session.commit()  # returns the Postgres connection to the pool for the wait
+            return None
+        return scan_out(session, scan)
+
+    immediate = await asyncio.to_thread(_initial)
+    if immediate is not None:
+        return immediate
+
+    def _settled_sync() -> bool:
+        with deps.sessionmaker() as s:
+            st = s.execute(select(Scan.status).where(Scan.id == scan_id)).scalar_one_or_none()
+        return st is None or st not in PENDING
+
+    async def _settled() -> bool:
+        return await asyncio.to_thread(_settled_sync)
+
+    await deps.queue.wait_async(scan_id, min(wait, MAX_WAIT_S), _settled)
+
+    def _final() -> ScanOut:
+        session.expire_all()
+        scan = _owned(session, user.id, scan_id)
+        return scan_out(session, scan)
+
+    return await asyncio.to_thread(_final)
+
+
 def image_response(session: Session, deps: ScanDeps, user: AuthUser, scan_id: uuid.UUID, ordinal: int) -> Response:
     _owned(session, user.id, scan_id)
     im = session.scalars(
@@ -373,7 +486,7 @@ def image_response(session: Session, deps: ScanDeps, user: AuthUser, scan_id: uu
 def _editable(session: Session, user_id: uuid.UUID, scan_id: uuid.UUID) -> Scan:
     scan = _owned(session, user_id, scan_id, lock=True)
     if scan.status != "done":
-        raise ApiError(409, ProblemCode.scan_not_editable, extra={"status": scan.status})
+        raise ApiError(409, ProblemCode.scan_not_editable, extra={"scan_status": scan.status})
     return scan
 
 
@@ -558,7 +671,7 @@ def confirm(
     if scan.status == "confirmed":
         return _replay(session, scan)
     if scan.status != "done":
-        raise ApiError(409, ProblemCode.invalid_scan_state, extra={"status": scan.status})
+        raise ApiError(409, ProblemCode.invalid_scan_state, extra={"scan_status": scan.status})
     items = list(
         session.scalars(
             select(ScanItem)
@@ -568,10 +681,29 @@ def confirm(
     )
     probs = _probs_by_item(session, [i.id for i in items])
     labels = {i.id: (pantry.image_freshness(probs.get(i.id)) or (None, None))[1] for i in items}
-    unchecked = [str(i.id) for i in items if labels[i.id] == "kiem_tra" and i.user_freshness is None]
+    raw_dets = list(session.scalars(select(Detection).where(Detection.scan_item_id.in_([i.id for i in items]))))
+    classes = catalog.vision_classes(session)
+    dets_by_item: dict[uuid.UUID, list[Detection]] = {}
+    for d in raw_dets:
+        if d.scan_item_id is not None:
+            dets_by_item.setdefault(d.scan_item_id, []).append(d)
+    ings = catalog.ingredients_by_ids(session, [i.ingredient_id for i in items])
+    unchecked: list[str] = []
+    for it in items:
+        fresh_unconfirmed = labels[it.id] == "kiem_tra" and it.user_freshness is None
+        is_abstained = False
+        if it.origin == "model" and it.original_ingredient_id is None:
+            nam_dets = [d for d in dets_by_item.get(it.id, ()) if classes[d.vision_class_id].code == "nam"]
+            if nam_dets:
+                if any(bool(d.safety_abstained) for d in nam_dets):
+                    is_abstained = True
+                elif all(d.sub_species_slug is None for d in nam_dets):
+                    is_abstained = _MUSHROOM_SUB_SPECIES_BY_NAME_VI.get(ings[it.ingredient_id].name_vi) is None
+        safety_unconfirmed = is_abstained and it.user_freshness not in ("tuoi", "dung_som", "dung_ngay")
+        if fresh_unconfirmed or safety_unconfirmed:
+            unchecked.append(str(it.id))
     if unchecked:
         raise ApiError(409, ProblemCode.freshness_check_required, extra={"item_ids": unchecked})  # FR-13-09
-    ings = catalog.ingredients_by_ids(session, [i.ingredient_id for i in items])
     missing_level = [str(i.id) for i in items if not is_count_kind(ings[i.ingredient_id]) and i.qty_level is None]
     if missing_level:
         raise ApiError(422, ProblemCode.qty_level_required, extra={"item_ids": missing_level})  # FR-13-11
@@ -623,7 +755,7 @@ def discard(session: Session, user: AuthUser, scan_id: uuid.UUID) -> ScanOut:
         scan.status = "discarded"
         session.flush()
     elif scan.status != "discarded":
-        raise ApiError(409, ProblemCode.invalid_scan_state, extra={"status": scan.status})
+        raise ApiError(409, ProblemCode.invalid_scan_state, extra={"scan_status": scan.status})
     return scan_out(session, scan)
 
 
@@ -631,18 +763,36 @@ def discard(session: Session, user: AuthUser, scan_id: uuid.UUID) -> ScanOut:
 
 
 def sweep_stuck_scans(session: Session, queue: ScanQueue | None) -> dict[str, int]:
-    """ST01 sweeper: enqueue scans whose enqueue never happened; expire scans no worker is handling."""
+    """ST01 sweeper: enqueue lost/requeueable scans; expire scans that exceeded retry or age limits."""
     now = utcnow()
     stuck = now - timedelta(seconds=STUCK_S)
     oldest = now - timedelta(seconds=MAX_AGE_S)
     requeued = 0
+    stuck_processing = session.execute(
+        select(Scan.id, Scan.attempts).where(
+            Scan.status == "processing",
+            Scan.started_at < stuck,
+            Scan.created_at >= oldest,
+            Scan.attempts < MAX_ATTEMPTS,
+        )
+    ).all()
+    if stuck_processing:
+        session.execute(
+            update(Scan)
+            .where(Scan.id.in_([sid for sid, _ in stuck_processing]), Scan.status == "processing")
+            .values(status="queued", enqueued_at=None, started_at=None)
+        )
+        session.flush()
     if queue is not None:
         rows = session.execute(
             select(Scan.id, Scan.attempts).where(
                 Scan.status == "queued", Scan.enqueued_at.is_(None), Scan.created_at < stuck, Scan.created_at >= oldest
             )
         ).all()
-        for sid, attempts in rows:
+        candidates = {sid: att for sid, att in rows}
+        for sid, att in stuck_processing:
+            candidates.setdefault(sid, att)
+        for sid, attempts in candidates.items():
             try:
                 queue.enqueue(sid, attempts + 1)
             except Exception:  # noqa: BLE001 — try again next minute; expiry below still applies
@@ -666,6 +816,8 @@ def sweep_stuck_scans(session: Session, queue: ScanQueue | None) -> dict[str, in
     if queue is not None:
         for sid in expired:
             queue.publish(sid, "expired")
+    metrics.inc_scan_job("requeued", requeued)
+    metrics.inc_scan_job("expired", len(expired))
     return {"scans_requeued": requeued, "scans_expired": len(expired)}
 
 
@@ -692,9 +844,11 @@ def purge_images(session: Session, storage_dir: Path, *, now: datetime | None = 
         im.purged_at = now
     session.flush()
     orphans = 0
-    root = Path(storage_dir) / "tmp" / "scans"
-    if root.is_dir():
-        day_ago = (now - timedelta(days=1)).timestamp()
+    day_ago = (now - timedelta(days=1)).timestamp()
+    for rel_root in ("tmp/scans", "contrib"):
+        root = Path(storage_dir) / rel_root
+        if not root.is_dir():
+            continue
         for user_dir in root.iterdir():
             for scan_dir in user_dir.iterdir() if user_dir.is_dir() else ():
                 try:
@@ -710,6 +864,20 @@ def purge_images(session: Session, storage_dir: Path, *, now: datetime | None = 
 
 
 # ---------------------------------------------------------------- data-subject requests
+
+
+def _commit_erase_moves(session: Session) -> None:
+    moves = session.info.pop("_scan_erase_moves", None)
+    if not moves:
+        return
+    for src, dst in moves:
+        if src.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            os.replace(src, dst)
+
+
+def _discard_erase_moves(session: Session) -> None:
+    session.info.pop("_scan_erase_moves", None)
 
 
 class ScanSubjectData:
@@ -743,7 +911,7 @@ class ScanSubjectData:
         }  # fmt: skip
 
     def erase_purpose(self, session: Session, user_id: uuid.UUID, purpose: str) -> None:
-        """Withdrawing photo_contribution (BR-CONSENT-04): contributed photos go back under the 30-day rule."""
+        """Withdrawing photo_contribution (BR-CONSENT-04): contributed photos move back to tmp/scans after commit."""
         if purpose != "photo_contribution":
             return
         rows = (
@@ -755,16 +923,116 @@ class ScanSubjectData:
             .scalars()
             .all()
         )
+        pending_moves: list[tuple[Path, Path]] = []
         for im in rows:
             new_key = image_key(user_id, im.scan_id, im.ordinal, False)
             src, dst = self.storage_dir / im.storage_key, self.storage_dir / new_key
             if im.purged_at is None and src.exists():
-                dst.parent.mkdir(parents=True, exist_ok=True)
-                os.replace(src, dst)
+                pending_moves.append((src, dst))
             im.storage_key = new_key
             im.contributed = False
         session.flush()
+        if pending_moves:
+            session.info.setdefault("_scan_erase_moves", []).extend(pending_moves)
+            if not session.info.get("_scan_erase_hooks"):
+                event.listen(session, "after_commit", _commit_erase_moves)
+                event.listen(session, "after_rollback", _discard_erase_moves)
+                session.info["_scan_erase_hooks"] = True
 
     def erase_files(self, user_id: uuid.UUID) -> None:
         for root in ("tmp/scans", "contrib"):
             shutil.rmtree(self.storage_dir / root / str(user_id), ignore_errors=True)
+
+
+def export_contributed_scans_since(
+    session: Session, *, user_ids: set[uuid.UUID], since_utc: datetime
+) -> TrainingScanBundle:
+    if not user_ids:
+        return TrainingScanBundle()
+    rows = session.execute(
+        select(Scan, ScanImage)
+        .join(ScanImage, ScanImage.scan_id == Scan.id)
+        .where(
+            Scan.user_id.in_(user_ids),
+            Scan.created_at >= since_utc,
+            ScanImage.contributed.is_(True),
+            ScanImage.purged_at.is_(None),
+        )
+        .order_by(Scan.created_at, Scan.id, ScanImage.ordinal)
+    ).all()
+    if not rows:
+        return TrainingScanBundle()
+    images: list[TrainingImageRow] = []
+    scan_users: dict[uuid.UUID, uuid.UUID] = {}
+    image_scan: dict[uuid.UUID, uuid.UUID] = {}
+    for s, im in rows:
+        scan_users[s.id] = s.user_id
+        image_scan[im.id] = s.id
+        images.append(
+            TrainingImageRow(
+                image_id=im.id,
+                scan_id=s.id,
+                user_id=s.user_id,
+                ordinal=im.ordinal,
+                shelf_group=im.shelf_group,
+                width=im.width,
+                height=im.height,
+                storage_key=im.storage_key,
+                mode=s.mode,
+                detector_version_id=s.detector_version_id,
+                classifier_version_id=s.classifier_version_id,
+                preprocess_version=s.preprocess_version,
+                created_at=s.created_at,
+            )
+        )
+    scan_ids = list(scan_users)
+    item_rows = session.scalars(
+        select(ScanItem)
+        .where(
+            ScanItem.scan_id.in_(scan_ids),
+            (ScanItem.user_action.in_(("relabeled", "deleted", "edited"))) | (ScanItem.origin == "user_added"),
+        )
+        .order_by(ScanItem.created_at, ScanItem.id)
+    ).all()
+    items = [
+        TrainingScanItemRow(
+            item_id=it.id,
+            scan_id=it.scan_id,
+            user_id=scan_users[it.scan_id],
+            ingredient_id=it.ingredient_id,
+            origin=it.origin,
+            model_count=it.model_count,
+            final_count=it.final_count,
+            qty_level=it.qty_level,
+            user_action=it.user_action,
+            original_ingredient_id=it.original_ingredient_id,
+            user_freshness=it.user_freshness,
+            created_at=it.created_at,
+        )
+        for it in item_rows
+    ]
+    image_ids = list(image_scan)
+    det_rows = session.scalars(
+        select(Detection).where(Detection.scan_image_id.in_(image_ids)).order_by(Detection.id)
+    ).all()
+    detections = [
+        TrainingDetectionRow(
+            detection_id=d.id,
+            scan_image_id=d.scan_image_id,
+            scan_id=image_scan[d.scan_image_id],
+            user_id=scan_users[image_scan[d.scan_image_id]],
+            scan_item_id=d.scan_item_id,
+            vision_class_id=d.vision_class_id,
+            x1=float(d.x1),
+            y1=float(d.y1),
+            x2=float(d.x2),
+            y2=float(d.y2),
+            confidence=float(d.confidence),
+            p_tuoi=float(d.p_tuoi) if d.p_tuoi is not None else None,
+            p_dung_som=float(d.p_dung_som) if d.p_dung_som is not None else None,
+            p_dung_ngay=float(d.p_dung_ngay) if d.p_dung_ngay is not None else None,
+            p_kiem_tra=float(d.p_kiem_tra) if d.p_kiem_tra is not None else None,
+        )
+        for d in det_rows
+    ]
+    return TrainingScanBundle(images=images, items=items, detections=detections)

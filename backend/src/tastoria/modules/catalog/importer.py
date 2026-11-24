@@ -65,7 +65,7 @@ SOURCES = [
     {
         "id": 1,
         "code": "fct2007",
-        "name": "Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng – Bộ Y tế)",
+        "name": "Bảng thành phần thực phẩm Việt Nam (Viện Dinh dưỡng, Bộ Y tế)",
         "version": "2007",
         "license": "Viện Dinh dưỡng giữ bản quyền; dùng cho nghiên cứu, ghi nguồn, không phát hành lại PDF",
         "url": "https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf",
@@ -73,7 +73,7 @@ SOURCES = [
     {
         "id": 2,
         "code": "usda_sr_legacy",
-        "name": "USDA FoodData Central — SR Legacy",
+        "name": "USDA FoodData Central: SR Legacy",
         "version": "2018-04",
         "license": "CC0 1.0",
         "url": "https://fdc.nal.usda.gov/",
@@ -81,7 +81,7 @@ SOURCES = [
     {
         "id": 3,
         "code": "usda_foundation",
-        "name": "USDA FoodData Central — Foundation Foods",
+        "name": "USDA FoodData Central: Foundation Foods",
         "version": "2026-04-30",
         "license": "CC0 1.0",
         "url": "https://fdc.nal.usda.gov/",
@@ -618,18 +618,16 @@ MIN_CALIBRATION_DISHES = 30  # BR-NUT-06
 
 
 def _set_db_param(session: Session, key: str, value: float | None, report: ImportReport) -> None:
-    """Database-level parameter tastoria.<key> (app_param() in views; catalog.service.db_param() reads it fresh).
-    None resets it. Needs the database owner; otherwise a warning (the API then falls back to "not calibrated")."""
+    """Database-level parameter stored in app_params (app_param() in views; catalog.service.db_param() reads it fresh).
+    None resets value_num to NULL."""
     assert key.isidentifier()
-    action = f"SET tastoria.{key} = %L" if value is not None else f"RESET tastoria.{key}"
-    arg = f", '{float(value)}'" if value is not None else ""
-    try:
-        with session.begin_nested():
-            session.execute(
-                text(f"DO $$ BEGIN EXECUTE format('ALTER DATABASE %I {action}', current_database(){arg}); END $$")
-            )
-    except Exception as exc:  # noqa: BLE001
-        report.warnings.append(f"ALTER DATABASE {action.split(' ')[0]} tastoria.{key} failed: {exc.__class__.__name__}")
+    session.execute(
+        text(
+            "INSERT INTO app_params (key, value_num, updated_at) VALUES (:k, :v, now()) "
+            "ON CONFLICT (key) DO UPDATE SET value_num = EXCLUDED.value_num, updated_at = EXCLUDED.updated_at"
+        ),
+        {"k": key, "v": float(value) if value is not None else None},
+    )
 
 
 def _calibration(b: Bundle, nut: NutritionResult, report: ImportReport) -> float | None:

@@ -1,0 +1,62 @@
+@startuml
+title CL11a — Tầng model: lần quét và kho (SQLAlchemy)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Scan" as SC <<ORM>> {
+  -mode: str
+  -status: str
+  -attempts: int
+  -enqueued_at: datetime
+  -confirmed_at: datetime
+}
+class "ScanImage" as SI <<ORM>> {
+  -ordinal: int
+  -shelf_group: int
+  -storage_key: str
+  -contributed: bool
+  -purged_at: datetime
+}
+class "Detection" as DT <<ORM>> {
+  -vision_class_id: int
+  -confidence: float
+  -p_tuoi: float
+  -p_kiem_tra: float
+}
+class "ScanItem" as IT <<ORM>> {
+  -ingredient_id: UUID
+  -model_count: int
+  -final_count: int
+  -qty_level: str
+  -user_action: str
+}
+class "PantryLot" as LO <<ORM>> {
+  -ingredient_id: UUID
+  -initial_g_min: Decimal
+  -initial_g_max: Decimal
+  -acquired_at: datetime
+  -status: str
+}
+class "PantryTransaction" as TX <<ORM>> {
+  -delta_g_min: Decimal
+  -delta_g_max: Decimal
+  -reason: str
+  -ref_id: UUID
+  -reverses_id: int
+}
+
+SC *-- "1..2" SI
+SC *-- "0..*" IT
+SI *-- "0..*" DT
+DT "0..*" -- "0..1" IT : gộp vào
+IT "0..1" -- "0..1" LO : tạo
+LO *-- "1..*" TX
+@enduml

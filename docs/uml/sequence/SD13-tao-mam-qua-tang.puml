@@ -1,0 +1,35 @@
+@startuml
+title SD13 — Tạo mâm qua các tầng (UC15)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+boundary "TrayScreen (app)" as APP
+control "meal.router" as MR
+control "meal.service" as MS
+control "meal.composer" as CP
+control "meal.schedule" as SH
+
+APP -> MR : POST /meal-plans (Idempotency-Key)
+MR -> MS : create_plan(body)
+MS -> MS : recipe_allowed: lọc dị ứng, chế độ ăn; Ranker.score
+MS -> CP : compose(problem, structures)
+CP --> MS : các Tray xếp theo hàm mục tiêu
+MS -> SH : solve(dishes, burners) cho từng mâm
+SH --> MS : Schedule, makespan
+alt có mâm makespan ≤ max_minutes
+  MS -> MS : thêm MealPlan, MealPlanItem; ghi served
+  MS --> MR : Created(plan)
+else không có mâm
+  MS --> MR : Created(error: no_feasible_tray)
+end
+MR -> MR : idempotency.finish
+MR --> APP : 201 MealPlanOut hoặc 422
+@enduml

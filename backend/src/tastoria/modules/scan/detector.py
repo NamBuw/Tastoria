@@ -14,12 +14,16 @@ The confidence threshold is part of the model version (`metrics.serving.conf`), 
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
 
 import numpy as np
 from PIL import Image
 
+from tastoria.core.health import metrics
+
 PAD_VALUE = 114
+MAX_DETECTIONS_PER_PHOTO = 64
 
 
 @dataclass(frozen=True)
@@ -75,15 +79,35 @@ def nms(boxes: np.ndarray, scores: np.ndarray, iou: float) -> np.ndarray:
     return np.asarray(keep, dtype=np.int64)
 
 
-def decode(output: np.ndarray, lb: Letterbox, *, conf: float, iou: float, max_det: int = 300) -> list[Box]:
+def decode(
+    output: np.ndarray,
+    lb: Letterbox,
+    *,
+    conf: float,
+    iou: float,
+    max_det: int = 300,
+    agnostic_iou: float | None = None,
+    class_conf: dict[int, float] | None = None,
+) -> list[Box]:
     """Raw head output [1, 4 + C, N] (or [4 + C, N]) -> boxes on the original image, best first."""
     out = np.asarray(output, dtype=np.float32)
     if out.ndim == 3:
         out = out[0]
     scores_all = out[4:]
-    cls = scores_all.argmax(axis=0)
-    best = scores_all[cls, np.arange(out.shape[1])]
-    m = best >= conf
+    if class_conf is not None:
+        thresh = np.full(scores_all.shape[0], conf, dtype=np.float32)
+        for ci, t in class_conf.items():
+            if 0 <= ci < scores_all.shape[0]:
+                thresh[ci] = float(t)
+        valid = (thresh[:, None] < 1.0) & (scores_all >= thresh[:, None])
+        masked = np.where(valid, scores_all, -1.0)
+        cls = masked.argmax(axis=0)
+        best = masked[cls, np.arange(out.shape[1])]
+        m = best >= 0.0
+    else:
+        cls = scores_all.argmax(axis=0)
+        best = scores_all[cls, np.arange(out.shape[1])]
+        m = best >= conf
     if not m.any():
         return []
     cx, cy, bw, bh = out[0, m], out[1, m], out[2, m], out[3, m]
@@ -91,7 +115,10 @@ def decode(output: np.ndarray, lb: Letterbox, *, conf: float, iou: float, max_de
     sc, cl = best[m], cls[m]
     # per-class NMS through a coordinate offset per class (as ultralytics): boxes of different classes never overlap
     offset = cl[:, None].astype(np.float32) * 7680.0
-    keep = nms(xyxy + offset, sc, iou)[:max_det]
+    keep = nms(xyxy + offset, sc, iou)
+    if agnostic_iou is not None and keep.size > 1:
+        keep = keep[nms(xyxy[keep], sc[keep], agnostic_iou)]
+    keep = keep[:max_det]
     res = []
     for k in keep:
         bx = xyxy[k]
@@ -121,16 +148,43 @@ def preprocess(img: Image.Image, version: str | None) -> Image.Image:
 class Detector:
     """One deployed detector version: an onnxruntime session + its serving parameters."""
 
-    def __init__(self, session, *, conf: float, iou: float, preprocess_version: str | None = None) -> None:  # noqa: ANN001
+    def __init__(
+        self,
+        session,  # noqa: ANN001
+        *,
+        conf: float,
+        iou: float,
+        preprocess_version: str | None = None,
+        agnostic_iou: float | None = None,
+        class_conf: dict[int, float] | None = None,
+    ) -> None:
         self.session = session
         self.conf = conf
         self.iou = iou
         self.preprocess_version = preprocess_version
+        self.agnostic_iou = agnostic_iou
+        self.class_conf = class_conf
         inp = session.get_inputs()[0]
         self.input_name = inp.name
         self.size = int(inp.shape[2])
 
     def detect(self, img: Image.Image) -> list[Box]:
         x, lb = letterbox(preprocess(img, self.preprocess_version), self.size)
-        out = self.session.run(None, {self.input_name: x})[0]
-        return decode(out, lb, conf=self.conf, iou=self.iou)
+        t0 = time.perf_counter()
+        outcome = "ok"
+        try:
+            out = self.session.run(None, {self.input_name: x})[0]
+        except Exception:
+            outcome = "error"
+            raise
+        finally:
+            metrics.observe_onnx("detector", time.perf_counter() - t0, outcome=outcome)
+        return decode(
+            out,
+            lb,
+            conf=self.conf,
+            iou=self.iou,
+            max_det=MAX_DETECTIONS_PER_PHOTO,
+            agnostic_iou=self.agnostic_iou,
+            class_conf=self.class_conf,
+        )

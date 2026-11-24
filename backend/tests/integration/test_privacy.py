@@ -43,9 +43,9 @@ def _states(client: TestClient, s: dict) -> dict[str, str]:
 
 def test_current_policy_text_and_hash(client: TestClient) -> None:
     p = _policy(client, "health_profile")
-    assert p["version"] == "2026-10-17" and p["purpose_code"] == "health_profile"
+    assert p["version"] == "2026-11-24" and p["purpose_code"] == "health_profile"
     assert p["purpose"]["is_sensitive"] is True and p["purpose"]["is_required"] is False
-    raw = (POLICY_DIR / "health_profile-2026-10-17.md").read_bytes()
+    raw = (POLICY_DIR / "health_profile-2026-11-24.md").read_bytes()
     assert p["text_vi"] == raw.decode() and p["text_sha256"] == hashlib.sha256(raw).hexdigest()
     r = client.get(f"{API}/policies/marketing/current")
     assert (r.status_code, r.json()["code"]) == (404, "purpose_not_found")
@@ -274,3 +274,39 @@ def test_download_preconditions(client: TestClient, db, storage_dir: Path) -> No
     r = client.get(f"{API}/me/data-requests/{done['id']}/download", headers=bearer(s))
     assert (r.status_code, r.json()["code"]) == (410, "export_expired")
     assert client.get(f"{API}/me/data-requests/{done['id']}", headers=bearer(s)).json()["download_available"] is False
+
+
+def test_data_request_rate_limit_zip_filename_and_concurrent_export(client: TestClient, db, app) -> None:
+    import concurrent.futures
+
+    from tastoria.modules.privacy.service import process_pending
+
+    # 1. Verify current survey policy points to 2026-11-24
+    survey_pol = _policy(client, "survey")
+    assert survey_pol["version"] == "2026-11-24"
+
+    # 2. Zip filename uses my-vi-du-lieu-{id}.zip and rate limit blocks 11th request per user
+    s = register(client)
+    exp = client.post(f"{API}/me/data-requests", json={"type": "export"}, headers=bearer(s))
+    assert exp.status_code == 202
+    rid = exp.json()["id"]
+    dl = client.get(f"{API}/me/data-requests/{rid}/download", headers=bearer(s))
+    assert dl.headers["content-disposition"] == f'attachment; filename="my-vi-du-lieu-{rid}.zip"'
+
+    # Enqueue a second raw pending export and race two concurrent process_pending workers
+    s2 = register(client)
+    q(
+        db,
+        "INSERT INTO dsr_requests (user_id, subject_ref, type, status, received_at) "
+        "VALUES (:u, '\\x02', 'export', 'received', now())",
+        u=s2["user"]["id"],
+    )
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        counts = list(pool.map(lambda _: process_pending(app.state.privacy), range(2)))
+    assert sum(counts) == 1
+
+    for _ in range(9):  # total 10 requests with exp above
+        resp = client.post(f"{API}/me/data-requests", json={"type": "correct", "note": "Kiểm tra"}, headers=bearer(s))
+        assert resp.status_code in (200, 202)
+    blocked = client.post(f"{API}/me/data-requests", json={"type": "correct", "note": "Vượt"}, headers=bearer(s))
+    assert (blocked.status_code, blocked.json()["code"]) == (429, "rate_limited")

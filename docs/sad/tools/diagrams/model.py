@@ -172,8 +172,8 @@ sq("SD02b", "xac-nhan-vao-kho", "SD02b — Xác nhận kết quả quét vào kh
     frag("alt",
          ("đã xác nhận trước đó", [m("API", "APP", "trả lại kết quả cũ", True)]),
          ("chưa xong hoặc còn chip cần kiểm tra", [m("API", "APP", "409 / 422", True)]),
-         ("hợp lệ", [m("API", "PAN", "tạo lô từ chip (mỗi chip một lô)"),
-                     m("PAN", "DB", "ghi lô và giao dịch nhập kho"),
+         ("hợp lệ", [m("API", "PAN", "tạo lô mới hoặc cập nhật lô đang có"),
+                     m("PAN", "DB", "ghi lô (lượng ban đầu, không giao dịch)"),
                      m("API", "PAN", "đánh dấu lô không thấy (chế độ toàn tủ)"),
                      m("API", "DB", "lần quét → «confirmed»; commit"),
                      m("API", "APP", "danh sách lô mới", True)])),
@@ -406,6 +406,58 @@ sq("SD10d", "quay-lui-mo-hinh", "SD10d — Quay lui phiên bản mô hình (UC30
     m("CLI", "OP", "kết quả", True)])
 
 
+
+# --- tuần tự thiết kế qua các tầng (tên lifeline và thông điệp lấy đúng từ mã nguồn)
+sq("SD11", "xac-nhan-quet-qua-tang", "SD11 — Xác nhận quét qua các tầng (UC13)",
+   [("CF", "boundary", "ConfirmScan (app)"), ("SR", "control", "scan.router"), ("SS", "control", "scan.service"),
+    ("PS", "control", "pantry.service"), ("DB", "entity", "PostgreSQL")], [
+    m("CF", "SR", "POST /scans/{id}/confirm"),
+    m("SR", "SS", "confirm(scan_id, body)"),
+    m("SS", "DB", "khoá Scan (SELECT … FOR UPDATE)"),
+    frag("alt",
+         ("status = confirmed", [m("SS", "SR", "_replay(): kết quả lần trước", True)]),
+         ("status ≠ done", [m("SS", "SR", "ApiError 409 invalid_scan_state", True)]),
+         ("status = done", [m("SS", "SS", "kiểm chip kiem_tra, qty_level"),
+                            m("SS", "PS", "apply_scan(user_id, mode, items)"),
+                            m("PS", "DB", "thêm PantryLot (initial_g), lô vắng → not_seen"),
+                            m("SS", "DB", "Scan.status = confirmed"),
+                            m("SS", "SR", "ScanConfirmResult", True)])),
+    m("SR", "DB", "UnitOfWork commit"),
+    m("SR", "CF", "200 ScanConfirmResult", True)])
+sq("SD12", "nau-xong-qua-tang", "SD12 — Nấu xong qua các tầng (UC20)",
+   [("APP", "boundary", "Finished + outbox (app)"), ("CR", "control", "cooking.router"),
+    ("ID", "control", "core.idempotency"), ("CK", "control", "cooking.service"), ("PS", "control", "pantry.service")], [
+    m("APP", "CR", "POST /cook-sessions/{id}/complete (Idempotency-Key)"),
+    m("CR", "ID", "begin(user_id, idem)"),
+    frag("alt",
+         ("khoá đã có phản hồi", [m("ID", "CR", "phản hồi đã lưu", True),
+                                  m("CR", "APP", "phản hồi cũ, không trừ kho lần hai", True)]),
+         ("khoá mới", [m("CR", "CK", "complete_session(id, body)"),
+                       m("CK", "CK", "khoá CookSession, kiểm in_progress"),
+                       m("CK", "PS", "deduct(user_id, cs.id, needs)"),
+                       m("PS", "CK", "deductions, shortfalls", True),
+                       m("CK", "CK", "completed; set_cooked; events.record"),
+                       m("CK", "CR", "CookCompletion", True),
+                       m("CR", "ID", "finish(user_id, idem, 200, res)"),
+                       m("CR", "APP", "200 CookCompletion", True)]))])
+sq("SD13", "tao-mam-qua-tang", "SD13 — Tạo mâm qua các tầng (UC15)",
+   [("APP", "boundary", "TrayScreen (app)"), ("MR", "control", "meal.router"), ("MS", "control", "meal.service"),
+    ("CP", "control", "meal.composer"), ("SH", "control", "meal.schedule")], [
+    m("APP", "MR", "POST /meal-plans (Idempotency-Key)"),
+    m("MR", "MS", "create_plan(body)"),
+    m("MS", "MS", "recipe_allowed: lọc dị ứng, chế độ ăn; Ranker.score"),
+    m("MS", "CP", "compose(problem, structures)"),
+    m("CP", "MS", "các Tray xếp theo hàm mục tiêu", True),
+    m("MS", "SH", "solve(dishes, burners) cho từng mâm"),
+    m("SH", "MS", "Schedule, makespan", True),
+    frag("alt",
+         ("có mâm makespan ≤ max_minutes", [m("MS", "MS", "thêm MealPlan, MealPlanItem; ghi served"),
+                                            m("MS", "MR", "Created(plan)", True)]),
+         ("không có mâm", [m("MS", "MR", "Created(error: no_feasible_tray)", True)])),
+    m("MR", "MR", "idempotency.finish"),
+    m("MR", "APP", "201 MealPlanOut hoặc 422", True)])
+
+
 # =====================================================================  HOẠT ĐỘNG
 def a(lane, text):
     return ("a", lane, text)
@@ -443,7 +495,7 @@ ad("AD01a", "quet-va-xac-nhan", "AD01a — Quét và xác nhận nguyên liệu 
     a("App", "Hiện chip nguyên liệu"),
     WHILE("Người dùng", "Còn chip cần sửa?", "có", [a("Người dùng", "Sửa tên, số lượng hoặc xoá chip")], "không"),
     a("Người dùng", "Bấm Xác nhận"),
-    a("Hệ thống", "Ghi lô và giao dịch nhập kho"),
+    a("Hệ thống", "Ghi lô mới vào kho"),
     a("App", "Hiện kho đã cập nhật")])
 ad("AD01b", "nhan-va-dieu-chinh-mam", "AD01b — Nhận và điều chỉnh mâm cơm (UC15–UC18)",
    ["Người dùng", "App", "Hệ thống"], [
@@ -505,8 +557,8 @@ ad("AD03b", "ghi-kho-tu-chip", "AD03b — Xác nhận quét: ghi kho từ chip (
     a("scan", "Lấy các chip chưa xoá"),
     WHILE("scan", "Còn chip chưa quy đổi?", "còn", [a("catalog", "Tra gam mỗi đơn vị hoặc mức lượng"),
                                                      a("pantry", "Tính khoảng gam của chip")], "hết"),
-    a("pantry", "Tạo mỗi chip một lô «in_stock»"),
-    a("pantry", "Ghi giao dịch nhập kho"),
+    a("pantry", "Tạo lô mới hoặc cập nhật lô đang có"),
+    a("pantry", "Lưu lượng làm lượng ban đầu của lô"),
     IF("scan", "Chế độ toàn tủ?", "không", [], "có", [a("pantry", "Lô không thấy → «not_seen»")]),
     a("scan", "Lần quét → «confirmed»; commit")])
 ad("AD04a", "thu-thap-du-lieu", "AD04a — Thu thập và xuất dữ liệu huấn luyện (UC12, UC28)",
@@ -769,10 +821,10 @@ cl("CL02b", "bce-xac-nhan-quet", "CL02b — Lớp phân tích BCE: UC13 Xác nh�
     C("CX", "Xác nhận vào kho", [], ["xácNhận()", "quyĐổiLượng()"], C_),
     C("ECH", "Chip nguyên liệu", ["sốĐếm", "mứcLượng", "thaoTác"], [], E_),
     C("ELO", "Lô kho", ["khoảngGam", "trạngThái"], [], E_),
-    C("EGD", "Giao dịch kho", ["lýDo", "delta"], [], E_)],
+    C("ELQ", "Lần quét", ["trạngThái", "xácNhậnLúc"], [], E_)],
    [("assoc", "BX", "CSC", "", "", ""), ("assoc", "BX", "CX", "", "", ""), ("assoc", "CSC", "ECH", "", "", ""),
-    ("assoc", "CX", "ECH", "", "", ""), ("assoc", "CX", "ELO", "", "", ""), ("assoc", "CX", "EGD", "", "", "")],
-   {"BX": (0, 0), "CSC": (1, 0), "ECH": (2, 0), "CX": (1, 1), "ELO": (2, 1), "EGD": (2, 2)})
+    ("assoc", "CX", "ECH", "", "", ""), ("assoc", "CX", "ELO", "", "", ""), ("assoc", "CX", "ELQ", "", "", "")],
+   {"BX": (0, 0), "CSC": (1, 0), "ECH": (2, 0), "CX": (1, 1), "ELO": (2, 1), "ELQ": (2, 2)})
 cl("CL03a", "bce-tao-mam", "CL03a — Lớp phân tích BCE: UC15 Tạo mâm cơm", [
     C("BM", "Màn hình Mâm cơm", ["bữa", "sốNgười"], ["yêuCầuMâm()"], B_),
     C("CT", "Tạo mâm", [], ["tạoMâm()"], C_),
@@ -814,100 +866,191 @@ cl("CL04b", "bce-nau-xong-tuong-tac", "CL04b — Lớp phân tích BCE: UC20 N�
     ("assoc", "CSK", "ETT", "", "", ""), ("assoc", "CSK", "EDY", "", "", "")],
    {"CH": (0, 0), "CM": (1, 0), "EM": (2, 0), "CSK": (1, 1), "ETT": (2, 1), "EDY": (2, 2)})
 
-# --- thiết kế
-cl("CL05a", "thiet-ke-meal-dieu-phoi", "CL05a — Thiết kế module meal: điều phối và dữ liệu", [
-    C("R", "MealRouter", [], ["create_plan()", "accept()", "swap()", "list_substitutes()", "choose_substitution()"], "router"),
-    C("S", "MealService", [], ["create_plan()", "accept()", "swap_item()", "choose_substitution()",
-                               "get_plan_for_cooking()"], "service"),
-    C("RP", "MealRepository", [], ["add_plan()", "get_plan()", "set_status()", "swap_out()"], "repository"),
-    C("RQ", "MealPlanRequest", ["meal: Meal", "persons: int", "max_minutes: int", "pinned_lot_ids: list"], [], "DTO"),
-    C("MP", "MealPlan", ["meal: Meal", "persons: int", "status: PlanStatus", "e_target_kcal: float"], [], "domain"),
-    C("MI", "MealPlanItem", ["slot: Slot", "recipe_id: UUID", "servings_scale: float", "status: ItemStatus"], [], "domain")],
-   [("dep", "R", "S", "", "", ""), ("dep", "R", "RQ", "", "", ""), ("dep", "S", "RP", "", "", ""),
-    ("dep", "RP", "MP", "", "", ""), ("comp", "MP", "MI", "", "1", "2..3")],
-   {"R": (0, 0), "RQ": (1, 0), "S": (0, 1), "RP": (0, 2), "MP": (1, 2), "MI": (2, 2)})
-cl("CL05b", "thiet-ke-meal-ghep-mam", "CL05b — Thiết kế module meal: dịch vụ ghép mâm", [
-    C("S", "MealService", [], ["create_plan()", "swap_item()"], "service"),
-    C("HF", "HardFilter", [], ["filter()"], "domain service"),
-    C("TR", "TasteRanker", [], ["score()"], "domain service"),
-    C("TC", "TrayComposer", [], ["compose()", "resolve_swap()"], "domain service"),
-    C("ME", "MakespanEstimator", [], ["estimate()"], "domain service"),
-    C("RB", "ReasonBuilder", [], ["build()"], "domain service")],
-   [("dep", "S", "HF", "", "", ""), ("dep", "S", "TR", "", "", ""), ("dep", "S", "TC", "", "", ""),
-    ("dep", "TC", "ME", "", "", ""), ("dep", "S", "RB", "", "", "")],
-   {"S": (1, 0), "HF": (0, 1), "TR": (1, 1), "TC": (2, 1), "RB": (0, 2), "ME": (2, 2)})
-cl("CL06a", "thiet-ke-pantry-dieu-phoi", "CL06a — Thiết kế module pantry: điều phối và dữ liệu", [
-    C("R", "PantryRouter", [], ["list_lots()", "add_lot()", "update_lot()", "discard_lot()"], "router"),
-    C("S", "PantryService", [], ["list_available_lots()", "add_lots_from_scan()", "mark_not_seen()",
-                                 "deduct_for_cooking()", "revert_cooking()"], "service"),
-    C("RP", "PantryRepository", [], ["add_lot()", "get_lot()", "balances()", "add_transaction()", "set_status()"],
-      "repository"),
-    C("LO", "PantryLot", ["ingredient_id: UUID", "acquired_at: datetime", "initial_g: GramRange", "status: LotStatus"],
-      [], "domain"),
-    C("TX", "PantryTransaction", ["reason: TxReason", "delta_g: GramRange", "ref_id: UUID", "reverses_id: int"], [],
-      "domain"),
-    C("GR", "GramRange", ["g_min: float", "g_max: float"], ["clamp_zero()"], "value object")],
-   [("dep", "R", "S", "", "", ""), ("dep", "S", "RP", "", "", ""), ("dep", "RP", "LO", "", "", ""),
-    ("comp", "LO", "TX", "", "1", "1..*"), ("dep", "LO", "GR", "", "", "")],
-   {"R": (0, 0), "S": (0, 1), "RP": (0, 2), "LO": (1, 2), "TX": (2, 2), "GR": (1, 1)})
-cl("CL06b", "thiet-ke-pantry-tinh-toan", "CL06b — Thiết kế module pantry: quy đổi lượng và độ gấp", [
-    C("S", "PantryService", [], ["deduct_for_cooking()", "list_available_lots()"], "service"),
-    C("UC", "UrgencyCalculator", [], ["u_time()", "u_img()", "urgency()"], "domain service"),
-    C("QC", "QuantityConverter", [], ["from_count()", "from_level()"], "domain service"),
-    C("DP", "DeductionPlanner", [], ["plan()"], "domain service"),
-    C("UR", "Urgency", ["u: float", "source: str"], [], "value object"),
-    C("FP", "FreshnessProbs", ["p_tuoi: float", "p_dung_som: float", "p_dung_ngay: float", "p_kiem_tra: float"], [],
-      "value object")],
-   [("dep", "S", "UC", "", "", ""), ("dep", "S", "QC", "", "", ""), ("dep", "S", "DP", "", "", ""),
-    ("dep", "UC", "UR", "", "", ""), ("dep", "UC", "FP", "", "", "")],
-   {"S": (1, 0), "QC": (0, 1), "UC": (1, 1), "DP": (2, 1), "UR": (0, 2), "FP": (1, 2)})
-cl("CL07a", "thiet-ke-scan-dieu-phoi", "CL07a — Thiết kế module scan: điều phối và dữ liệu", [
-    C("R", "ScanRouter", [], ["create_scan()", "get_scan()", "update_item()", "confirm()", "discard()"], "router"),
-    C("S", "ScanService", [], ["create_scan()", "get_scan()", "confirm()", "discard()", "sweep_stuck_scans()"],
-      "service"),
-    C("RP", "ScanRepository", [], ["add_scan()", "get_scan()", "set_status()", "upsert_item()", "stuck_scans()"],
-      "repository"),
-    C("SC", "Scan", ["mode: ScanMode", "status: ScanStatus", "attempts: int", "enqueued_at: datetime"], [], "domain"),
-    C("SI", "ScanImage", ["ordinal: int", "shelf_group: int", "storage_key: str", "contributed: bool"], [], "domain"),
-    C("IT", "ScanItem", ["ingredient_id: UUID", "final_count: int", "qty_level: QtyLevel", "user_action: Action"], [],
-      "domain")],
-   [("dep", "R", "S", "", "", ""), ("dep", "S", "RP", "", "", ""), ("dep", "RP", "SC", "", "", ""),
-    ("comp", "SC", "SI", "", "1", "1..2"), ("comp", "SC", "IT", "", "1", "0..*")],
-   {"R": (0, 0), "S": (0, 1), "RP": (0, 2), "SC": (1, 2), "SI": (2, 2), "IT": (1, 1)})
-cl("CL07b", "thiet-ke-scan-nhan-dien", "CL07b — Thiết kế module scan: job nhận diện", [
-    C("J", "InferenceJob", [], ["warm_up()", "run()"], "worker job"),
-    C("IS", "ImageSanitizer", [], ["sanitize()"], "domain service"),
-    C("DM", "DetectionMerger", [], ["merge()"], "domain service"),
-    C("CB", "ChipBuilder", [], ["build()"], "domain service"),
-    C("DT", "Detection", ["box: Box", "confidence: float", "p_fresh: FreshnessProbs"], [], "domain"),
-    C("IT", "ScanItem", ["ingredient_id: UUID", "model_count: int"], [], "domain")],
-   [("dep", "J", "DM", "", "", ""), ("dep", "J", "CB", "", "", ""), ("dep", "DM", "DT", "", "", ""),
-    ("dep", "CB", "IT", "", "", ""), ("dep", "J", "IS", "", "", "")],
-   {"J": (1, 0), "IS": (0, 0), "DM": (0, 1), "CB": (2, 1), "DT": (0, 2), "IT": (2, 2)})
-cl("CL08a", "thiet-ke-cooking-dieu-phoi", "CL08a — Thiết kế module cooking: điều phối và dữ liệu", [
-    C("R", "CookingRouter", [], ["start()", "complete()", "undo()", "abandon()"], "router"),
-    C("S", "CookingService", [], ["start()", "complete()", "undo()", "abandon()"], "service"),
-    C("RP", "CookingRepository", [], ["add_session()", "lock_session()", "add_entries()", "transition()"],
-      "repository"),
-    C("CS", "CookSession", ["meal_plan_id: UUID", "status: SessionStatus", "serve_at: datetime", "burners: int",
-                            "completed_at: datetime"], [], "domain"),
-    C("SE", "ScheduleEntry", ["recipe_id: UUID", "step_no: int", "start_offset_s: int", "end_offset_s: int"], [],
-      "domain"),
-    C("CC", "CookCompletion", ["cook_session: CookSessionOut", "deductions: list", "interactions_recorded: int"], [],
-      "DTO")],
-   [("dep", "R", "S", "", "", ""), ("dep", "S", "RP", "", "", ""), ("dep", "RP", "CS", "", "", ""),
-    ("comp", "CS", "SE", "", "1", "1..*"), ("dep", "S", "CC", "", "", "")],
-   {"R": (0, 0), "S": (0, 1), "CC": (1, 1), "RP": (0, 2), "CS": (1, 2), "SE": (2, 2)})
-cl("CL08b", "thiet-ke-cooking-lap-lich", "CL08b — Thiết kế module cooking: lập lịch và hoàn tác", [
-    C("S", "CookingService", [], ["start()", "complete()", "undo()"], "service"),
-    C("SC", "CookScheduler", [], ["solve()"], "domain service"),
-    C("NC", "NeedCalculator", [], ["needs()"], "domain service"),
-    C("UP", "UndoPolicy", [], ["can_undo()"], "domain service"),
-    C("SH", "Schedule", ["entries: list", "makespan_s: int"], [], "value object"),
-    C("CS", "CookSession", ["status: SessionStatus", "completed_at: datetime"], [], "domain")],
-   [("dep", "S", "SC", "", "", ""), ("dep", "S", "NC", "", "", ""), ("dep", "S", "UP", "", "", ""),
-    ("dep", "SC", "SH", "", "", ""), ("dep", "UP", "CS", "", "", "")],
-   {"S": (1, 0), "SC": (0, 1), "NC": (1, 1), "UP": (2, 1), "SH": (0, 2), "CS": (2, 2)})
+# --- lớp liên kết (association class) và mô hình sau khi bỏ lớp liên kết
+# kiểu quan hệ "acls:<khoá lớp liên kết>": association a–b có lớp liên kết; lớp đó phải có trong classes.
+cl("CL09a", "lop-lien-ket-mon-mam", "CL09a — Lớp liên kết: thành phần món và món trong mâm", [
+    C("MON", "Món", ["tên: Chuỗi", "slot: Slot", "khẩuPhầnGốc: Số nguyên"]),
+    C("NL", "Nguyên liệu", ["tên: Chuỗi", "đếmĐược: Boolean"]),
+    C("TPM", "Thành phần món", ["lượng: Gam", "vaiTrò: VaiTròNL", "luônCó: Boolean"]),
+    C("MAM", "Mâm cơm", ["bữa: Bữa", "sốNgười: Số nguyên", "trạngThái: TrạngTháiMâm"]),
+    C("MTM", "Món trong mâm", ["slot: Slot", "hệSốKhẩuPhần: Số thực", "trạngThái: TrạngTháiMónMâm"])],
+   [("acls:TPM", "MON", "NL", "dùng", "0..*", "1..*"), ("acls:MTM", "MAM", "MON", "gồm", "0..*", "2..3")],
+   {"NL": (0, 0), "MON": (1, 0), "MAM": (2, 0), "TPM": (0, 1), "MTM": (2, 1)})
+cl("CL09b", "bo-lop-lien-ket-mon-mam", "CL09b — Sau khi bỏ lớp liên kết: thành phần món và món trong mâm", [
+    C("MON", "Món", ["tên: Chuỗi", "slot: Slot", "khẩuPhầnGốc: Số nguyên"]),
+    C("NL", "Nguyên liệu", ["tên: Chuỗi", "đếmĐược: Boolean"]),
+    C("TPM", "Thành phần món", ["lượng: Gam", "vaiTrò: VaiTròNL", "luônCó: Boolean"]),
+    C("MAM", "Mâm cơm", ["bữa: Bữa", "sốNgười: Số nguyên", "trạngThái: TrạngTháiMâm"]),
+    C("MTM", "Món trong mâm", ["slot: Slot", "hệSốKhẩuPhần: Số thực", "trạngThái: TrạngTháiMónMâm"])],
+   [("comp", "MON", "TPM", "", "1", "1..*"), ("assoc", "TPM", "NL", "là", "0..*", "1"),
+    ("comp", "MAM", "MTM", "", "1", "2..3"), ("assoc", "MTM", "MON", "là", "0..*", "1")],
+   {"NL": (0, 1), "TPM": (0, 0), "MON": (1, 0), "MTM": (2, 0), "MAM": (2, 1)})
+cl("CL09c", "lop-lien-ket-tru-kho-khao-sat", "CL09c — Lớp liên kết: lần trừ kho và phân công món khảo sát", [
+    C("PN", "Phiên nấu", ["giờDọn: Thời điểm", "trạngThái: TrạngTháiPhiên"]),
+    C("LO", "Lô kho", ["ngàyNhập: Thời điểm", "gMin: Gam", "gMax: Gam"]),
+    C("LT", "Lần trừ kho", ["deltaMin: Gam", "deltaMax: Gam", "độGấpLúcTrừ: Số thực", "hoànTácLúc: Thời điểm"]),
+    C("NTG", "Người tham gia khảo sát", ["kênh: KênhKhảoSát", "hoànTấtLúc: Thời điểm"]),
+    C("MON", "Món", ["tên: Chuỗi", "slot: Slot"]),
+    C("PC", "Phân công món", ["thứTự: Số nguyên", "điểm: 1..5", "chưaTừngĂn: Boolean"])],
+   [("acls:LT", "PN", "LO", "trừ từ", "0..*", "0..*"), ("acls:PC", "NTG", "MON", "được giao", "0..*", "1..*")],
+   {"PN": (0, 0), "LO": (1, 0), "LT": (0, 1), "NTG": (0, 2), "MON": (1, 2), "PC": (0, 3)})
+cl("CL09d", "bo-lop-lien-ket-tru-kho-khao-sat", "CL09d — Sau khi bỏ lớp liên kết: lần trừ kho và phân công món", [
+    C("PN", "Phiên nấu", ["giờDọn: Thời điểm", "trạngThái: TrạngTháiPhiên"]),
+    C("LT", "Lần trừ kho", ["deltaMin: Gam", "deltaMax: Gam", "độGấpLúcTrừ: Số thực", "hoànTácLúc: Thời điểm"]),
+    C("LO", "Lô kho", ["ngàyNhập: Thời điểm", "gMin: Gam", "gMax: Gam"]),
+    C("NTG", "Người tham gia khảo sát", ["kênh: KênhKhảoSát", "hoànTấtLúc: Thời điểm"]),
+    C("PC", "Phân công món", ["thứTự: Số nguyên", "điểm: 1..5", "chưaTừngĂn: Boolean"]),
+    C("MON", "Món", ["tên: Chuỗi", "slot: Slot"])],
+   [("assoc", "PN", "LT", "phát sinh", "1", "0..*"), ("assoc", "LT", "LO", "trừ từ", "0..*", "1"),
+    ("comp", "NTG", "PC", "", "1", "1..*"), ("assoc", "PC", "MON", "là", "0..*", "1")],
+   {"PN": (0, 0), "LT": (1, 0), "LO": (2, 0), "NTG": (0, 1), "PC": (1, 1), "MON": (2, 1)})
+
+# --- thiết kế theo tầng, khớp mã nguồn backend/src/tastoria và app/src (tên lớp, hàm, trường lấy đúng từ mã).
+# Hàm của module service nhận session: Session làm tham số đầu; tham số này được lược trên sơ đồ.
+OR, SV, MO, RT, SC, SR = "ORM", "service", "module", "router", "schema", "screen"
+cl("CL11a", "tang-model-quet-kho", "CL11a — Tầng model: lần quét và kho (SQLAlchemy)", [
+    C("SC", "Scan", ["mode: str", "status: str", "attempts: int", "enqueued_at: datetime", "confirmed_at: datetime"],
+      [], OR),
+    C("SI", "ScanImage", ["ordinal: int", "shelf_group: int", "storage_key: str", "contributed: bool",
+                          "purged_at: datetime"], [], OR),
+    C("DT", "Detection", ["vision_class_id: int", "confidence: float", "p_tuoi: float", "p_kiem_tra: float"], [], OR),
+    C("IT", "ScanItem", ["ingredient_id: UUID", "model_count: int", "final_count: int", "qty_level: str",
+                         "user_action: str"], [], OR),
+    C("LO", "PantryLot", ["ingredient_id: UUID", "initial_g_min: Decimal", "initial_g_max: Decimal",
+                          "acquired_at: datetime", "status: str"], [], OR),
+    C("TX", "PantryTransaction", ["delta_g_min: Decimal", "delta_g_max: Decimal", "reason: str", "ref_id: UUID",
+                                  "reverses_id: int"], [], OR)],
+   [("comp", "SC", "SI", "", "1", "1..2"), ("comp", "SC", "IT", "", "1", "0..*"), ("comp", "SI", "DT", "", "1", "0..*"),
+    ("assoc", "DT", "IT", "gộp vào", "0..*", "0..1"), ("assoc", "IT", "LO", "tạo", "0..1", "0..1"),
+    ("comp", "LO", "TX", "", "1", "1..*")],
+   {"SI": (0, 0), "SC": (1, 0), "DT": (0, 1), "IT": (1, 1), "LO": (2, 1), "TX": (2, 2)})
+cl("CL11b", "tang-model-mam-nau", "CL11b — Tầng model: mâm cơm và phiên nấu (SQLAlchemy)", [
+    C("PIN", "MealPlanPin", ["lot_id: UUID"], [], OR),
+    C("MP", "MealPlan", ["meal: str", "persons: int", "max_minutes: int", "status: str", "e_target_kcal: Decimal"],
+      [], OR),
+    C("MI", "MealPlanItem", ["slot: str", "recipe_id: UUID", "status: str", "servings_scale: Decimal",
+                             "replaced_item_id: UUID"], [], OR),
+    C("SUB", "MealPlanItemSubstitution", ["original_ingredient_id: UUID", "substitute_ingredient_id: UUID",
+                                          "grams: Decimal", "origin: str"], [], OR),
+    C("CS", "CookSession", ["status: str", "serve_at: datetime", "burners: int", "completed_at: datetime",
+                            "reverted_at: datetime"], [], OR),
+    C("SE", "CookScheduleEntry", ["recipe_id: UUID", "step_no: int", "start_offset_s: int", "end_offset_s: int"],
+      [], OR)],
+   [("comp", "MP", "PIN", "", "1", "0..2"), ("comp", "MP", "MI", "", "1", "1..*"), ("comp", "MI", "SUB", "", "1", "0..*"),
+    ("assoc", "MP", "CS", "được nấu", "1", "0..*"), ("comp", "CS", "SE", "", "1", "1..*")],
+   {"PIN": (0, 0), "MP": (1, 0), "MI": (2, 0), "CS": (1, 1), "SUB": (2, 1), "SE": (1, 2)})
+cl("CL12a", "tang-service-quet-kho", "CL12a — Tầng service: quét ảnh và kho", [
+    C("SS", "scan.service", [], ["create_scan(mode: str, raws: list[bytes]): ScanAccepted",
+                                 "get_scan(scan_id: UUID, wait: int): ScanOut",
+                                 "update_item(scan_id: UUID, item_id: UUID, body: ScanItemPatch): ScanItemOut",
+                                 "confirm(scan_id: UUID, body: ScanConfirmRequest): ScanConfirmResult",
+                                 "discard(scan_id: UUID): ScanOut"], MO),
+    C("PS", "pantry.service", [], ["lot_views(user_id: UUID): list[LotView]",
+                                   "apply_scan(user_id: UUID, mode: str, items: list[ScanLotInput]): ScanApplyResult",
+                                   "chip_grams(ing: IngredientView, count: int, level: str): tuple"], MO),
+    C("Q", "ScanQueue", [], ["enqueue(scan_id: UUID, attempt: int): None", "publish(scan_id: UUID, status: str): None"],
+      "class"),
+    C("WK", "scan.worker", [], ["infer(scan_id: str): str", "run_job(ctx: WorkerContext, scan_id: UUID): str"], MO),
+    C("DE", "Detector", ["conf: float", "iou: float"], ["detect(img: Image): list[Box]"], "class"),
+    C("AG", "scan.aggregate", [], ["build_chips(found: list[FoundBox], rules: dict): list[Chip]"], MO)],
+   [("dep", "SS", "PS", "", "", ""), ("dep", "SS", "Q", "", "", ""), ("dep", "WK", "Q", "", "", ""),
+    ("dep", "WK", "DE", "", "", ""), ("dep", "WK", "AG", "", "", "")],
+   {"SS": (0, 0), "PS": (1, 0), "Q": (0, 1), "WK": (0, 2), "DE": (1, 2), "AG": (0, 3)})
+cl("CL12b", "tang-service-ghep-mam", "CL12b — Tầng service: ghép mâm cơm", [
+    C("MS", "meal.service", [], ["create_plan(body: MealPlanCreate): Created", "accept_plan(plan_id: UUID): MealPlanOut",
+                                 "plan_for_cooking(user_id: UUID, plan_id: UUID): CookPlan"], MO),
+    C("CAT", "catalog.service", [], ["published_recipes(slot: str): list[RecipeView]",
+                                     "recipe_allowed(recipe: RecipeView, allergens: set, excluded_groups: set): bool"], MO),
+    C("RK", "Ranker", [], ["score(ctx: RankContext, recipes: list[RecipeView]): dict"], "interface"),
+    C("CP", "meal.composer", [], ["compose(p: Problem, structures: list): list[Tray]",
+                                  "shortfall(p: Problem, tray: Tray): list"], MO),
+    C("SH", "meal.schedule", [], ["solve(dishes: list[Dish], burners: int): Schedule",
+                                  "sequential(dishes: list[Dish]): Schedule"], MO)],
+   [("dep", "MS", "CAT", "", "", ""), ("dep", "MS", "RK", "", "", ""), ("dep", "MS", "CP", "", "", ""),
+    ("dep", "MS", "SH", "", "", "")],
+   {"RK": (1, 0), "SH": (0, 1), "MS": (1, 1), "CP": (2, 1), "CAT": (1, 2)})
+cl("CL12c", "tang-service-nau", "CL12c — Tầng service: nấu, hoàn tất và hoàn tác", [
+    C("CK", "cooking.service", [], ["create_session(body: CookSessionCreate): CookSessionOut",
+                                    "complete_session(cook_session_id: UUID, body: CookCompleteRequest): CookCompletion",
+                                    "undo_session(cook_session_id: UUID): CookSessionOut",
+                                    "abandon_session(cook_session_id: UUID): CookSessionOut"], MO),
+    C("MS", "meal.service", [], ["plan_for_cooking(user_id: UUID, plan_id: UUID): CookPlan",
+                                 "consumption(plan: CookPlan): list[Need]", "set_cooked(plan_id: UUID, cooked: bool): None"], MO),
+    C("PS", "pantry.service", [], ["deduct(user_id: UUID, cook_session_id: UUID, needs: list[Need]): tuple",
+                                   "reverse(user_id: UUID, cook_session_id: UUID): list[Deduction]"], MO),
+    C("EV", "events.service", [], ["record(user_id: UUID, events: list[Event]): bool"], MO)],
+   [("dep", "CK", "MS", "", "", ""), ("dep", "CK", "PS", "", "", ""), ("dep", "CK", "EV", "", "", "")],
+   {"MS": (0, 0), "CK": (0, 1), "EV": (1, 1), "PS": (0, 2)})
+cl("CL12d", "thanh-phan-loi", "CL12d — Thành phần lõi: giao dịch, lũy đẳng, xác thực, lỗi", [
+    C("UW", "UnitOfWork", ["session: Session"], ["after_commit(fn: Callable): None", "run_after_commit(): None"], "class"),
+    C("ID", "core.idempotency", [], ["begin(user_id: UUID, idem: IdempotencyRequest): JSONResponse",
+                                     "finish(user_id: UUID, idem: IdempotencyRequest, status: int, body: object): JSONResponse",
+                                     "purge_expired(): int"], MO),
+    C("IR", "IdempotencyRequest", ["key: str", "request_sha256: bytes"], [], "dataclass"),
+    C("AU", "AuthUser", ["id: UUID", "role: str", "email: str"], [], "dataclass"),
+    C("AT", "core.auth", [], ["current_user(request: Request, uow: UnitOfWork): AuthUser"], MO),
+    C("ER", "ApiError", ["status: int", "code: ProblemCode", "commit: bool"], [], "exception")],
+   [("dep", "ID", "IR", "", "", ""), ("dep", "ID", "UW", "", "", ""), ("dep", "AT", "AU", "", "", ""),
+    ("dep", "AT", "UW", "", "", ""), ("dep", "UW", "ER", "", "", "")],
+   {"IR": (0, 0), "ID": (1, 0), "UW": (1, 1), "ER": (2, 1), "AT": (1, 2), "AU": (0, 2)})
+cl("CL13a", "tang-api-quet-kho", "CL13a — Tầng API: router và schema của quét, kho", [
+    C("SR", "scan.router", [], ["create_scan(mode: ScanMode, images: list[UploadFile]): Response",
+                                "get_scan(id: UUID, wait: int): ScanOut",
+                                "update_item(id: UUID, itemId: UUID, body: ScanItemPatch): ScanItemOut",
+                                "confirm(id: UUID, body: ScanConfirmRequest): ScanConfirmResult",
+                                "discard(id: UUID): JSONResponse"], RT),
+    C("PR", "pantry.router", [], ["list_lots(status: list[LotStatus], sort: str): PantryLotPage", "create_lot(body: PantryLotCreate): PantryLotOut",
+                                  "update_lot(id: UUID, body: PantryLotPatch): PantryLotOut",
+                                  "discard_lot(id: UUID): PantryLotOut"], RT),
+    C("SO", "ScanOut", ["id: UUID", "mode: ScanMode", "status: ScanStatus", "attempts: int"], [], SC),
+    C("CR", "ScanConfirmResult", ["scan_id: UUID", "confirmed_at: datetime", "created_lot_ids: list[UUID]",
+                                  "not_seen_lot_ids: list[UUID]"], [], SC),
+    C("LC", "PantryLotCreate", ["ingredient_id: UUID", "quantity: QuantityInput", "acquired_at: datetime"], [], SC),
+    C("LOU", "PantryLotOut", ["ingredient_id: UUID", "balance_g_min: float", "balance_g_max: float",
+                              "acquired_at: datetime", "status: LotStatus"], [], SC)],
+   [("dep", "SR", "SO", "", "", ""), ("dep", "SR", "CR", "", "", ""), ("dep", "PR", "LC", "", "", ""),
+    ("dep", "PR", "LOU", "", "", "")],
+   {"SO": (0, 0), "SR": (1, 0), "CR": (2, 0), "LC": (0, 1), "PR": (1, 1), "LOU": (2, 1)})
+cl("CL13b", "tang-api-mam-nau", "CL13b — Tầng API: router và schema của mâm cơm, nấu", [
+    C("MR", "meal.router", [], ["create_plan(body: MealPlanCreate): JSONResponse", "get_plan(id: UUID): MealPlanOut",
+                                "accept_plan(id: UUID): MealPlanOut",
+                                "swap_item(id: UUID, itemId: UUID, body: SwapRequest): MealPlanOut",
+                                "list_substitutes(id: UUID, itemId: UUID): list"], RT),
+    C("CR", "cooking.router", [], ["create_session(body: CookSessionCreate): JSONResponse",
+                                   "complete_session(id: UUID, body: CookCompleteRequest): JSONResponse",
+                                   "undo_session(id: UUID): CookSessionOut",
+                                   "abandon_session(id: UUID): CookSessionOut"], RT),
+    C("MC", "MealPlanCreate", ["meal: Meal", "persons: int", "max_minutes: int", "coeater_allergen_codes: list[str]",
+                               "pinned_lot_ids: list[UUID]"], [], SC),
+    C("MO", "MealPlanOut", ["status: PlanStatus", "e_target_kcal: float", "rice_bowls_per_person: float",
+                            "reason_vi: str", "items: list[MealPlanItemOut]"], [], SC),
+    C("CQ", "CookCompleteRequest", ["completed_at: datetime", "feedback: list[DishFeedback]"], [], SC),
+    C("CC", "CookCompletion", ["cook_session: CookSessionOut", "deductions: list[PantryDeductionOut]",
+                               "interactions_recorded: bool", "shortfalls: list[ShortfallOut]"], [], SC)],
+   [("dep", "MR", "MC", "", "", ""), ("dep", "MR", "MO", "", "", ""), ("dep", "CR", "CQ", "", "", ""),
+    ("dep", "CR", "CC", "", "", "")],
+   {"MC": (0, 0), "MR": (1, 0), "MO": (2, 0), "CQ": (0, 1), "CR": (1, 1), "CC": (2, 1)})
+cl("CL14a", "tang-giao-dien-quet-kho", "CL14a — Tầng giao diện: màn hình quét và kho (Expo)", [
+    C("SN", "Scan", ["images: list"], ["add(camera: boolean): void", "send(): void"], SR),
+    C("CF", "ConfirmScan", ["scan: ScanOut"], ["confirm(): ScanConfirmResult", "discard(): ScanOut", "reload(): void"], SR),
+    C("EC", "EditChip", ["item: ScanItemOut"], ["save(): void", "del(): void"], SR),
+    C("PA", "Pantry", ["lots: PantryLotPage"], [], SR),
+    C("EL", "EditLotSheet", ["lot: PantryLotOut"], ["patch(): PantryLotOut", "discard(): PantryLotOut"], SR),
+    C("CL", "api/client", [], ["call(p: Promise): T", "refreshSession(): AuthSession"], MO)],
+   [("comp", "CF", "EC", "", "1", "0..*"), ("comp", "PA", "EL", "", "1", "0..1"), ("dep", "SN", "CL", "", "", ""),
+    ("dep", "CF", "CL", "", "", ""), ("dep", "PA", "CL", "", "", "")],
+   {"SN": (0, 0), "CF": (1, 0), "EC": (2, 0), "CL": (1, 1), "PA": (1, 2), "EL": (2, 2)})
+cl("CL14b", "tang-giao-dien-mam-nau", "CL14b — Tầng giao diện: màn hình mâm cơm và nấu (Expo)", [
+    C("TS", "TrayScreen", ["meal: Meal"], ["useCreatePlan(meal: Meal): Mutation"], SR),
+    C("PV", "PlanView", ["plan: MealPlanOut"], ["swap(): MealPlanOut", "cook(): CookSessionOut"], SR),
+    C("MS", "Missing", ["item: MealPlanItemOut"], ["apply(): MealPlanOut"], SR),
+    C("CO", "Cooking", ["session: CookSessionOut"], ["abandon(): CookSessionOut"], SR),
+    C("FI", "Finished", ["session: CookSessionOut"], ["finish(): void", "undo(): CookSessionOut"], SR),
+    C("OB", "lib/outbox", [], ["enqueueComplete(sessionId: string, body: CookCompleteRequest): void", "flush(): void",
+                               "getCompleteOutcome(sessionId: string): CompleteOutcome"], MO)],
+   [("comp", "TS", "PV", "", "1", "0..1"), ("comp", "PV", "MS", "", "1", "0..*"), ("dep", "PV", "CO", "", "", ""),
+    ("dep", "CO", "FI", "", "", ""), ("dep", "FI", "OB", "", "", "")],
+   {"TS": (0, 0), "PV": (1, 0), "MS": (2, 0), "CO": (1, 1), "FI": (1, 2), "OB": (2, 2)})
 
 
 # Chữ ký thao tác (tham số và kiểu trả về) áp cho mọi sơ đồ lớp; khoá = (tên lớp, tên thao tác).
@@ -935,82 +1078,6 @@ SIG = {
     ("Màn hình Nấu xong", "nấuXong"): "nấuXong(phiên: PhiênNấu): KếtQuả",
     ("Trừ kho theo độ gấp", "trừKho"): "trừKho(nhuCầu: NhuCầu[*]): GiaoDịch[*]",
     ("Trừ kho theo độ gấp", "tínhLượngDùng"): "tínhLượngDùng(mâm: Mâm): NhuCầu[*]",
-    ("HardFilter", "filter"): "filter(recipes: list, c: MealConstraints): list",
-    ("MakespanEstimator", "estimate"): "estimate(steps: list, burners: int): int",
-    ("MealRepository", "add_plan"): "add_plan(plan: MealPlan): None",
-    ("MealRepository", "get_plan"): "get_plan(user_id: UUID, plan_id: UUID): MealPlan",
-    ("MealRepository", "set_status"): "set_status(plan_id: UUID, status: PlanStatus): None",
-    ("MealRepository", "swap_out"): "swap_out(item_id: UUID, new_item: MealPlanItem): None",
-    ("MealRouter", "accept"): "accept(id: UUID): MealPlanOut",
-    ("MealRouter", "choose_substitution"): "choose_substitution(id: UUID, item_id: UUID): ItemOut",
-    ("MealRouter", "create_plan"): "create_plan(req: MealPlanRequest): MealPlanOut",
-    ("MealRouter", "list_substitutes"): "list_substitutes(id: UUID, item_id: UUID): list",
-    ("MealRouter", "swap"): "swap(id: UUID, item_id: UUID, req: SwapRequest): MealPlanOut",
-    ("MealService", "accept"): "accept(user_id: UUID, plan_id: UUID): MealPlanOut",
-    ("MealService", "choose_substitution"): "choose_substitution(plan_id: UUID, item_id: UUID): ItemOut",
-    ("MealService", "create_plan"): "create_plan(user_id: UUID, req: MealPlanRequest): MealPlanOut",
-    ("MealService", "get_plan_for_cooking"): "get_plan_for_cooking(user_id: UUID, plan_id: UUID): PlanForCooking",
-    ("MealService", "swap_item"): "swap_item(plan_id: UUID, item_id: UUID, reason: SwapReason): MealPlanOut",
-    ("ReasonBuilder", "build"): "build(best: TrayScore, runner_up: TrayScore): str",
-    ("TasteRanker", "score"): "score(user_id: UUID, recipes: list): dict",
-    ("TrayComposer", "compose"): "compose(cands: dict, stock: StockView): list",
-    ("TrayComposer", "resolve_swap"): "resolve_swap(plan: MealPlan, slot: Slot): TrayResult",
-    ("DeductionPlanner", "plan"): "plan(needs: list, lots: list): list",
-    ("GramRange", "clamp_zero"): "clamp_zero(): GramRange",
-    ("PantryRepository", "add_lot"): "add_lot(lot: PantryLot): None",
-    ("PantryRepository", "add_transaction"): "add_transaction(tx: PantryTransaction): int",
-    ("PantryRepository", "balances"): "balances(lot_ids: list): dict",
-    ("PantryRepository", "get_lot"): "get_lot(user_id: UUID, lot_id: UUID): PantryLot",
-    ("PantryRepository", "set_status"): "set_status(lot_id: UUID, status: LotStatus): None",
-    ("PantryRouter", "add_lot"): "add_lot(req: LotCreate): LotOut",
-    ("PantryRouter", "discard_lot"): "discard_lot(id: UUID): LotOut",
-    ("PantryRouter", "list_lots"): "list_lots(status: LotStatus): list",
-    ("PantryRouter", "update_lot"): "update_lot(id: UUID, req: LotPatch): LotOut",
-    ("PantryService", "add_lots_from_scan"): "add_lots_from_scan(user_id: UUID, items: list): list",
-    ("PantryService", "deduct_for_cooking"): "deduct_for_cooking(user_id: UUID, needs: list): list",
-    ("PantryService", "list_available_lots"): "list_available_lots(user_id: UUID, at: datetime): list",
-    ("PantryService", "mark_not_seen"): "mark_not_seen(user_id: UUID, seen: set): int",
-    ("PantryService", "revert_cooking"): "revert_cooking(user_id: UUID, session_id: UUID): list",
-    ("QuantityConverter", "from_count"): "from_count(grams_per_unit: float, count: int): GramRange",
-    ("QuantityConverter", "from_level"): "from_level(level: GramRange): GramRange",
-    ("UrgencyCalculator", "u_img"): "u_img(probs: FreshnessProbs): float",
-    ("UrgencyCalculator", "u_time"): "u_time(acquired_at: datetime, now: datetime): float",
-    ("UrgencyCalculator", "urgency"): "urgency(lot: PantryLot, now: datetime): Urgency",
-    ("ChipBuilder", "build"): "build(counts: dict, class_map: ClassMap): list",
-    ("DetectionMerger", "merge"): "merge(dets: list, shelf_groups: dict): dict",
-    ("ImageSanitizer", "sanitize"): "sanitize(data: bytes): SanitizedImage",
-    ("InferenceJob", "run"): "run(scan_id: UUID): None",
-    ("InferenceJob", "warm_up"): "warm_up(): None",
-    ("ScanRepository", "add_scan"): "add_scan(scan: Scan): None",
-    ("ScanRepository", "get_scan"): "get_scan(user_id: UUID, scan_id: UUID): Scan",
-    ("ScanRepository", "set_status"): "set_status(scan_id: UUID, status: ScanStatus): None",
-    ("ScanRepository", "stuck_scans"): "stuck_scans(now: datetime): list",
-    ("ScanRepository", "upsert_item"): "upsert_item(item: ScanItem): None",
-    ("ScanRouter", "confirm"): "confirm(id: UUID): ConfirmOut",
-    ("ScanRouter", "create_scan"): "create_scan(mode: ScanMode, images: list): ScanAccepted",
-    ("ScanRouter", "discard"): "discard(id: UUID): ScanOut",
-    ("ScanRouter", "get_scan"): "get_scan(id: UUID, wait: int): ScanOut",
-    ("ScanRouter", "update_item"): "update_item(id: UUID, item_id: UUID, req: ItemPatch): ItemOut",
-    ("ScanService", "confirm"): "confirm(user_id: UUID, scan_id: UUID): ConfirmOut",
-    ("ScanService", "create_scan"): "create_scan(user_id: UUID, mode: ScanMode, images: list): ScanAccepted",
-    ("ScanService", "discard"): "discard(user_id: UUID, scan_id: UUID): ScanOut",
-    ("ScanService", "get_scan"): "get_scan(user_id: UUID, scan_id: UUID, wait_s: int): ScanOut",
-    ("ScanService", "sweep_stuck_scans"): "sweep_stuck_scans(now: datetime): int",
-    ("CookScheduler", "solve"): "solve(steps: list, burners: int, serve_at: datetime): Schedule",
-    ("CookingRepository", "add_entries"): "add_entries(session_id: UUID, entries: list): None",
-    ("CookingRepository", "add_session"): "add_session(s: CookSession): None",
-    ("CookingRepository", "lock_session"): "lock_session(session_id: UUID): CookSession",
-    ("CookingRepository", "transition"): "transition(session_id: UUID, to: SessionStatus): bool",
-    ("CookingRouter", "abandon"): "abandon(id: UUID): CookSessionOut",
-    ("CookingRouter", "complete"): "complete(id: UUID, req: CookCompleteRequest): CookCompletion",
-    ("CookingRouter", "start"): "start(req: CookStartRequest): CookSessionOut",
-    ("CookingRouter", "undo"): "undo(id: UUID): CookSessionOut",
-    ("CookingService", "abandon"): "abandon(user_id: UUID, session_id: UUID): CookSessionOut",
-    ("CookingService", "complete"): "complete(user_id: UUID, session_id: UUID): CookCompletion",
-    ("CookingService", "start"): "start(user_id: UUID, req: CookStartRequest): CookSessionOut",
-    ("CookingService", "undo"): "undo(user_id: UUID, session_id: UUID, now: datetime): CookSessionOut",
-    ("NeedCalculator", "needs"): "needs(plan: PlanForCooking, recipes: dict): list",
-    ("UndoPolicy", "can_undo"): "can_undo(session: CookSession, now: datetime): bool",
 }
 for _d in DIAGRAMS:
     if _d["kind"] == "class":
@@ -1041,11 +1108,9 @@ struct("comp", "CP01a", "he-thong", "CP01a — Thành phần: các khối chạy
 struct("comp", "CP01b", "ket-noi-ngoai", "CP01b — Thành phần: kết nối với hệ thống ngoài", [
     box("App", "App Tastoria (Expo)", "client"), box("CF", "Cloudflare Tunnel", "external"),
     box("Api", "API (FastAPI)", "process"), box("Sched", "Scheduler (cron)", "process"),
-    box("Smtp", "Dịch vụ email (SMTP)", "external"), box("Ls", "Công cụ gán nhãn (Label Studio)", "external"),
-    box("Drive", "Google Drive (rclone)", "external")],
-   [("App", "CF", "HTTPS"), ("CF", "Api", "tunnel"), ("Api", "Smtp", "SMTP"), ("Api", "Ls", "REST"),
-    ("Sched", "Drive", "sao lưu")],
-   {"App": (0, 0), "CF": (1, 0), "Api": (2, 0), "Smtp": (3, 0), "Ls": (3, 1), "Sched": (2, 1), "Drive": (2, 2)})
+    box("Smtp", "Dịch vụ email (SMTP)", "external"), box("Drive", "Google Drive (rclone)", "external")],
+   [("App", "CF", "HTTPS"), ("CF", "Api", "tunnel"), ("Api", "Smtp", "SMTP"), ("Sched", "Drive", "sao lưu")],
+   {"App": (0, 0), "CF": (1, 0), "Api": (2, 0), "Smtp": (3, 0), "Sched": (2, 1), "Drive": (2, 2)})
 MODS = {mm["name"]: mm for mm in META["modules"]}
 
 
@@ -1067,6 +1132,16 @@ mod_struct("CP01e", "module-nhan-su-tac-vu", "CP01e — Thành phần: module nh
            {"journal": (0, 0), "admin": (2, 0), "jobs": (4, 0), "survey": (0, 1), "mlops": (1, 1),
             "identity": (4, 1), "scan": (3, 2), "privacy": (2, 2)})
 
+struct("comp", "CP02", "phan-tang", "CP02 — Thành phần: các tầng từ màn hình tới cơ sở dữ liệu", [
+    box("App", "Màn hình Expo (app/src/app)", "view"), box("Client", "api/client, lib/outbox", "proxy"),
+    box("Router", "router.py (FastAPI)", "API"), box("Core", "core: UnitOfWork, idempotency, auth", "core"),
+    box("Service", "service.py, composer, schedule", "service"), box("Models", "models.py (SQLAlchemy)", "model"),
+    box("Worker", "scan.worker (RQ, ONNX Runtime)", "process"), box("Pg", "PostgreSQL 18", "database")],
+   [("App", "Client", "gọi hàm"), ("Client", "Router", "HTTPS, JSON"), ("Router", "Service", "gọi hàm"),
+    ("Router", "Core", "Depends"), ("Service", "Models", "đọc, ghi"), ("Worker", "Models", "ghi kết quả"),
+    ("Models", "Pg", "SQL")],
+   {"App": (0, 0), "Client": (0, 1), "Router": (0, 2), "Core": (1, 2), "Service": (0, 3), "Models": (0, 4),
+    "Worker": (1, 4), "Pg": (0, 5)})
 struct("deploy", "DP01a", "thiet-bi-ket-noi", "DP01a — Triển khai: thiết bị và kết nối", [
     box("Phone", "Điện thoại Android\n(App APK)", "device"), box("Browser", "Trình duyệt\n(web app, landing)", "device"),
     box("CF", "Cloudflare edge", "cloud"), box("Lab", "Máy chủ lab\n(Docker Compose)", "device"),
@@ -1102,17 +1177,116 @@ struct("pkg", "PG01a", "goi-tong-the", "PG01a — Gói: bố cục mã nguồn t
     "Land": (3, 3)})
 struct("pkg", "PG01b", "cau-truc-module", "PG01b — Gói: cấu trúc một module (ví dụ meal)", [
     box("M", "tastoria.modules.meal", "M11"),
-    box("Router", "router.py", None, "M"), box("Service", "service.py", "public", "M"),
-    box("Repo", "repository.py", None, "M"), box("Domain", "domain.py", None, "M"),
-    box("Schemas", "schemas.py", None, "M"), box("Tables", "tables.py", None, "M")],
-   [("Router", "Service", ""), ("Router", "Schemas", ""), ("Service", "Repo", ""), ("Service", "Domain", ""),
-    ("Repo", "Tables", "")],
-   {"Router": (0, 0), "Schemas": (1, 0), "Service": (0, 1), "Domain": (1, 1), "Repo": (0, 2), "Tables": (1, 2)})
+    box("Router", "router.py", None, "M"), box("Schemas", "schemas.py", None, "M"),
+    box("Service", "service.py", "public", "M"), box("Models", "models.py", None, "M"),
+    box("Composer", "composer.py", None, "M"), box("Schedule", "schedule.py", None, "M"),
+    box("Ranker", "ranker.py", None, "M")],
+   [("Router", "Service", ""), ("Router", "Schemas", ""), ("Service", "Models", ""), ("Service", "Composer", ""),
+    ("Service", "Schedule", ""), ("Service", "Ranker", "")],
+   {"Router": (1, 0), "Schemas": (2, 0), "Schedule": (0, 1), "Service": (1, 1), "Composer": (2, 1),
+    "Models": (1, 2), "Ranker": (2, 2)})
 struct("pkg", "PG01c", "goi-app", "PG01c — Gói: ứng dụng Expo", [
     box("A", "app", None), box("Routes", "app/app (expo-router)", None, "A"), box("Api", "src/api", None, "A"),
     box("Off", "src/offline", None, "A"), box("Ui", "src/ui", None, "A")],
    [("Routes", "Api", ""), ("Routes", "Off", ""), ("Routes", "Ui", ""), ("Off", "Api", "outbox")],
    {"Routes": (1, 0), "Ui": (0, 1), "Off": (1, 1), "Api": (2, 1)})
+
+
+# =====================================================================  LUỒNG DỮ LIỆU (DFD, ký pháp Yourdon–DeMarco)
+# Kho dữ liệu: nhóm bảng có cùng vòng đời (bảng thật ở model.yaml/tables). Mỗi sơ đồ mức 1 vẽ một quá trình với mọi
+# tác nhân ngoài và kho mà nó đọc/ghi; luồng giữa các quá trình đi qua kho (Tastoria không gọi chéo giữa các bước).
+DFD_STORES = {
+    "D1": "Tài khoản, hồ sơ và đồng ý",
+    "D2": "Danh mục món và nguyên liệu",
+    "D3": "Lần quét và ảnh",
+    "D4": "Kho nguyên liệu (lô, giao dịch)",
+    "D5": "Mâm cơm",
+    "D6": "Phiên nấu và lịch",
+    "D7": "Tương tác",
+    "D8": "Khảo sát gu",
+    "D9": "Phiên bản mô hình",
+    "D10": "Yêu cầu dữ liệu và kiểm toán",
+}
+DFD_ENTS = {"E1": "Người dùng", "E2": "Người tham gia khảo sát", "E3": "Quản trị viên",
+            "E4": "Người biên soạn công thức", "E5": "Người vận hành mô hình", "E6": "Dịch vụ email",
+            "E7": "Kho sao lưu ngoài"}
+
+
+def S(k, ins="", outs=""):
+    """Vệ tinh của sơ đồ sao: ins = luồng vào quá trình trung tâm, outs = luồng ra (chuỗi rỗng: không có)."""
+    typ = "E" if k.startswith("E") else "S"
+    name = DFD_ENTS[k] if typ == "E" else DFD_STORES[k]
+    return (k, typ, name, ins, outs)
+
+
+def dfd(did, slug, title, center, sats):
+    return D("dfd", did, slug, title, center=center, sats=list(sats))
+
+
+dfd("DFD00", "ngu-canh", "DFD00 — Sơ đồ ngữ cảnh của Tastoria", ("0", "Hệ thống Tastoria"), [
+    S("E1", "ảnh tủ lạnh, hồ sơ, yêu cầu mâm, nấu xong", "chip, kho, mâm, lịch nấu, nhật ký"),
+    S("E2", "điểm gu món", "phiếu khảo sát"),
+    S("E3", "quyết định xử lý yêu cầu", "hàng đợi yêu cầu, nhật ký kiểm toán"),
+    S("E4", "bộ công thức, cặp thay thế", "kết quả kiểm tra khi nhập"),
+    S("E5", "tệp mô hình, lệnh triển khai, đợt khảo sát", "kết quả kiểm định, bản xuất khảo sát"),
+    S("E6", "", "thư đặt lại mật khẩu"),
+    S("E7", "", "bản sao lưu mã hoá")])
+dfd("DFD01a", "qua-trinh-1-tai-khoan", "DFD01a — Mức 1, quá trình 1.0 Quản lý tài khoản, hồ sơ và đồng ý",
+    ("1.0", "Quản lý tài khoản, hồ sơ và đồng ý"), [
+    S("E1", "đăng ký, đăng nhập, hồ sơ, đồng ý", "phiên đăng nhập, hồ sơ, mục tiêu kcal"),
+    S("E6", "", "thư đặt lại mật khẩu"),
+    S("D1", "tài khoản, đồng ý hiện hành", "tài khoản, hồ sơ, sự kiện đồng ý"),
+    S("D2", "nhóm dị ứng, chế độ ăn, món hay ăn", ""),
+    S("D10", "", "yêu cầu tải, xoá, rút đồng ý")])
+dfd("DFD01b", "qua-trinh-2-quet", "DFD01b — Mức 1, quá trình 2.0 Quét và xác nhận nguyên liệu",
+    ("2.0", "Quét và xác nhận nguyên liệu"), [
+    S("E1", "1–2 ảnh, chế độ quét, chip đã sửa, xác nhận", "chip nguyên liệu, trạng thái quét"),
+    S("D3", "ảnh, khung, chip", "lần quét, ảnh, chip"),
+    S("D9", "mô hình đang triển khai, bản đồ lớp", ""),
+    S("D2", "lớp thị giác, quy đổi lượng", ""),
+    S("D4", "lô đang có (chế độ toàn tủ)", "lô mới, lô not_seen")])
+dfd("DFD01c", "qua-trinh-3-kho", "DFD01c — Mức 1, quá trình 3.0 Quản lý kho",
+    ("3.0", "Quản lý kho"), [
+    S("E1", "thêm, sửa lượng, bỏ lô", "lô, số dư, nhãn độ gấp"),
+    S("D4", "lô, giao dịch", "lô mới, giao dịch manual_edit, discard"),
+    S("D2", "nguyên liệu, hạn dùng, quy đổi", "")])
+dfd("DFD01d", "qua-trinh-4-mam", "DFD01d — Mức 1, quá trình 4.0 Ghép và điều chỉnh mâm cơm",
+    ("4.0", "Ghép và điều chỉnh mâm cơm"), [
+    S("E1", "bữa, số người, thời gian, lô ghim, đổi món", "mâm, lý do, nguyên liệu thiếu"),
+    S("D1", "dị ứng, chế độ ăn, kcal mục tiêu, đồng ý", ""),
+    S("D2", "món đã xuất bản, thành phần, bước", ""),
+    S("D4", "lô khả dụng, độ gấp", ""),
+    S("D5", "mâm hiện có", "mâm, món trong mâm, thay thế"),
+    S("D7", "", "served, swapped")])
+dfd("DFD01e", "qua-trinh-5-nau", "DFD01e — Mức 1, quá trình 5.0 Nấu, hoàn tất và hoàn tác",
+    ("5.0", "Nấu, hoàn tất và hoàn tác"), [
+    S("E1", "giờ dọn, nấu xong, đánh giá, hoàn tác", "lịch nấu, phần đã trừ, thiếu hụt"),
+    S("D5", "mâm đã nhận", "trạng thái cooked"),
+    S("D2", "bước nấu, thành phần", ""),
+    S("D6", "phiên đang nấu", "phiên nấu, lịch"),
+    S("D4", "lô khả dụng", "giao dịch cook_deduct, undo"),
+    S("D7", "", "cooked, liked, undone")])
+dfd("DFD01f", "qua-trinh-6-khao-sat", "DFD01f — Mức 1, quá trình 6.0 Khảo sát gu",
+    ("6.0", "Khảo sát gu"), [
+    S("E2", "đồng ý, điểm 1–5 từng món", "món cần chấm"),
+    S("E5", "phiếu khảo sát, lệnh xuất", "bản xuất điểm"),
+    S("D8", "phiếu, phân công món", "người tham gia, điểm"),
+    S("D2", "món đã xuất bản", "")])
+dfd("DFD01g", "qua-trinh-7-bien-soan", "DFD01g — Mức 1, quá trình 7.0 Biên soạn danh mục",
+    ("7.0", "Biên soạn danh mục"), [
+    S("E4", "bộ YAML công thức, nguyên liệu, cặp thay thế", "số thay đổi, lỗi kiểm tra"),
+    S("D2", "phiên bản món hiện có", "món, nguyên liệu, dinh dưỡng, cặp thay thế")])
+dfd("DFD01h", "qua-trinh-8-mo-hinh", "DFD01h — Mức 1, quá trình 8.0 Vận hành mô hình",
+    ("8.0", "Vận hành mô hình"), [
+    S("E5", "tệp ONNX, register, gate, deploy, rollback", "kết quả gate, danh sách phiên bản"),
+    S("D9", "phiên bản, triển khai hiện hành", "phiên bản, bản đồ lớp, con trỏ triển khai"),
+    S("D2", "lớp thị giác", "")])
+dfd("DFD01i", "qua-trinh-9-yeu-cau-du-lieu", "DFD01i — Mức 1, quá trình 9.0 Xử lý yêu cầu dữ liệu",
+    ("9.0", "Xử lý yêu cầu dữ liệu"), [
+    S("E3", "quyết định xử lý", "hàng đợi yêu cầu, nhật ký kiểm toán"),
+    S("D10", "yêu cầu đang chờ", "trạng thái yêu cầu, kiểm toán"),
+    S("D1", "dữ liệu của chủ thể", "xoá, xoá theo mục đích"),
+    S("E1", "", "tệp dữ liệu cá nhân")])
 
 
 # =====================================================================  ERD
@@ -1173,7 +1347,7 @@ CHEN_GROUPS = {
                ["NGUOIKS", "PHIEUKS", "DIEUKHOAN", "PHANCONG", "MON", "DIEMKS"]),
 }
 
-FOLDER = {"uc": "usecase", "ctx": "context", "seq": "sequence", "act": "activity", "state": "state",
+FOLDER = {"uc": "usecase", "ctx": "context", "dfd": "dfd", "seq": "sequence", "act": "activity", "state": "state",
           "class": "class", "comp": "component", "deploy": "deployment", "pkg": "package"}
 
 

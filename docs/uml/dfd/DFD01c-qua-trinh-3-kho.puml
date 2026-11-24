@@ -1,0 +1,20 @@
+@startuml
+title DFD01c — Mức 1, quá trình 3.0 Quản lý kho
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+
+usecase "3.0\nQuản lý kho" as P
+rectangle "Người dùng" as E1
+database "D4 Kho nguyên liệu (lô, giao dịch)" as D4
+database "D2 Danh mục món và nguyên liệu" as D2
+E1 --> P : thêm, sửa lượng, bỏ lô
+P --> E1 : lô, số dư, nhãn độ gấp
+D4 --> P : lô, giao dịch
+P --> D4 : lô mới, giao dịch manual_edit, discard
+D2 --> P : nguyên liệu, hạn dùng, quy đổi
+@enduml

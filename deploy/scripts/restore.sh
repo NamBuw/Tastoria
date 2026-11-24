@@ -17,6 +17,19 @@ trap cleanup EXIT
 gpg --batch --quiet --decrypt --pinentry-mode loopback --passphrase-fd 3 "$file" 3<<<"$pass" | tar xf - -C "$work"
 cat "$work/MANIFEST"
 
+role_sql="DO \$\$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_app') THEN
+        CREATE ROLE tastoria_app LOGIN;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_jobs') THEN
+        CREATE ROLE tastoria_jobs LOGIN;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_migrator') THEN
+        CREATE ROLE tastoria_migrator NOLOGIN;
+    END IF;
+END \$\$;"
+
 count_sql="select 'published_recipes='||count(*) from recipes where status='published'
   union all select 'users='||count(*) from users
   union all select 'alembic='||version_num from alembic_version"
@@ -27,6 +40,7 @@ if [ "$verify" = 1 ]; then
     -e POSTGRES_PASSWORD=verify pgvector/pgvector:pg18 >/dev/null
   for _ in $(seq 60); do docker exec "$tmpc" pg_isready -U tastoria -d tastoria -q 2>/dev/null && break; sleep 1; done
   sleep 2
+  docker exec "$tmpc" psql -U tastoria -d postgres -v ON_ERROR_STOP=1 -c "$role_sql"
   docker exec -i "$tmpc" pg_restore -U tastoria -d tastoria --no-owner --exit-on-error < "$work/db.dump"
   docker exec "$tmpc" psql -U tastoria -d tastoria -Atc "$count_sql"
   log "tệp trong bản sao lưu: $(tar tzf "$work/files.tar.gz" | grep -vc '/$') tệp"
@@ -38,16 +52,33 @@ read -r -p "Ghi đè CSDL và tệp đang chạy bằng $(basename "$file")? Gõ
 [ "$ans" = "khoi phuc" ] || die "đã huỷ"
 log "sao lưu trạng thái hiện tại trước khi ghi đè"
 "$DEPLOY_DIR/scripts/backup.sh" --local-only --label pre-restore
-dc stop nginx api scheduler
-dc exec -T postgres psql -U tastoria -d postgres -v ON_ERROR_STOP=1 \
+dc stop nginx api worker scheduler
+dc exec -T valkey valkey-cli FLUSHDB
+dc exec -T postgres psql -U tastoria -d postgres -v ON_ERROR_STOP=1 -c "$role_sql" \
   -c "select pg_terminate_backend(pid) from pg_stat_activity where datname='tastoria' and pid<>pg_backend_pid()" \
   -c "drop database tastoria" -c "create database tastoria owner tastoria"
 dc exec -T postgres pg_restore -U tastoria -d tastoria --no-owner --exit-on-error < "$work/db.dump"
 dc exec -T postgres psql -U tastoria -d tastoria -Atc "$count_sql"
 docker run --rm -i -u 0 -v tastoria_files:/f "tastoria-backend:$(env_get TASTORIA_IMAGE_TAG)" \
   sh -ec 'find /f -mindepth 1 -delete; tar xzf - -C /f; chown -R 10001:10001 /f' < "$work/files.tar.gz"
-# ALTER DATABASE parameters (tastoria.rice_bowl_kcal, tastoria.kcal_half_width) are not in pg_dump: the
-# catalog import in `migrate` sets them again.
+app_pw="$(env_get POSTGRES_APP_PASSWORD)"
+jobs_pw="$(env_get POSTGRES_JOBS_PASSWORD)"
+if [ -n "$app_pw" ] || [ -n "$jobs_pw" ]; then
+  dc exec -T postgres psql -U tastoria -d tastoria -v ON_ERROR_STOP=1 -v app_pw="$app_pw" -v jobs_pw="$jobs_pw" <<'SQL'
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_app') THEN
+        CREATE ROLE tastoria_app LOGIN;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_jobs') THEN
+        CREATE ROLE tastoria_jobs LOGIN;
+    END IF;
+END $$;
+ALTER ROLE tastoria_app WITH LOGIN PASSWORD :'app_pw';
+ALTER ROLE tastoria_jobs WITH LOGIN PASSWORD :'jobs_pw';
+SQL
+fi
+dc run --rm migrate
 dc up -d
-wait_healthy 240 api nginx scheduler
+wait_healthy 240 api worker nginx scheduler
 log "đã khôi phục từ $(basename "$file")"

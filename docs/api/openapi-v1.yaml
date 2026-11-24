@@ -51,6 +51,10 @@ tags:
   description: M12 — Lịch nấu CP-SAT, phiên nấu, nấu xong (UoW), hoàn tác
 - name: journal
   description: M13 — Nhật ký tuần (view chỉ đọc)
+- name: meal_logs
+  description: M18 — Nhật ký bữa ăn đồng bộ server
+- name: meal_calorie
+  description: M17 — Ước lượng calo và dinh dưỡng món ăn tách biệt (KB + ONNX Nutrition5k)
 - name: survey
   description: M14 — Phiếu khảo sát khối không đầy đủ, người tham gia ẩn danh, điểm, món hay ăn
 - name: admin
@@ -62,8 +66,8 @@ paths:
       tags:
       - identity
       summary: Đăng ký tài khoản
-      description: Tạo users (role = user) và trả phiên đăng nhập ngay. Mật khẩu băm Argon2id. Đồng ý theo mục đích được hỏi
-        ở bước sau (POST /me/consents), không tích sẵn.
+      description: Tạo users (role = user), đưa thư xác minh email vào email_outbox và trả phiên đăng nhập ngay. Mật khẩu
+        băm Argon2id. Đồng ý theo mục đích được hỏi ở bước sau (POST /me/consents), không tích sẵn.
       x-use-cases:
       - UC01
       x-module: M02
@@ -108,8 +112,9 @@ paths:
       tags:
       - identity
       summary: Đăng nhập
-      description: Kiểm mật khẩu, tạo refresh token family mới. Sai 5 lần theo (email, IP) → khoá 15 phút (NFR-SEC-02); trong
-        thời gian khoá trả 429 login_locked kể cả khi mật khẩu đúng.
+      description: Kiểm mật khẩu (và mã TOTP `totp_code` nếu tài khoản đã bật MFA), tạo refresh token family mới. Sai 5
+        lần theo (email, IP) hoặc 15 lần theo email trên nhiều IP → khoá 15 phút (NFR-SEC-02); trong thời gian khoá trả
+        429 login_locked kể cả khi mật khẩu đúng.
       x-use-cases:
       - UC02
       x-module: M02
@@ -133,13 +138,13 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
-          description: 'Sai thông tin đăng nhập — code: `invalid_credentials`'
+          description: 'Sai thông tin đăng nhập hoặc mã TOTP — code: `invalid_credentials`, `mfa_invalid`'
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
         '403':
-          description: 'Tài khoản đang chờ xoá — code: `account_deletion_pending`'
+          description: 'Tài khoản đang chờ xoá hoặc thiếu mã MFA — code: `account_deletion_pending`, `mfa_required`'
           content:
             application/problem+json:
               schema:
@@ -147,7 +152,7 @@ paths:
         '412':
           $ref: '#/components/responses/AppTooOld'
         '429':
-          description: 'Cặp (email, IP) bị khoá tạm hoặc vượt tần suất — code: `login_locked`, `rate_limited`'
+          description: 'Tài khoản/(email, IP) bị khoá tạm hoặc vượt tần suất — code: `login_locked`, `rate_limited`'
           content:
             application/problem+json:
               schema:
@@ -171,7 +176,8 @@ paths:
       - identity
       summary: Làm mới phiên
       description: 'Xoay vòng refresh token: thu hồi token cũ (revoked_at, replaced_by_id), cấp token mới cùng family_id.
-        Dùng lại token đã thu hồi → thu hồi cả family, trả 401 refresh_reused (NFR-SEC-01).'
+        Gọi trùng token vừa xoay trong cửa sổ 10 giây → trả 409 refresh_retry_conflict (không thu hồi family). Dùng lại
+        token sau 10 giây hoặc token đã thu hồi trực tiếp → thu hồi cả family, trả 401 refresh_reused (NFR-SEC-01).'
       x-use-cases:
       - UC02
       x-module: M02
@@ -180,7 +186,7 @@ paths:
       parameters:
       - $ref: '#/components/parameters/AppVersion'
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
@@ -201,11 +207,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
         '403':
-          description: 'Tài khoản đang chờ xoá — code: `account_deletion_pending`'
+          description: 'Tài khoản đang chờ xoá hoặc thiếu CSRF web — code: `account_deletion_pending`, `forbidden`'
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '409':
+          description: 'Token vừa được xoay trong vòng 10 giây ở yêu cầu khác; hãy thử lại — code: `refresh_retry_conflict`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          headers:
+            Retry-After:
+              $ref: '#/components/headers/RetryAfter'
         '412':
           $ref: '#/components/responses/AppTooOld'
         '429':
@@ -226,7 +241,7 @@ paths:
       parameters:
       - $ref: '#/components/parameters/AppVersion'
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
@@ -335,6 +350,316 @@ paths:
                 $ref: '#/components/schemas/Problem'
         '429':
           $ref: '#/components/responses/TooManyRequests'
+  /auth/verify-email/request:
+    post:
+      operationId: identity_request_email_verification
+      tags:
+      - identity
+      summary: Gửi lại thư xác minh email
+      description: Tạo token xác minh email mới (hạn 24 giờ, tuân theo cooldown gửi lại) và xếp vào email_outbox. Lũy
+        đẳng nếu email đã xác minh.
+      x-use-cases:
+      - UC01
+      x-module: M02
+      x-idempotency: idempotent
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AppVersion'
+      responses:
+        '204':
+          description: Đã nhận yêu cầu xác minh
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/verify-email/confirm:
+    post:
+      operationId: identity_confirm_email_verification
+      tags:
+      - identity
+      summary: Xác minh địa chỉ email bằng token
+      description: Đánh dấu email_verification_tokens.verified_at và users.email_verified_at. Token sai, đã dùng hoặc hết
+        hạn → 400 verification_token_invalid.
+      x-use-cases:
+      - UC01
+      x-module: M02
+      x-idempotency: none
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/AppVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailConfirm'
+      responses:
+        '204':
+          description: Đã xác minh email
+        '400':
+          description: 'Token xác minh sai, đã dùng hoặc hết hạn — code: `verification_token_invalid`, `validation_error`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/change-password:
+    post:
+      operationId: identity_change_password
+      tags:
+      - identity
+      summary: Đổi mật khẩu khi đang đăng nhập
+      description: Xác thực mật khẩu hiện tại (có chống brute-force theo IP), kiểm tra chính sách mật khẩu mới, thu hồi mọi
+        phiên cũ (tăng token_version) và cấp phiên mới cho thiết bị hiện tại.
+      x-use-cases:
+      - UC02
+      - UC04
+      x-module: M02
+      x-idempotency: none
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AppVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: Đã đổi mật khẩu và cấp phiên mới
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSession'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: 'Chưa xác thực hoặc mật khẩu hiện tại không đúng — code: `unauthenticated`, `token_revoked`, `invalid_credentials`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '422':
+          description: 'Mật khẩu mới không đạt chính sách — code: `weak_password`, `validation_error`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '429':
+          description: 'Bị khoá do nhập sai nhiều lần hoặc vượt tần suất — code: `login_locked`, `rate_limited`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          headers:
+            Retry-After:
+              $ref: '#/components/headers/RetryAfter'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /auth/sessions:
+    get:
+      operationId: identity_list_sessions
+      tags:
+      - identity
+      summary: Liệt kê các phiên đăng nhập đang hoạt động
+      description: Trả danh sách refresh token chưa thu hồi và chưa hết hạn của người dùng hiện tại.
+      x-use-cases:
+      - UC03
+      x-module: M02
+      x-idempotency: idempotent
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AppVersion'
+      responses:
+        '200':
+          description: Danh sách phiên đang hoạt động
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionListOut'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/sessions/{session_id}:
+    delete:
+      operationId: identity_revoke_session
+      tags:
+      - identity
+      summary: Thu hồi một phiên đăng nhập theo ID
+      description: Thu hồi cả family của phiên được chọn. Không tồn tại hoặc thuộc người khác → 404 session_not_found.
+      x-use-cases:
+      - UC03
+      x-module: M02
+      x-idempotency: idempotent
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/AppVersion'
+      responses:
+        '204':
+          description: Đã thu hồi phiên
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 'Không tìm thấy phiên đăng nhập — code: `session_not_found`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/mfa/setup:
+    post:
+      operationId: identity_mfa_setup
+      tags:
+      - identity
+      summary: Khởi tạo xác thực hai bước (TOTP)
+      description: Tạo bí mật TOTP mới, mã hoá AES-256-GCM và trả secret + otpauth URI để quét mã QR. Nếu đã bật MFA → 409
+        conflict_state.
+      x-use-cases:
+      - UC02
+      x-module: M02
+      x-idempotency: none
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AppVersion'
+      responses:
+        '200':
+          description: Bí mật TOTP và URI cấu hình
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaSetupOut'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/mfa/verify:
+    post:
+      operationId: identity_mfa_verify
+      tags:
+      - identity
+      summary: Xác nhận mã TOTP để kích hoạt MFA và nâng cấp phiên
+      description: Kiểm tra mã TOTP 6 chữ số; đặt mfa_enabled_at, thu hồi toàn bộ phiên tiền-MFA (tăng token_version) và
+        cấp phiên mới có mfa=true.
+      x-use-cases:
+      - UC02
+      x-module: M02
+      x-idempotency: none
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AppVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaVerifyRequest'
+      responses:
+        '200':
+          description: Đã xác nhận MFA và cấp phiên mới
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSession'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: 'Chưa xác thực hoặc mã TOTP sai — code: `unauthenticated`, `token_revoked`, `mfa_invalid`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: 'Chưa khởi tạo TOTP — code: `mfa_not_enabled`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/mfa/disable:
+    post:
+      operationId: identity_mfa_disable
+      tags:
+      - identity
+      summary: Tắt xác thực hai bước (TOTP)
+      description: Xác thực mật khẩu và mã TOTP hiện tại; xoá bí mật TOTP và thu hồi toàn bộ phiên hiện có.
+      x-use-cases:
+      - UC02
+      x-module: M02
+      x-idempotency: none
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AppVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaDisableRequest'
+      responses:
+        '204':
+          description: Đã tắt xác thực hai bước
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: 'Sai mật khẩu hoặc mã TOTP — code: `unauthenticated`, `token_revoked`, `invalid_credentials`, `mfa_invalid`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: 'Tài khoản chưa bật MFA — code: `mfa_not_enabled`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
   /policies/{purpose}/current:
     get:
       operationId: privacy_get_current_policy
@@ -667,6 +992,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '412':
           $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
         '500':
           description: 'Không giải mã được cột sức khoẻ — code: `decryption_failed`'
           content:
@@ -1082,7 +1409,7 @@ paths:
         schema:
           type: string
           maxLength: 100
-        description: Tìm theo tên (không dấu cũng khớp)
+        description: Tìm theo tên món hoặc nguyên liệu chính (không dấu cũng khớp)
       - name: slot
         in: query
         required: false
@@ -1098,6 +1425,63 @@ paths:
         schema:
           type: string
         description: Mã thẻ
+      - name: food_group
+        in: query
+        required: false
+        schema:
+          type: string
+          maxLength: 64
+        description: Mã nhóm thực phẩm
+      - name: food_group_code
+        in: query
+        required: false
+        schema:
+          type: string
+          maxLength: 64
+        description: Bí danh của food_group
+      - name: method_code
+        in: query
+        required: false
+        schema:
+          type: string
+          maxLength: 64
+        description: Mã cách nấu
+      - name: max_minutes
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 600
+        description: Tổng thời gian nấu tối đa (phút)
+      - name: max_kcal
+        in: query
+        required: false
+        schema:
+          type: number
+          minimum: 0
+          maximum: 5000
+        description: Calo mỗi khẩu phần tối đa
+      - name: kcal_max
+        in: query
+        required: false
+        schema:
+          type: number
+          minimum: 0
+          maximum: 5000
+        description: Bí danh của max_kcal
+      - name: make_ahead
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: Lọc món làm sẵn trước
+      - name: pantry_match
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: Lọc món đủ nguyên liệu chính trong kho (pantry_match_ratio == 1)
       - $ref: '#/components/parameters/Cursor'
       - $ref: '#/components/parameters/Limit'
       - $ref: '#/components/parameters/AppVersion'
@@ -2344,6 +2728,61 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /shopping-items/{id}/to-pantry:
+    post:
+      operationId: substitute_shopping_item_to_pantry
+      tags:
+      - substitute
+      summary: Đưa mục đi chợ vào kho nguyên liệu
+      description: Tạo lô pantry_lots (initial=0) cùng giao dịch pantry_transactions manual_edit (+qty_g), đánh dấu shopping_items
+        là bought và gắn pantry_lot_id. Không cho phép nếu trạng thái là dropped hoặc đã gắn pantry_lot_id (409 conflict_state).
+        Nếu thiếu qty_g ở cả mục lẫn body → 422 validation_error (qty_required).
+      x-use-cases:
+      - UC18
+      - UC14
+      x-module: M10
+      x-idempotency: none
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/AppVersion'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShoppingItemToPantryRequest'
+      responses:
+        '201':
+          description: Đã tạo lô kho từ mục đi chợ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShoppingItemToPantryOut'
+          headers:
+            Location:
+              $ref: '#/components/headers/Location'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Mục ở trạng thái dropped hoặc đã được đưa vào kho — code: `conflict_state`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '422':
+          description: 'Thiếu qty_g hoặc dữ liệu không hợp lệ — code: `validation_error`, `acquired_at_in_future`, `unknown_ingredient`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /cook-sessions:
     post:
       operationId: cooking_create_session
@@ -2645,6 +3084,299 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /meal-logs:
+    get:
+      operationId: meal_logs_list
+      tags:
+      - meal_logs
+      summary: Danh sách nhật ký bữa ăn
+      description: Trả về nhật ký bữa ăn theo khoảng ngày và phân trang keyset.
+      x-module: M18
+      x-idempotency: idempotent
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: meal_slot
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/MealSlot'
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          type: string
+          maxLength: 512
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - $ref: '#/components/parameters/AppVersion'
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealLogPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+    post:
+      operationId: meal_logs_create
+      tags:
+      - meal_logs
+      summary: Tạo nhật ký bữa ăn
+      description: Ghi nhận bữa ăn từ ước lượng món, mã vạch, công thức hoặc nhập tay.
+      x-module: M18
+      x-idempotency: idempotency-key
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AppVersion'
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 128
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MealLogCreate'
+      responses:
+        '201':
+          description: Đã lưu nhật ký bữa ăn
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealLogOut'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /meal-logs/{id}:
+    get:
+      operationId: meal_logs_get
+      tags:
+      - meal_logs
+      summary: Xem chi tiết nhật ký bữa ăn
+      x-module: M18
+      x-idempotency: idempotent
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/AppVersion'
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealLogOut'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+    delete:
+      operationId: meal_logs_delete
+      tags:
+      - meal_logs
+      summary: Xoá nhật ký bữa ăn
+      x-module: M18
+      x-idempotency: idempotent
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/AppVersion'
+      responses:
+        '204':
+          description: Đã xoá
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+  /meal-calorie/dishes:
+    get:
+      operationId: meal_calorie_list_dishes
+      tags:
+      - meal_calorie
+      summary: Danh sách món KB và khoảng sai số hiệu chuẩn
+      description: Trả về danh sách món ăn Việt Nam đã tính dinh dưỡng trong KB kèm hệ số hiệu chuẩn NIN.
+      x-use-cases:
+      - UC22
+      x-module: M17
+      x-idempotency: idempotent
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AppVersion'
+      - name: include_extended
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealCalorieDishListOut'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /meal-calorie/barcode/{barcode}:
+    get:
+      operationId: meal_calorie_lookup_barcode
+      tags:
+      - meal_calorie
+      summary: Tra cứu dinh dưỡng sản phẩm đóng gói theo mã vạch
+      x-use-cases:
+      - UC22
+      x-module: M17
+      x-idempotency: idempotent
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AppVersion'
+      - name: barcode
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]{8,14}$'
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BarcodeNutritionOut'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /meal-calorie/estimate:
+    post:
+      operationId: meal_calorie_estimate
+      tags:
+      - meal_calorie
+      summary: Ước lượng calo và dinh dưỡng bữa ăn
+      description: Hỗ trợ tra cứu KB theo món/khẩu phần (nho/vua/lon), ước lượng trực quan từ ảnh qua ONNX Nutrition5k, hoặc kết hợp cả hai.
+      x-use-cases:
+      - UC22
+      x-module: M17
+      x-idempotency: none
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/AppVersion'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                dish_slug:
+                  type: string
+                dish_name:
+                  type: string
+                portion:
+                  type: string
+                  enum:
+                  - nho
+                  - vua
+                  - lon
+                  default: vua
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealCalorieEstimateOut'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/AppTooOld'
+        '413':
+          description: 'Ảnh vượt quá 3 MB — code: `image_too_large`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '415':
+          description: 'Định dạng ảnh không hỗ trợ — code: `unsupported_media_type`'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
   /events:
     post:
       operationId: events_record_events
@@ -2778,6 +3510,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '412':
           $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
   /survey/respondents/{id}/ratings/{recipeId}:
     put:
       operationId: survey_put_rating
@@ -2833,6 +3567,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
   /survey/respondents/{id}/favorites:
     put:
       operationId: survey_set_favorites
@@ -2886,6 +3622,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
   /survey/respondents/{id}/complete:
     post:
       operationId: survey_complete_respondent
@@ -2933,14 +3671,17 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
   /admin/data-requests:
     get:
       operationId: admin_list_data_requests
       tags:
       - admin
       summary: Liệt kê yêu cầu dữ liệu
-      description: Mỗi lần đọc ghi audit_log. Sắp received_at tăng dần để xử lý theo hạn. Chỉ vai trò `admin` (claim `role`
-        trong JWT); vai trò khác → 403 forbidden. Mọi lời gọi ghi audit_log.
+      description: Sắp received_at tăng dần để xử lý theo hạn. Chỉ vai trò `admin` (claim `role` trong JWT; yêu cầu phiên
+        MFA ở production hoặc khi tài khoản bật MFA → thiếu trả 403 mfa_required); vai trò khác → 403 forbidden. Ghi
+        audit_log hợp nhất theo phiên đọc (bỏ qua khi phân trang cursor hoặc trong vòng 60 giây).
       x-use-cases:
       - UC27
       x-module: M15
@@ -2981,15 +3722,18 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '412':
           $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
   /admin/data-requests/{id}/resolve:
     post:
       operationId: admin_resolve_data_request
       tags:
       - admin
       summary: Xử lý yêu cầu dữ liệu thủ công
-      description: 'Dùng cho correct/restrict/object (UC08). Đặt status, acknowledged_at/completed_at, note; ghi audit_log.
-        Lũy đẳng: cùng status đã đặt trả 200. Yêu cầu đã completed/rejected không đổi được → 409. Chỉ vai trò `admin` (claim
-        `role` trong JWT); vai trò khác → 403 forbidden. Mọi lời gọi ghi audit_log.'
+      description: 'Dùng cho correct/restrict/object (UC08). Đặt status, acknowledged_at/completed_at, note; ghi audit_log
+        khi đổi trạng thái. Lũy đẳng: cùng status đã đặt trả 200. Yêu cầu đã completed/rejected không đổi được → 409. Chỉ
+        vai trò `admin` (yêu cầu phiên MFA ở production hoặc khi tài khoản bật MFA → 403 mfa_required); vai trò khác →
+        403 forbidden.'
       x-use-cases:
       - UC08
       - UC27
@@ -3036,14 +3780,16 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
   /admin/audit-log:
     get:
       operationId: admin_list_audit_log
       tags:
       - admin
       summary: Xem nhật ký kiểm toán
-      description: Chỉ đọc; keyset theo (created_at, id) giảm dần. Chỉ vai trò `admin` (claim `role` trong JWT); vai trò khác
-        → 403 forbidden. Mọi lời gọi ghi audit_log.
+      description: Chỉ đọc; keyset theo (created_at, id) giảm dần. Chỉ vai trò `admin` (yêu cầu phiên MFA ở production
+        hoặc khi tài khoản bật MFA → 403 mfa_required); vai trò khác → 403 forbidden. Lần gọi 200 không ghi thêm audit_log.
       x-use-cases:
       - UC27
       x-module: M15
@@ -3098,6 +3844,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '412':
           $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
   /admin/models:
     get:
       operationId: admin_list_models
@@ -3105,7 +3853,8 @@ paths:
       - admin
       summary: Xem phiên bản mô hình và bản đang chạy
       description: Đăng ký, kiểm định, triển khai, quay lui thực hiện qua CLI `tastoria mlops ...`; endpoint này chỉ đọc.
-        Chỉ vai trò `ml_operator` (claim `role` trong JWT); vai trò khác → 403 forbidden. Mọi lời gọi ghi audit_log.
+        Chỉ vai trò `ml_operator` (yêu cầu phiên MFA ở production hoặc khi tài khoản bật MFA → 403 mfa_required); vai trò
+        khác → 403 forbidden. Lần gọi 200 không ghi thêm audit_log.
       x-use-cases:
       - UC29
       - UC30
@@ -3148,6 +3897,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '412':
           $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
   /admin/surveys:
     get:
       operationId: admin_list_surveys
@@ -3155,7 +3906,8 @@ paths:
       - admin
       summary: Xem các đợt khảo sát
       description: Tạo phiếu và xuất kết quả qua CLI `tastoria survey ...`; endpoint này chỉ đọc số liệu tiến độ. Chỉ vai
-        trò `ml_operator` (claim `role` trong JWT); vai trò khác → 403 forbidden. Mọi lời gọi ghi audit_log.
+        trò `ml_operator` (yêu cầu phiên MFA ở production hoặc khi tài khoản bật MFA → 403 mfa_required); vai trò khác →
+        403 forbidden. Ghi audit_log hợp nhất theo phiên đọc (bỏ qua khi phân trang cursor hoặc trong vòng 60 giây).
       x-use-cases:
       - UC24
       x-module: M15
@@ -3182,6 +3934,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '412':
           $ref: '#/components/responses/AppTooOld'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
   /healthz:
     servers:
     - url: /
@@ -3404,6 +4158,12 @@ components:
                 title: Cần đồng ý mục đích xử lý dữ liệu
                 status: 403
                 code: consent_required
+            mfa_required:
+              value:
+                type: https://tastoria.ctslab.net/problems/mfa_required
+                title: Cần xác thực hai bước để tiếp tục
+                status: 403
+                code: mfa_required
     NotFound:
       description: '404: không có hoặc không thuộc người gọi'
       content:
@@ -3531,6 +4291,13 @@ components:
         | refresh_invalid | 401 | Refresh token không tồn tại hoặc hết hạn | UC02 |
         | refresh_reused | 401 | Refresh token đã thu hồi bị dùng lại; cả family bị thu hồi (NFR-SEC-01) | FR-02-07 |
         | reset_token_invalid | 400 | Token đặt lại mật khẩu sai, đã dùng hoặc hết hạn | UC04 |
+        | email_not_verified | 403 | Email chưa được xác minh | UC01, UC02 |
+        | verification_token_invalid | 400 | Liên kết xác minh email sai, đã dùng hoặc hết hạn | UC01 |
+        | mfa_required | 403 | Tài khoản yêu cầu mã xác thực hai bước | UC02 |
+        | mfa_invalid | 401 | Mã xác thực hai bước không đúng | UC02 |
+        | mfa_not_enabled | 409 | Tài khoản chưa bật xác thực hai bước | UC02 |
+        | session_not_found | 404 | Không tìm thấy phiên đăng nhập | UC03 |
+        | refresh_retry_conflict | 409 | Phiên đang được làm mới ở yêu cầu khác; hãy thử lại | UC02 |
         | purpose_not_found | 404 | Mục đích không có trong `consent_purposes` | UC05 |
         | purpose_not_allowed | 422 | Mục đích không ghi được qua endpoint này (`survey`) hoặc mã lạ trong lô quyết định | UC05 |
         | policy_outdated | 409 | `policy_version_id` gửi lên không phải bản điều khoản hiện hành | FR-05-04, FR-23-04 |
@@ -3610,6 +4377,13 @@ components:
       - refresh_invalid
       - refresh_reused
       - reset_token_invalid
+      - email_not_verified
+      - verification_token_invalid
+      - mfa_required
+      - mfa_invalid
+      - mfa_not_enabled
+      - session_not_found
+      - refresh_retry_conflict
       - purpose_not_found
       - purpose_not_allowed
       - policy_outdated
@@ -3757,6 +4531,34 @@ components:
         status: '400'
         when: Token đặt lại mật khẩu sai, đã dùng hoặc hết hạn
         source: UC04
+      - code: email_not_verified
+        status: '403'
+        when: Email chưa được xác minh
+        source: UC01, UC02
+      - code: verification_token_invalid
+        status: '400'
+        when: Liên kết xác minh email sai, đã dùng hoặc hết hạn
+        source: UC01
+      - code: mfa_required
+        status: '403'
+        when: Tài khoản yêu cầu mã xác thực hai bước
+        source: UC02
+      - code: mfa_invalid
+        status: '401'
+        when: Mã xác thực hai bước không đúng
+        source: UC02
+      - code: mfa_not_enabled
+        status: '409'
+        when: Tài khoản chưa bật xác thực hai bước
+        source: UC02
+      - code: session_not_found
+        status: '404'
+        when: Không tìm thấy phiên đăng nhập
+        source: UC03
+      - code: refresh_retry_conflict
+        status: '409'
+        when: Phiên đang được làm mới ở yêu cầu khác; hãy thử lại
+        source: UC02
       - code: purpose_not_found
         status: '404'
         when: Mục đích không có trong `consent_purposes`
@@ -4126,6 +4928,12 @@ components:
         created_at:
           type: string
           format: date-time
+        email_verified:
+          type: boolean
+          default: false
+        mfa_enabled:
+          type: boolean
+          default: false
       required:
       - id
       - email
@@ -4145,9 +4953,11 @@ components:
           type: integer
           const: 900
         refresh_token:
-          type: string
+          type:
+          - string
+          - 'null'
           description: Chuỗi ngẫu nhiên; server chỉ lưu SHA-256 (refresh_tokens.token_sha256); hạn 30 ngày, xoay vòng mỗi
-            lần dùng
+            lần dùng (null khi trả về qua cookie HttpOnly cho web)
         refresh_expires_at:
           type: string
           format: date-time
@@ -4185,6 +4995,12 @@ components:
         password:
           type: string
           writeOnly: true
+        totp_code:
+          type:
+          - string
+          - 'null'
+          writeOnly: true
+          description: Mã TOTP 6 chữ số (bắt buộc khi tài khoản đã bật MFA)
       required:
       - email
       - password
@@ -4193,18 +5009,18 @@ components:
       type: object
       properties:
         refresh_token:
-          type: string
-      required:
-      - refresh_token
+          type:
+          - string
+          - 'null'
       additionalProperties: false
     LogoutRequest:
       type: object
       properties:
         refresh_token:
-          type: string
+          type:
+          - string
+          - 'null'
           description: Token của thiết bị cần đăng xuất; family của nó bị thu hồi
-      required:
-      - refresh_token
       additionalProperties: false
     PasswordResetRequest:
       type: object
@@ -4229,6 +5045,112 @@ components:
       required:
       - token
       - new_password
+      additionalProperties: false
+    VerifyEmailConfirm:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token trong thư xác minh email; server so với email_verification_tokens.token_sha256
+      required:
+      - token
+      additionalProperties: false
+    ChangePasswordRequest:
+      type: object
+      properties:
+        current_password:
+          type: string
+          writeOnly: true
+        new_password:
+          type: string
+          minLength: 10
+          maxLength: 128
+          writeOnly: true
+      required:
+      - current_password
+      - new_password
+      additionalProperties: false
+    SessionOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        family_id:
+          type: string
+          format: uuid
+        user_agent:
+          type:
+          - string
+          - 'null'
+        ip_address:
+          type:
+          - string
+          - 'null'
+        issued_at:
+          type: string
+          format: date-time
+        last_used_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+        is_current:
+          type: boolean
+          default: false
+      required:
+      - id
+      - family_id
+      - user_agent
+      - ip_address
+      - issued_at
+      - last_used_at
+      - expires_at
+    SessionListOut:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionOut'
+      required:
+      - items
+    MfaSetupOut:
+      type: object
+      properties:
+        secret:
+          type: string
+          description: Khoá TOTP dạng Base32 để nhập thủ công
+        otpauth_uri:
+          type: string
+          description: URI otpauth://totp/... để quét mã QR
+      required:
+      - secret
+      - otpauth_uri
+    MfaVerifyRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Mã TOTP 6 chữ số từ ứng dụng xác thực
+      required:
+      - code
+      additionalProperties: false
+    MfaDisableRequest:
+      type: object
+      properties:
+        password:
+          type: string
+          writeOnly: true
+        code:
+          type: string
+          description: Mã TOTP 6 chữ số hiện tại
+      required:
+      - password
+      - code
       additionalProperties: false
     ConsentPurposeCode:
       type: string
@@ -5096,6 +6018,33 @@ components:
           - number
           - 'null'
           description: recipe_nutrition (energy_kcal)
+        protein_g:
+          type:
+          - number
+          - 'null'
+          description: recipe_nutrition (protein_g)
+        carbs_g:
+          type:
+          - number
+          - 'null'
+          description: recipe_nutrition (glucid_g)
+        fat_g:
+          type:
+          - number
+          - 'null'
+          description: recipe_nutrition (lipid_g)
+        fiber_g:
+          type:
+          - number
+          - 'null'
+          description: recipe_nutrition (fiber_g)
+        pantry_match_ratio:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 1
+          description: Tỷ lệ nguyên liệu chính hiện có trong kho của người dùng
         tag_codes:
           type: array
           items:
@@ -5632,6 +6581,19 @@ components:
           - 'null'
           minimum: 0
           maximum: 1
+        sub_species_slug:
+          type:
+          - string
+          - 'null'
+        sub_species_conf:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 1
+        safety_abstained:
+          type: boolean
+          default: false
       required:
       - id
       - image_ordinal
@@ -5724,6 +6686,19 @@ components:
         updated_at:
           type: string
           format: date-time
+        sub_species_slug:
+          type:
+          - string
+          - 'null'
+        sub_species_conf:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 1
+        safety_abstained:
+          type: boolean
+          default: false
       required:
       - id
       - ingredient_id
@@ -6253,6 +7228,8 @@ components:
       - score
       - origin
       - in_pantry
+      - available_g_min
+      - available_g_max
     MissingIngredient:
       type: object
       properties:
@@ -6337,6 +7314,11 @@ components:
           - string
           - 'null'
           format: uuid
+        pantry_lot_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
         created_at:
           type: string
           format: date-time
@@ -6398,6 +7380,31 @@ components:
           - bought
           - dropped
       additionalProperties: false
+    ShoppingItemToPantryRequest:
+      type: object
+      properties:
+        qty_g:
+          type:
+          - number
+          - 'null'
+          exclusiveMinimum: 0
+          maximum: 100000
+        acquired_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+      additionalProperties: false
+    ShoppingItemToPantryOut:
+      type: object
+      properties:
+        shopping_item:
+          $ref: '#/components/schemas/ShoppingItem'
+        pantry_lot:
+          $ref: '#/components/schemas/PantryLot'
+      required:
+      - shopping_item
+      - pantry_lot
     CookSessionStatus:
       type: string
       enum:
@@ -6612,6 +7619,93 @@ components:
       - cook_session
       - deductions
       - interactions_recorded
+    JournalMacros:
+      type: object
+      properties:
+        protein_g:
+          type: number
+        carbs_g:
+          type: number
+        fat_g:
+          type: number
+        fiber_g:
+          type: number
+      required:
+      - protein_g
+      - carbs_g
+      - fat_g
+      - fiber_g
+    CookedDish:
+      type: object
+      properties:
+        recipe_id:
+          type: string
+          format: uuid
+        name_vi:
+          type: string
+        slot:
+          type: string
+          enum:
+          - man
+          - rau
+          - canh
+        kcal_per_person:
+          type:
+          - number
+          - 'null'
+      required:
+      - recipe_id
+      - name_vi
+      - slot
+      - kcal_per_person
+    CookedMeal:
+      type: object
+      properties:
+        cook_session_id:
+          type: string
+          format: uuid
+        meal_plan_id:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        completed_at:
+          type: string
+          format: date-time
+        meal:
+          type: string
+          enum:
+          - lunch
+          - dinner
+        persons:
+          type: integer
+          minimum: 1
+        kcal_per_person:
+          type:
+          - number
+          - 'null'
+        rice_bowls_per_person:
+          type:
+          - number
+          - 'null'
+        macros:
+          $ref: '#/components/schemas/JournalMacros'
+        dishes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CookedDish'
+      required:
+      - cook_session_id
+      - meal_plan_id
+      - date
+      - completed_at
+      - meal
+      - persons
+      - kcal_per_person
+      - rice_bowls_per_person
+      - macros
+      - dishes
     JournalDay:
       type: object
       description: Một dòng v_journal_days
@@ -6622,6 +7716,14 @@ components:
         cooked_trays:
           type: integer
           minimum: 0
+        meal_logs_count:
+          type: integer
+          minimum: 0
+          default: 0
+        meal_logs_kcal:
+          type: number
+          minimum: 0
+          default: 0.0
         kcal_per_person:
           type:
           - number
@@ -6634,6 +7736,22 @@ components:
           type: integer
           minimum: 0
           description: Số lô gấp được dùng kịp
+        protein_g:
+          type:
+          - number
+          - 'null'
+        carbs_g:
+          type:
+          - number
+          - 'null'
+        fat_g:
+          type:
+          - number
+          - 'null'
+        fiber_g:
+          type:
+          - number
+          - 'null'
       required:
       - date
       - cooked_trays
@@ -6660,11 +7778,24 @@ components:
           - calibrated
           - calibrating
           description: calibrating → app hiện 'đang hiệu chỉnh' (BR-NUT-06)
+        macros:
+          $ref: '#/components/schemas/JournalMacros'
+        cooked_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/CookedMeal'
+        meal_logs:
+          type: array
+          default: []
+          items:
+            $ref: '#/components/schemas/MealLogOut'
       required:
       - week
       - timezone
       - days
       - kcal_range_status
+      - macros
+      - cooked_history
     InteractionType:
       type: string
       enum:
@@ -7017,6 +8148,9 @@ components:
       - freshness
       - ranker
       - substitution
+      - meal_calorie
+      - dish_classifier
+      - mushroom_classifier
     ModelVersion:
       type: object
       description: model_versions
@@ -7323,6 +8457,698 @@ components:
           - string
           - 'null'
           description: Con trỏ keyset cho trang sau; null khi hết dữ liệu
+      required:
+      - items
+      - next_cursor
+    MealCalorieDishOut:
+      type: object
+      properties:
+        slug:
+          type: string
+        name_vi:
+          type: string
+        slot:
+          type: string
+          enum:
+          - man
+          - rau
+          - canh
+        kcal_per_serving:
+          type: number
+        protein_g:
+          type: number
+        carbs_g:
+          type: number
+        fat_g:
+          type: number
+        fiber_g:
+          type: number
+      required:
+      - slug
+      - name_vi
+      - slot
+      - kcal_per_serving
+      - protein_g
+      - carbs_g
+      - fat_g
+      - fiber_g
+    MealCalorieDishListOut:
+      type: object
+      properties:
+        data_version:
+          type: string
+        calibrated:
+          type: boolean
+        half_width_rel:
+          type: number
+        dishes:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealCalorieDishOut'
+      required:
+      - data_version
+      - calibrated
+      - half_width_rel
+      - dishes
+    BarcodeNutritionOut:
+      type: object
+      properties:
+        barcode:
+          type: string
+        product_name:
+          type: string
+        brand:
+          type:
+          - string
+          - 'null'
+        serving_size:
+          type:
+          - string
+          - 'null'
+        serving_g:
+          type:
+          - number
+          - 'null'
+        kcal_per_serving:
+          type:
+          - number
+          - 'null'
+        protein_g_per_serving:
+          type:
+          - number
+          - 'null'
+        carbs_g_per_serving:
+          type:
+          - number
+          - 'null'
+        fat_g_per_serving:
+          type:
+          - number
+          - 'null'
+        fiber_g_per_serving:
+          type:
+          - number
+          - 'null'
+        kcal_per_100g:
+          type:
+          - number
+          - 'null'
+        protein_g_per_100g:
+          type:
+          - number
+          - 'null'
+        carbs_g_per_100g:
+          type:
+          - number
+          - 'null'
+        fat_g_per_100g:
+          type:
+          - number
+          - 'null'
+        fiber_g_per_100g:
+          type:
+          - number
+          - 'null'
+        source:
+          type: string
+        image_url:
+          type:
+          - string
+          - 'null'
+        nutrition_score:
+          type:
+          - integer
+          - 'null'
+        nutrition_grade:
+          type:
+          - string
+          - 'null'
+        macro_kcal_split:
+          anyOf:
+          - $ref: '#/components/schemas/MacroKcalSplitOut'
+          - type: 'null'
+      required:
+      - barcode
+      - product_name
+      - source
+    MacroKcalSplitOut:
+      type: object
+      properties:
+        protein_pct:
+          type: integer
+        carbs_pct:
+          type: integer
+        fat_pct:
+          type: integer
+      required:
+      - protein_pct
+      - carbs_pct
+      - fat_pct
+    DishCandidateOut:
+      type: object
+      properties:
+        dish_id:
+          type: string
+        name_vi:
+          type: string
+        name_en:
+          type: string
+        confidence:
+          type: number
+        kb_slug:
+          type:
+          - string
+          - 'null'
+        kcal_vua:
+          type:
+          - number
+          - 'null'
+      required:
+      - dish_id
+      - name_vi
+      - name_en
+      - confidence
+    ModifierSuggestionOut:
+      type: object
+      properties:
+        id:
+          type: string
+        label_vi:
+          type: string
+        kcal_delta:
+          type: number
+        fat_delta_g:
+          type: number
+          default: 0.0
+        carbs_delta_g:
+          type: number
+          default: 0.0
+        protein_delta_g:
+          type: number
+          default: 0.0
+      required:
+      - id
+      - label_vi
+      - kcal_delta
+    MealCalorieEstimateOut:
+      type: object
+      properties:
+        dish_name_vi:
+          type:
+          - string
+          - 'null'
+        kb_slug:
+          type:
+          - string
+          - 'null'
+        slot:
+          type:
+          - string
+          - 'null'
+        portion:
+          type: string
+          enum:
+          - nho
+          - vua
+          - lon
+        portion_multiplier:
+          type: number
+        estimated_kcal:
+          type: number
+        kcal_low:
+          type: number
+        kcal_high:
+          type: number
+        estimated_mass_g:
+          type:
+          - number
+          - 'null'
+        protein_g:
+          type: number
+        carbs_g:
+          type: number
+        fat_g:
+          type: number
+        fiber_g:
+          type:
+          - number
+          - 'null'
+        source:
+          type: string
+          enum:
+          - kb_calibrated
+          - onnx_nutrition5k
+          - hybrid
+        calibrated:
+          type: boolean
+        half_width_rel:
+          type: number
+        latency_ms:
+          type: number
+        visual_kcal:
+          type:
+          - number
+          - 'null'
+        domain_shift_note:
+          type:
+          - string
+          - 'null'
+        ood_clamped:
+          type: boolean
+          default: false
+        recognized_dish_id:
+          type:
+          - string
+          - 'null'
+        recognized_confidence:
+          type:
+          - number
+          - 'null'
+        top_candidates:
+          type: array
+          default: []
+          items:
+            $ref: '#/components/schemas/DishCandidateOut'
+        nutrition_score:
+          type:
+          - integer
+          - 'null'
+        nutrition_grade:
+          type:
+          - string
+          - 'null'
+        macro_kcal_split:
+          anyOf:
+          - $ref: '#/components/schemas/MacroKcalSplitOut'
+          - type: 'null'
+        serving_desc_vi:
+          type:
+          - string
+          - 'null'
+        source_ref:
+          type:
+          - string
+          - 'null'
+        disambiguation_required:
+          type: boolean
+          default: false
+        top_margin:
+          type:
+          - number
+          - 'null'
+        provenance_label_vi:
+          type: string
+          default: Ước lượng trực quan theo khẩu phần
+        fusion_mode:
+          type: string
+          enum:
+          - kb_exact
+          - variance_weighted
+          - top3_blend
+          - visual_fallback
+          default: visual_fallback
+        suggested_modifiers:
+          type: array
+          default: []
+          items:
+            $ref: '#/components/schemas/ModifierSuggestionOut'
+      required:
+      - portion
+      - portion_multiplier
+      - estimated_kcal
+      - kcal_low
+      - kcal_high
+      - protein_g
+      - carbs_g
+      - fat_g
+      - source
+      - nutrition_score
+      - nutrition_grade
+      - calibrated
+      - half_width_rel
+      - latency_ms
+    MealSlot:
+      type: string
+      enum:
+      - sang
+      - trua
+      - toi
+      - phu
+    MealLogSource:
+      type: string
+      enum:
+      - scan_calorie
+      - barcode
+      - manual
+      - recipe
+    MealLogSourceIn:
+      type: string
+      enum:
+      - scan_calorie
+      - calorie_scan
+      - barcode
+      - manual
+      - recipe
+    MealLogItemKind:
+      type: string
+      enum:
+      - dish
+      - modifier
+      - barcode_item
+      - manual_item
+    MealLogItemIn:
+      type: object
+      additionalProperties: false
+      properties:
+        item_kind:
+          $ref: '#/components/schemas/MealLogItemKind'
+          default: dish
+        label_vi:
+          type:
+          - string
+          - 'null'
+          maxLength: 200
+        dish_slug:
+          type:
+          - string
+          - 'null'
+          maxLength: 128
+        recipe_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        ingredient_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        barcode:
+          type:
+          - string
+          - 'null'
+          maxLength: 64
+        grams:
+          type:
+          - number
+          - 'null'
+          exclusiveMinimum: 0
+          maximum: 20000
+        kcal:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 10000
+        protein_g:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 1000
+        carbs_g:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 1000
+        fat_g:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 1000
+        fiber_g:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 500
+        modifiers:
+          type: array
+          default: []
+          maxItems: 20
+          items:
+            type: string
+    MealLogCreate:
+      type: object
+      additionalProperties: false
+      properties:
+        logged_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        logged_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        meal_slot:
+          $ref: '#/components/schemas/MealSlot'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        source_type:
+          $ref: '#/components/schemas/MealLogSourceIn'
+        source_ref_id:
+          type:
+          - string
+          - 'null'
+          maxLength: 200
+        portion_label:
+          type: string
+          minLength: 1
+          maxLength: 64
+          default: Vừa
+        portion_scale:
+          type: number
+          exclusiveMinimum: 0
+          maximum: 20
+          default: 1.0
+        modifiers:
+          type: array
+          default: []
+          maxItems: 20
+          items:
+            type: string
+        kcal:
+          type: number
+          minimum: 0
+          maximum: 20000
+          default: 0.0
+        kcal_low:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 20000
+        kcal_high:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 20000
+        protein_g:
+          type: number
+          minimum: 0
+          maximum: 2000
+          default: 0.0
+        carbs_g:
+          type: number
+          minimum: 0
+          maximum: 2000
+          default: 0.0
+        fat_g:
+          type: number
+          minimum: 0
+          maximum: 2000
+          default: 0.0
+        fiber_g:
+          type: number
+          minimum: 0
+          maximum: 1000
+          default: 0.0
+        provenance_label_vi:
+          type: string
+          maxLength: 200
+          default: ''
+        notes:
+          type:
+          - string
+          - 'null'
+          maxLength: 1000
+        items:
+          type: array
+          default: []
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/MealLogItemIn'
+      required:
+      - meal_slot
+      - title
+      - source_type
+    MealLogItemOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ordinal:
+          type: integer
+        item_kind:
+          $ref: '#/components/schemas/MealLogItemKind'
+        label_vi:
+          type: string
+        dish_slug:
+          type:
+          - string
+          - 'null'
+        recipe_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        ingredient_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        barcode:
+          type:
+          - string
+          - 'null'
+        grams:
+          type:
+          - number
+          - 'null'
+        kcal:
+          type: number
+        protein_g:
+          type: number
+        carbs_g:
+          type: number
+        fat_g:
+          type: number
+        fiber_g:
+          type: number
+        modifiers:
+          type: array
+          items: {}
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - ordinal
+      - item_kind
+      - label_vi
+      - dish_slug
+      - recipe_id
+      - ingredient_id
+      - barcode
+      - grams
+      - kcal
+      - protein_g
+      - carbs_g
+      - fat_g
+      - fiber_g
+      - modifiers
+      - created_at
+    MealLogOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        logged_date:
+          type: string
+          format: date
+        logged_at:
+          type: string
+          format: date-time
+        meal_slot:
+          $ref: '#/components/schemas/MealSlot'
+        title:
+          type: string
+        source_type:
+          $ref: '#/components/schemas/MealLogSource'
+        source_ref_id:
+          type:
+          - string
+          - 'null'
+        portion_label:
+          type: string
+        portion_scale:
+          type: number
+        modifiers:
+          type: array
+          items: {}
+        kcal:
+          type: number
+        kcal_low:
+          type: number
+        kcal_high:
+          type: number
+        protein_g:
+          type: number
+        carbs_g:
+          type: number
+        fat_g:
+          type: number
+        fiber_g:
+          type: number
+        provenance_label_vi:
+          type: string
+        notes:
+          type:
+          - string
+          - 'null'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealLogItemOut'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - logged_date
+      - logged_at
+      - meal_slot
+      - title
+      - source_type
+      - source_ref_id
+      - portion_label
+      - portion_scale
+      - modifiers
+      - kcal
+      - kcal_low
+      - kcal_high
+      - protein_g
+      - carbs_g
+      - fat_g
+      - fiber_g
+      - provenance_label_vi
+      - notes
+      - items
+      - created_at
+      - updated_at
+    MealLogPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealLogOut'
+        next_cursor:
+          type:
+          - string
+          - 'null'
       required:
       - items
       - next_cursor

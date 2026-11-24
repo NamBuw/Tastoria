@@ -22,8 +22,8 @@ while (Còn chip chưa quy đổi?) is (còn)
 |scan|
 endwhile (hết)
 |pantry|
-:Tạo mỗi chip một lô «in_stock»;
-:Ghi giao dịch nhập kho;
+:Tạo lô mới hoặc cập nhật lô đang có;
+:Lưu lượng làm lượng ban đầu của lô;
 |scan|
 if (Chế độ toàn tủ?) then (có)
   |pantry|

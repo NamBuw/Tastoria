@@ -1,24 +1,12 @@
 /**
- * Web: no secure store. The refresh token lives in sessionStorage (gone when the tab closes) with an
- * in-memory fallback when storage is blocked; the access token stays in memory only.
+ * Web: refresh token is managed exclusively via HttpOnly cookie (`tastoria_refresh`)
+ * by the backend when `X-Client-Platform: web` is sent. Never persist refresh tokens in
+ * browser web storage; the access token stays in memory only.
  */
-const KEY = 'tastoria.refresh';
-let memory: string | null = null;
-
 export async function loadRefresh(): Promise<string | null> {
-  try {
-    return window.sessionStorage.getItem(KEY) ?? memory;
-  } catch {
-    return memory;
-  }
+  return null;
 }
 
-export async function saveRefresh(token: string | null): Promise<void> {
-  memory = token;
-  try {
-    if (token) window.sessionStorage.setItem(KEY, token);
-    else window.sessionStorage.removeItem(KEY);
-  } catch {
-    // storage blocked: memory only
-  }
+export async function saveRefresh(_token: string | null): Promise<void> {
+  // No-op on web: HttpOnly cookie lifecycle is owned by the server.
 }

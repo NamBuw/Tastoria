@@ -1,0 +1,27 @@
+@startuml
+title CP02 — Thành phần: các tầng từ màn hình tới cơ sở dữ liệu
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+skinparam componentStyle rectangle
+
+component "Màn hình Expo (app/src/app)" as App <<view>>
+component "api/client, lib/outbox" as Client <<proxy>>
+component "router.py (FastAPI)" as Router <<API>>
+component "core: UnitOfWork, idempotency, auth" as Core <<core>>
+component "service.py, composer, schedule" as Service <<service>>
+component "models.py (SQLAlchemy)" as Models <<model>>
+component "scan.worker (RQ, ONNX Runtime)" as Worker <<process>>
+database "PostgreSQL 18" as Pg <<database>>
+
+App ..> Client : gọi hàm
+Client ..> Router : HTTPS, JSON
+Router ..> Service : gọi hàm
+Router ..> Core : Depends
+Service ..> Models : đọc, ghi
+Worker ..> Models : ghi kết quả
+Models ..> Pg : SQL
+@enduml

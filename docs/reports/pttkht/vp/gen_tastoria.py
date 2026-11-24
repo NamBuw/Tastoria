@@ -599,10 +599,25 @@ def vp_class(d):
         if r1 == r2 and abs(c1 - c2) == 1:
             gxs[min(c1, c2)] = max(gxs[min(c1, c2)], tw(lab) + tw(ma) + tw(mb) + 110)
     xy = grid_xy(d["grid"], sizes, gy=140, gxs=gxs)
+    acl = {r[0][5:] for r in d["rels"] if r[0].startswith("acls:")}
     for k, *_ in d["classes"]:
-        s.show(K(d, k), xy[k][0], xy[k][1], int(sizes[k][0]), int(sizes[k][1]), final=True)
+        if k not in acl:
+            s.show(K(d, k), xy[k][0], xy[k][1], int(sizes[k][0]), int(sizes[k][1]), final=True)
+    for kind, x, y, lab, ma, mb in d["rels"]:      # lớp liên kết: tâm nằm dưới điểm giữa đường association
+        if kind.startswith("acls:"):
+            c = kind[5:]
+            (xa, ya), (xb, yb) = xy[x], xy[y]
+            mid = (xa + sizes[x][0] / 2 + xb + sizes[y][0] / 2) / 2
+            xy[c] = (mid - sizes[c][0] / 2, xy[c][1])
+            s.show(K(d, c), xy[c][0], xy[c][1], int(sizes[c][0]), int(sizes[c][1]), final=True)
     for i, (kind, x, y, lab, ma, mb) in enumerate(d["rels"]):
         r = K(d, f"r{i}")
+        if kind.startswith("acls:"):
+            s.assoc(r, K(d, x), K(d, y), name=lab or None, ma=ma or None, mb=mb or None)
+            s.conn(r)
+            s.acls(K(d, f"ac{i}"), K(d, kind[5:]), r)
+            s.conn(K(d, f"ac{i}"))
+            continue
         if kind in ("assoc", "comp"):
             s.assoc(r, K(d, x), K(d, y), name=lab or None, ma=(ma or None) if kind != "comp" else None, mb=mb or None,
                     agg_a="composite" if kind == "comp" else None)
@@ -783,7 +798,73 @@ def vp_overview(ns):
     s.flush()
 
 
-V = {"uc": vp_uc, "ctx": vp_ctx, "seq": vp_seq, "act": vp_act, "state": vp_state, "class": vp_class,
+# ------------------------------------------------------------------ luồng dữ liệu (Yourdon–DeMarco)
+def vp_dfd(d):
+    """Sơ đồ sao: quá trình ở tâm, tác nhân ngoài và kho xếp trên elip quanh nó; mỗi chiều một luồng song song.
+    Góc đặt lệch nửa bước để không vệ tinh nào nằm thẳng trên/dưới tâm (nhãn luồng dọc dễ đè hình)."""
+    import math
+    start(d, "YD")
+    pk = K(d, "P")
+    dfid, pname = d["center"]
+    s.proc(pk, dfid, pname)
+    for k, typ, name, ins, outs in d["sats"]:
+        kk = K(d, k)
+        if typ == "E":
+            s.extent(kk, name)
+        else:
+            s.emit("NEW", kk, "DFDataStore", name, None)
+            s.emit("CALL", kk, "setDfId", k[1:])
+    n = len(d["sats"])
+    cx, cy = 900, 560
+    pw, ph = max(tw(pname) / 2 + 70, 250), 170
+    s.show(pk, cx - pw / 2, cy - ph / 2, pw, ph, final=True)
+    RX, RY = (720, 440) if n > 4 else (640, 380)
+    if n <= 3:   # ít vệ tinh: kéo dài đường để nhãn dài nhất nằm gọn giữa hai hình
+        longest = max(tw(x) for _, _, _, i_, o_ in d["sats"] for x in (i_, o_))
+        widest = max(max(tw(nm) + 110, 230) for _, _, nm, _, _ in d["sats"])
+        RX = max(RX, pw / 2 + widest / 2 + longest + 120)
+
+    def exit_t(ox, oy, ux, uy, hw, hh):
+        ts = []
+        if abs(ux) > 1e-9:
+            ts.append((hw - (ox if ux > 0 else -ox)) / abs(ux))
+        if abs(uy) > 1e-9:
+            ts.append((hh - (oy if uy > 0 else -oy)) / abs(uy))
+        return min(ts)
+    bottom = cy + ph / 2
+    for i, (k, typ, name, ins, outs) in enumerate(d["sats"]):
+        kk = K(d, k)
+        a = math.radians(90 - 360 * (i + 0.5) / n) if n > 2 else math.radians(180 - 180 * i)
+        ux, uy = math.cos(a), -math.sin(a)
+        ew = max(tw(name) + (110 if typ == "S" else 60), 230)
+        eh = 70 if typ == "E" else 56
+        ex, ey = cx + RX * ux, cy + RY * uy
+        s.show(kk, ex - ew / 2, ey - eh / 2, ew, eh, final=True)
+        bottom = max(bottom, ey + eh / 2)
+        px, py = -uy, ux
+        both = bool(ins) and bool(outs)
+        off = (30 if abs(uy) < 0.5 else 40) if both else 0
+        for sgn, dirn, lab in ((+1, "in", ins), (-1, "out", outs)):
+            if not lab:
+                continue
+            ox, oy = px * off * sgn, py * off * sgn
+            tp = exit_t(ox, oy, ux, uy, pw / 2, ph / 2)
+            p_pt = (cx + ox + ux * tp, cy + oy + uy * tp)
+            te = exit_t(ox, oy, -ux, -uy, ew / 2, eh / 2)
+            e_pt = (ex + ox - ux * te, ey + oy - uy * te)
+            fk = K(d, f"f{k}{dirn}")
+            if dirn == "in":
+                s.flow(fk, kk, pk, lab)
+                s.conn(fk, [FP(e_pt), FP(p_pt)])
+            else:
+                s.flow(fk, pk, kk, lab)
+                s.conn(fk, [FP(p_pt), FP(e_pt)])
+            if abs(uy) >= 0.3:
+                s.lorient(fk)
+    footer(d["id"], bottom + 30)
+    s.flush()
+
+V = {"dfd": vp_dfd, "uc": vp_uc, "ctx": vp_ctx, "seq": vp_seq, "act": vp_act, "state": vp_state, "class": vp_class,
      "comp": vp_struct, "deploy": vp_struct, "pkg": vp_struct}
 
 if __name__ == "__main__":

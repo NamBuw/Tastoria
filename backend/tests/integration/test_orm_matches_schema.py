@@ -40,4 +40,17 @@ def test_orm_models_match_database(engine: Engine) -> None:
     # COMMENT ON ... text lives in db/schema.sql only (data dictionary); the ORM does not repeat it.
     diffs = [d for d in diffs if not _is_comment_diff(d)]
     assert diffs == []
-    assert {"users", "refresh_tokens", "password_resets", "idempotency_keys", "consent_events", "profiles"} <= mapped
+    assert {
+        "users",
+        "refresh_tokens",
+        "password_resets",
+        "idempotency_keys",
+        "consent_events",
+        "profiles",
+        "ingredient_embeddings",
+        "meal_logs",
+        "meal_log_items",
+        "email_outbox",
+        "email_verification_tokens",
+        "app_params",
+    } <= mapped

@@ -140,3 +140,25 @@ class CookPlan:
     burners: int
     dishes: tuple[PlanDish, ...]
     pinned_lot_ids: tuple[uuid.UUID, ...]
+
+
+@dataclass(frozen=True)
+class CookedDishInfo:
+    recipe_id: uuid.UUID
+    name_vi: str
+    slot: Literal["man", "rau", "canh"]
+    kcal_per_person: float | None
+
+
+@dataclass(frozen=True)
+class CookedMealDetail:
+    meal_plan_id: uuid.UUID
+    meal: Literal["lunch", "dinner"]
+    persons: int
+    rice_bowls_per_person: float | None
+    kcal_per_person: float | None
+    protein_g: float
+    carbs_g: float
+    fat_g: float
+    fiber_g: float
+    dishes: tuple[CookedDishInfo, ...]

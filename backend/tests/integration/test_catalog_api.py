@@ -100,7 +100,79 @@ def test_snapshot_has_the_whole_catalog_and_an_etag(kb_client: TestClient) -> No
     r = kb_client.get(f"{API}/catalog/snapshot", headers=s)
     assert r.status_code == 200
     snap = r.json()
-    assert len(snap["recipes"]) == 171 and len(snap["ingredients"]) == 232
+    assert len(snap["recipes"]) == 171 and len(snap["ingredients"]) == 233
     assert all(x["status"] == "published" for x in snap["recipes"])
     assert r.headers["ETag"] == f'"{snap["data_version"]}"'
     assert kb_client.get(f"{API}/catalog/snapshot", headers=s | {"If-None-Match": r.headers["ETag"]}).status_code == 304
+    assert all(x["pantry_match_ratio"] is None for x in snap["recipes"])
+
+
+def test_recipe_expanded_filters_macros_and_pantry_match(kb_client: TestClient, kb_db) -> None:
+    from kb_helpers import stock_for, user
+
+    h = user(kb_client)
+    r = kb_client.get(f"{API}/recipes", params={"q": "dau dua"}, headers=h)
+    item = next(x for x in r.json()["items"] if x["name_vi"] == "Đậu đũa xào tỏi")
+    assert item["protein_g"] is not None and item["carbs_g"] is not None
+    assert item["fat_g"] is not None and item["fiber_g"] is not None
+    assert item["pantry_match_ratio"] == 0.0
+
+    # Search by non-staple ingredient name without diacritics ("thit ba chi")
+    by_ing = kb_client.get(f"{API}/recipes", params={"q": "thit ba chi", "limit": 100}, headers=h)
+    assert by_ing.status_code == 200
+    assert "Ba chỉ chiên nước mắm" in [x["name_vi"] for x in by_ing.json()["items"]]
+
+    # Filter by method_code, max_minutes, max_kcal, food_group, make_ahead
+    ma = kb_client.get(f"{API}/recipes", params={"make_ahead": True, "limit": 100}, headers=h).json()["items"]
+    assert {x["name_vi"] for x in ma} == {"Dưa cải muối", "Cà pháo muối", "Dưa giá", "Canh măng nấu chân giò"}
+    fast_canh = kb_client.get(
+        f"{API}/recipes",
+        params={"slot": "canh", "max_minutes": 25, "max_kcal": 300, "food_group_code": "rau_la", "limit": 100},
+        headers=h,
+    ).json()["items"]
+    assert fast_canh and all(x["total_minutes"] <= 25 and x["kcal_per_serving"] <= 300 for x in fast_canh)
+
+    # Stock pantry for Ba chỉ chiên nước mắm and verify pantry_match_ratio == 1.0 + pantry_match=true filter
+    stock_for(kb_client, h, kb_db, "Ba chỉ chiên nước mắm", prefer=False)
+    matched = kb_client.get(f"{API}/recipes", params={"pantry_match": True, "limit": 100}, headers=h).json()["items"]
+    assert any(x["name_vi"] == "Ba chỉ chiên nước mắm" and x["pantry_match_ratio"] == 1.0 for x in matched)
+    assert all(x["pantry_match_ratio"] == 1.0 for x in matched)
+
+
+def test_ingredient_nutrition_handles_duplicate_comp_source_code(kb_db, kb_engine) -> None:
+    """M4-3 P1-8: two ingredients sharing the same (comp_source_id, comp_source_code) both receive nutrition."""
+    import pytest
+    from sqlalchemy import text
+    from sqlalchemy.orm import Session
+
+    from tastoria.modules.catalog import service as catalog
+
+    with kb_engine.connect() as conn:
+        trans = conn.begin()
+        try:
+            s = Session(bind=conn)
+            src_id, src_code, grp = s.execute(
+                text(
+                    "SELECT i.comp_source_id, i.comp_source_code, i.food_group_code FROM ingredients i "
+                    "JOIN food_nutrients fn ON fn.source_id = i.comp_source_id AND fn.source_code = i.comp_source_code "
+                    "WHERE fn.nutrient_code = 'energy_kcal' AND fn.per_100g > 0 LIMIT 1"
+                )
+            ).one()
+            existing_id = s.execute(
+                text("SELECT id FROM ingredients WHERE comp_source_id = :s AND comp_source_code = :c LIMIT 1"),
+                {"s": src_id, "c": src_code},
+            ).scalar_one()
+            dup_id = s.execute(
+                text(
+                    "INSERT INTO ingredients (name_vi, food_group_code, comp_source_id, comp_source_code) "
+                    "VALUES (:n, :g, :s, :c) RETURNING id"
+                ),
+                {"n": f"trùng-mã-{uuid.uuid4().hex[:6]}", "g": grp, "s": src_id, "c": src_code},
+            ).scalar_one()
+            res = catalog.ingredient_nutrition(s, [existing_id, dup_id])
+            assert res[existing_id].per_100g_purchased.get("energy_kcal", 0.0) > 0
+            assert res[dup_id].per_100g_purchased.get("energy_kcal", 0.0) == pytest.approx(
+                res[existing_id].per_100g_purchased["energy_kcal"]
+            )
+        finally:
+            trans.rollback()

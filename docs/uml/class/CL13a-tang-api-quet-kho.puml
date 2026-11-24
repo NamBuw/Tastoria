@@ -1,0 +1,56 @@
+@startuml
+title CL13a — Tầng API: router và schema của quét, kho
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "scan.router" as SR <<router>> {
+  +create_scan(mode: ScanMode, images: list[UploadFile]): Response
+  +get_scan(id: UUID, wait: int): ScanOut
+  +update_item(id: UUID, itemId: UUID, body: ScanItemPatch): ScanItemOut
+  +confirm(id: UUID, body: ScanConfirmRequest): ScanConfirmResult
+  +discard(id: UUID): JSONResponse
+}
+class "pantry.router" as PR <<router>> {
+  +list_lots(status: list[LotStatus], sort: str): PantryLotPage
+  +create_lot(body: PantryLotCreate): PantryLotOut
+  +update_lot(id: UUID, body: PantryLotPatch): PantryLotOut
+  +discard_lot(id: UUID): PantryLotOut
+}
+class "ScanOut" as SO <<schema>> {
+  -id: UUID
+  -mode: ScanMode
+  -status: ScanStatus
+  -attempts: int
+}
+class "ScanConfirmResult" as CR <<schema>> {
+  -scan_id: UUID
+  -confirmed_at: datetime
+  -created_lot_ids: list[UUID]
+  -not_seen_lot_ids: list[UUID]
+}
+class "PantryLotCreate" as LC <<schema>> {
+  -ingredient_id: UUID
+  -quantity: QuantityInput
+  -acquired_at: datetime
+}
+class "PantryLotOut" as LOU <<schema>> {
+  -ingredient_id: UUID
+  -balance_g_min: float
+  -balance_g_max: float
+  -acquired_at: datetime
+  -status: LotStatus
+}
+
+SR ..> SO
+SR ..> CR
+PR ..> LC
+PR ..> LOU
+@enduml

@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, Request
 
 from tastoria.core.auth import CurrentUser
 from tastoria.core.db import Uow
+from tastoria.core.ratelimit import enforce_rate_limit
 from tastoria.modules.profile import service
 from tastoria.modules.profile.schemas import (
     AllergenSet,
@@ -29,7 +30,8 @@ Deps = Annotated[ProfileDeps, Depends(profile_deps)]
 
 
 @router.get("/profile", operation_id="profile_get_profile")
-def get_profile(user: CurrentUser, uow: Uow, deps: Deps) -> ProfileOut:
+def get_profile(request: Request, user: CurrentUser, uow: Uow, deps: Deps) -> ProfileOut:
+    enforce_rate_limit(request, bucket="profile_get", subject=str(user.id), limit=60, window_s=60)
     return service.get_profile(uow.session, deps, user)
 
 

@@ -1,0 +1,28 @@
+@startuml
+title DFD01e — Mức 1, quá trình 5.0 Nấu, hoàn tất và hoàn tác
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+
+usecase "5.0\nNấu, hoàn tất và hoàn tác" as P
+rectangle "Người dùng" as E1
+database "D5 Mâm cơm" as D5
+database "D2 Danh mục món và nguyên liệu" as D2
+database "D6 Phiên nấu và lịch" as D6
+database "D4 Kho nguyên liệu (lô, giao dịch)" as D4
+database "D7 Tương tác" as D7
+E1 --> P : giờ dọn, nấu xong, đánh giá, hoàn tác
+P --> E1 : lịch nấu, phần đã trừ, thiếu hụt
+D5 --> P : mâm đã nhận
+P --> D5 : trạng thái cooked
+D2 --> P : bước nấu, thành phần
+D6 --> P : phiên đang nấu
+P --> D6 : phiên nấu, lịch
+D4 --> P : lô khả dụng
+P --> D4 : giao dịch cook_deduct, undo
+P --> D7 : cooked, liked, undone
+@enduml

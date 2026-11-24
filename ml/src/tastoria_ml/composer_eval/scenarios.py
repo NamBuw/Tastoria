@@ -32,6 +32,8 @@ from tastoria_ml.recsys.kb_catalog import REPO, Catalog
 
 OUT = REPO / "data" / "processed" / "composer_eval"
 SEED = 20261018
+CONFIRMATORY_SEED = 20261118
+PROTOCOL_ID = "TASTORIA-ML-PREREG-2026-11-18"
 PERSONS = (1, 2, 3, 4)
 P_PERSONS = (0.20, 0.35, 0.20, 0.25)
 
@@ -136,6 +138,27 @@ def generate(cat: Catalog, n: int = 150, seed: int = SEED) -> dict:
 def write(cat: Catalog, path: Path | None = None, **kw) -> dict:
     data = generate(cat, **kw)
     path = path or OUT / "scenarios.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    return data
+
+
+def generate_confirmatory(cat: Catalog, n: int = 90, seed: int = CONFIRMATORY_SEED) -> dict:
+    """Untouched single-pass confirmatory split (distinct seed from SEED=20261018) per PREREG H5a."""
+    if seed == SEED:
+        raise ValueError(f"Confirmatory seed must differ from exploratory SEED={SEED}")
+    data = generate(cat, n=n, seed=seed)
+    for idx, s in enumerate(data["scenarios"]):
+        s["id"] = f"c{idx:03d}"
+        s["split"] = "confirmatory"
+    data["split_mode"] = "confirmatory_single_pass"
+    data["protocol_id"] = PROTOCOL_ID
+    return data
+
+
+def write_confirmatory(cat: Catalog, path: Path | None = None, n: int = 90, seed: int = CONFIRMATORY_SEED) -> dict:
+    data = generate_confirmatory(cat, n=n, seed=seed)
+    path = path or OUT / "scenarios_confirmatory.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     return data

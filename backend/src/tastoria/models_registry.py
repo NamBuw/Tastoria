@@ -11,6 +11,7 @@ import tastoria.modules.cooking.models  # noqa: F401
 import tastoria.modules.events.models  # noqa: F401
 import tastoria.modules.identity.models  # noqa: F401
 import tastoria.modules.meal.models  # noqa: F401
+import tastoria.modules.meal_logs.models  # noqa: F401
 import tastoria.modules.mlops.models  # noqa: F401
 import tastoria.modules.pantry.models  # noqa: F401
 import tastoria.modules.privacy.models  # noqa: F401

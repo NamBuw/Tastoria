@@ -20,7 +20,7 @@ from typing import Annotated
 
 from fastapi import Depends, Request
 from sqlalchemy import MetaData, create_engine
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from tastoria.core.errors import ApiError
@@ -41,8 +41,31 @@ class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=NAMING)
 
 
-def make_engine(url: str, *, pool_size: int = 5) -> Engine:
-    return create_engine(url, pool_size=pool_size, max_overflow=pool_size, pool_pre_ping=True)
+def make_engine(
+    url: str,
+    *,
+    pool_size: int = 5,
+    pool_recycle: int = 1800,
+    pool_timeout: int = 10,
+    statement_timeout_ms: int = 15_000,
+    lock_timeout_ms: int = 5_000,
+    idle_in_transaction_session_timeout_ms: int = 30_000,
+) -> Engine:
+    kwargs: dict[str, object] = {
+        "pool_size": pool_size,
+        "max_overflow": pool_size,
+        "pool_pre_ping": True,
+        "pool_recycle": pool_recycle,
+        "pool_timeout": pool_timeout,
+    }
+    if make_url(url).get_backend_name() == "postgresql":
+        opts = [
+            f"-c statement_timeout={int(statement_timeout_ms)}",
+            f"-c lock_timeout={int(lock_timeout_ms)}",
+            f"-c idle_in_transaction_session_timeout={int(idle_in_transaction_session_timeout_ms)}",
+        ]
+        kwargs["connect_args"] = {"options": " ".join(opts)}
+    return create_engine(url, **kwargs)
 
 
 def make_sessionmaker(engine: Engine) -> sessionmaker[Session]:
@@ -82,21 +105,28 @@ def run_in_uow(sm: sessionmaker[Session], fn: Callable[[UnitOfWork], object]) ->
 
 def get_uow(request: Request) -> Iterator[UnitOfWork]:
     sm: sessionmaker[Session] = request.app.state.sessionmaker
-    with sm() as session:
-        uow = UnitOfWork(session)
-        try:
-            yield uow
-        except ApiError as exc:
-            if exc.commit:
-                session.commit()
-            else:
+    committed = False
+    uow: UnitOfWork | None = None
+    try:
+        with sm() as session:
+            uow = UnitOfWork(session)
+            try:
+                yield uow
+            except ApiError as exc:
+                if exc.commit:
+                    session.commit()
+                    committed = True
+                else:
+                    session.rollback()
+                raise
+            except BaseException:
                 session.rollback()
-            raise
-        except BaseException:
-            session.rollback()
-            raise
-        session.commit()
-    uow.run_after_commit()
+                raise
+            session.commit()
+            committed = True
+    finally:
+        if committed and uow is not None:
+            uow.run_after_commit()
 
 
 # Use this everywhere (routers and dependencies) so a request shares one Unit of Work.

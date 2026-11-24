@@ -1,0 +1,39 @@
+@startuml
+title CL12b — Tầng service: ghép mâm cơm
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "meal.service" as MS <<module>> {
+  +create_plan(body: MealPlanCreate): Created
+  +accept_plan(plan_id: UUID): MealPlanOut
+  +plan_for_cooking(user_id: UUID, plan_id: UUID): CookPlan
+}
+class "catalog.service" as CAT <<module>> {
+  +published_recipes(slot: str): list[RecipeView]
+  +recipe_allowed(recipe: RecipeView, allergens: set, excluded_groups: set): bool
+}
+class "Ranker" as RK <<interface>> {
+  +score(ctx: RankContext, recipes: list[RecipeView]): dict
+}
+class "meal.composer" as CP <<module>> {
+  +compose(p: Problem, structures: list): list[Tray]
+  +shortfall(p: Problem, tray: Tray): list
+}
+class "meal.schedule" as SH <<module>> {
+  +solve(dishes: list[Dish], burners: int): Schedule
+  +sequential(dishes: list[Dish]): Schedule
+}
+
+MS ..> CAT
+MS ..> RK
+MS ..> CP
+MS ..> SH
+@enduml

@@ -15,6 +15,7 @@ from tastoria.core.db import Uow
 from tastoria.core.errors import problem_body
 from tastoria.core.idempotency import IdempotencyKeyDep
 from tastoria.core.pagination import DEFAULT_LIMIT, MAX_LIMIT
+from tastoria.core.ratelimit import enforce_rate_limit
 from tastoria.modules.meal import service
 from tastoria.modules.meal.schemas import (
     MealPlanCreate,
@@ -42,6 +43,7 @@ Deps = Annotated[MealDeps, Depends(meal_deps)]
 def create_plan(
     body: MealPlanCreate, request: Request, user: CurrentUser, uow: Uow, deps: Deps, idem: IdempotencyKeyDep
 ) -> JSONResponse:
+    enforce_rate_limit(request, bucket="meal_plan_create", subject=str(user.id), limit=20, window_s=60)
     if (replayed := idempotency.begin(uow.session, user.id, idem)) is not None:
         return replayed
     res = service.create_plan(uow.session, deps, user, body)

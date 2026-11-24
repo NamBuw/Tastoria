@@ -13,6 +13,7 @@ import {
   EnergyTargetPanel,
   FavoritesPicker,
   profileToDraft,
+  validateBodyDraft,
   type BodyDraft,
 } from '@/components/profileForms';
 import { Button, ErrorBox, Loading, Notice, ProgressDots, Screen, T } from '@/components/ui';
@@ -66,7 +67,7 @@ export default function ProfileSteps() {
     return () => { cancelled = true; };
   }, [user, consents.isLoading, profile.isLoading, profile.data, idx, steps.length]);
 
-  if (idx === null) return <Screen><Loading /></Screen>;
+  if (idx === null) return <Screen variant="focused"><Loading /></Screen>;
   const step = steps[idx];
   const set = (p: Partial<BodyDraft>) => setDraft((d) => ({ ...d, ...p }));
 
@@ -124,8 +125,9 @@ export default function ProfileSteps() {
       await advance();
     });
 
-  const fe = fieldErrors(err);
-  const bodyOk = draft.sex && draft.birth_year.length === 4 && draft.height_cm && draft.weight_kg;
+  const draftErrors = validateBodyDraft(draft);
+  const fe = { ...draftErrors, ...fieldErrors(err) };
+  const bodyOk = Boolean(draft.sex && draft.birth_year.length === 4 && draft.height_cm && draft.weight_kg && Object.keys(draftErrors).length === 0);
 
   let content: ReactNode = null;
   let footer: ReactNode = null;
@@ -141,7 +143,7 @@ export default function ProfileSteps() {
     if (minor) {
       content = (
         <Notice tone="warn">
-          <T>Tastoria chỉ tính mục tiêu năng lượng cho người từ 18 tuổi. Bạn vẫn dùng được quét và ghép mâm; mâm sẽ không bám mục tiêu calo.</T>
+          <T>Mỹ Vị chỉ tính mục tiêu năng lượng cho người từ 18 tuổi. Bạn vẫn dùng được quét và ghép mâm; mâm sẽ không bám mục tiêu calo.</T>
         </Notice>
       );
       footer = <Button label="Tiếp" onPress={() => setIdx(idx + 1)} />;
@@ -157,7 +159,7 @@ export default function ProfileSteps() {
       content = (
         <Notice>
           <T v="title">Bạn đã đủ 18 tuổi chưa?</T>
-          <T>Theo năm sinh, bạn có thể mới 17 tuổi. Tastoria chỉ tính mục tiêu năng lượng cho người từ 18 tuổi.</T>
+          <T>Theo năm sinh, bạn có thể mới 17 tuổi. Mỹ Vị chỉ tính mục tiêu năng lượng cho người từ 18 tuổi.</T>
           <Button label="Tôi đã đủ 18 tuổi" onPress={() => saveBody(true)} loading={busy} />
           <Button
             label="Chưa"
@@ -202,7 +204,7 @@ export default function ProfileSteps() {
   } else {
     content = (
       <>
-        <T tone="muted">Chọn tối đa 5 món nhà bạn hay ăn. Tastoria dùng chúng để đoán gu lúc đầu.</T>
+        <T tone="muted">Chọn tối đa 5 món nhà bạn hay ăn. Mỹ Vị dùng chúng để đoán gu lúc đầu.</T>
         <FavoritesPicker selected={favs} onChange={setFavs} />
       </>
     );
@@ -215,7 +217,7 @@ export default function ProfileSteps() {
   }
 
   return (
-    <Screen testID={`screen-onboarding-${step}`} footer={footer}>
+    <Screen testID={`screen-onboarding-${step}`} variant="focused" footer={footer}>
       <ProgressDots step={idx + 1} total={steps.length} label={LABEL[step]} />
       <T v="h1" accessibilityRole="header">
         {step === 'activity' && energyFor ? 'Mục tiêu năng lượng' : LABEL[step]}

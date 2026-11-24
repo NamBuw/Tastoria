@@ -21,7 +21,17 @@ from sqlalchemy.orm import Mapped, mapped_column
 from tastoria.core.db import Base
 
 TZ = TIMESTAMP(timezone=True)
-MODEL_NAME = ENUM("detector", "freshness", "ranker", "substitution", name="model_name_t", create_type=False)
+MODEL_NAME = ENUM(
+    "detector",
+    "freshness",
+    "ranker",
+    "substitution",
+    "meal_calorie",
+    "dish_classifier",
+    "mushroom_classifier",
+    name="model_name_t",
+    create_type=False,
+)
 MODEL_STATUS = ENUM("candidate", "validated", "rejected", "retired", name="model_status_t", create_type=False)
 
 

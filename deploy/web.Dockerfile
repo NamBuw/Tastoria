@@ -13,11 +13,15 @@ ENV EXPO_PUBLIC_API_URL=/api/v1 \
 RUN npx expo export --platform web --output-dir dist
 
 FROM nginx:1.28-alpine
-RUN rm -f /etc/nginx/conf.d/default.conf
+RUN rm -f /etc/nginx/conf.d/default.conf \
+    && mkdir -p /tmp/nginx_client_body /tmp/nginx_proxy /tmp/nginx_fastcgi /tmp/nginx_uwsgi /tmp/nginx_scgi \
+    && chown -R nginx:nginx /tmp/nginx_* /var/cache/nginx /var/log/nginx /etc/nginx/conf.d
 COPY deploy/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY deploy/nginx/tastoria.conf /etc/nginx/conf.d/tastoria.conf
 COPY --from=web /app/dist /usr/share/nginx/tastoria
 # Landing page /gioi-thieu/ (static, landing/nginx-snippet.conf is inlined in tastoria.conf)
-COPY landing/index.html landing/style.css landing/story.js /usr/share/nginx/landing/
+COPY landing/*.html landing/style.css landing/story.js /usr/share/nginx/landing/
 COPY landing/fonts /usr/share/nginx/landing/fonts
 COPY landing/img /usr/share/nginx/landing/img
+EXPOSE 8080
+USER nginx

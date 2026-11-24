@@ -21,7 +21,11 @@ Scorers (higher = better substitute; candidates = same food group, not the ingre
 
 from __future__ import annotations
 
+import hashlib
+import json
 import math
+import re
+import unicodedata
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -33,6 +37,16 @@ import scipy.sparse as sp
 from tastoria_ml.recsys.kb_catalog import REPO, Catalog
 
 FOODCOM = REPO / "data" / "processed" / "foodcom"
+NON_MEAL_FOOD_GROUPS = frozenset({"do_an_vat"})
+
+
+def slugify_vi(name_vi: str) -> str:
+    """Deterministic ASCII slug from a Vietnamese ingredient name (for metadata; key_field remains name_vi)."""
+    s = unicodedata.normalize("NFKD", name_vi.strip())
+    s = s.replace("đ", "d").replace("Đ", "D")
+    s = "".join(ch for ch in s if not unicodedata.combining(ch))
+    s = re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
+    return s or "ingredient"
 
 
 def tok(s: str) -> str:
@@ -77,7 +91,7 @@ def longest(sentences: list[list[str]]) -> int:
 
 class W2V:
     def __init__(self, dim: int = 100, min_count: int = 5, epochs: int = 10, negative: int = 10, kb_repeat: int = 1,
-                 seed: int = 0, workers: int = 8):
+                 seed: int = 0, workers: int = 1):
         self.kw = dict(dim=dim, min_count=min_count, epochs=epochs, negative=negative, kb_repeat=kb_repeat)
         self.seed, self.workers = seed, workers
 
@@ -257,3 +271,211 @@ def random_mrr(n: int, m: int) -> float:
     # P(first relevant at rank r) = C(n − r, m − 1) / C(n, m)
     tot = math.comb(n, m)
     return sum(math.comb(n - r, m - 1) / tot / r for r in range(1, n - m + 2))
+
+
+class HybridScorer:
+    """Score-level fusion of unsupervised representation signals (W2V + Nutrient + PMI) + FoodGroup filter.
+
+    Strictly excludes Curated table lookup to avoid circularity under PREREG H4.
+    """
+
+    def __init__(
+        self,
+        w2v: W2V | None = None,
+        nut: Nutrient | None = None,
+        pmi: PMI | None = None,
+        weights: dict[str, float] | None = None,
+        *,
+        norm_mode: str = "affine",
+        missing_mode: str = "renorm",
+        exclude_non_meal: bool = False,
+        cat: Catalog | None = None,
+        fallback_to_group_prior: bool = False,
+        prior_counts: dict[str, int] | None = None,
+    ) -> None:
+        if norm_mode not in ("affine", "minmax"):
+            raise ValueError(f"Unsupported norm_mode: {norm_mode}")
+        if missing_mode not in ("renorm", "zero"):
+            raise ValueError(f"Unsupported missing_mode: {missing_mode}")
+        self.scorers = {"w2v": w2v, "nut": nut, "pmi": pmi}
+        w = dict(weights or {"w2v": 0.6, "nut": 0.25, "pmi": 0.15})
+        self.weights = {k: float(w.get(k, 0.0)) for k in ("w2v", "nut", "pmi")}
+        if sum(max(0.0, v) for v in self.weights.values()) <= 0.0:
+            raise ValueError("HybridScorer requires positive total weight")
+        self.norm_mode = norm_mode
+        self.missing_mode = missing_mode
+        self.exclude_non_meal = exclude_non_meal
+        self.cat = cat
+        self.fallback_to_group_prior = fallback_to_group_prior
+        self.prior_counts = prior_counts or {}
+
+    def _normalize(self, raw: dict[str, float], kind: str) -> dict[str, float]:
+        if not raw:
+            return {}
+        if self.norm_mode == "affine":
+            if kind in ("w2v", "nut"):
+                return {c: 0.5 * (max(-1.0, min(1.0, float(v))) + 1.0) for c, v in raw.items()}
+            return {c: max(0.0, min(1.0, float(v))) for c, v in raw.items()}
+        vals = list(raw.values())
+        lo, hi = min(vals), max(vals)
+        if hi <= lo:
+            return {c: 0.5 for c in raw}
+        span = hi - lo
+        return {c: (float(v) - lo) / span for c, v in raw.items()}
+
+    def score(self, missing: str, cands: list[str]) -> dict[str, float]:
+        active_cands = list(cands)
+        if self.exclude_non_meal and self.cat is not None:
+            active_cands = [
+                c for c in active_cands
+                if c in self.cat.ingredients and self.cat.ingredients[c].food_group not in NON_MEAL_FOOD_GROUPS
+            ]
+        if not active_cands:
+            return {}
+
+        norm_by_sig: dict[str, dict[str, float]] = {}
+        active_total_w = 0.0
+        for name, scorer in self.scorers.items():
+            w = self.weights.get(name, 0.0)
+            if w <= 0.0 or scorer is None:
+                continue
+            active_total_w += w
+            raw = scorer.score(missing, active_cands)
+            if raw:
+                norm_by_sig[name] = self._normalize(raw, name)
+
+        if not norm_by_sig:
+            if self.fallback_to_group_prior:
+                max_cnt = max((self.prior_counts.get(c, 0) for c in active_cands), default=0)
+                denom = float(max_cnt + 1)
+                return {c: (self.prior_counts.get(c, 0) + 1.0) / (denom + 1.0) for c in active_cands}
+            return {}
+
+        out: dict[str, float] = {}
+        for c in active_cands:
+            avail = [(m, norm_by_sig[m][c], self.weights[m]) for m in norm_by_sig if c in norm_by_sig[m]]
+            if not avail:
+                continue
+            if self.missing_mode == "renorm":
+                w_sum = sum(w for _, _, w in avail)
+                out[c] = float(sum(w * val for _, val, w in avail) / w_sum)
+            else:
+                out[c] = float(sum(w * val for _, val, w in avail) / active_total_w)
+        return out
+
+
+class HybridWithCurated:
+    """Serving-style wrapper placing Curated context matches ahead of HybridScorer candidates.
+
+    Reported separately from unsupervised HybridScorer on queries.yaml per PREREG H4 anti-circularity.
+    """
+
+    def __init__(self, curated: Curated, hybrid: HybridScorer, curated_boost: float = 1.0) -> None:
+        self.curated = curated
+        self.hybrid = hybrid
+        self.curated_boost = float(curated_boost)
+
+    def score(self, missing: str, cands: list[str], slot: str | None = None, method: str | None = None) -> dict[str, float]:
+        cur_scores = self.curated.score(missing, cands, slot=slot, method=method)
+        hyb_scores = self.hybrid.score(missing, cands)
+        out = dict(hyb_scores)
+        for c, v in cur_scores.items():
+            out[c] = self.curated_boost + float(v)
+        return out
+
+
+def export_embeddings(
+    w2v: W2V,
+    cat: Catalog,
+    out_dir: Path | None = None,
+    *,
+    version: str = "sub-w2v-100d-v1",
+    hybrid_config: dict | None = None,
+    eval_summary: dict | None = None,
+) -> dict:
+    """Export 100d L2-normalized finite pgvector-ready ingredient embeddings and SHA-256 manifest."""
+    dim = int(w2v.kw["dim"])
+    if dim != 100:
+        raise ValueError(f"pgvector ingredient_embeddings requires dim=100, got {dim}")
+    out_dir = out_dir or (REPO / "deploy" / "models" / "embeddings")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    all_names = sorted(unicodedata.normalize("NFC", n) for n in cat.ingredients)
+    covered_names: list[str] = []
+    uncovered_names: list[str] = []
+    vecs: list[np.ndarray] = []
+    slugs: list[str] = []
+    food_groups: list[str] = []
+    sources: list[str] = []
+    meta_rows: list[dict[str, str]] = []
+
+    raw_by_nfc = {unicodedata.normalize("NFC", k): k for k in cat.ingredients}
+    for nfc_name in all_names:
+        orig_name = raw_by_nfc[nfc_name]
+        v_raw = w2v.vec.get(orig_name)
+        if v_raw is None:
+            uncovered_names.append(nfc_name)
+            continue
+        v = np.asarray(v_raw, dtype=np.float64)
+        norm = float(np.linalg.norm(v))
+        if not np.isfinite(v).all() or norm <= 1e-12:
+            uncovered_names.append(nfc_name)
+            continue
+        v32 = (v / norm).astype(np.float32)
+        if not np.isfinite(v32).all():
+            raise ValueError(f"Non-finite normalized vector for {nfc_name}")
+        covered_names.append(nfc_name)
+        vecs.append(v32)
+        sl = slugify_vi(nfc_name)
+        fg = cat.ingredients[orig_name].food_group
+        src = w2v.source.get(orig_name, "unknown")
+        slugs.append(sl)
+        food_groups.append(fg)
+        sources.append(src)
+        meta_rows.append({"name_vi": nfc_name, "slug": sl, "food_group": fg, "source": src})
+
+    if not vecs:
+        raise ValueError("No covered ingredient embeddings to export")
+    vectors = np.stack(vecs, axis=0).astype(np.float32)
+    assert vectors.shape == (len(covered_names), 100)
+    assert np.isfinite(vectors).all()
+    assert np.allclose(np.linalg.norm(vectors, axis=1), 1.0, atol=1e-5)
+
+    npz_path = out_dir / "ingredient_embeddings.npz"
+    np.savez(
+        npz_path,
+        vectors=vectors,
+        names_vi=np.asarray(covered_names, dtype=str),
+        slugs=np.asarray(slugs, dtype=str),
+        food_groups=np.asarray(food_groups, dtype=str),
+        sources=np.asarray(sources, dtype=str),
+    )
+    sha = hashlib.sha256(npz_path.read_bytes()).hexdigest()
+
+    manifest = {
+        "name": "substitution",
+        "version": version,
+        "artifact_file": "ingredient_embeddings.npz",
+        "artifact_sha256": sha,
+        "dim": 100,
+        "dtype": "float32",
+        "l2_normalized": True,
+        "distance_metric": "cosine",
+        "key_field": "name_vi",
+        "key_normalization": "NFC",
+        "catalog_total": len(all_names),
+        "embedded_count": len(covered_names),
+        "uncovered_count": len(uncovered_names),
+        "uncovered_ingredients": uncovered_names,
+        "w2v_params": {
+            **w2v.kw,
+            "seed": int(w2v.seed),
+            "workers": int(w2v.workers),
+            "window": int(getattr(w2v, "window", 0)),
+        },
+        "hybrid_fusion": hybrid_config or {},
+        "eval": eval_summary or {},
+        "ingredients": meta_rows,
+    }
+    (out_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return manifest

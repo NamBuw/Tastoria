@@ -1,5 +1,4 @@
-"""Tables owned by substitute: substitution_pairs (curated lookup table, UC26) and shopping_items (UC18).
-ingredient_embeddings waits for the substitution model (mlops)."""
+"""Tables owned by substitute: substitution_pairs, ingredient_embeddings, and shopping_items."""
 
 from __future__ import annotations
 
@@ -10,12 +9,35 @@ from decimal import Decimal
 from sqlalchemy import Boolean, ForeignKey, Index, Numeric, Text, UniqueConstraint, text
 from sqlalchemy.dialects.postgresql import ENUM, REAL, TIMESTAMP, UUID
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.types import UserDefinedType
 
 from tastoria.core.db import Base
 
 TZ = TIMESTAMP(timezone=True)
 SLOT = ENUM("man", "rau", "canh", name="slot_t", create_type=False)
 SHOP_STATUS = ENUM("open", "bought", "dropped", name="shopping_status_t", create_type=False)
+
+
+class PgVector(UserDefinedType):
+    cache_ok = True
+
+    def __init__(self, dim: int) -> None:
+        self.dim = dim
+
+    def get_col_spec(self, **kw: object) -> str:
+        return f"vector({self.dim})"
+
+
+class IngredientEmbedding(Base):
+    __tablename__ = "ingredient_embeddings"
+
+    ingredient_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("ingredients.id"), primary_key=True
+    )
+    model_version_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("model_versions.id"), primary_key=True
+    )
+    vector: Mapped[object] = mapped_column(PgVector(100), nullable=False)
 
 
 class SubstitutionPair(Base):
@@ -61,10 +83,29 @@ class ShoppingItem(Base):
     source_meal_plan_item_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("meal_plan_items.id", ondelete="SET NULL")
     )
+    pantry_lot_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("pantry_lots.id", ondelete="SET NULL")
+    )
     created_at: Mapped[datetime] = mapped_column(TZ, nullable=False, server_default=text("now()"))
     updated_at: Mapped[datetime] = mapped_column(TZ, nullable=False, server_default=text("now()"))
 
     __table_args__ = (
         Index("ix_shopping_items_user_id_status", "user_id", "status"),
         Index("ix_shopping_items_source_meal_plan_item_id", "source_meal_plan_item_id"),
+        Index("ix_shopping_items_pantry_lot_id", "pantry_lot_id"),
+        Index(
+            "ux_shopping_items_open_null_src",
+            "user_id",
+            "ingredient_id",
+            unique=True,
+            postgresql_where=text("status = 'open' AND source_meal_plan_item_id IS NULL"),
+        ),
+        Index(
+            "ux_shopping_items_open_with_src",
+            "user_id",
+            "ingredient_id",
+            "source_meal_plan_item_id",
+            unique=True,
+            postgresql_where=text("status = 'open' AND source_meal_plan_item_id IS NOT NULL"),
+        ),
     )

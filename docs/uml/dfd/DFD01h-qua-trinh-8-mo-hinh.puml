@@ -1,0 +1,20 @@
+@startuml
+title DFD01h — Mức 1, quá trình 8.0 Vận hành mô hình
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+left to right direction
+
+usecase "8.0\nVận hành mô hình" as P
+rectangle "Người vận hành mô hình" as E5
+database "D9 Phiên bản mô hình" as D9
+database "D2 Danh mục món và nguyên liệu" as D2
+E5 --> P : tệp ONNX, register, gate, deploy, rollback
+P --> E5 : kết quả gate, danh sách phiên bản
+D9 --> P : phiên bản, triển khai hiện hành
+P --> D9 : phiên bản, bản đồ lớp, con trỏ triển khai
+D2 --> P : lớp thị giác
+@enduml

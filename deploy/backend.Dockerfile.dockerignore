@@ -8,6 +8,7 @@
 !ml/src/**
 !data/kb/**
 !data/processed/fct2007/**
+!data/processed/kb/**
 !data/processed/usda/**
 !deploy/scripts/scheduler.sh
 !deploy/scripts/models-bootstrap.sh

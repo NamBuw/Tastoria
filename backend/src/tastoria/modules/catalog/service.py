@@ -10,11 +10,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import threading
 import uuid
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from fastapi import Request
 from fastapi.encoders import jsonable_encoder
@@ -60,6 +62,7 @@ from tastoria.modules.catalog.schemas import (
     ConsentPurposeRef,
     DietOut,
     FoodNutrition,
+    IngredientExportRef,
     IngredientOut,
     IngredientPage,
     IngredientUnitOut,
@@ -68,6 +71,7 @@ from tastoria.modules.catalog.schemas import (
     MakeAheadView,
     NutrientOut,
     QtyLevelOut,
+    RecipeExportRef,
     RecipeIngredientOut,
     RecipeLine,
     RecipeNutrientOut,
@@ -93,6 +97,7 @@ class CatalogDeps:
     """Installed by tastoria.app: /reference lists consent purposes, owned by privacy (no import from here)."""
 
     consent_purposes: Callable[[Session], Sequence[object]]
+    available_ingredient_ids: Callable[[Session, uuid.UUID], set[uuid.UUID]] = lambda s, uid: set()
 
 
 def catalog_deps(request: Request) -> CatalogDeps:
@@ -245,13 +250,14 @@ def _recipe_views(session: Session, recipes: list[Recipe]) -> list[RecipeView]:
         select(RecipeTag.recipe_id, RecipeTag.tag_code).where(RecipeTag.recipe_id.in_(ids))
     ):
         tags[rid].add(code)
-    kcal = dict(
-        session.execute(
-            select(RecipeNutrition.recipe_id, RecipeNutrition.per_serving).where(
-                RecipeNutrition.recipe_id.in_(ids), RecipeNutrition.nutrient_code == "energy_kcal"
-            )
-        ).all()
-    )
+    macros: dict[uuid.UUID, dict[str, float]] = defaultdict(dict)
+    for rid, ncode, val in session.execute(
+        select(RecipeNutrition.recipe_id, RecipeNutrition.nutrient_code, RecipeNutrition.per_serving).where(
+            RecipeNutrition.recipe_id.in_(ids),
+            RecipeNutrition.nutrient_code.in_(("energy_kcal", "protein_g", "lipid_g", "glucid_g", "fiber_g")),
+        )
+    ):
+        macros[rid][ncode] = float(val)
     by_recipe: dict[uuid.UUID, list[RecipeLine]] = defaultdict(list)
     for ln in sorted(lines, key=lambda x: (x.role != "main", x.role != "side", -float(x.grams))):
         by_recipe[ln.recipe_id].append(RecipeLine(ing[ln.ingredient_id], float(ln.grams), ln.role, ln.is_optional))
@@ -259,6 +265,7 @@ def _recipe_views(session: Session, recipes: list[Recipe]) -> list[RecipeView]:
     for r in recipes:
         m = makes.get(r.id)
         st = tuple(steps.get(r.id, ()))
+        nut_map = macros.get(r.id, {})
         out.append(
             RecipeView(
                 id=r.id,
@@ -270,21 +277,78 @@ def _recipe_views(session: Session, recipes: list[Recipe]) -> list[RecipeView]:
                 lines=tuple(by_recipe.get(r.id, ())),
                 steps=st,
                 tag_codes=frozenset(tags.get(r.id, ())),
-                kcal_per_serving=float(kcal[r.id]) if r.id in kcal else None,
+                kcal_per_serving=nut_map.get("energy_kcal"),
                 make_ahead=MakeAheadView(ing[m.item_ingredient_id], m.through_step_no, m.through_step_no >= len(st))
                 if m
                 else None,
                 created_at=r.created_at,
+                protein_g=nut_map.get("protein_g"),
+                carbs_g=nut_map.get("glucid_g"),
+                fat_g=nut_map.get("lipid_g"),
+                fiber_g=nut_map.get("fiber_g"),
             )
         )
     return out
 
 
-def published_recipes(session: Session, slot: str | None = None) -> list[RecipeView]:
+_PUBLISHED_CACHE_LOCK = threading.Lock()
+_PUBLISHED_CACHE: dict[str, tuple[tuple[Any, ...], tuple[RecipeView, ...]]] = {}
+
+
+def _cache_db_key(session: Session) -> str:
+    bind = session.get_bind()
+    engine = getattr(bind, "engine", bind)
+    url = engine.url.render_as_string(hide_password=True)
+    if url.startswith("sqlite") and (":memory:" in url or url in ("sqlite://", "sqlite+pysqlite://")):
+        return f"{url}#{id(engine)}"
+    return url
+
+
+def _catalog_version_key(session: Session) -> tuple[Any, ...]:
+    row = session.execute(
+        text(
+            "SELECT "
+            "(SELECT count(*) FROM recipes WHERE status = 'published'), "
+            "(SELECT max(updated_at) FROM recipes), "
+            "(SELECT max(CAST(id AS TEXT)) FROM recipes WHERE status = 'published'), "
+            "(SELECT count(*) FROM ingredients WHERE is_active), "
+            "(SELECT max(updated_at) FROM ingredients), "
+            "(SELECT count(*) FROM recipe_nutrition), "
+            "(SELECT max(computed_at) FROM recipe_nutrition)"
+        )
+    ).one()
+    return tuple(row)
+
+
+def invalidate_published_recipes_cache(session: Session | None = None) -> None:
+    with _PUBLISHED_CACHE_LOCK:
+        if session is None:
+            _PUBLISHED_CACHE.clear()
+        else:
+            _PUBLISHED_CACHE.pop(_cache_db_key(session), None)
+
+
+def _published_recipes_uncached(session: Session, slot: str | None = None) -> list[RecipeView]:
     q = select(Recipe).where(Recipe.status == "published")
     if slot is not None:
         q = q.where(Recipe.slot == slot)
     return _recipe_views(session, list(session.scalars(q.order_by(Recipe.created_at, Recipe.id))))
+
+
+def published_recipes(session: Session, slot: str | None = None) -> list[RecipeView]:
+    if session.new or session.dirty or session.deleted:
+        return _published_recipes_uncached(session, slot=slot)
+    db_key = _cache_db_key(session)
+    ver = _catalog_version_key(session)
+    with _PUBLISHED_CACHE_LOCK:
+        entry = _PUBLISHED_CACHE.get(db_key)
+        if entry is not None and entry[0] == ver:
+            cached = entry[1]
+            return [v for v in cached if slot is None or v.slot == slot]
+    views = tuple(_published_recipes_uncached(session, slot=None))
+    with _PUBLISHED_CACHE_LOCK:
+        _PUBLISHED_CACHE[db_key] = (ver, views)
+    return [v for v in views if slot is None or v.slot == slot]
 
 
 def recipes_by_ids(session: Session, ids: Iterable[uuid.UUID]) -> dict[uuid.UUID, RecipeView]:
@@ -299,6 +363,8 @@ def ingredient_nutrition(session: Session, ids: Iterable[uuid.UUID]) -> dict[uui
     """Per 100 g as purchased (EP = 1 − refuse for FCT rows) — for recomputing a dish after a substitution
     (BR-NUT-05) and for the nutrition-vector neighbours of substitute (design v2 §6.3 c)."""
     wanted = list(set(ids))
+    if not wanted:
+        return {}
     rows = session.execute(
         select(Ingredient.id, Ingredient.comp_source_id, Ingredient.comp_source_code, FoodItem.refuse_pct)
         .join(
@@ -307,15 +373,16 @@ def ingredient_nutrition(session: Session, ids: Iterable[uuid.UUID]) -> dict[uui
         )
         .where(Ingredient.id.in_(wanted))
     ).all()
-    keys = {(r.comp_source_id, r.comp_source_code): r for r in rows}
+    comp_keys = {(r.comp_source_id, r.comp_source_code) for r in rows}
     vals: dict[tuple[int, str], dict[str, float]] = defaultdict(dict)
-    if keys:
+    if comp_keys:
         for fn in session.scalars(
-            select(FoodNutrient).where(tuple_(FoodNutrient.source_id, FoodNutrient.source_code).in_(list(keys)))
+            select(FoodNutrient).where(tuple_(FoodNutrient.source_id, FoodNutrient.source_code).in_(list(comp_keys)))
         ):
             vals[(fn.source_id, fn.source_code)][fn.nutrient_code] = float(fn.per_100g)
     out = {i: FoodNutrition(i) for i in wanted}
-    for k, r in keys.items():
+    for r in rows:
+        k = (r.comp_source_id, r.comp_source_code)
         ep = 1 - float(r.refuse_pct or 0) / 100 if r.comp_source_id == importer.SOURCE_ID["fct2007"] else 1.0
         out[r.id] = FoodNutrition(r.id, {n: v * ep for n, v in vals[k].items()})
     return out
@@ -333,20 +400,55 @@ def rice_bowl_kcal(session: Session) -> float | None:
     return round(float(v) * nut.RICE_BOWL_G / nut.RICE_YIELD / 100, 1) if v is not None else None
 
 
-_DB_PARAM = text(
-    "SELECT split_part(c, '=', 2) FROM pg_db_role_setting s CROSS JOIN LATERAL unnest(s.setconfig) c "
-    "WHERE s.setdatabase = (SELECT oid FROM pg_database WHERE datname = current_database()) AND s.setrole = 0 "
-    "AND split_part(c, '=', 1) = :k"
-)
+def rice_bowl_macros(session: Session) -> dict[str, float]:
+    """Per-bowl macros (protein_g, carbs_g, fat_g, fiber_g, energy_kcal) of 150 g cooked rice (FCT 1004)."""
+    rows = session.execute(
+        select(FoodNutrient.nutrient_code, FoodNutrient.per_100g).where(
+            FoodNutrient.source_id == importer.SOURCE_ID["fct2007"],
+            FoodNutrient.source_code == RICE_FCT_CODE,
+            FoodNutrient.nutrient_code.in_(("energy_kcal", "protein_g", "lipid_g", "glucid_g", "fiber_g")),
+        )
+    ).all()
+    scale = nut.RICE_BOWL_G / nut.RICE_YIELD / 100
+    raw = {code: float(val) * scale for code, val in rows}
+    if not raw:
+        return {}
+    return {
+        "energy_kcal": round(raw.get("energy_kcal", 0.0), 1),
+        "protein_g": raw.get("protein_g", 0.0),
+        "carbs_g": raw.get("glucid_g", 0.0),
+        "fat_g": raw.get("lipid_g", 0.0),
+        "fiber_g": raw.get("fiber_g", 0.0),
+    }
+
+
+def recipe_macros(session: Session, recipe_ids: Iterable[uuid.UUID]) -> dict[uuid.UUID, dict[str, float]]:
+    wanted = list(set(recipe_ids))
+    if not wanted:
+        return {}
+    out: dict[uuid.UUID, dict[str, float]] = defaultdict(dict)
+    for rid, ncode, val in session.execute(
+        select(RecipeNutrition.recipe_id, RecipeNutrition.nutrient_code, RecipeNutrition.per_serving).where(
+            RecipeNutrition.recipe_id.in_(wanted),
+            RecipeNutrition.nutrient_code.in_(("energy_kcal", "protein_g", "lipid_g", "glucid_g", "fiber_g")),
+        )
+    ):
+        out[rid][ncode] = float(val)
+    return dict(out)
+
+
+_DB_PARAM = text("SELECT app_param(:k)")
 
 
 def db_param(session: Session, key: str) -> float | None:
-    """A database-level parameter tastoria.<key> as stored now (pg_db_role_setting), not the value the pooled
-    connection saw when it opened — so a catalog import takes effect without restarting the API."""
-    v = session.scalar(_DB_PARAM, {"k": f"tastoria.{key}"})
+    """A database-level parameter from app_params (via app_param()), so a catalog import takes effect without
+    restarting the API."""
+    v = session.scalar(_DB_PARAM, {"k": key})
+    if v is None:
+        return None
     try:
-        return float(v) if v not in (None, "") else None
-    except ValueError:
+        return float(v)
+    except (TypeError, ValueError):
         return None
 
 
@@ -405,7 +507,17 @@ def get_reference(session: Session, deps: CatalogDeps) -> ReferenceData:
 # ---------------------------------------------------------------- API: recipes, ingredients, snapshot
 
 
-def _summary(v: RecipeView) -> RecipeSummary:
+def _pantry_match_ratio(v: RecipeView, available_ids: set[uuid.UUID]) -> float:
+    if v.make_ahead and v.make_ahead.whole_dish:
+        required = [v.make_ahead.item.id]
+    else:
+        required = [ln.ingredient.id for ln in v.lines if not ln.ingredient.is_staple and not ln.is_optional]
+    if not required:
+        return 1.0
+    return round(sum(1 for iid in required if iid in available_ids) / len(required), 2)
+
+
+def _summary(v: RecipeView, available_ids: set[uuid.UUID] | None = None) -> RecipeSummary:
     return RecipeSummary(
         id=v.id,
         name_vi=v.name_vi,
@@ -414,43 +526,86 @@ def _summary(v: RecipeView) -> RecipeSummary:
         method_code=v.method_code,
         total_minutes=sum(s.minutes for s in v.steps),
         kcal_per_serving=v.kcal_per_serving,
+        protein_g=v.protein_g,
+        carbs_g=v.carbs_g,
+        fat_g=v.fat_g,
+        fiber_g=v.fiber_g,
+        pantry_match_ratio=_pantry_match_ratio(v, available_ids) if available_ids is not None else None,
         tag_codes=sorted(v.tag_codes),
     )
 
 
 def list_recipes(
-    session: Session, *, q: str | None, slot: str | None, tag: str | None, cursor: str | None, limit: int
+    session: Session,
+    *,
+    q: str | None,
+    slot: str | None,
+    tag: str | None,
+    cursor: str | None,
+    limit: int,
+    food_group: str | None = None,
+    method_code: str | None = None,
+    max_minutes: int | None = None,
+    max_kcal: float | None = None,
+    make_ahead: bool | None = None,
+    pantry_match: bool | None = None,
+    available_ids: set[uuid.UUID] | None = None,
 ) -> RecipeSummaryPage:
     after = pagination.decode_created(cursor)
     views = published_recipes(session, slot)
     if tag:
         views = [v for v in views if tag in v.tag_codes]
+    if food_group:
+        views = [v for v in views if food_group in v.food_group_codes]
+    if method_code:
+        views = [v for v in views if v.method_code == method_code]
+    if max_minutes is not None:
+        views = [v for v in views if sum(s.minutes for s in v.steps) <= max_minutes]
+    if max_kcal is not None:
+        views = [v for v in views if v.kcal_per_serving is not None and v.kcal_per_serving <= max_kcal]
+    if make_ahead is not None:
+        views = [v for v in views if (v.make_ahead is not None) is make_ahead]
     if q:
         needle = fold(q)
-        views = [v for v in views if needle in fold(v.name_vi)]
+        views = [
+            v
+            for v in views
+            if needle in fold(v.name_vi)
+            or any(needle in fold(ln.ingredient.name_vi) for ln in v.lines if not ln.ingredient.is_staple)
+        ]
+    if pantry_match is not None:
+        avail = available_ids or set()
+        views = [v for v in views if (_pantry_match_ratio(v, avail) == 1.0) is pantry_match]
     if after is not None:
         views = [v for v in views if (v.created_at, v.id) > after]  # type: ignore[operator]
     page = views[:limit]
     nxt = pagination.encode_created(page[-1].created_at, page[-1].id) if len(views) > limit else None  # type: ignore[arg-type]
-    return RecipeSummaryPage(items=[_summary(v) for v in page], next_cursor=nxt)
+    return RecipeSummaryPage(items=[_summary(v, available_ids) for v in page], next_cursor=nxt)
 
 
-def _recipe_out(session: Session, v: RecipeView, r: Recipe) -> RecipeOut:
+def _recipe_out(
+    session: Session, v: RecipeView, r: Recipe, available_ids: set[uuid.UUID] | None = None
+) -> RecipeOut:
     sources = session.scalars(select(RecipeSource).where(RecipeSource.recipe_id == v.id).order_by(RecipeSource.url))
     nutrients = list(
         session.scalars(
             select(RecipeNutrition).where(RecipeNutrition.recipe_id == v.id).order_by(RecipeNutrition.nutrient_code)
         )
     )
-    return _recipe_out_from(v, r.notes, list(sources), nutrients)
+    return _recipe_out_from(v, r.notes, list(sources), nutrients, available_ids=available_ids)
 
 
 def _recipe_out_from(
-    v: RecipeView, notes: str | None, sources: list[RecipeSource], nutrients: list[RecipeNutrition]
+    v: RecipeView,
+    notes: str | None,
+    sources: list[RecipeSource],
+    nutrients: list[RecipeNutrition],
+    *,
+    available_ids: set[uuid.UUID] | None = None,
 ) -> RecipeOut:
     m = v.make_ahead
     return RecipeOut(
-        **_summary(v).model_dump(),
+        **_summary(v, available_ids).model_dump(),
         status=v.status,  # type: ignore[arg-type]
         notes=notes,
         ingredients=[
@@ -487,12 +642,14 @@ def _recipe_out_from(
     )
 
 
-def get_recipe(session: Session, recipe_id: uuid.UUID) -> RecipeOut:
+def get_recipe(
+    session: Session, recipe_id: uuid.UUID, *, available_ids: set[uuid.UUID] | None = None
+) -> RecipeOut:
     """Published and retired recipes are readable (old plans show the version they used); drafts are not."""
     r = session.get(Recipe, recipe_id)
     if r is None or r.status == "draft":
         raise ApiError(404, ProblemCode.not_found)
-    return _recipe_out(session, _recipe_views(session, [r])[0], r)
+    return _recipe_out(session, _recipe_views(session, [r])[0], r, available_ids=available_ids)
 
 
 def _ingredient_out(v: IngredientView, units: list[IngredientUnit], synonyms: list[str]) -> IngredientOut:
@@ -594,6 +751,7 @@ def import_bundle(session: Session, bundle: Bundle, processed: Path) -> importer
     (FR-25-15); any violation raises ValueError so the caller rolls everything back."""
     result = nut.compute(bundle, processed)
     report = importer.apply(session, bundle, result, utcnow())
+    invalidate_published_recipes_cache(session)
     problems = check_catalog_safety(session, bundle)
     if problems:
         raise ValueError("catalog safety check failed:\n" + "\n".join(problems))
@@ -603,7 +761,7 @@ def import_bundle(session: Session, bundle: Bundle, processed: Path) -> importer
 def check_catalog_safety(session: Session, bundle: Bundle | None = None) -> list[str]:
     """Hard filter vs raw SQL for every published recipe × every allergen group and diet, plus the `vegetarian`
     flags of dish_list.yaml against the diet `chay`."""
-    views = published_recipes(session)
+    views = _published_recipes_uncached(session)
     allergen_rows = session.execute(
         text(
             "SELECT ri.recipe_id, ia.allergen_code FROM recipe_ingredients ri "
@@ -666,3 +824,19 @@ def vision_classes(session: Session) -> dict[int, VisionClassView]:
 
 def vision_class_ids_by_code(session: Session) -> dict[str, int]:
     return {code: vid for vid, code in session.execute(select(VisionClass.id, VisionClass.code))}
+
+
+def all_recipes_for_export(session: Session) -> list[RecipeExportRef]:
+    rows = session.execute(
+        select(Recipe.id, Recipe.name_vi, Recipe.slot, Recipe.method_code, Recipe.status).order_by(Recipe.id)
+    )
+    return [RecipeExportRef(*r) for r in rows]
+
+
+def all_ingredients_for_export(session: Session) -> list[IngredientExportRef]:
+    rows = session.execute(
+        select(Ingredient.id, Ingredient.name_vi, Ingredient.food_group_code, Ingredient.is_staple).order_by(
+            Ingredient.id
+        )
+    )
+    return [IngredientExportRef(*r) for r in rows]

@@ -6,7 +6,11 @@ source "$(dirname "$0")/lib.sh"
 do_backup=1
 [ "${1:-}" = "--no-backup" ] && do_backup=0
 
-[ -f "$ENV_FILE" ] || "$DEPLOY_DIR/scripts/init-env.sh"
+if [ -f "$ENV_FILE" ]; then
+  "$DEPLOY_DIR/scripts/init-env.sh" --ensure-missing
+else
+  "$DEPLOY_DIR/scripts/init-env.sh"
+fi
 chmod 600 "$ENV_FILE"
 
 tag="$(git -C "$REPO_DIR" rev-parse --short=12 HEAD)"
@@ -14,8 +18,11 @@ git -C "$REPO_DIR" diff --quiet HEAD -- backend ml app data/kb data/processed/fc
   || tag="$tag-dirty-$(date +%Y%m%d%H%M%S)"
 prev="$(env_get TASTORIA_IMAGE_TAG)"
 log "build tastoria-backend:$tag, tastoria-web:$tag (trước đó: ${prev:-chưa có})"
-TASTORIA_IMAGE_TAG="$tag" dc build --pull api nginx
+TASTORIA_IMAGE_TAG="$tag" TASTORIA_WEB_TAG="$tag" dc build --pull api nginx
 docker tag "tastoria-backend:$tag" tastoria-backend:latest
+docker tag "tastoria-web:$tag" tastoria-web:latest
+
+"$DEPLOY_DIR/scripts/check-web-image.sh" "tastoria-web:$tag"
 
 # pg_dump before migrating (spec v2 §10), when a database is already running.
 if [ "$do_backup" = 1 ] && [ -n "$(dc ps -q --status running postgres 2>/dev/null)" ]; then
@@ -25,32 +32,58 @@ fi
 
 # Models (gitignored on the host): stage them for the migrate container, which registers them in the file volume
 # (scripts/models-bootstrap.sh). Missing files are not fatal when the volume already holds a deployed version.
-stage_model() { # stage_model NAME VERSION PREPROCESS ONNX METRICS SERVING
+stage_model() { # stage_model NAME VERSION PREPROCESS ARTIFACT METRICS SERVING [FILENAME]
   local d="$DEPLOY_DIR/models/$1"
+  local fname="${7:-model.onnx}"
   if [ ! -f "$4" ]; then
-    log "không thấy $4: bỏ qua đăng ký $1 (bản đã đăng ký trong volume vẫn dùng được)"
-    rm -rf "$d"
+    log "không thấy nguồn ngoài $4: giữ nguyên bản đã stage trong $d (nếu có)"
     return 0
   fi
   mkdir -p "$d"
-  cp "$4" "$d/model.onnx.tmp" && mv "$d/model.onnx.tmp" "$d/model.onnx"
+  cp "$4" "$d/$fname.tmp" && mv "$d/$fname.tmp" "$d/$fname"
   printf '%s' "$2" > "$d/version"
   printf '%s' "$3" > "$d/preprocess_version"
-  cp "$5" "$d/metrics.json"
-  cp "$6" "$d/serving.json"
-  log "model $1 $2 (sha256 $(sha256sum "$d/model.onnx" | cut -c1-12)…)"
+  [ -f "$5" ] && cp "$5" "$d/metrics.json"
+  [ -f "$6" ] && cp "$6" "$d/serving.json"
+  log "model $1 $2 (sha256 $(sha256sum "$d/$fname" | cut -c1-12)…)"
 }
 mkdir -p "$DEPLOY_DIR/models"
-det_version="${TASTORIA_DETECTOR_VERSION:-yolo26n_640_none}"
-stage_model detector "$det_version" none \
-  "${TASTORIA_DETECTOR_ONNX:-$REPO_DIR/ml/runs/detect/$det_version/weights/best.onnx}" \
-  "$REPO_DIR/data/processed/cv/detector/$det_version.json" \
-  "$REPO_DIR/data/processed/cv/detector/${det_version}_serving.json"
-# No freshness model is exported yet (backend/README.md, slice 3): nothing to stage.
+if [ -n "${TASTORIA_DETECTOR_VERSION:-}" ] || [ -n "${TASTORIA_DETECTOR_ONNX:-}" ] || [ ! -f "$DEPLOY_DIR/models/detector/model.onnx" ]; then
+  det_version="${TASTORIA_DETECTOR_VERSION:-yolo26n_640_none}"
+  stage_model detector "$det_version" none \
+    "${TASTORIA_DETECTOR_ONNX:-$REPO_DIR/ml/runs/detect/$det_version/weights/best.onnx}" \
+    "$REPO_DIR/data/processed/cv/detector/$det_version.json" \
+    "$REPO_DIR/data/processed/cv/detector/${det_version}_serving.json"
+else
+  log "giữ nguyên detector đã stage trong $DEPLOY_DIR/models/detector ($(cat "$DEPLOY_DIR/models/detector/version" 2>/dev/null || echo unknown))"
+fi
+# Already-staged models (detector, meal_calorie, dish_classifier, mushroom_classifier, ranker, embeddings) are preserved as-is unless explicitly overridden.
 
 env_set TASTORIA_IMAGE_TAG "$tag"
+env_set TASTORIA_WEB_TAG "$tag"
 log "migrate + import catalog, rồi khởi động"
 dc up -d --remove-orphans --wait --wait-timeout 300 postgres valkey
+
+app_pw="$(env_get POSTGRES_APP_PASSWORD)"
+jobs_pw="$(env_get POSTGRES_JOBS_PASSWORD)"
+[ -n "$app_pw" ] || die "POSTGRES_APP_PASSWORD trống trong .env"
+[ -n "$jobs_pw" ] || die "POSTGRES_JOBS_PASSWORD trống trong .env"
+
+log "cấu hình role PostgreSQL least-privilege tastoria_app & tastoria_jobs"
+dc exec -T postgres psql -U tastoria -d tastoria -v ON_ERROR_STOP=1 -v app_pw="$app_pw" -v jobs_pw="$jobs_pw" <<'SQL'
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_app') THEN
+        CREATE ROLE tastoria_app LOGIN;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_jobs') THEN
+        CREATE ROLE tastoria_jobs LOGIN;
+    END IF;
+END $$;
+ALTER ROLE tastoria_app WITH LOGIN PASSWORD :'app_pw';
+ALTER ROLE tastoria_jobs WITH LOGIN PASSWORD :'jobs_pw';
+SQL
+
 up_ok=1
 dc up -d --remove-orphans || up_ok=0
 code="$(docker inspect -f '{{.State.ExitCode}}' "$(dc ps -aq migrate)" 2>/dev/null || echo '?')"

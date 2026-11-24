@@ -354,3 +354,56 @@ def test_export_contains_decrypted_profile(client: TestClient, user: dict, db, s
     assert json.loads(z.read("user_allergens.json")) == [{"allergen_code": "sua"}]
     assert _audits(db, "dsr_export") == 1  # FR-06-05
     assert "weight_kg_enc" not in z.read("profiles.json").decode()
+
+
+def test_withdraw_erases_activity_level_and_get_audits_coalesce(client: TestClient, user: dict, db) -> None:
+    _put(client, user, weight_kg=55, activity_level="heavy")
+    before = _audits(db)
+    for _ in range(3):
+        got = client.get(f"{API}/me/profile", headers=bearer(user))
+        assert got.status_code == 200 and got.json()["activity_level"] == "heavy"
+    assert _audits(db) == before + 1  # read audit is coalesced within 60s on GET /me/profile
+
+    assert client.post(f"{API}/me/consents/health_profile/withdraw", headers=bearer(user)).status_code == 200
+    assert q(db, "SELECT activity_level FROM profiles").scalar() is None
+    s2 = login(client, user["user"]["email"])
+    after = client.get(f"{API}/me/profile", headers=bearer(s2)).json()
+    assert after["health_profile_consented"] is False and after["activity_level"] is None
+
+
+def test_age_uses_user_timezone_and_favorites_trigger_enforced(client: TestClient, user: dict, db, engine) -> None:
+    from datetime import UTC, datetime
+
+    from sqlalchemy import text
+    from sqlalchemy.exc import DBAPIError
+    from sqlalchemy.orm import Session
+
+    from tastoria.core import clock
+
+    # At Dec 31 20:00Z it is already Jan 1 next year in Asia/Ho_Chi_Minh (+7), still Dec 31 in UTC
+    base_year = local_year()
+    dec31_utc = datetime(base_year, 12, 31, 20, 0, tzinfo=UTC)
+    now_offset = int((dec31_utc - datetime.now(UTC)).total_seconds())
+    try:
+        clock.shift_for_tests(now_offset)
+        client.put(f"{API}/me/settings", json={"timezone": "Asia/Ho_Chi_Minh"}, headers=bearer(user))
+        # Birth year such that in Asia/Ho_Chi_Minh (base_year + 1) age == 25, while in UTC age == 24
+        birth_year = (base_year + 1) - 25
+        _put(client, user, birth_year=birth_year)
+        vn_sug = client.post(f"{API}/me/energy-suggestion", headers=bearer(user)).json()
+        assert vn_sug["age_years"] == 25
+        client.put(f"{API}/me/settings", json={"timezone": "UTC"}, headers=bearer(user))
+        utc_sug = client.post(f"{API}/me/energy-suggestion", headers=bearer(user)).json()
+        assert utc_sug["age_years"] == 24
+    finally:
+        clock.shift_for_tests(0)
+
+    # DB trigger blocks inserting > 5 favorites directly
+    published = [insert_recipe(db, f"Fav-{i}") for i in range(6)]
+    client.put(f"{API}/me/favorites", json={"recipe_ids": published[:5]}, headers=bearer(user))
+    uid = uuid.UUID(user["user"]["id"])
+    with pytest.raises(DBAPIError), Session(engine) as sess, sess.begin():
+        sess.execute(
+            text("INSERT INTO user_favorite_recipes (user_id, recipe_id) VALUES (:u, :r)"),
+            {"u": uid, "r": published[5]},
+        )

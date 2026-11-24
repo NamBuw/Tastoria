@@ -1,0 +1,318 @@
+{
+  "splits": {
+    "nutrition5k_test_clean": {
+      "n": 457,
+      "v3": {
+        "kcal_mae": 47.0127,
+        "kcal_mape_pct": 19.33,
+        "mass_mae_g": 28.468,
+        "r2": 0.8732,
+        "within_20pct": 65.13,
+        "cpu_p95_ms": 38.769
+      },
+      "v4_rejected": {
+        "kcal_mae": 49.148,
+        "kcal_mape_pct": 21.47,
+        "mass_mae_g": 32.2371,
+        "r2": 0.878,
+        "within_20pct": 60.26,
+        "cpu_p95_ms": 39.685
+      },
+      "paired_bootstrap_v4_minus_v3": {
+        "mae_model": 49.148,
+        "mae_baseline": 47.0127,
+        "delta_mae": 2.1353,
+        "ci95_low": -0.6262,
+        "ci95_high": 5.0101,
+        "p_model_worse_or_equal": 0.931,
+        "n_boot": 2000
+      }
+    },
+    "mmfood_100k_unseen": {
+      "n_samples": 160,
+      "eval_protocol": "Independent Ground-Truth Calorie Eval",
+      "disambiguation_rate_pct": 68.75,
+      "classifier_ood_rate_pct": 2.5,
+      "mean_raps_set_size": 8.54,
+      "e2e_cpu_p50_ms": 160.58,
+      "e2e_cpu_p95_ms": 194.41,
+      "arms": {
+        "visual_v3": {
+          "n": 160,
+          "mae": 123.0145,
+          "rmse": 167.0146,
+          "mape_pct": 24.75,
+          "within_20pct": 53.12,
+          "ci_coverage_pct": 77.5
+        },
+        "visual_v4_rejected": {
+          "n": 160,
+          "mae": 115.6549,
+          "rmse": 164.6568,
+          "mape_pct": 21.57,
+          "within_20pct": 60.62,
+          "ci_coverage_pct": 78.75
+        },
+        "legacy_cascade": {
+          "n": 160,
+          "mae": 225.542,
+          "rmse": 313.4515,
+          "mape_pct": 37.61,
+          "within_20pct": 31.25,
+          "ci_coverage_pct": 26.88
+        },
+        "m2_fusion": {
+          "n": 160,
+          "mae": 128.1581,
+          "rmse": 175.818,
+          "mape_pct": 25.71,
+          "within_20pct": 51.25,
+          "ci_coverage_pct": 77.5
+        }
+      },
+      "paired_bootstrap_m2_vs_legacy": {
+        "mae_model": 128.1581,
+        "mae_baseline": 225.542,
+        "delta_mae": -97.3838,
+        "ci95_low": -126.3869,
+        "ci95_high": -71.2129,
+        "p_model_worse_or_equal": 0.0,
+        "n_boot": 2000
+      },
+      "paired_bootstrap_m2_vs_visual_v3": {
+        "mae_model": 128.1581,
+        "mae_baseline": 123.0145,
+        "delta_mae": 5.1436,
+        "ci95_low": -0.637,
+        "ci95_high": 11.24,
+        "p_model_worse_or_equal": 0.9625,
+        "n_boot": 2000
+      }
+    },
+    "hoagmin_vn_valid": {
+      "n_samples": 250,
+      "eval_protocol": "Classifier-to-KB Proxy Eval (calorie GT from kb.estimate_recognized(dish_id, portion='vua'))",
+      "disambiguation_rate_pct": 9.2,
+      "classifier_ood_rate_pct": 0.0,
+      "mean_raps_set_size": 1.71,
+      "e2e_cpu_p50_ms": 162.17,
+      "e2e_cpu_p95_ms": 184.7,
+      "arms": {
+        "visual_v3": {
+          "n": 250,
+          "mae": 55.2607,
+          "rmse": 76.9877,
+          "mape_pct": 12.48,
+          "within_20pct": 81.6,
+          "ci_coverage_pct": 94.0
+        },
+        "visual_v4_rejected": {
+          "n": 250,
+          "mae": 55.6904,
+          "rmse": 74.5969,
+          "mape_pct": 12.61,
+          "within_20pct": 78.8,
+          "ci_coverage_pct": 94.8
+        },
+        "legacy_cascade": {
+          "n": 250,
+          "mae": 5.1964,
+          "rmse": 22.0437,
+          "mape_pct": 1.16,
+          "within_20pct": 98.8,
+          "ci_coverage_pct": 98.4
+        },
+        "m2_fusion": {
+          "n": 250,
+          "mae": 11.5268,
+          "rmse": 36.9676,
+          "mape_pct": 2.68,
+          "within_20pct": 97.2,
+          "ci_coverage_pct": 99.6
+        }
+      },
+      "classifier": {
+        "n": 250,
+        "top1_acc_pct": 94.4,
+        "top3_acc_pct": 98.4,
+        "macro_f1": 0.5976,
+        "mean_margin_correct": 0.9517,
+        "mean_margin_wrong": 0.4892
+      },
+      "paired_bootstrap_m2_vs_legacy": {
+        "mae_model": 11.5268,
+        "mae_baseline": 5.1964,
+        "delta_mae": 6.3304,
+        "ci95_low": 2.9549,
+        "ci95_high": 10.5023,
+        "p_model_worse_or_equal": 1.0,
+        "n_boot": 2000
+      },
+      "paired_bootstrap_m2_vs_visual_v3": {
+        "mae_model": 11.5268,
+        "mae_baseline": 55.2607,
+        "delta_mae": -43.7339,
+        "ci95_low": -49.9537,
+        "ci95_high": -38.1759,
+        "p_model_worse_or_equal": 0.0,
+        "n_boot": 2000
+      }
+    },
+    "vn103_validation": {
+      "n_samples": 250,
+      "eval_protocol": "Classifier-to-KB Proxy Eval (calorie GT from kb.estimate_recognized(dish_id, portion='vua'))",
+      "disambiguation_rate_pct": 14.0,
+      "classifier_ood_rate_pct": 0.0,
+      "mean_raps_set_size": 2.12,
+      "e2e_cpu_p50_ms": 164.51,
+      "e2e_cpu_p95_ms": 192.29,
+      "arms": {
+        "visual_v3": {
+          "n": 250,
+          "mae": 55.6373,
+          "rmse": 80.8642,
+          "mape_pct": 16.56,
+          "within_20pct": 71.6,
+          "ci_coverage_pct": 90.8
+        },
+        "visual_v4_rejected": {
+          "n": 250,
+          "mae": 54.8789,
+          "rmse": 77.6032,
+          "mape_pct": 16.01,
+          "within_20pct": 76.8,
+          "ci_coverage_pct": 90.8
+        },
+        "legacy_cascade": {
+          "n": 250,
+          "mae": 7.186,
+          "rmse": 22.2816,
+          "mape_pct": 2.08,
+          "within_20pct": 97.6,
+          "ci_coverage_pct": 98.4
+        },
+        "m2_fusion": {
+          "n": 250,
+          "mae": 11.33,
+          "rmse": 32.5045,
+          "mape_pct": 3.41,
+          "within_20pct": 96.8,
+          "ci_coverage_pct": 99.6
+        }
+      },
+      "classifier": {
+        "n": 250,
+        "top1_acc_pct": 92.4,
+        "top3_acc_pct": 96.8,
+        "macro_f1": 0.7143,
+        "mean_margin_correct": 0.9258,
+        "mean_margin_wrong": 0.5478
+      },
+      "paired_bootstrap_m2_vs_legacy": {
+        "mae_model": 11.33,
+        "mae_baseline": 7.186,
+        "delta_mae": 4.144,
+        "ci95_low": 1.0888,
+        "ci95_high": 7.6965,
+        "p_model_worse_or_equal": 0.9985,
+        "n_boot": 2000
+      },
+      "paired_bootstrap_m2_vs_visual_v3": {
+        "mae_model": 11.33,
+        "mae_baseline": 55.6373,
+        "delta_mae": -44.3073,
+        "ci95_low": -50.6292,
+        "ci95_high": -38.5301,
+        "p_model_worse_or_equal": 0.0,
+        "n_boot": 2000
+      }
+    }
+  },
+  "sota_jobs": {
+    "task_4790_cal_v4_out": {
+      "status": "COMPLETED & REJECTED by Parsimony Gate",
+      "reason": "Higher Nutrition5k MAE (47.39 vs 45.47 v3) and mass MAE (31.43g vs 27.46g v3); kept v3 weights in deploy/models/meal_calorie/model.onnx"
+    },
+    "task_4789_dish_v5_siglip2": {
+      "host": "153 -> 121",
+      "status": "COMPLETED & REJECTED by Parsimony Gate (kept SigLIP2-B/16 v3 FP32 in deploy/models/dish_classifier/)"
+    },
+    "next_gen_cpu_roadmap": "Distill SigLIP2-SO400M + DINOv3-L offline into DINOv3-ConvNeXt-Tiny Static INT8 QDQ (AVX-512 VNNI ~20-28ms CPU) + Spatial Depth Factorized Calorie v5 (no external VLM calls, PDPL compliant)"
+  },
+  "curated_ood_live_separate": {
+    "n_samples": 12,
+    "eval_protocol": "Classifier-to-KB Proxy Eval (calorie GT from kb.estimate_recognized(dish_id, portion='vua'))",
+    "disambiguation_rate_pct": 41.67,
+    "classifier_ood_rate_pct": 0.0,
+    "mean_raps_set_size": 4.42,
+    "e2e_cpu_p50_ms": 163.82,
+    "e2e_cpu_p95_ms": 175.2,
+    "arms": {
+      "visual_v3": {
+        "n": 12,
+        "mae": 140.2515,
+        "rmse": 182.4113,
+        "mape_pct": 74.7,
+        "within_20pct": 33.33,
+        "ci_coverage_pct": 41.67
+      },
+      "visual_v4_rejected": {
+        "n": 12,
+        "mae": 124.8606,
+        "rmse": 155.0892,
+        "mape_pct": 55.62,
+        "within_20pct": 25.0,
+        "ci_coverage_pct": 50.0
+      },
+      "legacy_cascade": {
+        "n": 12,
+        "mae": 28.3417,
+        "rmse": 48.4299,
+        "mape_pct": 17.8,
+        "within_20pct": 83.33,
+        "ci_coverage_pct": 83.33
+      },
+      "m2_fusion": {
+        "n": 12,
+        "mae": 24.6333,
+        "rmse": 41.3744,
+        "mape_pct": 14.61,
+        "within_20pct": 91.67,
+        "ci_coverage_pct": 91.67
+      }
+    },
+    "classifier": {
+      "n": 12,
+      "top1_acc_pct": 66.67,
+      "top3_acc_pct": 100.0,
+      "macro_f1": 0.5,
+      "mean_margin_correct": 0.6462,
+      "mean_margin_wrong": 0.6109
+    },
+    "paired_bootstrap_m2_vs_legacy": {
+      "mae_model": 24.6333,
+      "mae_baseline": 28.3417,
+      "delta_mae": -3.7083,
+      "ci95_low": -22.7333,
+      "ci95_high": 9.3667,
+      "p_model_worse_or_equal": 0.3425,
+      "n_boot": 2000
+    },
+    "paired_bootstrap_m2_vs_visual_v3": {
+      "mae_model": 24.6333,
+      "mae_baseline": 140.2515,
+      "delta_mae": -115.6182,
+      "ci95_low": -178.6088,
+      "ci95_high": -60.4888,
+      "p_model_worse_or_equal": 0.0,
+      "n_boot": 2000
+    }
+  },
+  "highres_mobile_3024x4032_ms": {
+    "jpeg_bytes": 1001296,
+    "sanitize_p50_ms": 60.04,
+    "dish_cls_p50_ms": 119.36,
+    "e2e_p50_ms": 223.01,
+    "e2e_p95_ms": 245.46
+  }
+}

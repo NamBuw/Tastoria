@@ -1,5 +1,5 @@
 -- Tastoria — lược đồ CSDL vật lý, PostgreSQL 18 + pgvector.
--- Nguồn sự thật: docs/sad/model.yaml (62 bảng). Tài liệu: docs/sad/05-tu-dien-du-lieu.md (sinh từ catalog).
+-- Nguồn sự thật: docs/sad/model.yaml (68 bảng). Tài liệu: docs/sad/05-tu-dien-du-lieu.md (sinh từ catalog).
 -- Quy ước: khoá chính uuid DEFAULT gen_random_uuid() (trừ interactions.id do app sinh làm event_id),
 --   created_at/updated_at DEFAULT now(); khoá ngoại trỏ tới bảng tạo sau được thêm bằng ALTER TABLE ở cuối tệp.
 -- Bất biến mà chuẩn hoá dựa vào (docs/sad/04-chuan-hoa.md mục 4) được ép trong CSDL, không chỉ ở service:
@@ -9,7 +9,7 @@
 --   * trigger trg_meal_*: cột dẫn xuất của mâm chỉ đổi khi mâm còn proposed/accepted.
 --   Ngoại lệ duy nhất: giao dịch xoá theo quyền chủ thể dữ liệu và thời hạn lưu (UC07, BR-CONSENT-04, job dọn)
 --   chạy `SET LOCAL tastoria.erasure = 'on'`. Đây là chốt chặn lỗi lập trình; ranh giới quyền là REVOKE ở cuối tệp.
--- Tham số nghiệp vụ dùng trong view đọc qua app_param() (GUC tastoria.<khoá>, đặt bằng ALTER DATABASE ... SET);
+-- Tham số nghiệp vụ dùng trong view đọc qua app_param() (bảng app_params, dự phòng GUC tastoria.<khoá>);
 --   bảng tham số có phiên bản là đề xuất mô hình (04 mục 6).
 -- Bản cho Visual Paradigm: db/schema_vp.sql.
 
@@ -42,7 +42,7 @@ CREATE TYPE acquired_basis_t AS ENUM ('purchase_date_entered', 'first_seen');
 CREATE TYPE lot_status_t AS ENUM ('in_stock', 'used_up', 'discarded', 'not_seen');
 CREATE TYPE pantry_tx_reason_t AS ENUM ('scan_add', 'cook_deduct', 'manual_edit', 'discard', 'undo');
 CREATE TYPE pantry_ref_type_t AS ENUM ('scan', 'cook_session', 'user');
-CREATE TYPE model_name_t AS ENUM ('detector', 'freshness', 'ranker', 'substitution');
+CREATE TYPE model_name_t AS ENUM ('detector', 'freshness', 'ranker', 'substitution', 'meal_calorie', 'dish_classifier', 'mushroom_classifier');
 CREATE TYPE model_status_t AS ENUM ('candidate', 'validated', 'rejected', 'retired');
 CREATE TYPE scan_mode_t AS ENUM ('fridge', 'haul');
 CREATE TYPE scan_status_t AS ENUM ('queued', 'processing', 'done', 'failed', 'expired', 'confirmed', 'discarded');
@@ -58,6 +58,10 @@ CREATE TYPE substitution_origin_t AS ENUM ('lookup', 'embedding', 'user');
 CREATE TYPE cook_status_t AS ENUM ('in_progress', 'completed', 'reverted', 'abandoned');
 CREATE TYPE interaction_type_t AS ENUM ('served', 'viewed', 'swapped', 'cooked', 'liked', 'disliked', 'undone');
 CREATE TYPE survey_channel_t AS ENUM ('link', 'qr');
+CREATE TYPE meal_log_slot_t AS ENUM ('sang', 'trua', 'toi', 'phu');
+CREATE TYPE meal_log_source_t AS ENUM ('scan_calorie', 'barcode', 'manual', 'recipe');
+CREATE TYPE meal_log_item_kind_t AS ENUM ('dish', 'modifier', 'barcode_item', 'manual_item');
+CREATE TYPE email_outbox_status_t AS ENUM ('pending', 'sending', 'sent', 'failed');
 
 -- ===================== Module core =====================
 
@@ -68,7 +72,16 @@ CREATE TABLE idempotency_keys (
     status_code smallint NOT NULL,
     response_body jsonb NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now(),
+    response_headers jsonb NOT NULL DEFAULT '{}'::jsonb,
     CONSTRAINT pk_idempotency_keys PRIMARY KEY (user_id, key)
+);
+
+CREATE TABLE app_params (
+    key text NOT NULL,
+    value_num double precision,
+    value_text text,
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT pk_app_params PRIMARY KEY (key)
 );
 
 -- ===================== Module identity =====================
@@ -84,10 +97,16 @@ CREATE TABLE users (
     locked_until timestamptz,
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now(),
+    email_verified_at timestamptz,
+    totp_secret_enc bytea,
+    totp_key_id text,
+    mfa_enabled_at timestamptz,
     CONSTRAINT pk_users PRIMARY KEY (id),
     CONSTRAINT uq_users_email UNIQUE (email),
     CONSTRAINT ck_users_token_version CHECK (token_version >= 0),
-    CONSTRAINT ck_users_failed_logins CHECK (failed_logins >= 0)
+    CONSTRAINT ck_users_failed_logins CHECK (failed_logins >= 0),
+    CONSTRAINT ck_users_totp_enc_key CHECK (totp_secret_enc IS NULL OR totp_key_id IS NOT NULL),
+    CONSTRAINT ck_users_mfa_enabled CHECK (mfa_enabled_at IS NULL OR totp_secret_enc IS NOT NULL)
 );
 
 CREATE TABLE refresh_tokens (
@@ -100,6 +119,8 @@ CREATE TABLE refresh_tokens (
     revoked_at timestamptz,
     replaced_by_id uuid,
     user_agent text,
+    ip_address text,
+    last_used_at timestamptz,
     CONSTRAINT pk_refresh_tokens PRIMARY KEY (id),
     CONSTRAINT uq_refresh_tokens_token_sha256 UNIQUE (token_sha256),
     CONSTRAINT uq_refresh_tokens_replaced_by_id UNIQUE (replaced_by_id),
@@ -120,6 +141,37 @@ CREATE TABLE password_resets (
     CONSTRAINT uq_password_resets_token_sha256 UNIQUE (token_sha256),
     CONSTRAINT ck_password_resets_expiry CHECK (expires_at > created_at),
     CONSTRAINT fk_password_resets_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE email_outbox (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    user_id uuid,
+    to_email citext NOT NULL,
+    template text NOT NULL,
+    subject text NOT NULL,
+    body_text text NOT NULL,
+    status email_outbox_status_t NOT NULL DEFAULT 'pending',
+    attempts smallint NOT NULL DEFAULT 0,
+    next_attempt_at timestamptz NOT NULL DEFAULT now(),
+    sent_at timestamptz,
+    last_error text,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT pk_email_outbox PRIMARY KEY (id),
+    CONSTRAINT ck_email_outbox_attempts CHECK (attempts >= 0),
+    CONSTRAINT fk_email_outbox_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE TABLE email_verification_tokens (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    user_id uuid NOT NULL,
+    token_sha256 bytea NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    expires_at timestamptz NOT NULL,
+    verified_at timestamptz,
+    CONSTRAINT pk_email_verification_tokens PRIMARY KEY (id),
+    CONSTRAINT uq_email_verification_tokens_token_sha256 UNIQUE (token_sha256),
+    CONSTRAINT ck_email_verification_tokens_expiry CHECK (expires_at > created_at),
+    CONSTRAINT fk_email_verification_tokens_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 -- ===================== Module privacy =====================
@@ -399,6 +451,17 @@ CREATE TABLE recipe_nutrition (
     CONSTRAINT fk_recipe_nutrition_nutrient_code FOREIGN KEY (nutrient_code) REFERENCES nutrients (code)
 );
 
+CREATE TABLE recipe_make_ahead (
+    recipe_id uuid NOT NULL,
+    item_ingredient_id uuid NOT NULL,
+    through_step_no smallint NOT NULL,
+    CONSTRAINT pk_recipe_make_ahead PRIMARY KEY (recipe_id),
+    CONSTRAINT ck_recipe_make_ahead_through_step_no CHECK (through_step_no > 0),
+    CONSTRAINT fk_recipe_make_ahead_recipe_id FOREIGN KEY (recipe_id) REFERENCES recipes (id),
+    CONSTRAINT fk_recipe_make_ahead_recipe_id_through_step_no FOREIGN KEY (recipe_id, through_step_no) REFERENCES recipe_steps (recipe_id, step_no),
+    CONSTRAINT fk_recipe_make_ahead_item_ingredient_id FOREIGN KEY (item_ingredient_id) REFERENCES ingredients (id)
+);
+
 CREATE TABLE vision_classes (
     id smallint NOT NULL,
     code text NOT NULL,
@@ -654,6 +717,9 @@ CREATE TABLE detections (
     p_dung_som real,
     p_dung_ngay real,
     p_kiem_tra real,
+    sub_species_slug text,
+    sub_species_conf real,
+    safety_abstained boolean NOT NULL DEFAULT false,
     CONSTRAINT pk_detections PRIMARY KEY (id),
     CONSTRAINT ck_detections_1 CHECK (0 <= x1 AND x1 < x2 AND x2 <= 1 AND 0 <= y1 AND y1 < y2 AND y2 <= 1),
     CONSTRAINT ck_detections_confidence CHECK (confidence BETWEEN 0 AND 1),
@@ -661,6 +727,7 @@ CREATE TABLE detections (
                                             AND p_dung_ngay BETWEEN 0 AND 1 AND p_kiem_tra BETWEEN 0 AND 1),
     CONSTRAINT ck_detections_p_group CHECK (num_nulls(p_tuoi, p_dung_som, p_dung_ngay, p_kiem_tra) IN (0, 4)),
     CONSTRAINT ck_detections_p_sum CHECK (p_tuoi IS NULL OR abs(p_tuoi + p_dung_som + p_dung_ngay + p_kiem_tra - 1) <= 0.01),
+    CONSTRAINT ck_detections_sub_species_conf CHECK (sub_species_conf IS NULL OR (sub_species_conf BETWEEN 0 AND 1)),
     CONSTRAINT fk_detections_scan_image_id FOREIGN KEY (scan_image_id) REFERENCES scan_images (id) ON DELETE CASCADE,
     CONSTRAINT fk_detections_scan_item_id FOREIGN KEY (scan_item_id) REFERENCES scan_items (id) ON DELETE SET NULL,
     CONSTRAINT fk_detections_vision_class_id FOREIGN KEY (vision_class_id) REFERENCES vision_classes (id)
@@ -706,6 +773,7 @@ CREATE TABLE shopping_items (
     source_meal_plan_item_id uuid,
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now(),
+    pantry_lot_id uuid,
     CONSTRAINT pk_shopping_items PRIMARY KEY (id),
     CONSTRAINT ck_shopping_items_qty_g CHECK (qty_g > 0),
     CONSTRAINT fk_shopping_items_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
@@ -924,11 +992,73 @@ CREATE TABLE survey_favorites (
     CONSTRAINT fk_survey_favorites_recipe_id FOREIGN KEY (recipe_id) REFERENCES recipes (id)
 );
 
+-- ===================== Module meal_logs =====================
+
+CREATE TABLE meal_logs (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    user_id uuid NOT NULL,
+    logged_date date NOT NULL,
+    logged_at timestamptz NOT NULL DEFAULT now(),
+    meal_slot meal_log_slot_t NOT NULL,
+    title text NOT NULL,
+    source_type meal_log_source_t NOT NULL,
+    source_ref_id text,
+    portion_label text NOT NULL DEFAULT 'Vừa',
+    portion_scale numeric NOT NULL DEFAULT 1,
+    modifiers jsonb NOT NULL DEFAULT '[]'::jsonb,
+    kcal numeric NOT NULL DEFAULT 0,
+    kcal_low numeric NOT NULL DEFAULT 0,
+    kcal_high numeric NOT NULL DEFAULT 0,
+    protein_g numeric NOT NULL DEFAULT 0,
+    carbs_g numeric NOT NULL DEFAULT 0,
+    fat_g numeric NOT NULL DEFAULT 0,
+    fiber_g numeric NOT NULL DEFAULT 0,
+    provenance_label_vi text NOT NULL DEFAULT '',
+    notes text,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT pk_meal_logs PRIMARY KEY (id),
+    CONSTRAINT ck_meal_logs_portion_scale CHECK (portion_scale > 0),
+    CONSTRAINT ck_meal_logs_kcal CHECK (kcal >= 0 AND kcal_low >= 0 AND kcal_low <= kcal_high),
+    CONSTRAINT ck_meal_logs_macros CHECK (protein_g >= 0 AND carbs_g >= 0 AND fat_g >= 0 AND fiber_g >= 0),
+    CONSTRAINT fk_meal_logs_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE meal_log_items (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    meal_log_id uuid NOT NULL,
+    ordinal smallint NOT NULL DEFAULT 1,
+    item_kind meal_log_item_kind_t NOT NULL DEFAULT 'dish',
+    label_vi text NOT NULL,
+    dish_slug text,
+    recipe_id uuid,
+    ingredient_id uuid,
+    barcode text,
+    grams numeric,
+    kcal numeric NOT NULL DEFAULT 0,
+    protein_g numeric NOT NULL DEFAULT 0,
+    carbs_g numeric NOT NULL DEFAULT 0,
+    fat_g numeric NOT NULL DEFAULT 0,
+    fiber_g numeric NOT NULL DEFAULT 0,
+    modifiers jsonb NOT NULL DEFAULT '[]'::jsonb,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT pk_meal_log_items PRIMARY KEY (id),
+    CONSTRAINT uq_meal_log_items_meal_log_id_ordinal UNIQUE (meal_log_id, ordinal),
+    CONSTRAINT ck_meal_log_items_ordinal CHECK (ordinal >= 1),
+    CONSTRAINT ck_meal_log_items_grams CHECK (grams IS NULL OR grams >= 0),
+    CONSTRAINT ck_meal_log_items_kcal CHECK (kcal >= 0),
+    CONSTRAINT ck_meal_log_items_macros CHECK (protein_g >= 0 AND carbs_g >= 0 AND fat_g >= 0 AND fiber_g >= 0),
+    CONSTRAINT fk_meal_log_items_meal_log_id FOREIGN KEY (meal_log_id) REFERENCES meal_logs (id) ON DELETE CASCADE,
+    CONSTRAINT fk_meal_log_items_recipe_id FOREIGN KEY (recipe_id) REFERENCES recipes (id) ON DELETE SET NULL,
+    CONSTRAINT fk_meal_log_items_ingredient_id FOREIGN KEY (ingredient_id) REFERENCES ingredients (id) ON DELETE SET NULL
+);
+
 -- ===================== Khoá ngoại trỏ tới bảng tạo sau =====================
 ALTER TABLE idempotency_keys ADD CONSTRAINT fk_idempotency_keys_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE pantry_lots ADD CONSTRAINT fk_pantry_lots_freshness_model_version_id FOREIGN KEY (freshness_model_version_id) REFERENCES model_versions (id);
 ALTER TABLE pantry_lots ADD CONSTRAINT fk_pantry_lots_source_scan_item_id FOREIGN KEY (source_scan_item_id) REFERENCES scan_items (id) ON DELETE SET NULL;
 ALTER TABLE shopping_items ADD CONSTRAINT fk_shopping_items_source_meal_plan_item_id FOREIGN KEY (source_meal_plan_item_id) REFERENCES meal_plan_items (id) ON DELETE SET NULL;
+ALTER TABLE shopping_items ADD CONSTRAINT fk_shopping_items_pantry_lot_id FOREIGN KEY (pantry_lot_id) REFERENCES pantry_lots (id) ON DELETE SET NULL;
 
 -- ===================== Chỉ mục =====================
 -- Duy nhất một phần (ràng buộc nghiệp vụ không viết được bằng UNIQUE thường).
@@ -937,13 +1067,22 @@ CREATE UNIQUE INDEX ux_recipes_name_vi_live ON recipes (name_vi) WHERE status <>
 CREATE UNIQUE INDEX ux_ingredients_name_vi_active ON ingredients (name_vi) WHERE is_active;
 CREATE UNIQUE INDEX ux_vision_class_ingredients_default ON vision_class_ingredients (vision_class_id) WHERE is_default;
 CREATE UNIQUE INDEX ux_cook_sessions_one_live ON cook_sessions (meal_plan_id) WHERE status IN ('in_progress', 'completed');
+CREATE UNIQUE INDEX ux_shopping_items_open_null_src ON shopping_items (user_id, ingredient_id) WHERE status = 'open' AND source_meal_plan_item_id IS NULL;
+CREATE UNIQUE INDEX ux_shopping_items_open_with_src ON shopping_items (user_id, ingredient_id, source_meal_plan_item_id) WHERE status = 'open' AND source_meal_plan_item_id IS NOT NULL;
 -- Truy vấn nóng.
 CREATE INDEX ix_recipe_ingredients_ingredient_id ON recipe_ingredients (ingredient_id);
+CREATE INDEX ix_recipe_make_ahead_item_ingredient_id ON recipe_make_ahead (item_ingredient_id);
 CREATE INDEX ix_ingredient_allergens_allergen_code ON ingredient_allergens (allergen_code);
 CREATE INDEX ix_pantry_lots_user_id_status ON pantry_lots (user_id, status);
+CREATE INDEX ix_pantry_lots_user_status_created ON pantry_lots (user_id, status, created_at, id);
 CREATE INDEX ix_pantry_transactions_lot_id ON pantry_transactions (lot_id);
+CREATE INDEX ix_pantry_transactions_lot_id_created_at ON pantry_transactions (lot_id, created_at DESC);
+CREATE INDEX ix_pantry_transactions_cook_deduct ON pantry_transactions (ref_type, ref_id, lot_id) WHERE reason = 'cook_deduct';
 CREATE INDEX ix_interactions_user_id_occurred_at ON interactions (user_id, occurred_at DESC);
+CREATE INDEX ix_interactions_recipe_type_swap ON interactions (recipe_id, type, swap_reason);
+CREATE INDEX ix_interactions_user_type_recipe_swap ON interactions (user_id, type, recipe_id, swap_reason);
 CREATE INDEX ix_meal_plans_user_id_created_at ON meal_plans (user_id, created_at DESC);
+CREATE INDEX ix_meal_plans_user_status_created ON meal_plans (user_id, status, created_at DESC, id DESC);
 CREATE INDEX ix_meal_plan_items_meal_plan_id ON meal_plan_items (meal_plan_id);
 CREATE INDEX ix_scans_user_id_created_at ON scans (user_id, created_at DESC);
 CREATE INDEX ix_scan_items_scan_id ON scan_items (scan_id);
@@ -953,10 +1092,22 @@ CREATE INDEX ix_dsr_requests_status_received_at ON dsr_requests (status, receive
 CREATE INDEX ix_refresh_tokens_user_id ON refresh_tokens (user_id);
 CREATE INDEX ix_refresh_tokens_family_id ON refresh_tokens (family_id);
 CREATE INDEX ix_shopping_items_user_id_status ON shopping_items (user_id, status);
+CREATE INDEX ix_shopping_items_pantry_lot_id ON shopping_items (pantry_lot_id);
 CREATE INDEX ix_audit_log_created_at ON audit_log (created_at);
+CREATE INDEX ix_audit_log_entity_created_at ON audit_log (entity, created_at DESC);
 CREATE INDEX ix_cook_sessions_meal_plan_id ON cook_sessions (meal_plan_id);
+CREATE INDEX ix_cook_sessions_meal_plan_status_completed ON cook_sessions (meal_plan_id, status, completed_at DESC);
 CREATE INDEX ix_survey_ratings_recipe_id ON survey_ratings (recipe_id);
 CREATE INDEX ix_pantry_transactions_ref ON pantry_transactions (ref_type, ref_id);
+CREATE INDEX ix_password_resets_user_created_at ON password_resets (user_id, created_at DESC);
+CREATE INDEX ix_email_outbox_status_next_attempt_at ON email_outbox (status, next_attempt_at);
+CREATE INDEX ix_email_outbox_user_id ON email_outbox (user_id);
+CREATE INDEX ix_email_verification_tokens_user_id ON email_verification_tokens (user_id);
+CREATE INDEX ix_email_verification_tokens_expires_at ON email_verification_tokens (expires_at);
+CREATE INDEX ix_meal_logs_user_id_logged_date ON meal_logs (user_id, logged_date DESC, created_at DESC);
+CREATE INDEX ix_meal_log_items_meal_log_id ON meal_log_items (meal_log_id);
+CREATE INDEX ix_meal_log_items_recipe_id ON meal_log_items (recipe_id);
+CREATE INDEX ix_meal_log_items_ingredient_id ON meal_log_items (ingredient_id);
 -- Khoá ngoại có ON DELETE CASCADE / SET NULL (xoá cứng tài khoản UC07, xoá chip, xoá ảnh): tránh quét tuần tự bảng con.
 CREATE INDEX ix_audit_log_actor_user_id ON audit_log (actor_user_id);
 CREATE INDEX ix_dsr_requests_user_id ON dsr_requests (user_id);
@@ -976,11 +1127,17 @@ CREATE INDEX ix_scan_images_purge ON scan_images (scan_id) WHERE purged_at IS NU
 
 -- ===================== Hàm, trigger bảo vệ bất biến =====================
 
--- Tham số nghiệp vụ đọc lúc chạy từ GUC `tastoria.<khoá>` (ALTER DATABASE ... SET, đổi được không đổi mã).
--- Trả NULL khi chưa đặt. Khoá đang dùng: fresh_u_soon, fresh_u_check (BR-FRESH-04), rice_bowl_kcal (E_bát, BR-TRAY-03).
+-- Tham số nghiệp vụ đọc lúc chạy từ bảng app_params (ưu tiên) hoặc GUC `tastoria.<khoá>`.
+-- Trả NULL khi chưa đặt. Khoá đang dùng: fresh_u_soon, fresh_u_check (BR-FRESH-04), rice_bowl_kcal (E_bát, BR-TRAY-03), kcal_half_width.
 CREATE FUNCTION app_param(p_key text) RETURNS numeric
-LANGUAGE sql STABLE PARALLEL SAFE AS $$
-    SELECT NULLIF(current_setting('tastoria.' || p_key, true), '')::numeric
+LANGUAGE sql STABLE PARALLEL SAFE
+SET search_path = public, pg_temp
+AS $$
+    SELECT CASE
+        WHEN EXISTS (SELECT 1 FROM public.app_params WHERE key = p_key)
+            THEN (SELECT value_num::numeric FROM public.app_params WHERE key = p_key)
+        ELSE NULLIF(pg_catalog.current_setting('tastoria.' || p_key, true), '')::numeric
+    END
 $$;
 
 -- Đúng khi giao dịch hiện tại là giao dịch xoá theo quyền chủ thể dữ liệu / thời hạn lưu.
@@ -1184,6 +1341,19 @@ BEGIN
     RETURN NEW;
 END $$;
 
+CREATE FUNCTION trg_user_favorite_recipes_limit() RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+    PERFORM pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('fav:' || NEW.user_id::text, 0));
+    IF (SELECT count(*) FROM public.user_favorite_recipes WHERE user_id = NEW.user_id) > 5 THEN
+        RAISE EXCEPTION 'tối đa 5 món hay ăn (FAVORITES_MAX = 5)'
+            USING ERRCODE = 'integrity_constraint_violation';
+    END IF;
+    RETURN NEW;
+END $$;
+
 CREATE TRIGGER trg_consent_events_append_only BEFORE UPDATE OR DELETE ON consent_events
     FOR EACH ROW EXECUTE FUNCTION trg_append_only();
 CREATE TRIGGER trg_audit_log_append_only BEFORE UPDATE OR DELETE ON audit_log
@@ -1228,6 +1398,8 @@ CREATE TRIGGER trg_recipe_steps_guard BEFORE INSERT OR UPDATE OR DELETE ON recip
     FOR EACH ROW EXECUTE FUNCTION trg_recipe_children_guard();
 CREATE TRIGGER trg_recipe_tags_guard BEFORE INSERT OR UPDATE OR DELETE ON recipe_tags
     FOR EACH ROW EXECUTE FUNCTION trg_recipe_children_guard();
+CREATE TRIGGER trg_recipe_make_ahead_guard BEFORE INSERT OR UPDATE OR DELETE ON recipe_make_ahead
+    FOR EACH ROW EXECUTE FUNCTION trg_recipe_children_guard();
 CREATE TRIGGER trg_survey_form_anchors_guard BEFORE INSERT OR UPDATE OR DELETE ON survey_form_anchors
     FOR EACH ROW EXECUTE FUNCTION trg_survey_form_anchors_guard();
 CREATE TRIGGER trg_meal_plans_guard BEFORE UPDATE ON meal_plans
@@ -1240,6 +1412,8 @@ CREATE TRIGGER trg_pantry_transactions_ref BEFORE INSERT ON pantry_transactions
     FOR EACH ROW EXECUTE FUNCTION trg_pantry_transactions_ref();
 CREATE TRIGGER trg_user_settings_timezone BEFORE INSERT OR UPDATE OF timezone ON user_settings
     FOR EACH ROW EXECUTE FUNCTION trg_user_settings_timezone();
+CREATE TRIGGER trg_user_favorite_recipes_limit AFTER INSERT ON user_favorite_recipes
+    FOR EACH ROW EXECUTE FUNCTION trg_user_favorite_recipes_limit();
 
 -- ===================== View =====================
 
@@ -1326,25 +1500,102 @@ SELECT d.user_id,
               GROUP BY 1, 2) u
     ON u.user_id = d.user_id AND u.local_date = d.local_date;
 
--- Giá trị mặc định của tham số (BR-FRESH-04). E_bát (rice_bowl_kcal) do lệnh nhập kho món tính từ bảng thành phần
--- cho 150 g cơm (BR-TRAY-03) rồi đặt; không có giá trị viết cứng ở đây.
-DO $$
+-- Giá trị mặc định của tham số lưu trong app_params (bền vững qua pg_dump/pg_restore).
+INSERT INTO app_params (key, value_num) VALUES
+    ('fresh_u_soon', 0.5),
+    ('fresh_u_check', 1.0),
+    ('rice_bowl_kcal', 200.0),
+    ('kcal_half_width', 0.15)
+ON CONFLICT (key) DO NOTHING;
+
+-- Hàm xoá dữ liệu bị bảo vệ bởi SECURITY DEFINER và kiểm soát DSR / rút đồng ý.
+CREATE OR REPLACE FUNCTION erase_user_interactions(p_user_id uuid) RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
 BEGIN
-    EXECUTE format('ALTER DATABASE %I SET tastoria.fresh_u_soon = %L', current_database(), '0.5');
-    EXECUTE format('ALTER DATABASE %I SET tastoria.fresh_u_check = %L', current_database(), '1.0');
+    IF NOT public.erasure_active() THEN
+        RAISE EXCEPTION 'tastoria.erasure is not active' USING ERRCODE = '42501';
+    END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM public.dsr_requests
+         WHERE user_id = p_user_id
+           AND type IN ('withdraw', 'delete')
+           AND status IN ('received', 'in_progress')
+    ) AND NOT EXISTS (
+        SELECT 1 FROM public.consent_events ce
+        JOIN public.policy_versions pv ON pv.id = ce.policy_version_id
+         WHERE ce.user_id = p_user_id
+           AND pv.purpose_code = 'personalization'
+           AND ce.action = 'withdraw'
+           AND ce.created_at >= pg_catalog.now() - interval '5 minutes'
+    ) THEN
+        RAISE EXCEPTION 'erasure requires an active DSR request or recent consent withdrawal'
+            USING ERRCODE = '42501';
+    END IF;
+    DELETE FROM public.interactions WHERE user_id = p_user_id;
 END $$;
 
--- Quyền: vai trò ứng dụng không được sửa/xoá bảng chỉ ghi thêm; chỉ vai trò job xoá theo PDPL được DELETE.
--- Vai trò do hạ tầng tạo (docs/adr); khối này chỉ chạy khi vai trò đã có, nên áp lược đồ trên CSDL trống vẫn được.
+CREATE OR REPLACE FUNCTION erase_user_account(p_user_id uuid) RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+    v_deleted integer;
+BEGIN
+    IF NOT public.erasure_active() THEN
+        RAISE EXCEPTION 'tastoria.erasure is not active' USING ERRCODE = '42501';
+    END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM public.dsr_requests
+         WHERE user_id = p_user_id
+           AND type = 'delete'
+           AND status IN ('received', 'in_progress')
+    ) THEN
+        RAISE EXCEPTION 'account deletion requires an active delete DSR request'
+            USING ERRCODE = '42501';
+    END IF;
+    DELETE FROM public.users WHERE id = p_user_id;
+    GET DIAGNOSTICS v_deleted = ROW_COUNT;
+    RETURN v_deleted > 0;
+END $$;
+
+-- Quyền: vai trò ứng dụng không được sửa/xoá bảng chỉ ghi thêm hoặc app_params; chỉ vai trò job xoá theo PDPL được DELETE.
 DO $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_app') THEN
-        REVOKE UPDATE, DELETE, TRUNCATE ON consent_events, audit_log, pantry_transactions, interactions FROM tastoria_app;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_app') THEN
+        CREATE ROLE tastoria_app NOLOGIN;
     END IF;
-    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_jobs') THEN
-        GRANT DELETE ON consent_events, audit_log, pantry_transactions, interactions TO tastoria_jobs;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_jobs') THEN
+        CREATE ROLE tastoria_jobs NOLOGIN;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tastoria_migrator') THEN
+        CREATE ROLE tastoria_migrator NOLOGIN;
     END IF;
 END $$;
+
+GRANT USAGE ON SCHEMA public TO tastoria_app, tastoria_jobs;
+GRANT ALL ON SCHEMA public TO tastoria_migrator;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO tastoria_app;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO tastoria_app;
+REVOKE UPDATE, DELETE, TRUNCATE ON public.consent_events, public.audit_log, public.pantry_transactions, public.interactions FROM tastoria_app;
+REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON public.app_params FROM tastoria_app;
+REVOKE DELETE, TRUNCATE ON public.users, public.dsr_requests FROM tastoria_app;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO tastoria_jobs;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO tastoria_jobs;
+
+GRANT ALL ON ALL TABLES IN SCHEMA public TO tastoria_migrator;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO tastoria_migrator;
+
+REVOKE ALL ON FUNCTION erase_user_interactions(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION erase_user_interactions(uuid) TO tastoria_app, tastoria_jobs;
+
+REVOKE ALL ON FUNCTION erase_user_account(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION erase_user_account(uuid) TO tastoria_app, tastoria_jobs;
 
 -- ===================== Chú thích =====================
 COMMENT ON TABLE idempotency_keys IS 'Khoá lũy đẳng của các request POST có header Idempotency-Key (tạo quét, mâm, đổi món, phiên nấu, nấu xong); lưu phản hồi đầu tiên để trả lại nguyên văn khi client gửi lại; job dọn xoá sau 48 giờ (UC34).';
@@ -1564,6 +1815,10 @@ COMMENT ON COLUMN recipe_nutrition.nutrient_code IS 'Chất dinh dưỡng.';
 COMMENT ON COLUMN recipe_nutrition.per_serving IS 'Hàm lượng mỗi khẩu phần, đơn vị theo nutrients.unit.';
 COMMENT ON COLUMN recipe_nutrition.computed_at IS 'Thời điểm tính.';
 COMMENT ON COLUMN recipe_nutrition.data_version IS 'Phiên bản dữ liệu nguồn dùng khi tính (kho món, bảng thành phần).';
+
+COMMENT ON TABLE recipe_make_ahead IS 'Món làm sẵn (bước chờ > 2 giờ): bước 1..through_step_no làm từ trước, không xếp vào lịch nấu; món chỉ được đề xuất khi kho có đồ làm sẵn item_ingredient_id. Bất biến khi món published.';
+COMMENT ON COLUMN recipe_make_ahead.item_ingredient_id IS 'Đồ làm sẵn phải có trong kho (ví dụ dưa cải chua)';
+COMMENT ON COLUMN recipe_make_ahead.through_step_no IS 'Bước cuối cùng làm từ trước (bước chờ dài cuối cùng)';
 
 COMMENT ON TABLE vision_classes IS 'Lớp nhận dạng của mô hình phát hiện nguyên liệu trong ảnh.';
 COMMENT ON COLUMN vision_classes.id IS 'Định danh lớp (số nhỏ).';
@@ -1940,7 +2195,8 @@ COMMENT ON INDEX ix_refresh_tokens_expires_at IS 'Job dọn token hết hạn (U
 COMMENT ON INDEX ix_password_resets_expires_at IS 'Job dọn yêu cầu đặt lại mật khẩu hết hạn (UC34).';
 COMMENT ON INDEX ix_audit_log_actor_user_id IS 'ON DELETE SET NULL khi xoá tài khoản (UC07); lọc nhật ký theo nhân sự (UC27).';
 
-COMMENT ON FUNCTION app_param(text) IS 'Đọc tham số nghiệp vụ tastoria.<khoá> (GUC); NULL khi chưa đặt.';
+COMMENT ON TABLE app_params IS 'Tham số nghiệp vụ lưu trong bảng để bền vững qua pg_dump/pg_restore (thay thế ALTER DATABASE GUC).';
+COMMENT ON FUNCTION app_param(text) IS 'Đọc tham số nghiệp vụ từ app_params (ưu tiên) hoặc GUC tastoria.<khoá>; NULL khi chưa đặt.';
 COMMENT ON FUNCTION erasure_active() IS 'true khi giao dịch đã SET LOCAL tastoria.erasure = on (xoá theo UC07, BR-CONSENT-04, thời hạn lưu).';
 COMMENT ON TRIGGER trg_pantry_transactions_ref ON pantry_transactions IS 'Thay cho khoá ngoại của tham chiếu đa hình (ref_type, ref_id): kiểm tồn tại và cùng chủ lô (D13).';
 COMMENT ON TRIGGER trg_recipes_guard ON recipes IS 'BR-CATALOG-01: published chỉ chuyển retired, retired bất biến, không xoá món đã công bố.';

@@ -1,0 +1,35 @@
+@startuml
+title SD12 — Nấu xong qua các tầng (UC20)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+autonumber
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+boundary "Finished + outbox (app)" as APP
+control "cooking.router" as CR
+control "core.idempotency" as ID
+control "cooking.service" as CK
+control "pantry.service" as PS
+
+APP -> CR : POST /cook-sessions/{id}/complete (Idempotency-Key)
+CR -> ID : begin(user_id, idem)
+alt khoá đã có phản hồi
+  ID --> CR : phản hồi đã lưu
+  CR --> APP : phản hồi cũ, không trừ kho lần hai
+else khoá mới
+  CR -> CK : complete_session(id, body)
+  CK -> CK : khoá CookSession, kiểm in_progress
+  CK -> PS : deduct(user_id, cs.id, needs)
+  PS --> CK : deductions, shortfalls
+  CK -> CK : completed; set_cooked; events.record
+  CK --> CR : CookCompletion
+  CR -> ID : finish(user_id, idem, 200, res)
+  CR --> APP : 200 CookCompletion
+end
+@enduml

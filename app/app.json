@@ -1,18 +1,18 @@
 {
   "expo": {
-    "name": "Tastoria",
+    "name": "Mỹ Vị",
     "slug": "tastoria",
     "version": "0.1.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "tastoria",
-    "userInterfaceStyle": "automatic",
-    "backgroundColor": "#FFF9ED",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#E3CFA6",
     "android": {
       "package": "net.ctslab.tastoria",
       "versionCode": 5,
       "adaptiveIcon": {
-        "backgroundColor": "#FFF9ED",
+        "backgroundColor": "#FAF2E0",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
@@ -29,10 +29,10 @@
     "web": {
       "output": "single",
       "favicon": "./assets/images/favicon.png",
-      "name": "Tastoria",
+      "name": "Mỹ Vị",
       "lang": "vi",
-      "themeColor": "#F3512C",
-      "backgroundColor": "#FFF9ED"
+      "themeColor": "#E3CFA6",
+      "backgroundColor": "#E3CFA6"
     },
     "plugins": [
       "expo-router",
@@ -40,20 +40,16 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Tastoria dùng ảnh bạn chọn để nhận ra nguyên liệu trong tủ lạnh.",
-          "cameraPermission": "Tastoria dùng máy ảnh để chụp tủ lạnh hoặc đồ vừa mua."
+          "photosPermission": "Mỹ Vị dùng ảnh bạn chọn để nhận ra nguyên liệu trong tủ lạnh.",
+          "cameraPermission": "Mỹ Vị dùng máy ảnh để chụp tủ lạnh hoặc đồ vừa mua."
         }
       ],
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F6F0E2",
+          "backgroundColor": "#E3CFA6",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 96,
-          "dark": {
-            "backgroundColor": "#1A1612",
-            "image": "./assets/images/splash-icon.png"
-          }
+          "imageWidth": 96
         }
       ],
       "./plugins/with-android-release"

@@ -1,0 +1,56 @@
+@startuml
+title CL13b — Tầng API: router và schema của mâm cơm, nấu
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "meal.router" as MR <<router>> {
+  +create_plan(body: MealPlanCreate): JSONResponse
+  +get_plan(id: UUID): MealPlanOut
+  +accept_plan(id: UUID): MealPlanOut
+  +swap_item(id: UUID, itemId: UUID, body: SwapRequest): MealPlanOut
+  +list_substitutes(id: UUID, itemId: UUID): list
+}
+class "cooking.router" as CR <<router>> {
+  +create_session(body: CookSessionCreate): JSONResponse
+  +complete_session(id: UUID, body: CookCompleteRequest): JSONResponse
+  +undo_session(id: UUID): CookSessionOut
+  +abandon_session(id: UUID): CookSessionOut
+}
+class "MealPlanCreate" as MC <<schema>> {
+  -meal: Meal
+  -persons: int
+  -max_minutes: int
+  -coeater_allergen_codes: list[str]
+  -pinned_lot_ids: list[UUID]
+}
+class "MealPlanOut" as MO <<schema>> {
+  -status: PlanStatus
+  -e_target_kcal: float
+  -rice_bowls_per_person: float
+  -reason_vi: str
+  -items: list[MealPlanItemOut]
+}
+class "CookCompleteRequest" as CQ <<schema>> {
+  -completed_at: datetime
+  -feedback: list[DishFeedback]
+}
+class "CookCompletion" as CC <<schema>> {
+  -cook_session: CookSessionOut
+  -deductions: list[PantryDeductionOut]
+  -interactions_recorded: bool
+  -shortfalls: list[ShortfallOut]
+}
+
+MR ..> MC
+MR ..> MO
+CR ..> CQ
+CR ..> CC
+@enduml

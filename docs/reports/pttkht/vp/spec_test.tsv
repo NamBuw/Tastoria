@@ -1,0 +1,1790 @@
+NEWPROJECT
+FONTSIZE	15
+CPTCENTER	1
+EXTDIR	3	2
+PKG	PSD02b	SD02b
+USEPKG	PSD02b
+NEW	SD02b_U	InteractionActor	Người dùng	-
+NEW	SD02b_APP	InteractionLifeLine	App	-
+CALL	SD02b_APP	addStereotype	boundary
+NEW	SD02b_API	InteractionLifeLine	API (scan)	-
+CALL	SD02b_API	addStereotype	control
+NEW	SD02b_PAN	InteractionLifeLine	pantry	-
+CALL	SD02b_PAN	addStereotype	control
+NEW	SD02b_DB	InteractionLifeLine	CSDL	-
+CALL	SD02b_DB	addStereotype	entity
+DIAG	SD02b	SEQ	SD02b Xác nhận kết quả quét vào kho (UC13)
+NEWREL	SD02b_m0	Message	SD02b_U	SD02b_APP	1: bấm Xác nhận
+NEWREL	SD02b_m1	Message	SD02b_APP	SD02b_API	2: xác nhận lần quét
+NEWREL	SD02b_m2	Message	SD02b_API	SD02b_DB	3: khoá lần quét, kiểm tra chủ và trạng thái
+NEWREL	SD02b_m3	Message	SD02b_API	SD02b_APP	4: trả lại kết quả cũ
+NEW	SD02b_m3_rt	ActionTypeReturn	-	-
+CALL	SD02b_m3	setActionType	@SD02b_m3_rt
+NEWREL	SD02b_m4	Message	SD02b_API	SD02b_APP	5: 409 / 422
+NEW	SD02b_m4_rt	ActionTypeReturn	-	-
+CALL	SD02b_m4	setActionType	@SD02b_m4_rt
+NEWREL	SD02b_m5	Message	SD02b_API	SD02b_PAN	6: tạo lô mới hoặc cập nhật lô đang có
+NEWREL	SD02b_m6	Message	SD02b_PAN	SD02b_DB	7: ghi lô (lượng ban đầu, không giao dịch)
+NEWREL	SD02b_m7	Message	SD02b_API	SD02b_PAN	8: đánh dấu lô không thấy (chế độ toàn tủ)
+NEWREL	SD02b_m8	Message	SD02b_API	SD02b_DB	9: lần quét → «confirmed»; commit
+NEWREL	SD02b_m9	Message	SD02b_API	SD02b_APP	10: danh sách lô mới
+NEW	SD02b_m9_rt	ActionTypeReturn	-	-
+CALL	SD02b_m9	setActionType	@SD02b_m9_rt
+NEWREL	SD02b_m10	Message	SD02b_APP	SD02b_U	11: hiện kho đã cập nhật
+NEW	SD02b_m10_rt	ActionTypeReturn	-	-
+CALL	SD02b_m10	setActionType	@SD02b_m10_rt
+NEW	SD02b_APP_act0	Activation	-	SD02b_APP
+NEW	SD02b_API_act0	Activation	-	SD02b_API
+NEW	SD02b_PAN_act0	Activation	-	SD02b_PAN
+NEW	SD02b_DB_act0	Activation	-	SD02b_DB
+NEW	SD02b_f	CombinedFragment	alt	-
+CALL	SD02b_f	setInteractionOperator	alt
+CALL	SD02b_f	addCoveredLifeLine	@SD02b_APP
+CALL	SD02b_f	addCoveredLifeLine	@SD02b_API
+CALL	SD02b_f	addCoveredLifeLine	@SD02b_PAN
+CALL	SD02b_f	addCoveredLifeLine	@SD02b_DB
+NEW	SD02b_f_op0	InteractionOperand	-	-
+CALL	SD02b_f	addOperand	@SD02b_f_op0
+NEW	SD02b_f_op0_g	InteractionConstraint	-	-
+CALL	SD02b_f_op0_g	setConstraint	đã xác nhận trước đó
+CALL	SD02b_f_op0	setGuard	@SD02b_f_op0_g
+NEW	SD02b_f_op1	InteractionOperand	-	-
+CALL	SD02b_f	addOperand	@SD02b_f_op1
+NEW	SD02b_f_op1_g	InteractionConstraint	-	-
+CALL	SD02b_f_op1_g	setConstraint	chưa xong hoặc còn chip cần kiểm tra
+CALL	SD02b_f_op1	setGuard	@SD02b_f_op1_g
+NEW	SD02b_f_op2	InteractionOperand	-	-
+CALL	SD02b_f	addOperand	@SD02b_f_op2
+NEW	SD02b_f_op2_g	InteractionConstraint	-	-
+CALL	SD02b_f_op2_g	setConstraint	hợp lệ
+CALL	SD02b_f_op2	setGuard	@SD02b_f_op2_g
+CALL	SD02b_m0	setToActivation	@SD02b_APP_act0
+CALL	SD02b_m1	setFromActivation	@SD02b_APP_act0
+CALL	SD02b_m1	setToActivation	@SD02b_API_act0
+CALL	SD02b_m2	setFromActivation	@SD02b_API_act0
+CALL	SD02b_m2	setToActivation	@SD02b_DB_act0
+CALL	SD02b_m3	setFromActivation	@SD02b_API_act0
+CALL	SD02b_m3	setToActivation	@SD02b_APP_act0
+CALL	SD02b_m4	setFromActivation	@SD02b_API_act0
+CALL	SD02b_m4	setToActivation	@SD02b_APP_act0
+CALL	SD02b_m5	setFromActivation	@SD02b_API_act0
+CALL	SD02b_m5	setToActivation	@SD02b_PAN_act0
+CALL	SD02b_m6	setFromActivation	@SD02b_PAN_act0
+CALL	SD02b_m6	setToActivation	@SD02b_DB_act0
+CALL	SD02b_m7	setFromActivation	@SD02b_API_act0
+CALL	SD02b_m7	setToActivation	@SD02b_PAN_act0
+CALL	SD02b_m8	setFromActivation	@SD02b_API_act0
+CALL	SD02b_m8	setToActivation	@SD02b_DB_act0
+CALL	SD02b_m9	setFromActivation	@SD02b_API_act0
+CALL	SD02b_m9	setToActivation	@SD02b_APP_act0
+CALL	SD02b_m10	setFromActivation	@SD02b_APP_act0
+SHOW	SD02b	SD02b_U	75	30	-	-	-
+SHOW	SD02b	SD02b_APP	272	30	110	882	-
+SHOW	SD02b	SD02b_API	471	30	125	882	-
+SHOW	SD02b	SD02b_PAN	852	30	110	882	-
+SHOW	SD02b	SD02b_DB	1216	30	110	882	-
+SHOW	SD02b	SD02b_APP_act0	320	130	14	712	SD02b_APP
+SHOW	SD02b	SD02b_API_act0	527	180	14	566	SD02b_API
+SHOW	SD02b	SD02b_PAN_act0	900	526	14	120	SD02b_PAN
+SHOW	SD02b	SD02b_DB_act0	1264	230	14	466	SD02b_DB
+SHOW	SD02b	SD02b_f	257	270	1083	512	-
+SHOW	SD02b	SD02b_f_op0	257	270	1083	100	SD02b_f
+SHOW	SD02b	SD02b_f_op1	257	370	1083	94	SD02b_f
+SHOW	SD02b	SD02b_f_op2	257	464	1083	318	SD02b_f
+CONN	SD02b	SD02b_m0	SD02b_U	SD02b_APP_act0	90,140;320,140
+CONN	SD02b	SD02b_m1	SD02b_APP_act0	SD02b_API_act0	334,190;527,190
+CONN	SD02b	SD02b_m2	SD02b_API_act0	SD02b_DB_act0	541,240;1264,240
+CONN	SD02b	SD02b_m3	SD02b_API_act0	SD02b_APP_act0	527,348;334,348
+CONN	SD02b	SD02b_m4	SD02b_API_act0	SD02b_APP_act0	527,442;334,442
+CONN	SD02b	SD02b_m5	SD02b_API_act0	SD02b_PAN_act0	541,536;900,536
+CONN	SD02b	SD02b_m6	SD02b_PAN_act0	SD02b_DB_act0	914,586;1264,586
+CONN	SD02b	SD02b_m7	SD02b_API_act0	SD02b_PAN_act0	541,636;900,636
+CONN	SD02b	SD02b_m8	SD02b_API_act0	SD02b_DB_act0	541,686;1264,686
+CONN	SD02b	SD02b_m9	SD02b_API_act0	SD02b_APP_act0	527,736;334,736
+CONN	SD02b	SD02b_m10	SD02b_APP_act0	SD02b_U	320,832;90,832
+NOTE	SD02b_foot	Tastoria | SD02b
+SHOW	SD02b	SD02b_foot	20	962	260	34	-
+PKG	PSD11	SD11
+USEPKG	PSD11
+NEW	SD11_CF	InteractionLifeLine	ConfirmScan (app)	-
+CALL	SD11_CF	addStereotype	boundary
+NEW	SD11_SR	InteractionLifeLine	scan.router	-
+CALL	SD11_SR	addStereotype	control
+NEW	SD11_SS	InteractionLifeLine	scan.service	-
+CALL	SD11_SS	addStereotype	control
+NEW	SD11_PS	InteractionLifeLine	pantry.service	-
+CALL	SD11_PS	addStereotype	control
+NEW	SD11_DB	InteractionLifeLine	PostgreSQL	-
+CALL	SD11_DB	addStereotype	entity
+DIAG	SD11	SEQ	SD11 Xác nhận quét qua các tầng (UC13)
+NEWREL	SD11_m0	Message	SD11_CF	SD11_SR	1: POST /scans/{id}/confirm
+NEWREL	SD11_m1	Message	SD11_SR	SD11_SS	2: confirm(scan_id, body)
+NEWREL	SD11_m2	Message	SD11_SS	SD11_DB	3: khoá Scan (SELECT … FOR UPDATE)
+NEWREL	SD11_m3	Message	SD11_SS	SD11_SR	4: _replay(): kết quả lần trước
+NEW	SD11_m3_rt	ActionTypeReturn	-	-
+CALL	SD11_m3	setActionType	@SD11_m3_rt
+NEWREL	SD11_m4	Message	SD11_SS	SD11_SR	5: ApiError 409 invalid_scan_state
+NEW	SD11_m4_rt	ActionTypeReturn	-	-
+CALL	SD11_m4	setActionType	@SD11_m4_rt
+NEWREL	SD11_m5	Message	SD11_SS	SD11_SS	6: kiểm chip kiem_tra, qty_level
+NEWREL	SD11_m6	Message	SD11_SS	SD11_PS	7: apply_scan(user_id, mode, items)
+NEWREL	SD11_m7	Message	SD11_PS	SD11_DB	8: thêm PantryLot (initial_g), lô vắng → not_seen
+NEWREL	SD11_m8	Message	SD11_SS	SD11_DB	9: Scan.status = confirmed
+NEWREL	SD11_m9	Message	SD11_SS	SD11_SR	10: ScanConfirmResult
+NEW	SD11_m9_rt	ActionTypeReturn	-	-
+CALL	SD11_m9	setActionType	@SD11_m9_rt
+NEWREL	SD11_m10	Message	SD11_SR	SD11_DB	11: UnitOfWork commit
+NEWREL	SD11_m11	Message	SD11_SR	SD11_CF	12: 200 ScanConfirmResult
+NEW	SD11_m11_rt	ActionTypeReturn	-	-
+CALL	SD11_m11	setActionType	@SD11_m11_rt
+NEW	SD11_CF_act0	Activation	-	SD11_CF
+NEW	SD11_SR_act0	Activation	-	SD11_SR
+NEW	SD11_SS_act0	Activation	-	SD11_SS
+NEW	SD11_PS_act0	Activation	-	SD11_PS
+NEW	SD11_DB_act0	Activation	-	SD11_DB
+NEW	SD11_f	CombinedFragment	alt	-
+CALL	SD11_f	setInteractionOperator	alt
+CALL	SD11_f	addCoveredLifeLine	@SD11_SR
+CALL	SD11_f	addCoveredLifeLine	@SD11_SS
+CALL	SD11_f	addCoveredLifeLine	@SD11_PS
+CALL	SD11_f	addCoveredLifeLine	@SD11_DB
+NEW	SD11_f_op0	InteractionOperand	-	-
+CALL	SD11_f	addOperand	@SD11_f_op0
+NEW	SD11_f_op0_g	InteractionConstraint	-	-
+CALL	SD11_f_op0_g	setConstraint	status = confirmed
+CALL	SD11_f_op0	setGuard	@SD11_f_op0_g
+NEW	SD11_f_op1	InteractionOperand	-	-
+CALL	SD11_f	addOperand	@SD11_f_op1
+NEW	SD11_f_op1_g	InteractionConstraint	-	-
+CALL	SD11_f_op1_g	setConstraint	status ≠ done
+CALL	SD11_f_op1	setGuard	@SD11_f_op1_g
+NEW	SD11_f_op2	InteractionOperand	-	-
+CALL	SD11_f	addOperand	@SD11_f_op2
+NEW	SD11_f_op2_g	InteractionConstraint	-	-
+CALL	SD11_f_op2_g	setConstraint	status = done
+CALL	SD11_f_op2	setGuard	@SD11_f_op2_g
+CALL	SD11_m0	setFromActivation	@SD11_CF_act0
+CALL	SD11_m0	setToActivation	@SD11_SR_act0
+CALL	SD11_m1	setFromActivation	@SD11_SR_act0
+CALL	SD11_m1	setToActivation	@SD11_SS_act0
+CALL	SD11_m2	setFromActivation	@SD11_SS_act0
+CALL	SD11_m2	setToActivation	@SD11_DB_act0
+CALL	SD11_m3	setFromActivation	@SD11_SS_act0
+CALL	SD11_m3	setToActivation	@SD11_SR_act0
+CALL	SD11_m4	setFromActivation	@SD11_SS_act0
+CALL	SD11_m4	setToActivation	@SD11_SR_act0
+CALL	SD11_m5	setFromActivation	@SD11_SS_act0
+CALL	SD11_m5	setToActivation	@SD11_SS_act0
+CALL	SD11_m6	setFromActivation	@SD11_SS_act0
+CALL	SD11_m6	setToActivation	@SD11_PS_act0
+CALL	SD11_m7	setFromActivation	@SD11_PS_act0
+CALL	SD11_m7	setToActivation	@SD11_DB_act0
+CALL	SD11_m8	setFromActivation	@SD11_SS_act0
+CALL	SD11_m8	setToActivation	@SD11_DB_act0
+CALL	SD11_m9	setFromActivation	@SD11_SS_act0
+CALL	SD11_m9	setToActivation	@SD11_SR_act0
+CALL	SD11_m10	setFromActivation	@SD11_SR_act0
+CALL	SD11_m10	setToActivation	@SD11_DB_act0
+CALL	SD11_m11	setFromActivation	@SD11_SR_act0
+CALL	SD11_m11	setToActivation	@SD11_CF_act0
+SHOW	SD11	SD11_CF	-8	30	197	932	-
+SHOW	SD11	SD11_SR	282	30	137	932	-
+SHOW	SD11	SD11_SS	584	30	144	932	-
+SHOW	SD11	SD11_PS	955	30	160	932	-
+SHOW	SD11	SD11_DB	1380	30	138	932	-
+SHOW	SD11	SD11_CF_act0	83	130	14	762	SD11_CF
+SHOW	SD11	SD11_SR_act0	344	130	14	762	SD11_SR
+SHOW	SD11	SD11_SS_act0	649	180	14	566	SD11_SS
+SHOW	SD11	SD11_PS_act0	1028	576	14	70	SD11_PS
+SHOW	SD11	SD11_DB_act0	1442	230	14	612	SD11_DB
+SHOW	SD11	SD11_f	281	270	1238	512	-
+SHOW	SD11	SD11_f_op0	281	270	1238	100	SD11_f
+SHOW	SD11	SD11_f_op1	281	370	1238	94	SD11_f
+SHOW	SD11	SD11_f_op2	281	464	1238	318	SD11_f
+CONN	SD11	SD11_m0	SD11_CF_act0	SD11_SR_act0	97,140;344,140
+CONN	SD11	SD11_m1	SD11_SR_act0	SD11_SS_act0	358,190;649,190
+CONN	SD11	SD11_m2	SD11_SS_act0	SD11_DB_act0	663,240;1443,240
+CONN	SD11	SD11_m3	SD11_SS_act0	SD11_SR_act0	649,348;358,348
+CONN	SD11	SD11_m4	SD11_SS_act0	SD11_SR_act0	649,442;358,442
+CONN	SD11	SD11_m5	SD11_SS_act0	SD11_SS_act0	663,536;716,536;716,560;663,560
+CSTYLE	SD11	SD11_m5	0
+CAPTION	SD11	SD11_m5	724	537	251	22
+CONN	SD11	SD11_m6	SD11_SS_act0	SD11_PS_act0	663,586;1029,586
+CONN	SD11	SD11_m7	SD11_PS_act0	SD11_DB_act0	1043,636;1443,636
+CONN	SD11	SD11_m8	SD11_SS_act0	SD11_DB_act0	663,686;1443,686
+CONN	SD11	SD11_m9	SD11_SS_act0	SD11_SR_act0	649,736;358,736
+CONN	SD11	SD11_m10	SD11_SR_act0	SD11_DB_act0	358,832;1443,832
+CONN	SD11	SD11_m11	SD11_SR_act0	SD11_CF_act0	344,882;97,882
+NOTE	SD11_foot	Tastoria | SD11
+SHOW	SD11	SD11_foot	20	1012	260	34	-
+PKG	PSD12	SD12
+USEPKG	PSD12
+NEW	SD12_APP	InteractionLifeLine	Finished + outbox (app)	-
+CALL	SD12_APP	addStereotype	boundary
+NEW	SD12_CR	InteractionLifeLine	cooking.router	-
+CALL	SD12_CR	addStereotype	control
+NEW	SD12_ID	InteractionLifeLine	core.idempotency	-
+CALL	SD12_ID	addStereotype	control
+NEW	SD12_CK	InteractionLifeLine	cooking.service	-
+CALL	SD12_CK	addStereotype	control
+NEW	SD12_PS	InteractionLifeLine	pantry.service	-
+CALL	SD12_PS	addStereotype	control
+DIAG	SD12	SEQ	SD12 Nấu xong qua các tầng (UC20)
+NEWREL	SD12_m0	Message	SD12_APP	SD12_CR	1: POST /cook-sessions/{id}/complete (Idempotency-Key)
+NEWREL	SD12_m1	Message	SD12_CR	SD12_ID	2: begin(user_id, idem)
+NEWREL	SD12_m2	Message	SD12_ID	SD12_CR	3: phản hồi đã lưu
+NEW	SD12_m2_rt	ActionTypeReturn	-	-
+CALL	SD12_m2	setActionType	@SD12_m2_rt
+NEWREL	SD12_m3	Message	SD12_CR	SD12_APP	4: phản hồi cũ, không trừ kho lần hai
+NEW	SD12_m3_rt	ActionTypeReturn	-	-
+CALL	SD12_m3	setActionType	@SD12_m3_rt
+NEWREL	SD12_m4	Message	SD12_CR	SD12_CK	5: complete_session(id, body)
+NEWREL	SD12_m5	Message	SD12_CK	SD12_CK	6: khoá CookSession, kiểm in_progress
+NEWREL	SD12_m6	Message	SD12_CK	SD12_PS	7: deduct(user_id, cs.id, needs)
+NEWREL	SD12_m7	Message	SD12_PS	SD12_CK	8: deductions, shortfalls
+NEW	SD12_m7_rt	ActionTypeReturn	-	-
+CALL	SD12_m7	setActionType	@SD12_m7_rt
+NEWREL	SD12_m8	Message	SD12_CK	SD12_CK	9: completed; set_cooked; events.record
+NEWREL	SD12_m9	Message	SD12_CK	SD12_CR	10: CookCompletion
+NEW	SD12_m9_rt	ActionTypeReturn	-	-
+CALL	SD12_m9	setActionType	@SD12_m9_rt
+NEWREL	SD12_m10	Message	SD12_CR	SD12_ID	11: finish(user_id, idem, 200, res)
+NEWREL	SD12_m11	Message	SD12_CR	SD12_APP	12: 200 CookCompletion
+NEW	SD12_m11_rt	ActionTypeReturn	-	-
+CALL	SD12_m11	setActionType	@SD12_m11_rt
+NEW	SD12_APP_act0	Activation	-	SD12_APP
+NEW	SD12_CR_act0	Activation	-	SD12_CR
+NEW	SD12_ID_act0	Activation	-	SD12_ID
+NEW	SD12_CK_act0	Activation	-	SD12_CK
+NEW	SD12_PS_act0	Activation	-	SD12_PS
+NEW	SD12_f	CombinedFragment	alt	-
+CALL	SD12_f	setInteractionOperator	alt
+CALL	SD12_f	addCoveredLifeLine	@SD12_APP
+CALL	SD12_f	addCoveredLifeLine	@SD12_CR
+CALL	SD12_f	addCoveredLifeLine	@SD12_ID
+CALL	SD12_f	addCoveredLifeLine	@SD12_CK
+CALL	SD12_f	addCoveredLifeLine	@SD12_PS
+NEW	SD12_f_op0	InteractionOperand	-	-
+CALL	SD12_f	addOperand	@SD12_f_op0
+NEW	SD12_f_op0_g	InteractionConstraint	-	-
+CALL	SD12_f_op0_g	setConstraint	khoá đã có phản hồi
+CALL	SD12_f_op0	setGuard	@SD12_f_op0_g
+NEW	SD12_f_op1	InteractionOperand	-	-
+CALL	SD12_f	addOperand	@SD12_f_op1
+NEW	SD12_f_op1_g	InteractionConstraint	-	-
+CALL	SD12_f_op1_g	setConstraint	khoá mới
+CALL	SD12_f_op1	setGuard	@SD12_f_op1_g
+CALL	SD12_m0	setFromActivation	@SD12_APP_act0
+CALL	SD12_m0	setToActivation	@SD12_CR_act0
+CALL	SD12_m1	setFromActivation	@SD12_CR_act0
+CALL	SD12_m1	setToActivation	@SD12_ID_act0
+CALL	SD12_m2	setFromActivation	@SD12_ID_act0
+CALL	SD12_m2	setToActivation	@SD12_CR_act0
+CALL	SD12_m3	setFromActivation	@SD12_CR_act0
+CALL	SD12_m3	setToActivation	@SD12_APP_act0
+CALL	SD12_m4	setFromActivation	@SD12_CR_act0
+CALL	SD12_m4	setToActivation	@SD12_CK_act0
+CALL	SD12_m5	setFromActivation	@SD12_CK_act0
+CALL	SD12_m5	setToActivation	@SD12_CK_act0
+CALL	SD12_m6	setFromActivation	@SD12_CK_act0
+CALL	SD12_m6	setToActivation	@SD12_PS_act0
+CALL	SD12_m7	setFromActivation	@SD12_PS_act0
+CALL	SD12_m7	setToActivation	@SD12_CK_act0
+CALL	SD12_m8	setFromActivation	@SD12_CK_act0
+CALL	SD12_m8	setToActivation	@SD12_CK_act0
+CALL	SD12_m9	setFromActivation	@SD12_CK_act0
+CALL	SD12_m9	setToActivation	@SD12_CR_act0
+CALL	SD12_m10	setFromActivation	@SD12_CR_act0
+CALL	SD12_m10	setToActivation	@SD12_ID_act0
+CALL	SD12_m11	setFromActivation	@SD12_CR_act0
+CALL	SD12_m11	setToActivation	@SD12_APP_act0
+SHOW	SD12	SD12_APP	-32	30	244	888	-
+SHOW	SD12	SD12_CR	490	30	164	888	-
+SHOW	SD12	SD12_ID	779	30	191	888	-
+SHOW	SD12	SD12_CK	1031	30	172	888	-
+SHOW	SD12	SD12_PS	1482	30	160	888	-
+SHOW	SD12	SD12_APP_act0	83	130	14	672	SD12_APP
+SHOW	SD12	SD12_CR_act0	565	130	14	672	SD12_CR
+SHOW	SD12	SD12_ID_act0	868	180	14	572	SD12_ID
+SHOW	SD12	SD12_CK_act0	1110	432	14	270	SD12_CK
+SHOW	SD12	SD12_PS_act0	1556	532	14	70	SD12_PS
+SHOW	SD12	SD12_f	20	220	1613	618	-
+SHOW	SD12	SD12_f_op0	20	220	1613	150	SD12_f
+SHOW	SD12	SD12_f_op1	20	370	1613	468	SD12_f
+CONN	SD12	SD12_m0	SD12_APP_act0	SD12_CR_act0	97,140;566,140
+CONN	SD12	SD12_m1	SD12_CR_act0	SD12_ID_act0	580,190;868,190
+CONN	SD12	SD12_m2	SD12_ID_act0	SD12_CR_act0	868,298;580,298
+CONN	SD12	SD12_m3	SD12_CR_act0	SD12_APP_act0	566,348;97,348
+CONN	SD12	SD12_m4	SD12_CR_act0	SD12_CK_act0	580,442;1110,442
+CONN	SD12	SD12_m5	SD12_CK_act0	SD12_CK_act0	1124,492;1177,492;1177,516;1124,516
+CSTYLE	SD12	SD12_m5	0
+CAPTION	SD12	SD12_m5	1185	493	304	22
+CONN	SD12	SD12_m6	SD12_CK_act0	SD12_PS_act0	1124,542;1556,542
+CONN	SD12	SD12_m7	SD12_PS_act0	SD12_CK_act0	1556,592;1124,592
+CONN	SD12	SD12_m8	SD12_CK_act0	SD12_CK_act0	1124,642;1177,642;1177,666;1124,666
+CSTYLE	SD12	SD12_m8	0
+CAPTION	SD12	SD12_m8	1185	643	317	22
+CONN	SD12	SD12_m9	SD12_CK_act0	SD12_CR_act0	1110,692;580,692
+CONN	SD12	SD12_m10	SD12_CR_act0	SD12_ID_act0	580,742;868,742
+CONN	SD12	SD12_m11	SD12_CR_act0	SD12_APP_act0	566,792;97,792
+NOTE	SD12_foot	Tastoria | SD12
+SHOW	SD12	SD12_foot	20	968	260	34	-
+PKG	PSD13	SD13
+USEPKG	PSD13
+NEW	SD13_APP	InteractionLifeLine	TrayScreen (app)	-
+CALL	SD13_APP	addStereotype	boundary
+NEW	SD13_MR	InteractionLifeLine	meal.router	-
+CALL	SD13_MR	addStereotype	control
+NEW	SD13_MS	InteractionLifeLine	meal.service	-
+CALL	SD13_MS	addStereotype	control
+NEW	SD13_CP	InteractionLifeLine	meal.composer	-
+CALL	SD13_CP	addStereotype	control
+NEW	SD13_SH	InteractionLifeLine	meal.schedule	-
+CALL	SD13_SH	addStereotype	control
+DIAG	SD13	SEQ	SD13 Tạo mâm qua các tầng (UC15)
+NEWREL	SD13_m0	Message	SD13_APP	SD13_MR	1: POST /meal-plans (Idempotency-Key)
+NEWREL	SD13_m1	Message	SD13_MR	SD13_MS	2: create_plan(body)
+NEWREL	SD13_m2	Message	SD13_MS	SD13_MS	3: recipe_allowed: lọc dị ứng, chế độ ăn; Ranker.score
+NEWREL	SD13_m3	Message	SD13_MS	SD13_CP	4: compose(problem, structures)
+NEWREL	SD13_m4	Message	SD13_CP	SD13_MS	5: các Tray xếp theo hàm mục tiêu
+NEW	SD13_m4_rt	ActionTypeReturn	-	-
+CALL	SD13_m4	setActionType	@SD13_m4_rt
+NEWREL	SD13_m5	Message	SD13_MS	SD13_SH	6: solve(dishes, burners) cho từng mâm
+NEWREL	SD13_m6	Message	SD13_SH	SD13_MS	7: Schedule, makespan
+NEW	SD13_m6_rt	ActionTypeReturn	-	-
+CALL	SD13_m6	setActionType	@SD13_m6_rt
+NEWREL	SD13_m7	Message	SD13_MS	SD13_MS	8: thêm MealPlan, MealPlanItem; ghi served
+NEWREL	SD13_m8	Message	SD13_MS	SD13_MR	9: Created(plan)
+NEW	SD13_m8_rt	ActionTypeReturn	-	-
+CALL	SD13_m8	setActionType	@SD13_m8_rt
+NEWREL	SD13_m9	Message	SD13_MS	SD13_MR	10: Created(error: no_feasible_tray)
+NEW	SD13_m9_rt	ActionTypeReturn	-	-
+CALL	SD13_m9	setActionType	@SD13_m9_rt
+NEWREL	SD13_m10	Message	SD13_MR	SD13_MR	11: idempotency.finish
+NEWREL	SD13_m11	Message	SD13_MR	SD13_APP	12: 201 MealPlanOut hoặc 422
+NEW	SD13_m11_rt	ActionTypeReturn	-	-
+CALL	SD13_m11	setActionType	@SD13_m11_rt
+NEW	SD13_APP_act0	Activation	-	SD13_APP
+NEW	SD13_MR_act0	Activation	-	SD13_MR
+NEW	SD13_MS_act0	Activation	-	SD13_MS
+NEW	SD13_CP_act0	Activation	-	SD13_CP
+NEW	SD13_SH_act0	Activation	-	SD13_SH
+NEW	SD13_f	CombinedFragment	alt	-
+CALL	SD13_f	setInteractionOperator	alt
+CALL	SD13_f	addCoveredLifeLine	@SD13_MR
+CALL	SD13_f	addCoveredLifeLine	@SD13_MS
+NEW	SD13_f_op0	InteractionOperand	-	-
+CALL	SD13_f	addOperand	@SD13_f_op0
+NEW	SD13_f_op0_g	InteractionConstraint	-	-
+CALL	SD13_f_op0_g	setConstraint	có mâm makespan ≤ max_minutes
+CALL	SD13_f_op0	setGuard	@SD13_f_op0_g
+NEW	SD13_f_op1	InteractionOperand	-	-
+CALL	SD13_f	addOperand	@SD13_f_op1
+NEW	SD13_f_op1_g	InteractionConstraint	-	-
+CALL	SD13_f_op1_g	setConstraint	không có mâm
+CALL	SD13_f_op1	setGuard	@SD13_f_op1_g
+CALL	SD13_m0	setFromActivation	@SD13_APP_act0
+CALL	SD13_m0	setToActivation	@SD13_MR_act0
+CALL	SD13_m1	setFromActivation	@SD13_MR_act0
+CALL	SD13_m1	setToActivation	@SD13_MS_act0
+CALL	SD13_m2	setFromActivation	@SD13_MS_act0
+CALL	SD13_m2	setToActivation	@SD13_MS_act0
+CALL	SD13_m3	setFromActivation	@SD13_MS_act0
+CALL	SD13_m3	setToActivation	@SD13_CP_act0
+CALL	SD13_m4	setFromActivation	@SD13_CP_act0
+CALL	SD13_m4	setToActivation	@SD13_MS_act0
+CALL	SD13_m5	setFromActivation	@SD13_MS_act0
+CALL	SD13_m5	setToActivation	@SD13_SH_act0
+CALL	SD13_m6	setFromActivation	@SD13_SH_act0
+CALL	SD13_m6	setToActivation	@SD13_MS_act0
+CALL	SD13_m7	setFromActivation	@SD13_MS_act0
+CALL	SD13_m7	setToActivation	@SD13_MS_act0
+CALL	SD13_m8	setFromActivation	@SD13_MS_act0
+CALL	SD13_m8	setToActivation	@SD13_MR_act0
+CALL	SD13_m9	setFromActivation	@SD13_MS_act0
+CALL	SD13_m9	setToActivation	@SD13_MR_act0
+CALL	SD13_m10	setFromActivation	@SD13_MR_act0
+CALL	SD13_m10	setToActivation	@SD13_MR_act0
+CALL	SD13_m11	setFromActivation	@SD13_MR_act0
+CALL	SD13_m11	setToActivation	@SD13_APP_act0
+SHOW	SD13	SD13_APP	-2	30	184	940	-
+SHOW	SD13	SD13_MR	368	30	139	940	-
+SHOW	SD13	SD13_MS	683	30	147	940	-
+SHOW	SD13	SD13_CP	1215	30	169	940	-
+SHOW	SD13	SD13_SH	1444	30	162	940	-
+SHOW	SD13	SD13_APP_act0	83	130	14	770	SD13_APP
+SHOW	SD13	SD13_MR_act0	431	130	14	770	SD13_MR
+SHOW	SD13	SD13_MS_act0	749	180	14	548	SD13_MS
+SHOW	SD13	SD13_CP_act0	1293	306	14	70	SD13_CP
+SHOW	SD13	SD13_SH_act0	1518	406	14	70	SD13_SH
+SHOW	SD13	SD13_f	368	496	458	268	-
+SHOW	SD13	SD13_f_op0	368	496	458	150	SD13_f
+SHOW	SD13	SD13_f_op1	368	646	458	118	SD13_f
+CONN	SD13	SD13_m0	SD13_APP_act0	SD13_MR_act0	97,140;432,140
+CONN	SD13	SD13_m1	SD13_MR_act0	SD13_MS_act0	446,190;750,190
+CONN	SD13	SD13_m2	SD13_MS_act0	SD13_MS_act0	764,240;817,240;817,264;764,264
+CSTYLE	SD13	SD13_m2	0
+CAPTION	SD13	SD13_m2	824	241	415	22
+CONN	SD13	SD13_m3	SD13_MS_act0	SD13_CP_act0	764,316;1293,316
+CONN	SD13	SD13_m4	SD13_CP_act0	SD13_MS_act0	1293,366;764,366
+CONN	SD13	SD13_m5	SD13_MS_act0	SD13_SH_act0	764,416;1519,416
+CONN	SD13	SD13_m6	SD13_SH_act0	SD13_MS_act0	1519,466;764,466
+CONN	SD13	SD13_m7	SD13_MS_act0	SD13_MS_act0	764,574;817,574;817,598;764,598
+CSTYLE	SD13	SD13_m7	0
+CAPTION	SD13	SD13_m7	824	575	342	22
+CONN	SD13	SD13_m8	SD13_MS_act0	SD13_MR_act0	750,624;446,624
+CONN	SD13	SD13_m9	SD13_MS_act0	SD13_MR_act0	750,718;446,718
+CONN	SD13	SD13_m10	SD13_MR_act0	SD13_MR_act0	446,814;499,814;499,838;446,838
+CSTYLE	SD13	SD13_m10	0
+CAPTION	SD13	SD13_m10	506	815	181	22
+CONN	SD13	SD13_m11	SD13_MR_act0	SD13_APP_act0	432,890;97,890
+NOTE	SD13_foot	Tastoria | SD13
+SHOW	SD13	SD13_foot	20	1020	260	34	-
+PKG	PAD01a	AD01a
+USEPKG	PAD01a
+DIAG	AD01a	ACT	AD01a Quét và xác nhận nguyên liệu (UC12, UC13)
+NEW	AD01a_SW	ActivitySwimlane2	 	-
+NEW	AD01a_L0	ActivityPartition	Người dùng	-
+CALL	AD01a_SW	addVerticalPartition	@AD01a_L0
+NEW	AD01a_L1	ActivityPartition	App	-
+CALL	AD01a_SW	addVerticalPartition	@AD01a_L1
+NEW	AD01a_L2	ActivityPartition	Hệ thống	-
+CALL	AD01a_SW	addVerticalPartition	@AD01a_L2
+NEW	AD01a_SW_h	ActivityPartition	 	-
+CALL	AD01a_SW	addHorizontalPartition	@AD01a_SW_h
+SHOW	AD01a	AD01a_SW	20	20	1408	1500	-
+SHOW	AD01a	AD01a_L0	20	50	412	1470	AD01a_SW
+SHOW	AD01a	AD01a_L1	432	50	508	1470	AD01a_SW
+SHOW	AD01a	AD01a_L2	940	50	488	1470	AD01a_SW
+NEW	AD01a_start	InitialNode	-	-
+SHOW	AD01a	AD01a_start	211	85	30	30	AD01a_L0
+NEW	AD01a_n1	ActivityAction	Chọn chế độ quét, chụp 1–2 ảnh	-
+SHOW	AD01a	AD01a_n1	87	169	277	46	AD01a_L0
+NEW	AD01a_n2	ActivityAction	Nén ảnh, gửi yêu cầu quét	-
+SHOW	AD01a	AD01a_n2	465	261	232	46	AD01a_L1
+NEW	AD01a_n3	ActivityAction	Kiểm tra ảnh, tạo lần quét	-
+SHOW	AD01a	AD01a_n3	1069	353	231	46	AD01a_L2
+NEW	AD01a_n4	ActivityAction	Nhận diện nguyên liệu (worker)	-
+SHOW	AD01a	AD01a_n4	1049	445	270	46	AD01a_L2
+NEW	AD01a_n5	DecisionNode	Nhận diện thành công?	-
+SHOW	AD01a	AD01a_n5	1166	542	36	36	AD01a_L2
+CAPTION	AD01a	AD01a_n5	978	516	186	22
+NEW	AD01a_n6	ActivityAction	Báo lỗi, mời quét lại	-
+SHOW	AD01a	AD01a_n6	724	629	183	46	AD01a_L1
+NEW	AD01a_n7	ActivityFinalNode	-	-
+SHOW	AD01a	AD01a_n7	800	729	30	30	AD01a_L1
+NEW	AD01a_n8	ActivityAction	Hiện chip nguyên liệu	-
+SHOW	AD01a	AD01a_n8	483	813	197	46	AD01a_L1
+NEW	AD01a_n9	DecisionNode	Còn chip cần sửa?	-
+SHOW	AD01a	AD01a_n9	208	910	36	36	AD01a_L0
+CAPTION	AD01a	AD01a_n9	58	884	148	22
+NEW	AD01a_n10	ActivityAction	Sửa tên, số lượng hoặc xoá chip	-
+SHOW	AD01a	AD01a_n10	89	997	273	46	AD01a_L0
+NEW	AD01a_n11	ActivityAction	Bấm Xác nhận	-
+SHOW	AD01a	AD01a_n11	154	1089	143	46	AD01a_L0
+NEW	AD01a_n12	ActivityAction	Ghi lô mới vào kho	-
+SHOW	AD01a	AD01a_n12	1097	1181	174	46	AD01a_L2
+NEW	AD01a_n13	ActivityAction	Hiện kho đã cập nhật	-
+SHOW	AD01a	AD01a_n13	484	1273	194	46	AD01a_L1
+NEW	AD01a_n14	ActivityFinalNode	-	-
+SHOW	AD01a	AD01a_n14	566	1373	30	30	AD01a_L1
+NEWREL	AD01a_e0	ControlFlow	AD01a_start	AD01a_n1	-
+CONN	AD01a	AD01a_e0	-	-	226,115;226,169
+NEWREL	AD01a_e1	ControlFlow	AD01a_n1	AD01a_n2	-
+CONN	AD01a	AD01a_e1	-	-	365,192;582,192;582,261
+CSTYLE	AD01a	AD01a_e1	0
+NEWREL	AD01a_e2	ControlFlow	AD01a_n2	AD01a_n3	-
+CONN	AD01a	AD01a_e2	-	-	698,284;1185,284;1185,353
+CSTYLE	AD01a	AD01a_e2	0
+NEWREL	AD01a_e3	ControlFlow	AD01a_n3	AD01a_n4	-
+CONN	AD01a	AD01a_e3	-	-	1185,399;1185,445
+NEWREL	AD01a_e4	ControlFlow	AD01a_n4	AD01a_n5	-
+CONN	AD01a	AD01a_e4	-	-	1185,491;1185,542
+NEWREL	AD01a_e5	ControlFlow	AD01a_n5	AD01a_n6	không
+CONN	AD01a	AD01a_e5	-	-	1167,560;816,560;816,629
+CSTYLE	AD01a	AD01a_e5	0
+CAPTION	AD01a	AD01a_e5	1100	564	58	22
+NEWREL	AD01a_e6	ControlFlow	AD01a_n6	AD01a_n7	-
+CONN	AD01a	AD01a_e6	-	-	816,675;816,729
+NEWREL	AD01a_e7	ControlFlow	AD01a_n5	AD01a_n8	có
+CONN	AD01a	AD01a_e7	-	-	1185,578;1185,836;680,836
+CSTYLE	AD01a	AD01a_e7	0
+CAPTION	AD01a	AD01a_e7	1190	580	29	22
+NEWREL	AD01a_e8	ControlFlow	AD01a_n8	AD01a_n9	-
+CONN	AD01a	AD01a_e8	-	-	483,836;226,836;226,910
+CSTYLE	AD01a	AD01a_e8	0
+NEWREL	AD01a_e9	ControlFlow	AD01a_n9	AD01a_n10	có
+CONN	AD01a	AD01a_e9	-	-	226,946;226,997
+CAPTION	AD01a	AD01a_e9	232	948	29	22
+NEWREL	AD01a_e10	ControlFlow	AD01a_n10	AD01a_n9	-
+CONN	AD01a	AD01a_e10	-	-	363,1020;393,1020;393,928;244,928
+CSTYLE	AD01a	AD01a_e10	0
+NEWREL	AD01a_e11	ControlFlow	AD01a_n9	AD01a_n11	không
+CONN	AD01a	AD01a_e11	-	-	208,928;60,928;60,1067;226,1067;226,1089
+CSTYLE	AD01a	AD01a_e11	0
+CAPTION	AD01a	AD01a_e11	141	932	58	22
+NEWREL	AD01a_e12	ControlFlow	AD01a_n11	AD01a_n12	-
+CONN	AD01a	AD01a_e12	-	-	298,1112;1185,1112;1185,1181
+CSTYLE	AD01a	AD01a_e12	0
+NEWREL	AD01a_e13	ControlFlow	AD01a_n12	AD01a_n13	-
+CONN	AD01a	AD01a_e13	-	-	1098,1204;582,1204;582,1273
+CSTYLE	AD01a	AD01a_e13	0
+NEWREL	AD01a_e14	ControlFlow	AD01a_n13	AD01a_n14	-
+CONN	AD01a	AD01a_e14	-	-	582,1319;582,1373
+NOTE	AD01a_foot	Tastoria | AD01a
+SHOW	AD01a	AD01a_foot	20	1570	260	34	-
+PKG	PAD03b	AD03b
+USEPKG	PAD03b
+DIAG	AD03b	ACT	AD03b Xác nhận quét: ghi kho từ chip (UC13)
+NEW	AD03b_SW	ActivitySwimlane2	 	-
+NEW	AD03b_L0	ActivityPartition	scan	-
+CALL	AD03b_SW	addVerticalPartition	@AD03b_L0
+NEW	AD03b_L1	ActivityPartition	catalog	-
+CALL	AD03b_SW	addVerticalPartition	@AD03b_L1
+NEW	AD03b_L2	ActivityPartition	pantry	-
+CALL	AD03b_SW	addVerticalPartition	@AD03b_L2
+NEW	AD03b_SW_h	ActivityPartition	 	-
+CALL	AD03b_SW	addHorizontalPartition	@AD03b_SW_h
+SHOW	AD03b	AD03b_SW	20	20	1505	1224	-
+SHOW	AD03b	AD03b_L0	20	50	489	1194	AD03b_SW
+SHOW	AD03b	AD03b_L1	509	50	368	1194	AD03b_SW
+SHOW	AD03b	AD03b_L2	878	50	647	1194	AD03b_SW
+NEW	AD03b_start	InitialNode	-	-
+SHOW	AD03b	AD03b_start	249	85	30	30	AD03b_L0
+NEW	AD03b_n1	ActivityAction	Lấy các chip chưa xoá	-
+SHOW	AD03b	AD03b_n1	164	169	199	46	AD03b_L0
+NEW	AD03b_n2	DecisionNode	Còn chip chưa quy đổi?	-
+SHOW	AD03b	AD03b_n2	246	266	36	36	AD03b_L0
+CAPTION	AD03b	AD03b_n2	58	240	186	22
+NEW	AD03b_n3	ActivityAction	Tra gam mỗi đơn vị hoặc mức lượng	-
+SHOW	AD03b	AD03b_n3	542	353	302	46	AD03b_L1
+NEW	AD03b_n4	ActivityAction	Tính khoảng gam của chip	-
+SHOW	AD03b	AD03b_n4	948	445	232	46	AD03b_L2
+NEW	AD03b_n5	ActivityAction	Tạo lô mới hoặc cập nhật lô đang có	-
+SHOW	AD03b	AD03b_n5	911	537	306	46	AD03b_L2
+NEW	AD03b_n6	ActivityAction	Lưu lượng làm lượng ban đầu của lô	-
+SHOW	AD03b	AD03b_n6	912	629	303	46	AD03b_L2
+NEW	AD03b_n7	DecisionNode	Chế độ toàn tủ?	-
+SHOW	AD03b	AD03b_n7	246	726	36	36	AD03b_L0
+CAPTION	AD03b	AD03b_n7	113	700	131	22
+NEW	AD03b_n8	ActivityAction	Lô không thấy → «not_seen»	-
+SHOW	AD03b	AD03b_n8	1243	813	248	46	AD03b_L2
+NEW	AD03b_n9	MergeNode	 	-
+SHOW	AD03b	AD03b_n9	246	910	36	36	AD03b_L0
+NEW	AD03b_n10	ActivityAction	Lần quét → «confirmed»; commit	-
+SHOW	AD03b	AD03b_n10	123	997	282	46	AD03b_L0
+NEW	AD03b_n11	ActivityFinalNode	-	-
+SHOW	AD03b	AD03b_n11	249	1097	30	30	AD03b_L0
+NEWREL	AD03b_e0	ControlFlow	AD03b_start	AD03b_n1	-
+CONN	AD03b	AD03b_e0	-	-	265,115;265,169
+NEWREL	AD03b_e1	ControlFlow	AD03b_n1	AD03b_n2	-
+CONN	AD03b	AD03b_e1	-	-	265,215;265,266
+NEWREL	AD03b_e2	ControlFlow	AD03b_n2	AD03b_n3	còn
+CONN	AD03b	AD03b_e2	-	-	265,302;265,376;543,376
+CSTYLE	AD03b	AD03b_e2	0
+CAPTION	AD03b	AD03b_e2	270	304	38	22
+NEWREL	AD03b_e3	ControlFlow	AD03b_n3	AD03b_n4	-
+CONN	AD03b	AD03b_e3	-	-	845,376;1064,376;1064,445
+CSTYLE	AD03b	AD03b_e3	0
+NEWREL	AD03b_e4	ControlFlow	AD03b_n4	AD03b_n2	-
+CONN	AD03b	AD03b_e4	-	-	1181,468;1211,468;1211,284;283,284
+CSTYLE	AD03b	AD03b_e4	0
+NEWREL	AD03b_e5	ControlFlow	AD03b_n2	AD03b_n5	hết
+CONN	AD03b	AD03b_e5	-	-	247,284;217,284;217,560;911,560
+CSTYLE	AD03b	AD03b_e5	0
+CAPTION	AD03b	AD03b_e5	202	288	36	22
+NEWREL	AD03b_e6	ControlFlow	AD03b_n5	AD03b_n6	-
+CONN	AD03b	AD03b_e6	-	-	1064,583;1064,629
+NEWREL	AD03b_e7	ControlFlow	AD03b_n6	AD03b_n7	-
+CONN	AD03b	AD03b_e7	-	-	913,652;265,652;265,726
+CSTYLE	AD03b	AD03b_e7	0
+NEWREL	AD03b_e8	ControlFlow	AD03b_n7	AD03b_n8	có
+CONN	AD03b	AD03b_e8	-	-	283,744;1368,744;1368,813
+CSTYLE	AD03b	AD03b_e8	0
+CAPTION	AD03b	AD03b_e8	290	718	29	22
+NEWREL	AD03b_e9	ControlFlow	AD03b_n7	AD03b_n9	không
+CONN	AD03b	AD03b_e9	-	-	265,762;265,910
+CAPTION	AD03b	AD03b_e9	200	764	58	22
+NEWREL	AD03b_e10	ControlFlow	AD03b_n8	AD03b_n9	-
+CONN	AD03b	AD03b_e10	-	-	1368,859;1368,928;283,928
+CSTYLE	AD03b	AD03b_e10	0
+NEWREL	AD03b_e11	ControlFlow	AD03b_n9	AD03b_n10	-
+CONN	AD03b	AD03b_e11	-	-	265,946;265,997
+NEWREL	AD03b_e12	ControlFlow	AD03b_n10	AD03b_n11	-
+CONN	AD03b	AD03b_e12	-	-	265,1043;265,1097
+NOTE	AD03b_foot	Tastoria | AD03b
+SHOW	AD03b	AD03b_foot	20	1294	260	34	-
+PKG	PCL02b	CL02b
+USEPKG	PCL02b
+DIAG	CL02b	CLASS	CL02b Lớp phân tích BCE: UC13 Xác nhận kết quả quét
+CLASS	CL02b_BX	Màn hình Xác nhận	-	boundary
+ATTR	CL02b_BX	-	danhSáchChip	-	-	-
+OPER	CL02b_BX	+	sửaChip	chip:Chip	Chip
+OPER	CL02b_BX	+	xácNhận	lầnQuét:LầnQuét	Lô[*]
+CLASS	CL02b_CSC	Sửa chip	-	control
+OPER	CL02b_CSC	+	cậpNhậtChip	chip:Chip	Chip
+CLASS	CL02b_CX	Xác nhận vào kho	-	control
+OPER	CL02b_CX	+	xácNhận	lầnQuét:LầnQuét	Lô[*]
+OPER	CL02b_CX	+	quyĐổiLượng	chip:Chip	KhoảngGam
+CLASS	CL02b_ECH	Chip nguyên liệu	-	entity
+ATTR	CL02b_ECH	-	sốĐếm	-	-	-
+ATTR	CL02b_ECH	-	mứcLượng	-	-	-
+ATTR	CL02b_ECH	-	thaoTác	-	-	-
+CLASS	CL02b_ELO	Lô kho	-	entity
+ATTR	CL02b_ELO	-	khoảngGam	-	-	-
+ATTR	CL02b_ELO	-	trạngThái	-	-	-
+CLASS	CL02b_ELQ	Lần quét	-	entity
+ATTR	CL02b_ELQ	-	trạngThái	-	-	-
+ATTR	CL02b_ELQ	-	xácNhậnLúc	-	-	-
+ASSOC	CL02b_r0	CL02b_BX	CL02b_CSC	-	-	-	-	-	-	-	-	-
+ASSOC	CL02b_r1	CL02b_BX	CL02b_CX	-	-	-	-	-	-	-	-	-
+ASSOC	CL02b_r2	CL02b_CSC	CL02b_ECH	-	-	-	-	-	-	-	-	-
+ASSOC	CL02b_r3	CL02b_CX	CL02b_ECH	-	-	-	-	-	-	-	-	-
+ASSOC	CL02b_r4	CL02b_CX	CL02b_ELO	-	-	-	-	-	-	-	-	-
+ASSOC	CL02b_r5	CL02b_CX	CL02b_ELQ	-	-	-	-	-	-	-	-	-
+NOTE	CL02b_foot	Tastoria | CL02b
+SHOW	CL02b	CL02b_foot	20	692	260	34	-
+SHOW	CL02b	CL02b_BX	40	40	342	120	-
+SHOW	CL02b	CL02b_CSC	643	59	313	82	-
+SHOW	CL02b	CL02b_CX	612	300	374	101	-
+SHOW	CL02b	CL02b_ECH	1217	40	177	120	-
+SHOW	CL02b	CL02b_ELO	1231	300	150	101	-
+SHOW	CL02b	CL02b_ELQ	1231	541	150	101	-
+FIT	CL02b
+CONN	CL02b	CL02b_r0	-	-	-
+CONN	CL02b	CL02b_r1	-	-	-
+CONN	CL02b	CL02b_r2	-	-	-
+CONN	CL02b	CL02b_r3	-	-	-
+CONN	CL02b	CL02b_r4	-	-	-
+CONN	CL02b	CL02b_r5	-	-	-
+SCALL	CL02b	CL02b_BX	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL02b	CL02b_CSC	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL02b	CL02b_CX	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL02b	CL02b_ECH	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL02b	CL02b_ELO	setDisplayAsRobustnessAnalysisIcon	b:false
+SCALL	CL02b	CL02b_ELQ	setDisplayAsRobustnessAnalysisIcon	b:false
+PKG	PCL09a	CL09a
+USEPKG	PCL09a
+DIAG	CL09a	CLASS	CL09a Lớp liên kết: thành phần món và món trong mâm
+CLASS	CL09a_MON	Món	-	-
+ATTR	CL09a_MON	-	tên	Chuỗi	-	-
+ATTR	CL09a_MON	-	slot	Slot	-	-
+ATTR	CL09a_MON	-	khẩuPhầnGốc	Số nguyên	-	-
+CLASS	CL09a_NL	Nguyên liệu	-	-
+ATTR	CL09a_NL	-	tên	Chuỗi	-	-
+ATTR	CL09a_NL	-	đếmĐược	Boolean	-	-
+CLASS	CL09a_TPM	Thành phần món	-	-
+ATTR	CL09a_TPM	-	lượng	Gam	-	-
+ATTR	CL09a_TPM	-	vaiTrò	VaiTròNL	-	-
+ATTR	CL09a_TPM	-	luônCó	Boolean	-	-
+CLASS	CL09a_MAM	Mâm cơm	-	-
+ATTR	CL09a_MAM	-	bữa	Bữa	-	-
+ATTR	CL09a_MAM	-	sốNgười	Số nguyên	-	-
+ATTR	CL09a_MAM	-	trạngThái	TrạngTháiMâm	-	-
+CLASS	CL09a_MTM	Món trong mâm	-	-
+ATTR	CL09a_MTM	-	slot	Slot	-	-
+ATTR	CL09a_MTM	-	hệSốKhẩuPhần	Số thực	-	-
+ATTR	CL09a_MTM	-	trạngThái	TrạngTháiMónMâm	-	-
+ASSOC	CL09a_r0	CL09a_MON	CL09a_NL	dùng	0..*	1..*	-	-	-	-	-	-
+ACLS	CL09a_ac0	CL09a_TPM	CL09a_r0
+ASSOC	CL09a_r1	CL09a_MAM	CL09a_MON	gồm	0..*	2..3	-	-	-	-	-	-
+ACLS	CL09a_ac1	CL09a_MTM	CL09a_r1
+NOTE	CL09a_foot	Tastoria | CL09a
+SHOW	CL09a	CL09a_foot	20	432	260	34	-
+SHOW	CL09a	CL09a_MON	463	40	243	101	-
+SHOW	CL09a	CL09a_NL	40	49	193	82	-
+SHOW	CL09a	CL09a_MAM	952	40	243	101	-
+SHOW	CL09a	CL09a_TPM	272	281	177	101	-
+SHOW	CL09a	CL09a_MTM	692	281	274	101	-
+FIT	CL09a
+CONN	CL09a	CL09a_r0	-	-	-
+CONN	CL09a	CL09a_ac0	-	-	-
+CONN	CL09a	CL09a_r1	-	-	-
+CONN	CL09a	CL09a_ac1	-	-	-
+PKG	PCL09b	CL09b
+USEPKG	PCL09b
+DIAG	CL09b	CLASS	CL09b Sau khi bỏ lớp liên kết: thành phần món và món trong mâm
+CLASS	CL09b_MON	Món	-	-
+ATTR	CL09b_MON	-	tên	Chuỗi	-	-
+ATTR	CL09b_MON	-	slot	Slot	-	-
+ATTR	CL09b_MON	-	khẩuPhầnGốc	Số nguyên	-	-
+CLASS	CL09b_NL	Nguyên liệu	-	-
+ATTR	CL09b_NL	-	tên	Chuỗi	-	-
+ATTR	CL09b_NL	-	đếmĐược	Boolean	-	-
+CLASS	CL09b_TPM	Thành phần món	-	-
+ATTR	CL09b_TPM	-	lượng	Gam	-	-
+ATTR	CL09b_TPM	-	vaiTrò	VaiTròNL	-	-
+ATTR	CL09b_TPM	-	luônCó	Boolean	-	-
+CLASS	CL09b_MAM	Mâm cơm	-	-
+ATTR	CL09b_MAM	-	bữa	Bữa	-	-
+ATTR	CL09b_MAM	-	sốNgười	Số nguyên	-	-
+ATTR	CL09b_MAM	-	trạngThái	TrạngTháiMâm	-	-
+CLASS	CL09b_MTM	Món trong mâm	-	-
+ATTR	CL09b_MTM	-	slot	Slot	-	-
+ATTR	CL09b_MTM	-	hệSốKhẩuPhần	Số thực	-	-
+ATTR	CL09b_MTM	-	trạngThái	TrạngTháiMónMâm	-	-
+ASSOC	CL09b_r0	CL09b_MON	CL09b_TPM	-	-	1..*	composite	-	-	-	-	-
+ASSOC	CL09b_r1	CL09b_TPM	CL09b_NL	là	0..*	1	-	-	-	-	-	-
+ASSOC	CL09b_r2	CL09b_MAM	CL09b_MTM	-	-	2..3	composite	-	-	-	-	-
+ASSOC	CL09b_r3	CL09b_MTM	CL09b_MON	là	0..*	1	-	-	-	-	-	-
+NOTE	CL09b_foot	Tastoria | CL09b
+SHOW	CL09b	CL09b_foot	20	432	260	34	-
+SHOW	CL09b	CL09b_MON	463	40	243	101	-
+SHOW	CL09b	CL09b_NL	40	290	193	82	-
+SHOW	CL09b	CL09b_TPM	47	40	177	101	-
+SHOW	CL09b	CL09b_MAM	952	281	243	101	-
+SHOW	CL09b	CL09b_MTM	936	40	274	101	-
+FIT	CL09b
+CONN	CL09b	CL09b_r0	-	-	-
+CONN	CL09b	CL09b_r1	-	-	-
+CONN	CL09b	CL09b_r2	-	-	-
+CONN	CL09b	CL09b_r3	-	-	-
+PKG	PCL09c	CL09c
+USEPKG	PCL09c
+DIAG	CL09c	CLASS	CL09c Lớp liên kết: trừ kho và tương tác
+CLASS	CL09c_LO	Lô kho	-	-
+ATTR	CL09c_LO	-	ngàyNhập	Thời điểm	-	-
+ATTR	CL09c_LO	-	gMin	Gam	-	-
+ATTR	CL09c_LO	-	gMax	Gam	-	-
+CLASS	CL09c_PN	Phiên nấu	-	-
+ATTR	CL09c_PN	-	giờDọn	Thời điểm	-	-
+ATTR	CL09c_PN	-	trạngThái	TrạngTháiPhiên	-	-
+CLASS	CL09c_GD	Lần trừ kho	-	-
+ATTR	CL09c_GD	-	deltaMin	Gam	-	-
+ATTR	CL09c_GD	-	deltaMax	Gam	-	-
+ATTR	CL09c_GD	-	độGấpLúcTrừ	Số thực	-	-
+CLASS	CL09c_TK	Tài khoản	-	-
+ATTR	CL09c_TK	-	email	Email	-	-
+ATTR	CL09c_TK	-	trạngThái	TrạngTháiTK	-	-
+CLASS	CL09c_MON	Món	-	-
+ATTR	CL09c_MON	-	tên	Chuỗi	-	-
+ATTR	CL09c_MON	-	slot	Slot	-	-
+CLASS	CL09c_TT	Tương tác	-	-
+ATTR	CL09c_TT	-	loại	LoạiTươngTác	-	-
+ATTR	CL09c_TT	-	thờiĐiểm	Thời điểm	-	-
+ASSOC	CL09c_r0	CL09c_PN	CL09c_LO	trừ từ	0..*	0..*	-	-	-	-	-	-
+ACLS	CL09c_ac0	CL09c_GD	CL09c_r0
+ASSOC	CL09c_r1	CL09c_TK	CL09c_MON	phản hồi về	0..*	0..*	-	-	-	-	-	-
+ACLS	CL09c_ac1	CL09c_TT	CL09c_r1
+NOTE	CL09c_foot	Tastoria | CL09c
+SHOW	CL09c	CL09c_foot	20	876	260	34	-
+SHOW	CL09c	CL09c_LO	539	40	211	101	-
+SHOW	CL09c	CL09c_PN	40	49	247	82	-
+SHOW	CL09c	CL09c_TK	51	522	225	82	-
+SHOW	CL09c	CL09c_MON	569	522	150	82	-
+SHOW	CL09c	CL09c_GD	297	281	214	101	-
+SHOW	CL09c	CL09c_TT	302	744	203	82	-
+FIT	CL09c
+CONN	CL09c	CL09c_r0	-	-	-
+CONN	CL09c	CL09c_ac0	-	-	-
+CONN	CL09c	CL09c_r1	-	-	-
+CONN	CL09c	CL09c_ac1	-	-	-
+PKG	PCL09d	CL09d
+USEPKG	PCL09d
+DIAG	CL09d	CLASS	CL09d Sau khi bỏ lớp liên kết: giao dịch kho và tương tác
+CLASS	CL09d_LO	Lô kho	-	-
+ATTR	CL09d_LO	-	ngàyNhập	Thời điểm	-	-
+ATTR	CL09d_LO	-	gMin	Gam	-	-
+ATTR	CL09d_LO	-	gMax	Gam	-	-
+CLASS	CL09d_PN	Phiên nấu	-	-
+ATTR	CL09d_PN	-	giờDọn	Thời điểm	-	-
+ATTR	CL09d_PN	-	trạngThái	TrạngTháiPhiên	-	-
+CLASS	CL09d_GD	Giao dịch kho	-	-
+ATTR	CL09d_GD	-	lýDo	LýDoGiaoDịch	-	-
+ATTR	CL09d_GD	-	deltaMin	Gam	-	-
+ATTR	CL09d_GD	-	deltaMax	Gam	-	-
+ATTR	CL09d_GD	-	độGấpLúcTrừ	Số thực	-	-
+CLASS	CL09d_TK	Tài khoản	-	-
+ATTR	CL09d_TK	-	email	Email	-	-
+ATTR	CL09d_TK	-	trạngThái	TrạngTháiTK	-	-
+CLASS	CL09d_MON	Món	-	-
+ATTR	CL09d_MON	-	tên	Chuỗi	-	-
+ATTR	CL09d_MON	-	slot	Slot	-	-
+CLASS	CL09d_TT	Tương tác	-	-
+ATTR	CL09d_TT	-	loại	LoạiTươngTác	-	-
+ATTR	CL09d_TT	-	thờiĐiểm	Thời điểm	-	-
+ASSOC	CL09d_r0	CL09d_LO	CL09d_GD	-	-	1..*	composite	-	-	-	-	-
+ASSOC	CL09d_r1	CL09d_PN	CL09d_GD	phát sinh	0..1	0..*	-	-	-	-	-	-
+ASSOC	CL09d_r2	CL09d_TK	CL09d_TT	ghi	1	0..*	-	-	-	-	-	-
+ASSOC	CL09d_r3	CL09d_TT	CL09d_MON	về	0..*	1	-	-	-	-	-	-
+NOTE	CL09d_foot	Tastoria | CL09d
+SHOW	CL09d	CL09d_foot	20	432	260	34	-
+SHOW	CL09d	CL09d_LO	967	49	211	101	-
+SHOW	CL09d	CL09d_PN	40	59	247	82	-
+SHOW	CL09d	CL09d_GD	522	40	214	120	-
+SHOW	CL09d	CL09d_TK	51	300	225	82	-
+SHOW	CL09d	CL09d_MON	998	300	150	82	-
+SHOW	CL09d	CL09d_TT	528	300	203	82	-
+FIT	CL09d
+CONN	CL09d	CL09d_r0	-	-	-
+CONN	CL09d	CL09d_r1	-	-	-
+CONN	CL09d	CL09d_r2	-	-	-
+CONN	CL09d	CL09d_r3	-	-	-
+PKG	PCL11a	CL11a
+USEPKG	PCL11a
+DIAG	CL11a	CLASS	CL11a Tầng model: lần quét và kho (SQLAlchemy)
+CLASS	CL11a_SC	Scan	-	ORM
+ATTR	CL11a_SC	-	mode	str	-	-
+ATTR	CL11a_SC	-	status	str	-	-
+ATTR	CL11a_SC	-	attempts	int	-	-
+ATTR	CL11a_SC	-	enqueued_at	datetime	-	-
+ATTR	CL11a_SC	-	confirmed_at	datetime	-	-
+CLASS	CL11a_SI	ScanImage	-	ORM
+ATTR	CL11a_SI	-	ordinal	int	-	-
+ATTR	CL11a_SI	-	shelf_group	int	-	-
+ATTR	CL11a_SI	-	storage_key	str	-	-
+ATTR	CL11a_SI	-	contributed	bool	-	-
+ATTR	CL11a_SI	-	purged_at	datetime	-	-
+CLASS	CL11a_DT	Detection	-	ORM
+ATTR	CL11a_DT	-	vision_class_id	int	-	-
+ATTR	CL11a_DT	-	confidence	float	-	-
+ATTR	CL11a_DT	-	p_tuoi	float	-	-
+ATTR	CL11a_DT	-	p_kiem_tra	float	-	-
+CLASS	CL11a_IT	ScanItem	-	ORM
+ATTR	CL11a_IT	-	ingredient_id	UUID	-	-
+ATTR	CL11a_IT	-	model_count	int	-	-
+ATTR	CL11a_IT	-	final_count	int	-	-
+ATTR	CL11a_IT	-	qty_level	str	-	-
+ATTR	CL11a_IT	-	user_action	str	-	-
+CLASS	CL11a_LO	PantryLot	-	ORM
+ATTR	CL11a_LO	-	ingredient_id	UUID	-	-
+ATTR	CL11a_LO	-	initial_g_min	Decimal	-	-
+ATTR	CL11a_LO	-	initial_g_max	Decimal	-	-
+ATTR	CL11a_LO	-	acquired_at	datetime	-	-
+ATTR	CL11a_LO	-	status	str	-	-
+CLASS	CL11a_TX	PantryTransaction	-	ORM
+ATTR	CL11a_TX	-	delta_g_min	Decimal	-	-
+ATTR	CL11a_TX	-	delta_g_max	Decimal	-	-
+ATTR	CL11a_TX	-	reason	str	-	-
+ATTR	CL11a_TX	-	ref_id	UUID	-	-
+ATTR	CL11a_TX	-	reverses_id	int	-	-
+ASSOC	CL11a_r0	CL11a_SC	CL11a_SI	-	-	1..2	composite	-	-	-	-	-
+ASSOC	CL11a_r1	CL11a_SC	CL11a_IT	-	-	0..*	composite	-	-	-	-	-
+ASSOC	CL11a_r2	CL11a_SI	CL11a_DT	-	-	0..*	composite	-	-	-	-	-
+ASSOC	CL11a_r3	CL11a_DT	CL11a_IT	gộp vào	0..*	0..1	-	-	-	-	-	-
+ASSOC	CL11a_r4	CL11a_IT	CL11a_LO	tạo	0..1	0..1	-	-	-	-	-	-
+ASSOC	CL11a_r5	CL11a_LO	CL11a_TX	-	-	1..*	composite	-	-	-	-	-
+NOTE	CL11a_foot	Tastoria | CL11a
+SHOW	CL11a	CL11a_foot	20	844	260	34	-
+SHOW	CL11a	CL11a_SC	474	40	226	158	-
+SHOW	CL11a	CL11a_SI	40	40	204	158	-
+SHOW	CL11a	CL11a_DT	47	347	189	139	-
+SHOW	CL11a	CL11a_IT	489	338	196	158	-
+SHOW	CL11a	CL11a_LO	930	338	220	158	-
+SHOW	CL11a	CL11a_TX	932	636	217	158	-
+FIT	CL11a
+CONN	CL11a	CL11a_r0	-	-	-
+CONN	CL11a	CL11a_r1	-	-	-
+CONN	CL11a	CL11a_r2	-	-	-
+CONN	CL11a	CL11a_r3	-	-	-
+CONN	CL11a	CL11a_r4	-	-	-
+CONN	CL11a	CL11a_r5	-	-	-
+PKG	PCL11b	CL11b
+USEPKG	PCL11b
+DIAG	CL11b	CLASS	CL11b Tầng model: mâm cơm và phiên nấu (SQLAlchemy)
+CLASS	CL11b_PIN	MealPlanPin	-	ORM
+ATTR	CL11b_PIN	-	lot_id	UUID	-	-
+CLASS	CL11b_MP	MealPlan	-	ORM
+ATTR	CL11b_MP	-	meal	str	-	-
+ATTR	CL11b_MP	-	persons	int	-	-
+ATTR	CL11b_MP	-	max_minutes	int	-	-
+ATTR	CL11b_MP	-	status	str	-	-
+ATTR	CL11b_MP	-	e_target_kcal	Decimal	-	-
+CLASS	CL11b_MI	MealPlanItem	-	ORM
+ATTR	CL11b_MI	-	slot	str	-	-
+ATTR	CL11b_MI	-	recipe_id	UUID	-	-
+ATTR	CL11b_MI	-	status	str	-	-
+ATTR	CL11b_MI	-	servings_scale	Decimal	-	-
+ATTR	CL11b_MI	-	replaced_item_id	UUID	-	-
+CLASS	CL11b_SUB	MealPlanItemSubstitution	-	ORM
+ATTR	CL11b_SUB	-	original_ingredient_id	UUID	-	-
+ATTR	CL11b_SUB	-	substitute_ingredient_id	UUID	-	-
+ATTR	CL11b_SUB	-	grams	Decimal	-	-
+ATTR	CL11b_SUB	-	origin	str	-	-
+CLASS	CL11b_CS	CookSession	-	ORM
+ATTR	CL11b_CS	-	status	str	-	-
+ATTR	CL11b_CS	-	serve_at	datetime	-	-
+ATTR	CL11b_CS	-	burners	int	-	-
+ATTR	CL11b_CS	-	completed_at	datetime	-	-
+ATTR	CL11b_CS	-	reverted_at	datetime	-	-
+CLASS	CL11b_SE	CookScheduleEntry	-	ORM
+ATTR	CL11b_SE	-	recipe_id	UUID	-	-
+ATTR	CL11b_SE	-	step_no	int	-	-
+ATTR	CL11b_SE	-	start_offset_s	int	-	-
+ATTR	CL11b_SE	-	end_offset_s	int	-	-
+ASSOC	CL11b_r0	CL11b_MP	CL11b_PIN	-	-	0..2	composite	-	-	-	-	-
+ASSOC	CL11b_r1	CL11b_MP	CL11b_MI	-	-	1..*	composite	-	-	-	-	-
+ASSOC	CL11b_r2	CL11b_MI	CL11b_SUB	-	-	0..*	composite	-	-	-	-	-
+ASSOC	CL11b_r3	CL11b_MP	CL11b_CS	được nấu	1	0..*	-	-	-	-	-	-
+ASSOC	CL11b_r4	CL11b_CS	CL11b_SE	-	-	1..*	composite	-	-	-	-	-
+NOTE	CL11b_foot	Tastoria | CL11b
+SHOW	CL11b	CL11b_foot	20	825	260	34	-
+SHOW	CL11b	CL11b_PIN	40	78	150	82	-
+SHOW	CL11b	CL11b_MP	424	40	222	158	-
+SHOW	CL11b	CL11b_MI	904	40	231	158	-
+SHOW	CL11b	CL11b_SUB	880	347	279	139	-
+SHOW	CL11b	CL11b_CS	420	338	230	158	-
+SHOW	CL11b	CL11b_SE	435	636	200	139	-
+FIT	CL11b
+CONN	CL11b	CL11b_r0	-	-	-
+CONN	CL11b	CL11b_r1	-	-	-
+CONN	CL11b	CL11b_r2	-	-	-
+CONN	CL11b	CL11b_r3	-	-	-
+CONN	CL11b	CL11b_r4	-	-	-
+PKG	PCL12a	CL12a
+USEPKG	PCL12a
+DIAG	CL12a	CLASS	CL12a Tầng service: quét ảnh và kho
+CLASS	CL12a_SS	scan.service	-	module
+OPER	CL12a_SS	+	create_scan	mode:str,raws:list[bytes]	ScanAccepted
+OPER	CL12a_SS	+	get_scan	scan_id:UUID,wait:int	ScanOut
+OPER	CL12a_SS	+	update_item	scan_id:UUID,item_id:UUID,body:ScanItemPatch	ScanItemOut
+OPER	CL12a_SS	+	confirm	scan_id:UUID,body:ScanConfirmRequest	ScanConfirmResult
+OPER	CL12a_SS	+	discard	scan_id:UUID	ScanOut
+CLASS	CL12a_PS	pantry.service	-	module
+OPER	CL12a_PS	+	lot_views	user_id:UUID	list[LotView]
+OPER	CL12a_PS	+	apply_scan	user_id:UUID,mode:str,items:list[ScanLotInput]	ScanApplyResult
+OPER	CL12a_PS	+	chip_grams	ing:IngredientView,count:int,level:str	tuple
+CLASS	CL12a_Q	ScanQueue	-	class
+OPER	CL12a_Q	+	enqueue	scan_id:UUID,attempt:int	None
+OPER	CL12a_Q	+	publish	scan_id:UUID,status:str	None
+CLASS	CL12a_WK	scan.worker	-	module
+OPER	CL12a_WK	+	infer	scan_id:str	str
+OPER	CL12a_WK	+	run_job	ctx:WorkerContext,scan_id:UUID	str
+CLASS	CL12a_DE	Detector	-	class
+ATTR	CL12a_DE	-	conf	float	-	-
+ATTR	CL12a_DE	-	iou	float	-	-
+OPER	CL12a_DE	+	detect	img:Image	list[Box]
+CLASS	CL12a_AG	scan.aggregate	-	module
+OPER	CL12a_AG	+	build_chips	found:list[FoundBox],rules:dict	list[Chip]
+DEP	CL12a_r0	CL12a_SS	CL12a_PS	-	-
+DEP	CL12a_r1	CL12a_SS	CL12a_Q	-	-
+DEP	CL12a_r2	CL12a_WK	CL12a_Q	-	-
+DEP	CL12a_r3	CL12a_WK	CL12a_DE	-	-
+DEP	CL12a_r4	CL12a_WK	CL12a_AG	-	-
+NOTE	CL12a_foot	Tastoria | CL12a
+SHOW	CL12a	CL12a_foot	20	971	260	34	-
+SHOW	CL12a	CL12a_SS	40	40	722	158	-
+SHOW	CL12a	CL12a_PS	992	59	731	120	-
+SHOW	CL12a	CL12a_Q	183	338	434	101	-
+SHOW	CL12a	CL12a_WK	171	588	460	101	-
+SHOW	CL12a	CL12a_DE	1206	579	302	120	-
+SHOW	CL12a	CL12a_AG	140	839	522	82	-
+FIT	CL12a
+CONN	CL12a	CL12a_r0	-	-	-
+CONN	CL12a	CL12a_r1	-	-	-
+CONN	CL12a	CL12a_r2	-	-	-
+CONN	CL12a	CL12a_r3	-	-	-
+CONN	CL12a	CL12a_r4	-	-	-
+PKG	PCL12b	CL12b
+USEPKG	PCL12b
+DIAG	CL12b	CLASS	CL12b Tầng service: ghép mâm cơm
+CLASS	CL12b_MS	meal.service	-	module
+OPER	CL12b_MS	+	create_plan	body:MealPlanCreate	Created
+OPER	CL12b_MS	+	accept_plan	plan_id:UUID	MealPlanOut
+OPER	CL12b_MS	+	plan_for_cooking	user_id:UUID,plan_id:UUID	CookPlan
+CLASS	CL12b_CAT	catalog.service	-	module
+OPER	CL12b_CAT	+	published_recipes	slot:str	list[RecipeView]
+OPER	CL12b_CAT	+	recipe_allowed	recipe:RecipeView,allergens:set,excluded_groups:set	bool
+CLASS	CL12b_RK	Ranker	-	interface
+OPER	CL12b_RK	+	score	ctx:RankContext,recipes:list[RecipeView]	dict
+CLASS	CL12b_CP	meal.composer	-	module
+OPER	CL12b_CP	+	compose	p:Problem,structures:list	list[Tray]
+OPER	CL12b_CP	+	shortfall	p:Problem,tray:Tray	list
+CLASS	CL12b_SH	meal.schedule	-	module
+OPER	CL12b_SH	+	solve	dishes:list[Dish],burners:int	Schedule
+OPER	CL12b_SH	+	sequential	dishes:list[Dish]	Schedule
+DEP	CL12b_r0	CL12b_MS	CL12b_CAT	-	-
+DEP	CL12b_r1	CL12b_MS	CL12b_RK	-	-
+DEP	CL12b_r2	CL12b_MS	CL12b_CP	-	-
+DEP	CL12b_r3	CL12b_MS	CL12b_SH	-	-
+NOTE	CL12b_foot	Tastoria | CL12b
+SHOW	CL12b	CL12b_foot	20	673	260	34	-
+SHOW	CL12b	CL12b_MS	814	262	535	120	-
+SHOW	CL12b	CL12b_CAT	726	522	711	101	-
+SHOW	CL12b	CL12b_RK	823	40	517	82	-
+SHOW	CL12b	CL12b_CP	1668	271	457	101	-
+SHOW	CL12b	CL12b_SH	40	271	456	101	-
+FIT	CL12b
+CONN	CL12b	CL12b_r0	-	-	-
+CONN	CL12b	CL12b_r1	-	-	-
+CONN	CL12b	CL12b_r2	-	-	-
+CONN	CL12b	CL12b_r3	-	-	-
+PKG	PCL12c	CL12c
+USEPKG	PCL12c
+DIAG	CL12c	CLASS	CL12c Tầng service: nấu, hoàn tất và hoàn tác
+CLASS	CL12c_CK	cooking.service	-	module
+OPER	CL12c_CK	+	create_session	body:CookSessionCreate	CookSessionOut
+OPER	CL12c_CK	+	complete_session	cook_session_id:UUID,body:CookCompleteRequest	CookCompletion
+OPER	CL12c_CK	+	undo_session	cook_session_id:UUID	CookSessionOut
+OPER	CL12c_CK	+	abandon_session	cook_session_id:UUID	CookSessionOut
+CLASS	CL12c_MS	meal.service	-	module
+OPER	CL12c_MS	+	plan_for_cooking	user_id:UUID,plan_id:UUID	CookPlan
+OPER	CL12c_MS	+	consumption	plan:CookPlan	list[Need]
+OPER	CL12c_MS	+	set_cooked	plan_id:UUID,cooked:bool	None
+CLASS	CL12c_PS	pantry.service	-	module
+OPER	CL12c_PS	+	deduct	user_id:UUID,cook_session_id:UUID,needs:list[Need]	tuple
+OPER	CL12c_PS	+	reverse	user_id:UUID,cook_session_id:UUID	list[Deduction]
+CLASS	CL12c_EV	events.service	-	module
+OPER	CL12c_EV	+	record	user_id:UUID,events:list[Event]	bool
+DEP	CL12c_r0	CL12c_CK	CL12c_MS	-	-
+DEP	CL12c_r1	CL12c_CK	CL12c_PS	-	-
+DEP	CL12c_r2	CL12c_CK	CL12c_EV	-	-
+NOTE	CL12c_foot	Tastoria | CL12c
+SHOW	CL12c	CL12c_foot	20	730	260	34	-
+SHOW	CL12c	CL12c_CK	40	300	778	139	-
+SHOW	CL12c	CL12c_MS	161	40	535	120	-
+SHOW	CL12c	CL12c_PS	102	579	652	101	-
+SHOW	CL12c	CL12c_EV	1048	328	455	82	-
+FIT	CL12c
+CONN	CL12c	CL12c_r0	-	-	-
+CONN	CL12c	CL12c_r1	-	-	-
+CONN	CL12c	CL12c_r2	-	-	-
+PKG	PCL12d	CL12d
+USEPKG	PCL12d
+DIAG	CL12d	CLASS	CL12d Thành phần lõi: giao dịch, lũy đẳng, xác thực, lỗi
+CLASS	CL12d_UW	UnitOfWork	-	class
+ATTR	CL12d_UW	-	session	Session	-	-
+OPER	CL12d_UW	+	after_commit	fn:Callable	None
+OPER	CL12d_UW	+	run_after_commit	-	None
+CLASS	CL12d_ID	core.idempotency	-	module
+OPER	CL12d_ID	+	begin	user_id:UUID,idem:IdempotencyRequest	JSONResponse
+OPER	CL12d_ID	+	finish	user_id:UUID,idem:IdempotencyRequest,status:int,body:object	JSONResponse
+OPER	CL12d_ID	+	purge_expired	-	int
+CLASS	CL12d_IR	IdempotencyRequest	-	dataclass
+ATTR	CL12d_IR	-	key	str	-	-
+ATTR	CL12d_IR	-	request_sha256	bytes	-	-
+CLASS	CL12d_AU	AuthUser	-	dataclass
+ATTR	CL12d_AU	-	id	UUID	-	-
+ATTR	CL12d_AU	-	role	str	-	-
+ATTR	CL12d_AU	-	email	str	-	-
+CLASS	CL12d_AT	core.auth	-	module
+OPER	CL12d_AT	+	current_user	request:Request,uow:UnitOfWork	AuthUser
+CLASS	CL12d_ER	ApiError	-	exception
+ATTR	CL12d_ER	-	status	int	-	-
+ATTR	CL12d_ER	-	code	ProblemCode	-	-
+ATTR	CL12d_ER	-	commit	bool	-	-
+DEP	CL12d_r0	CL12d_ID	CL12d_IR	-	-
+DEP	CL12d_r1	CL12d_ID	CL12d_UW	-	-
+DEP	CL12d_r2	CL12d_AT	CL12d_AU	-	-
+DEP	CL12d_r3	CL12d_AT	CL12d_UW	-	-
+DEP	CL12d_r4	CL12d_UW	CL12d_ER	-	-
+NOTE	CL12d_foot	Tastoria | CL12d
+SHOW	CL12d	CL12d_foot	20	730	260	34	-
+SHOW	CL12d	CL12d_UW	735	300	331	120	-
+SHOW	CL12d	CL12d_ID	491	40	820	120	-
+SHOW	CL12d	CL12d_IR	40	49	221	101	-
+SHOW	CL12d	CL12d_AU	72	560	157	120	-
+SHOW	CL12d	CL12d_AT	624	579	554	82	-
+SHOW	CL12d	CL12d_ER	1541	300	196	120	-
+FIT	CL12d
+CONN	CL12d	CL12d_r0	-	-	-
+CONN	CL12d	CL12d_r1	-	-	-
+CONN	CL12d	CL12d_r2	-	-	-
+CONN	CL12d	CL12d_r3	-	-	-
+CONN	CL12d	CL12d_r4	-	-	-
+PKG	PCL13a	CL13a
+USEPKG	PCL13a
+DIAG	CL13a	CLASS	CL13a Tầng API: router và schema của quét, kho
+CLASS	CL13a_SR	scan.router	-	router
+OPER	CL13a_SR	+	create_scan	mode:ScanMode,images:list[UploadFile]	Response
+OPER	CL13a_SR	+	get_scan	id:UUID,wait:int	ScanOut
+OPER	CL13a_SR	+	update_item	id:UUID,itemId:UUID,body:ScanItemPatch	ScanItemOut
+OPER	CL13a_SR	+	confirm	id:UUID,body:ScanConfirmRequest	ScanConfirmResult
+OPER	CL13a_SR	+	discard	id:UUID	JSONResponse
+CLASS	CL13a_PR	pantry.router	-	router
+OPER	CL13a_PR	+	list_lots	status:list[LotStatus],sort:str	PantryLotPage
+OPER	CL13a_PR	+	create_lot	body:PantryLotCreate	PantryLotOut
+OPER	CL13a_PR	+	update_lot	id:UUID,body:PantryLotPatch	PantryLotOut
+OPER	CL13a_PR	+	discard_lot	id:UUID	PantryLotOut
+CLASS	CL13a_SO	ScanOut	-	schema
+ATTR	CL13a_SO	-	id	UUID	-	-
+ATTR	CL13a_SO	-	mode	ScanMode	-	-
+ATTR	CL13a_SO	-	status	ScanStatus	-	-
+ATTR	CL13a_SO	-	attempts	int	-	-
+CLASS	CL13a_CR	ScanConfirmResult	-	schema
+ATTR	CL13a_CR	-	scan_id	UUID	-	-
+ATTR	CL13a_CR	-	confirmed_at	datetime	-	-
+ATTR	CL13a_CR	-	created_lot_ids	list[UUID]	-	-
+ATTR	CL13a_CR	-	not_seen_lot_ids	list[UUID]	-	-
+CLASS	CL13a_LC	PantryLotCreate	-	schema
+ATTR	CL13a_LC	-	ingredient_id	UUID	-	-
+ATTR	CL13a_LC	-	quantity	QuantityInput	-	-
+ATTR	CL13a_LC	-	acquired_at	datetime	-	-
+CLASS	CL13a_LOU	PantryLotOut	-	schema
+ATTR	CL13a_LOU	-	ingredient_id	UUID	-	-
+ATTR	CL13a_LOU	-	balance_g_min	float	-	-
+ATTR	CL13a_LOU	-	balance_g_max	float	-	-
+ATTR	CL13a_LOU	-	acquired_at	datetime	-	-
+ATTR	CL13a_LOU	-	status	LotStatus	-	-
+DEP	CL13a_r0	CL13a_SR	CL13a_SO	-	-
+DEP	CL13a_r1	CL13a_SR	CL13a_CR	-	-
+DEP	CL13a_r2	CL13a_PR	CL13a_LC	-	-
+DEP	CL13a_r3	CL13a_PR	CL13a_LOU	-	-
+NOTE	CL13a_foot	Tastoria | CL13a
+SHOW	CL13a	CL13a_foot	20	546	260	34	-
+SHOW	CL13a	CL13a_SR	496	40	673	158	-
+SHOW	CL13a	CL13a_PR	565	347	535	139	-
+SHOW	CL13a	CL13a_SO	57	49	191	139	-
+SHOW	CL13a	CL13a_CR	1399	49	255	139	-
+SHOW	CL13a	CL13a_LC	40	357	226	120	-
+SHOW	CL13a	CL13a_LOU	1419	338	216	158	-
+FIT	CL13a
+CONN	CL13a	CL13a_r0	-	-	-
+CONN	CL13a	CL13a_r1	-	-	-
+CONN	CL13a	CL13a_r2	-	-	-
+CONN	CL13a	CL13a_r3	-	-	-
+PKG	PCL13b	CL13b
+USEPKG	PCL13b
+DIAG	CL13b	CLASS	CL13b Tầng API: router và schema của mâm cơm, nấu
+CLASS	CL13b_MR	meal.router	-	router
+OPER	CL13b_MR	+	create_plan	body:MealPlanCreate	JSONResponse
+OPER	CL13b_MR	+	get_plan	id:UUID	MealPlanOut
+OPER	CL13b_MR	+	accept_plan	id:UUID	MealPlanOut
+OPER	CL13b_MR	+	swap_item	id:UUID,itemId:UUID,body:SwapRequest	MealPlanOut
+OPER	CL13b_MR	+	list_substitutes	id:UUID,itemId:UUID	list
+CLASS	CL13b_CR	cooking.router	-	router
+OPER	CL13b_CR	+	create_session	body:CookSessionCreate	JSONResponse
+OPER	CL13b_CR	+	complete_session	id:UUID,body:CookCompleteRequest	JSONResponse
+OPER	CL13b_CR	+	undo_session	id:UUID	CookSessionOut
+OPER	CL13b_CR	+	abandon_session	id:UUID	CookSessionOut
+CLASS	CL13b_MC	MealPlanCreate	-	schema
+ATTR	CL13b_MC	-	meal	Meal	-	-
+ATTR	CL13b_MC	-	persons	int	-	-
+ATTR	CL13b_MC	-	max_minutes	int	-	-
+ATTR	CL13b_MC	-	coeater_allergen_codes	list[str]	-	-
+ATTR	CL13b_MC	-	pinned_lot_ids	list[UUID]	-	-
+CLASS	CL13b_MO	MealPlanOut	-	schema
+ATTR	CL13b_MO	-	status	PlanStatus	-	-
+ATTR	CL13b_MO	-	e_target_kcal	float	-	-
+ATTR	CL13b_MO	-	rice_bowls_per_person	float	-	-
+ATTR	CL13b_MO	-	reason_vi	str	-	-
+ATTR	CL13b_MO	-	items	list[MealPlanItemOut]	-	-
+CLASS	CL13b_CQ	CookCompleteRequest	-	schema
+ATTR	CL13b_CQ	-	completed_at	datetime	-	-
+ATTR	CL13b_CQ	-	feedback	list[DishFeedback]	-	-
+CLASS	CL13b_CC	CookCompletion	-	schema
+ATTR	CL13b_CC	-	cook_session	CookSessionOut	-	-
+ATTR	CL13b_CC	-	deductions	list[PantryDeductionOut]	-	-
+ATTR	CL13b_CC	-	interactions_recorded	bool	-	-
+ATTR	CL13b_CC	-	shortfalls	list[ShortfallOut]	-	-
+DEP	CL13b_r0	CL13b_MR	CL13b_MC	-	-
+DEP	CL13b_r1	CL13b_MR	CL13b_MO	-	-
+DEP	CL13b_r2	CL13b_CR	CL13b_CQ	-	-
+DEP	CL13b_r3	CL13b_CR	CL13b_CC	-	-
+NOTE	CL13b_foot	Tastoria | CL13b
+SHOW	CL13b	CL13b_foot	20	527	260	34	-
+SHOW	CL13b	CL13b_MR	567	40	645	158	-
+SHOW	CL13b	CL13b_CR	561	338	657	139	-
+SHOW	CL13b	CL13b_MC	40	40	291	158	-
+SHOW	CL13b	CL13b_MO	1481	40	264	158	-
+SHOW	CL13b	CL13b_CQ	51	357	267	101	-
+SHOW	CL13b	CL13b_CC	1449	338	328	139	-
+FIT	CL13b
+CONN	CL13b	CL13b_r0	-	-	-
+CONN	CL13b	CL13b_r1	-	-	-
+CONN	CL13b	CL13b_r2	-	-	-
+CONN	CL13b	CL13b_r3	-	-	-
+PKG	PCL14a	CL14a
+USEPKG	PCL14a
+DIAG	CL14a	CLASS	CL14a Tầng giao diện: màn hình quét và kho (Expo)
+CLASS	CL14a_SN	Scan	-	screen
+ATTR	CL14a_SN	-	images	list	-	-
+OPER	CL14a_SN	+	add	camera:boolean	void
+OPER	CL14a_SN	+	send	-	void
+CLASS	CL14a_CF	ConfirmScan	-	screen
+ATTR	CL14a_CF	-	scan	ScanOut	-	-
+OPER	CL14a_CF	+	confirm	-	ScanConfirmResult
+OPER	CL14a_CF	+	discard	-	ScanOut
+OPER	CL14a_CF	+	reload	-	void
+CLASS	CL14a_EC	EditChip	-	screen
+ATTR	CL14a_EC	-	item	ScanItemOut	-	-
+OPER	CL14a_EC	+	save	-	void
+OPER	CL14a_EC	+	del	-	void
+CLASS	CL14a_PA	Pantry	-	screen
+ATTR	CL14a_PA	-	lots	PantryLotPage	-	-
+CLASS	CL14a_EL	EditLotSheet	-	screen
+ATTR	CL14a_EL	-	lot	PantryLotOut	-	-
+OPER	CL14a_EL	+	patch	-	PantryLotOut
+OPER	CL14a_EL	+	discard	-	PantryLotOut
+CLASS	CL14a_CL	api/client	-	module
+OPER	CL14a_CL	+	call	p:Promise	T
+OPER	CL14a_CL	+	refreshSession	-	AuthSession
+ASSOC	CL14a_r0	CL14a_CF	CL14a_EC	-	-	0..*	composite	-	-	-	-	-
+ASSOC	CL14a_r1	CL14a_PA	CL14a_EL	-	-	0..1	composite	-	-	-	-	-
+DEP	CL14a_r2	CL14a_SN	CL14a_CL	-	-
+DEP	CL14a_r3	CL14a_CF	CL14a_CL	-	-
+DEP	CL14a_r4	CL14a_PA	CL14a_CL	-	-
+NOTE	CL14a_foot	Tastoria | CL14a
+SHOW	CL14a	CL14a_foot	20	730	260	34	-
+SHOW	CL14a	CL14a_SN	40	49	294	120	-
+SHOW	CL14a	CL14a_CF	566	40	287	139	-
+SHOW	CL14a	CL14a_EC	1110	49	192	120	-
+SHOW	CL14a	CL14a_PA	612	579	195	82	-
+SHOW	CL14a	CL14a_EL	1086	560	241	120	-
+SHOW	CL14a	CL14a_CL	564	319	291	101	-
+FIT	CL14a
+CONN	CL14a	CL14a_r0	-	-	-
+CONN	CL14a	CL14a_r1	-	-	-
+CONN	CL14a	CL14a_r2	-	-	-
+CONN	CL14a	CL14a_r3	-	-	-
+CONN	CL14a	CL14a_r4	-	-	-
+PKG	PCL14b	CL14b
+USEPKG	PCL14b
+DIAG	CL14b	CLASS	CL14b Tầng giao diện: màn hình mâm cơm và nấu (Expo)
+CLASS	CL14b_TS	TrayScreen	-	screen
+ATTR	CL14b_TS	-	meal	Meal	-	-
+OPER	CL14b_TS	+	useCreatePlan	meal:Meal	Mutation
+CLASS	CL14b_PV	PlanView	-	screen
+ATTR	CL14b_PV	-	plan	MealPlanOut	-	-
+OPER	CL14b_PV	+	swap	-	MealPlanOut
+OPER	CL14b_PV	+	cook	-	CookSessionOut
+CLASS	CL14b_MS	Missing	-	screen
+ATTR	CL14b_MS	-	item	MealPlanItemOut	-	-
+OPER	CL14b_MS	+	apply	-	MealPlanOut
+CLASS	CL14b_CO	Cooking	-	screen
+ATTR	CL14b_CO	-	session	CookSessionOut	-	-
+OPER	CL14b_CO	+	abandon	-	CookSessionOut
+CLASS	CL14b_FI	Finished	-	screen
+ATTR	CL14b_FI	-	session	CookSessionOut	-	-
+OPER	CL14b_FI	+	finish	-	void
+OPER	CL14b_FI	+	undo	-	CookSessionOut
+CLASS	CL14b_OB	lib/outbox	-	module
+OPER	CL14b_OB	+	enqueueComplete	sessionId:string,body:CookCompleteRequest	void
+OPER	CL14b_OB	+	flush	-	void
+OPER	CL14b_OB	+	getCompleteOutcome	sessionId:string	CompleteOutcome
+ASSOC	CL14b_r0	CL14b_TS	CL14b_PV	-	-	0..1	composite	-	-	-	-	-
+ASSOC	CL14b_r1	CL14b_PV	CL14b_MS	-	-	0..*	composite	-	-	-	-	-
+DEP	CL14b_r2	CL14b_PV	CL14b_CO	-	-
+DEP	CL14b_r3	CL14b_CO	CL14b_FI	-	-
+DEP	CL14b_r4	CL14b_FI	CL14b_OB	-	-
+NOTE	CL14b_foot	Tastoria | CL14b
+SHOW	CL14b	CL14b_foot	20	711	260	34	-
+SHOW	CL14b	CL14b_TS	40	49	365	101	-
+SHOW	CL14b	CL14b_PV	650	40	246	120	-
+SHOW	CL14b	CL14b_MS	1352	49	225	101	-
+SHOW	CL14b	CL14b_CO	635	300	276	101	-
+SHOW	CL14b	CL14b_FI	649	541	248	120	-
+SHOW	CL14b	CL14b_OB	1141	541	646	120	-
+FIT	CL14b
+CONN	CL14b	CL14b_r0	-	-	-
+CONN	CL14b	CL14b_r1	-	-	-
+CONN	CL14b	CL14b_r2	-	-	-
+CONN	CL14b	CL14b_r3	-	-	-
+CONN	CL14b	CL14b_r4	-	-	-
+PKG	PCP01b	CP01b
+USEPKG	PCP01b
+DIAG	CP01b	CMP	CP01b Thành phần: kết nối với hệ thống ngoài
+DSTYLE	CP01b	1
+NEW	CP01b_App	Component	App Tastoria (Expo)	-
+CALL	CP01b_App	addStereotype	client
+NEW	CP01b_CF	Component	Cloudflare Tunnel	-
+CALL	CP01b_CF	addStereotype	external
+NEW	CP01b_Api	Component	API (FastAPI)	-
+CALL	CP01b_Api	addStereotype	process
+NEW	CP01b_Sched	Component	Scheduler (cron)	-
+CALL	CP01b_Sched	addStereotype	process
+NEW	CP01b_Smtp	Component	Dịch vụ email (SMTP)	-
+CALL	CP01b_Smtp	addStereotype	external
+NEW	CP01b_Drive	Component	Google Drive (rclone)	-
+CALL	CP01b_Drive	addStereotype	external
+SHOW	CP01b	CP01b_App	80	100	235	94	-
+SHOW	CP01b	CP01b_CF	505	100	217	94	-
+SHOW	CP01b	CP01b_Api	948	100	180	94	-
+SHOW	CP01b	CP01b_Sched	933	324	210	94	-
+SHOW	CP01b	CP01b_Smtp	1354	100	250	94	-
+SHOW	CP01b	CP01b_Drive	913	548	250	94	-
+DEP	CP01b_r0	CP01b_App	CP01b_CF	-	HTTPS
+CONN	CP01b	CP01b_r0	-	-	-
+DEP	CP01b_r1	CP01b_CF	CP01b_Api	-	tunnel
+CONN	CP01b	CP01b_r1	-	-	-
+DEP	CP01b_r2	CP01b_Api	CP01b_Smtp	-	SMTP
+CONN	CP01b	CP01b_r2	-	-	-
+DEP	CP01b_r3	CP01b_Sched	CP01b_Drive	-	sao lưu
+CONN	CP01b	CP01b_r3	-	-	-
+NOTE	CP01b_foot	Tastoria | CP01b
+SHOW	CP01b	CP01b_foot	20	692	260	34	-
+PKG	PCP02	CP02
+USEPKG	PCP02
+DIAG	CP02	CMP	CP02 Thành phần: các tầng từ màn hình tới cơ sở dữ liệu
+DSTYLE	CP02	1
+NEW	CP02_App	Component	Màn hình Expo (app/src/app)	-
+CALL	CP02_App	addStereotype	view
+NEW	CP02_Client	Component	api/client, lib/outbox	-
+CALL	CP02_Client	addStereotype	proxy
+NEW	CP02_Router	Component	router.py (FastAPI)	-
+CALL	CP02_Router	addStereotype	API
+NEW	CP02_Core	Component	core: UnitOfWork, idempotency, auth	-
+CALL	CP02_Core	addStereotype	core
+NEW	CP02_Service	Component	service.py, composer, schedule	-
+CALL	CP02_Service	addStereotype	service
+NEW	CP02_Models	Component	models.py (SQLAlchemy)	-
+CALL	CP02_Models	addStereotype	model
+NEW	CP02_Worker	Component	scan.worker (RQ, ONNX Runtime)	-
+CALL	CP02_Worker	addStereotype	process
+NEW	CP02_Pg	Component	PostgreSQL 18	-
+CALL	CP02_Pg	addStereotype	database
+SHOW	CP02	CP02_App	90	100	312	94	-
+SHOW	CP02	CP02_Client	123	324	244	94	-
+SHOW	CP02	CP02_Router	131	548	229	94	-
+SHOW	CP02	CP02_Core	602	548	384	94	-
+SHOW	CP02	CP02_Service	80	772	332	94	-
+SHOW	CP02	CP02_Models	105	996	281	94	-
+SHOW	CP02	CP02_Worker	618	996	352	94	-
+SHOW	CP02	CP02_Pg	148	1220	194	94	-
+DEP	CP02_r0	CP02_App	CP02_Client	-	gọi hàm
+CONN	CP02	CP02_r0	-	-	-
+DEP	CP02_r1	CP02_Client	CP02_Router	-	HTTPS, JSON
+CONN	CP02	CP02_r1	-	-	-
+DEP	CP02_r2	CP02_Router	CP02_Service	-	gọi hàm
+CONN	CP02	CP02_r2	-	-	-
+DEP	CP02_r3	CP02_Router	CP02_Core	-	Depends
+CONN	CP02	CP02_r3	-	-	-
+DEP	CP02_r4	CP02_Service	CP02_Models	-	đọc, ghi
+CONN	CP02	CP02_r4	-	-	-
+DEP	CP02_r5	CP02_Worker	CP02_Models	-	ghi kết quả
+CONN	CP02	CP02_r5	-	-	-
+DEP	CP02_r6	CP02_Models	CP02_Pg	-	SQL
+CONN	CP02	CP02_r6	-	-	-
+NOTE	CP02_foot	Tastoria | CP02
+SHOW	CP02	CP02_foot	20	1364	260	34	-
+PKG	PPG01b	PG01b
+USEPKG	PPG01b
+DIAG	PG01b	PKGD	PG01b Gói: cấu trúc một module (ví dụ meal)
+DSTYLE	PG01b	1
+NEW	PG01b_M	Package	tastoria.modules.meal	-
+CALL	PG01b_M	addStereotype	M11
+NEW	PG01b_Router	Class	router.py	PG01b_M
+NEW	PG01b_Schemas	Class	schemas.py	PG01b_M
+NEW	PG01b_Service	Class	service.py	PG01b_M
+CALL	PG01b_Service	addStereotype	public
+NEW	PG01b_Models	Class	models.py	PG01b_M
+NEW	PG01b_Composer	Class	composer.py	PG01b_M
+NEW	PG01b_Schedule	Class	schedule.py	PG01b_M
+NEW	PG01b_Ranker	Class	ranker.py	PG01b_M
+SHOW	PG01b	PG01b_M	40	40	1198	614	-
+SHOW	PG01b	PG01b_Router	551	100	170	80	PG01b_M
+SHOW	PG01b	PG01b_Schemas	1024	100	170	80	PG01b_M
+SHOW	PG01b	PG01b_Service	551	310	170	94	PG01b_M
+SHOW	PG01b	PG01b_Models	551	534	170	80	PG01b_M
+SHOW	PG01b	PG01b_Composer	1021	317	176	80	PG01b_M
+SHOW	PG01b	PG01b_Schedule	80	317	171	80	PG01b_M
+SHOW	PG01b	PG01b_Ranker	1024	534	170	80	PG01b_M
+DEP	PG01b_r0	PG01b_Router	PG01b_Service	-	-
+CONN	PG01b	PG01b_r0	-	-	-
+DEP	PG01b_r1	PG01b_Router	PG01b_Schemas	-	-
+CONN	PG01b	PG01b_r1	-	-	-
+DEP	PG01b_r2	PG01b_Service	PG01b_Models	-	-
+CONN	PG01b	PG01b_r2	-	-	-
+DEP	PG01b_r3	PG01b_Service	PG01b_Composer	-	-
+CONN	PG01b	PG01b_r3	-	-	-
+DEP	PG01b_r4	PG01b_Service	PG01b_Schedule	-	-
+CONN	PG01b	PG01b_r4	-	-	-
+DEP	PG01b_r5	PG01b_Service	PG01b_Ranker	-	-
+CONN	PG01b	PG01b_r5	-	-	-
+NOTE	PG01b_foot	Tastoria | PG01b
+SHOW	PG01b	PG01b_foot	20	704	260	34	-
+PKG	PDFD00	DFD00
+USEPKG	PDFD00
+DIAG	DFD00	YD	DFD00 Sơ đồ ngữ cảnh của Tastoria
+PROC	DFD00_P	0	Hệ thống Tastoria
+EXTENT	DFD00_E1	Người dùng
+EXTENT	DFD00_E2	Người tham gia khảo sát
+EXTENT	DFD00_E3	Quản trị viên
+EXTENT	DFD00_E4	Người biên soạn công thức
+EXTENT	DFD00_E5	Người vận hành mô hình
+EXTENT	DFD00_E6	Dịch vụ email
+EXTENT	DFD00_E7	Kho sao lưu ngoài
+FLOW	DFD00_fE1in	DFD00_E1	DFD00_P	ảnh tủ lạnh, hồ sơ, yêu cầu mâm, nấu xong
+FLOW	DFD00_fE1out	DFD00_P	DFD00_E1	chip, kho, mâm, lịch nấu, nhật ký
+FLOW	DFD00_fE2in	DFD00_E2	DFD00_P	điểm gu món
+FLOW	DFD00_fE2out	DFD00_P	DFD00_E2	phiếu khảo sát
+FLOW	DFD00_fE3in	DFD00_E3	DFD00_P	quyết định xử lý yêu cầu
+FLOW	DFD00_fE3out	DFD00_P	DFD00_E3	hàng đợi yêu cầu, nhật ký kiểm toán
+FLOW	DFD00_fE4in	DFD00_E4	DFD00_P	bộ công thức, cặp thay thế
+FLOW	DFD00_fE4out	DFD00_P	DFD00_E4	kết quả kiểm tra khi nhập
+FLOW	DFD00_fE5in	DFD00_E5	DFD00_P	tệp mô hình, lệnh triển khai, đợt khảo sát
+FLOW	DFD00_fE5out	DFD00_P	DFD00_E5	kết quả kiểm định, bản xuất khảo sát
+FLOW	DFD00_fE6out	DFD00_P	DFD00_E6	thư đặt lại mật khẩu
+FLOW	DFD00_fE7out	DFD00_P	DFD00_E7	bản sao lưu mã hoá
+NOTE	DFD00_foot	Tastoria | DFD00
+SHOW	DFD00	DFD00_foot	20	1115	260	34	-
+SHOW	DFD00	DFD00_P	775	475	250	170	-
+SHOW	DFD00	DFD00_E1	1097	128	230	70	-
+FIT	DFD00
+CONN	DFD00	DFD00_fE1in	-	-	1240,199;985,475
+LORIENT	DFD00	DFD00_fE1in	3
+CONN	DFD00	DFD00_fE1out	-	-	897,475;1151,199
+LORIENT	DFD00	DFD00_fE1out	3
+SHOW	DFD00	DFD00_E2	1479	427	244	70	-
+CONN	DFD00	DFD00_fE2in	-	-	1583,497;1025,562
+CONN	DFD00	DFD00_fE2out	-	-	1025,501;1480,459
+SHOW	DFD00	DFD00_E3	1347	799	230	70	-
+CONN	DFD00	DFD00_fE3in	-	-	1355,799;942,645
+LORIENT	DFD00	DFD00_fE3in	3
+CONN	DFD00	DFD00_fE3out	-	-	1025,609;1483,799
+LORIENT	DFD00	DFD00_fE3out	3
+SHOW	DFD00	DFD00_E4	769	965	260	70	-
+CONN	DFD00	DFD00_fE4in	-	-	860,965;860,645
+LORIENT	DFD00	DFD00_fE4in	3
+CONN	DFD00	DFD00_fE4out	-	-	940,645;940,965
+LORIENT	DFD00	DFD00_fE4out	3
+SHOW	DFD00	DFD00_E5	214	799	244	70	-
+CONN	DFD00	DFD00_fE5in	-	-	317,799;775,609
+LORIENT	DFD00	DFD00_fE5in	3
+CONN	DFD00	DFD00_fE5out	-	-	858,645;445,799
+LORIENT	DFD00	DFD00_fE5out	3
+SHOW	DFD00	DFD00_E6	83	427	230	70	-
+CONN	DFD00	DFD00_fE6out	-	-	775,531;313,488
+SHOW	DFD00	DFD00_E7	472	128	230	70	-
+CONN	DFD00	DFD00_fE7out	-	-	859,475;604,199
+LORIENT	DFD00	DFD00_fE7out	3
+PKG	PDFD01a	DFD01a
+USEPKG	PDFD01a
+DIAG	DFD01a	YD	DFD01a Mức 1, quá trình 1.0 Quản lý tài khoản, hồ sơ và đồng ý
+PROC	DFD01a_P	1.0	Quản lý tài khoản, hồ sơ và đồng ý
+EXTENT	DFD01a_E1	Người dùng
+EXTENT	DFD01a_E6	Dịch vụ email
+NEW	DFD01a_D1	DFDataStore	Tài khoản, hồ sơ và đồng ý	-
+CALL	DFD01a_D1	setDfId	1
+NEW	DFD01a_D2	DFDataStore	Danh mục món và nguyên liệu	-
+CALL	DFD01a_D2	setDfId	2
+NEW	DFD01a_D10	DFDataStore	Yêu cầu dữ liệu và kiểm toán	-
+CALL	DFD01a_D10	setDfId	10
+FLOW	DFD01a_fE1in	DFD01a_E1	DFD01a_P	đăng ký, đăng nhập, hồ sơ, đồng ý
+FLOW	DFD01a_fE1out	DFD01a_P	DFD01a_E1	phiên đăng nhập, hồ sơ, mục tiêu kcal
+FLOW	DFD01a_fE6out	DFD01a_P	DFD01a_E6	thư đặt lại mật khẩu
+FLOW	DFD01a_fD1in	DFD01a_D1	DFD01a_P	tài khoản, đồng ý hiện hành
+FLOW	DFD01a_fD1out	DFD01a_P	DFD01a_D1	tài khoản, hồ sơ, sự kiện đồng ý
+FLOW	DFD01a_fD2in	DFD01a_D2	DFD01a_P	nhóm dị ứng, chế độ ăn, món hay ăn
+FLOW	DFD01a_fD10out	DFD01a_P	DFD01a_D10	yêu cầu tải, xoá, rút đồng ý
+NOTE	DFD01a_foot	Tastoria | DFD01a
+SHOW	DFD01a	DFD01a_foot	20	1108	260	34	-
+SHOW	DFD01a	DFD01a_P	775	475	250	170	-
+SHOW	DFD01a	DFD01a_E1	1208	169	230	70	-
+FIT	DFD01a
+CONN	DFD01a	DFD01a_fE1in	-	-	1347,239;1011,475
+LORIENT	DFD01a	DFD01a_fE1in	3
+CONN	DFD01a	DFD01a_fE1out	-	-	912,475;1248,239
+LORIENT	DFD01a	DFD01a_fE1out	3
+SHOW	DFD01a	DFD01a_E6	1469	660	230	70	-
+CONN	DFD01a	DFD01a_fE6out	-	-	1025,601;1477,661
+LORIENT	DFD01a	DFD01a_fE6out	3
+SHOW	DFD01a	DFD01a_D1	744	972	310	56	-
+CONN	DFD01a	DFD01a_fD1in	-	-	860,972;860,645
+LORIENT	DFD01a	DFD01a_fD1in	3
+CONN	DFD01a	DFD01a_fD1out	-	-	940,645;940,972
+LORIENT	DFD01a	DFD01a_fD1out	3
+SHOW	DFD01a	DFD01a_D2	45	667	340	56	-
+CONN	DFD01a	DFD01a_fD2in	-	-	301,668;775,601
+LORIENT	DFD01a	DFD01a_fD2in	3
+SHOW	DFD01a	DFD01a_D10	313	176	326	56	-
+CONN	DFD01a	DFD01a_fD10out	-	-	838,475;497,232
+LORIENT	DFD01a	DFD01a_fD10out	3
+PKG	PDFD01b	DFD01b
+USEPKG	PDFD01b
+DIAG	DFD01b	YD	DFD01b Mức 1, quá trình 2.0 Quét và xác nhận nguyên liệu
+PROC	DFD01b_P	2.0	Quét và xác nhận nguyên liệu
+EXTENT	DFD01b_E1	Người dùng
+NEW	DFD01b_D3	DFDataStore	Lần quét và ảnh	-
+CALL	DFD01b_D3	setDfId	3
+NEW	DFD01b_D9	DFDataStore	Phiên bản mô hình	-
+CALL	DFD01b_D9	setDfId	9
+NEW	DFD01b_D2	DFDataStore	Danh mục món và nguyên liệu	-
+CALL	DFD01b_D2	setDfId	2
+NEW	DFD01b_D4	DFDataStore	Kho nguyên liệu (lô, giao dịch)	-
+CALL	DFD01b_D4	setDfId	4
+FLOW	DFD01b_fE1in	DFD01b_E1	DFD01b_P	1–2 ảnh, chế độ quét, chip đã sửa, xác nhận
+FLOW	DFD01b_fE1out	DFD01b_P	DFD01b_E1	chip nguyên liệu, trạng thái quét
+FLOW	DFD01b_fD3in	DFD01b_D3	DFD01b_P	ảnh, khung, chip
+FLOW	DFD01b_fD3out	DFD01b_P	DFD01b_D3	lần quét, ảnh, chip
+FLOW	DFD01b_fD9in	DFD01b_D9	DFD01b_P	mô hình đang triển khai, bản đồ lớp
+FLOW	DFD01b_fD2in	DFD01b_D2	DFD01b_P	lớp thị giác, quy đổi lượng
+FLOW	DFD01b_fD4in	DFD01b_D4	DFD01b_P	lô đang có (chế độ toàn tủ)
+FLOW	DFD01b_fD4out	DFD01b_P	DFD01b_D4	lô mới, lô not_seen
+NOTE	DFD01b_foot	Tastoria | DFD01b
+SHOW	DFD01b	DFD01b_foot	20	1108	260	34	-
+SHOW	DFD01b	DFD01b_P	775	475	250	170	-
+SHOW	DFD01b	DFD01b_E1	1208	169	230	70	-
+FIT	DFD01b
+CONN	DFD01b	DFD01b_fE1in	-	-	1347,239;1011,475
+LORIENT	DFD01b	DFD01b_fE1in	3
+CONN	DFD01b	DFD01b_fE1out	-	-	912,475;1248,239
+LORIENT	DFD01b	DFD01b_fE1out	3
+SHOW	DFD01b	DFD01b_D3	1468	667	231	56	-
+CONN	DFD01b	DFD01b_fD3in	-	-	1469,690;1025,632
+LORIENT	DFD01b	DFD01b_fD3in	3
+CONN	DFD01b	DFD01b_fD3out	-	-	1025,569;1596,668
+LORIENT	DFD01b	DFD01b_fD3out	3
+SHOW	DFD01b	DFD01b_D9	774	972	250	56	-
+CONN	DFD01b	DFD01b_fD9in	-	-	900,972;900,645
+LORIENT	DFD01b	DFD01b_fD9in	3
+SHOW	DFD01b	DFD01b_D2	45	667	340	56	-
+CONN	DFD01b	DFD01b_fD2in	-	-	301,668;775,601
+LORIENT	DFD01b	DFD01b_fD2in	3
+SHOW	DFD01b	DFD01b_D4	307	176	338	56	-
+CONN	DFD01b	DFD01b_fD4in	-	-	547,232;888,475
+LORIENT	DFD01b	DFD01b_fD4in	3
+CONN	DFD01b	DFD01b_fD4out	-	-	789,475;448,232
+LORIENT	DFD01b	DFD01b_fD4out	3
+PKG	PDFD01c	DFD01c
+USEPKG	PDFD01c
+DIAG	DFD01c	YD	DFD01c Mức 1, quá trình 3.0 Quản lý kho
+PROC	DFD01c_P	3.0	Quản lý kho
+EXTENT	DFD01c_E1	Người dùng
+NEW	DFD01c_D4	DFDataStore	Kho nguyên liệu (lô, giao dịch)	-
+CALL	DFD01c_D4	setDfId	4
+NEW	DFD01c_D2	DFDataStore	Danh mục món và nguyên liệu	-
+CALL	DFD01c_D2	setDfId	2
+FLOW	DFD01c_fE1in	DFD01c_E1	DFD01c_P	thêm, sửa lượng, bỏ lô
+FLOW	DFD01c_fE1out	DFD01c_P	DFD01c_E1	lô, số dư, nhãn độ gấp
+FLOW	DFD01c_fD4in	DFD01c_D4	DFD01c_P	lô, giao dịch
+FLOW	DFD01c_fD4out	DFD01c_P	DFD01c_D4	lô mới, giao dịch manual_edit, discard
+FLOW	DFD01c_fD2in	DFD01c_D2	DFD01c_P	nguyên liệu, hạn dùng, quy đổi
+NOTE	DFD01c_foot	Tastoria | DFD01c
+SHOW	DFD01c	DFD01c_foot	20	1048	260	34	-
+SHOW	DFD01c	DFD01c_P	775	475	250	170	-
+SHOW	DFD01c	DFD01c_E1	1391	335	230	70	-
+FIT	DFD01c
+CONN	DFD01c	DFD01c_fE1in	-	-	1506,405;1025,522
+LORIENT	DFD01c	DFD01c_fE1in	3
+CONN	DFD01c	DFD01c_fE1out	-	-	987,475;1391,402
+LORIENT	DFD01c	DFD01c_fE1out	3
+SHOW	DFD01c	DFD01c_D4	730	912	338	56	-
+CONN	DFD01c	DFD01c_fD4in	-	-	860,912;860,645
+LORIENT	DFD01c	DFD01c_fD4in	3
+CONN	DFD01c	DFD01c_fD4out	-	-	940,645;940,912
+LORIENT	DFD01c	DFD01c_fD4out	3
+SHOW	DFD01c	DFD01c_D2	123	342	340	56	-
+CONN	DFD01c	DFD01c_fD2in	-	-	342,398;775,488
+LORIENT	DFD01c	DFD01c_fD2in	3
+PKG	PDFD01d	DFD01d
+USEPKG	PDFD01d
+DIAG	DFD01d	YD	DFD01d Mức 1, quá trình 4.0 Ghép và điều chỉnh mâm cơm
+PROC	DFD01d_P	4.0	Ghép và điều chỉnh mâm cơm
+EXTENT	DFD01d_E1	Người dùng
+NEW	DFD01d_D1	DFDataStore	Tài khoản, hồ sơ và đồng ý	-
+CALL	DFD01d_D1	setDfId	1
+NEW	DFD01d_D2	DFDataStore	Danh mục món và nguyên liệu	-
+CALL	DFD01d_D2	setDfId	2
+NEW	DFD01d_D4	DFDataStore	Kho nguyên liệu (lô, giao dịch)	-
+CALL	DFD01d_D4	setDfId	4
+NEW	DFD01d_D5	DFDataStore	Mâm cơm	-
+CALL	DFD01d_D5	setDfId	5
+NEW	DFD01d_D7	DFDataStore	Tương tác	-
+CALL	DFD01d_D7	setDfId	7
+FLOW	DFD01d_fE1in	DFD01d_E1	DFD01d_P	bữa, số người, thời gian, lô ghim, đổi món
+FLOW	DFD01d_fE1out	DFD01d_P	DFD01d_E1	mâm, lý do, nguyên liệu thiếu
+FLOW	DFD01d_fD1in	DFD01d_D1	DFD01d_P	dị ứng, chế độ ăn, kcal mục tiêu, đồng ý
+FLOW	DFD01d_fD2in	DFD01d_D2	DFD01d_P	món đã xuất bản, thành phần, bước
+FLOW	DFD01d_fD4in	DFD01d_D4	DFD01d_P	lô khả dụng, độ gấp
+FLOW	DFD01d_fD5in	DFD01d_D5	DFD01d_P	mâm hiện có
+FLOW	DFD01d_fD5out	DFD01d_P	DFD01d_D5	mâm, món trong mâm, thay thế
+FLOW	DFD01d_fD7out	DFD01d_P	DFD01d_D7	served, swapped
+NOTE	DFD01d_foot	Tastoria | DFD01d
+SHOW	DFD01d	DFD01d_foot	20	1049	260	34	-
+SHOW	DFD01d	DFD01d_P	775	475	250	170	-
+SHOW	DFD01d	DFD01d_E1	1145	143	230	70	-
+FIT	DFD01d
+CONN	DFD01d	DFD01d_fE1in	-	-	1286,214;995,475
+LORIENT	DFD01d	DFD01d_fE1in	3
+CONN	DFD01d	DFD01d_fE1out	-	-	903,475;1194,214
+LORIENT	DFD01d	DFD01d_fE1out	3
+SHOW	DFD01d	DFD01d_D1	1464	532	310	56	-
+CONN	DFD01d	DFD01d_fD1in	-	-	1465,560;1025,560
+SHOW	DFD01d	DFD01d_D2	1089	913	340	56	-
+CONN	DFD01d	DFD01d_fD2in	-	-	1244,913;949,645
+LORIENT	DFD01d	DFD01d_fD2in	3
+SHOW	DFD01d	DFD01d_D4	370	913	338	56	-
+CONN	DFD01d	DFD01d_fD4in	-	-	556,913;851,645
+LORIENT	DFD01d	DFD01d_fD4in	3
+SHOW	DFD01d	DFD01d_D5	65	532	230	56	-
+CONN	DFD01d	DFD01d_fD5in	-	-	295,530;775,530
+CONN	DFD01d	DFD01d_fD5out	-	-	775,590;295,590
+SHOW	DFD01d	DFD01d_D7	424	150	230	56	-
+CONN	DFD01d	DFD01d_fD7out	-	-	851,475;556,207
+LORIENT	DFD01d	DFD01d_fD7out	3
+PKG	PDFD01e	DFD01e
+USEPKG	PDFD01e
+DIAG	DFD01e	YD	DFD01e Mức 1, quá trình 5.0 Nấu, hoàn tất và hoàn tác
+PROC	DFD01e_P	5.0	Nấu, hoàn tất và hoàn tác
+EXTENT	DFD01e_E1	Người dùng
+NEW	DFD01e_D5	DFDataStore	Mâm cơm	-
+CALL	DFD01e_D5	setDfId	5
+NEW	DFD01e_D2	DFDataStore	Danh mục món và nguyên liệu	-
+CALL	DFD01e_D2	setDfId	2
+NEW	DFD01e_D6	DFDataStore	Phiên nấu và lịch	-
+CALL	DFD01e_D6	setDfId	6
+NEW	DFD01e_D4	DFDataStore	Kho nguyên liệu (lô, giao dịch)	-
+CALL	DFD01e_D4	setDfId	4
+NEW	DFD01e_D7	DFDataStore	Tương tác	-
+CALL	DFD01e_D7	setDfId	7
+FLOW	DFD01e_fE1in	DFD01e_E1	DFD01e_P	giờ dọn, nấu xong, đánh giá, hoàn tác
+FLOW	DFD01e_fE1out	DFD01e_P	DFD01e_E1	lịch nấu, phần đã trừ, thiếu hụt
+FLOW	DFD01e_fD5in	DFD01e_D5	DFD01e_P	mâm đã nhận
+FLOW	DFD01e_fD5out	DFD01e_P	DFD01e_D5	trạng thái cooked
+FLOW	DFD01e_fD2in	DFD01e_D2	DFD01e_P	bước nấu, thành phần
+FLOW	DFD01e_fD6in	DFD01e_D6	DFD01e_P	phiên đang nấu
+FLOW	DFD01e_fD6out	DFD01e_P	DFD01e_D6	phiên nấu, lịch
+FLOW	DFD01e_fD4in	DFD01e_D4	DFD01e_P	lô khả dụng
+FLOW	DFD01e_fD4out	DFD01e_P	DFD01e_D4	giao dịch cook_deduct, undo
+FLOW	DFD01e_fD7out	DFD01e_P	DFD01e_D7	cooked, liked, undone
+NOTE	DFD01e_foot	Tastoria | DFD01e
+SHOW	DFD01e	DFD01e_foot	20	1049	260	34	-
+SHOW	DFD01e	DFD01e_P	775	475	250	170	-
+SHOW	DFD01e	DFD01e_E1	1145	143	230	70	-
+FIT	DFD01e
+CONN	DFD01e	DFD01e_fE1in	-	-	1286,214;995,475
+LORIENT	DFD01e	DFD01e_fE1in	3
+CONN	DFD01e	DFD01e_fE1out	-	-	903,475;1194,214
+LORIENT	DFD01e	DFD01e_fE1out	3
+SHOW	DFD01e	DFD01e_D5	1505	532	230	56	-
+CONN	DFD01e	DFD01e_fD5in	-	-	1505,590;1025,590
+CONN	DFD01e	DFD01e_fD5out	-	-	1025,530;1505,530
+SHOW	DFD01e	DFD01e_D2	1089	913	340	56	-
+CONN	DFD01e	DFD01e_fD2in	-	-	1244,913;949,645
+LORIENT	DFD01e	DFD01e_fD2in	3
+SHOW	DFD01e	DFD01e_D6	420	913	238	56	-
+CONN	DFD01e	DFD01e_fD6in	-	-	510,913;805,645
+LORIENT	DFD01e	DFD01e_fD6in	3
+CONN	DFD01e	DFD01e_fD6out	-	-	897,645;602,913
+LORIENT	DFD01e	DFD01e_fD6out	3
+SHOW	DFD01e	DFD01e_D4	10	532	338	56	-
+CONN	DFD01e	DFD01e_fD4in	-	-	349,530;775,530
+CONN	DFD01e	DFD01e_fD4out	-	-	775,590;349,590
+SHOW	DFD01e	DFD01e_D7	424	150	230	56	-
+CONN	DFD01e	DFD01e_fD7out	-	-	851,475;556,207
+LORIENT	DFD01e	DFD01e_fD7out	3
+PKG	PDFD01f	DFD01f
+USEPKG	PDFD01f
+DIAG	DFD01f	YD	DFD01f Mức 1, quá trình 6.0 Khảo sát gu
+PROC	DFD01f_P	6.0	Khảo sát gu
+EXTENT	DFD01f_E2	Người tham gia khảo sát
+EXTENT	DFD01f_E5	Người vận hành mô hình
+NEW	DFD01f_D8	DFDataStore	Khảo sát gu	-
+CALL	DFD01f_D8	setDfId	8
+NEW	DFD01f_D2	DFDataStore	Danh mục món và nguyên liệu	-
+CALL	DFD01f_D2	setDfId	2
+FLOW	DFD01f_fE2in	DFD01f_E2	DFD01f_P	đồng ý, điểm 1–5 từng món
+FLOW	DFD01f_fE2out	DFD01f_P	DFD01f_E2	món cần chấm
+FLOW	DFD01f_fE5in	DFD01f_E5	DFD01f_P	phiếu khảo sát, lệnh xuất
+FLOW	DFD01f_fE5out	DFD01f_P	DFD01f_E5	bản xuất điểm
+FLOW	DFD01f_fD8in	DFD01f_D8	DFD01f_P	phiếu, phân công món
+FLOW	DFD01f_fD8out	DFD01f_P	DFD01f_D8	người tham gia, điểm
+FLOW	DFD01f_fD2in	DFD01f_D2	DFD01f_P	món đã xuất bản
+NOTE	DFD01f_foot	Tastoria | DFD01f
+SHOW	DFD01f	DFD01f_foot	20	943	260	34	-
+SHOW	DFD01f	DFD01f_P	775	475	250	170	-
+SHOW	DFD01f	DFD01f_E2	1230	256	244	70	-
+FIT	DFD01f
+CONN	DFD01f	DFD01f_fE2in	-	-	1374,326;1025,492
+LORIENT	DFD01f	DFD01f_fE2in	3
+CONN	DFD01f	DFD01f_fE2out	-	-	928,475;1261,326
+LORIENT	DFD01f	DFD01f_fE2out	3
+SHOW	DFD01f	DFD01f_E5	1230	793	244	70	-
+CONN	DFD01f	DFD01f_fE5in	-	-	1261,794;928,645
+LORIENT	DFD01f	DFD01f_fE5in	3
+CONN	DFD01f	DFD01f_fE5out	-	-	1025,628;1374,794
+LORIENT	DFD01f	DFD01f_fE5out	3
+SHOW	DFD01f	DFD01f_D8	332	800	230	56	-
+CONN	DFD01f	DFD01f_fD8in	-	-	419,801;775,628
+LORIENT	DFD01f	DFD01f_fD8in	3
+CONN	DFD01f	DFD01f_fD8out	-	-	872,645;532,801
+LORIENT	DFD01f	DFD01f_fD8out	3
+SHOW	DFD01f	DFD01f_D2	277	263	340	56	-
+CONN	DFD01f	DFD01f_fD2in	-	-	475,319;815,475
+LORIENT	DFD01f	DFD01f_fD2in	3
+PKG	PDFD01g	DFD01g
+USEPKG	PDFD01g
+DIAG	DFD01g	YD	DFD01g Mức 1, quá trình 7.0 Biên soạn danh mục
+PROC	DFD01g_P	7.0	Biên soạn danh mục
+EXTENT	DFD01g_E4	Người biên soạn công thức
+NEW	DFD01g_D2	DFDataStore	Danh mục món và nguyên liệu	-
+CALL	DFD01g_D2	setDfId	2
+FLOW	DFD01g_fE4in	DFD01g_E4	DFD01g_P	bộ YAML công thức, nguyên liệu, cặp thay thế
+FLOW	DFD01g_fE4out	DFD01g_P	DFD01g_E4	số thay đổi, lỗi kiểm tra
+FLOW	DFD01g_fD2in	DFD01g_D2	DFD01g_P	phiên bản món hiện có
+FLOW	DFD01g_fD2out	DFD01g_P	DFD01g_D2	món, nguyên liệu, dinh dưỡng, cặp thay thế
+NOTE	DFD01g_foot	Tastoria | DFD01g
+SHOW	DFD01g	DFD01g_foot	20	725	260	34	-
+SHOW	DFD01g	DFD01g_P	775	475	250	170	-
+SHOW	DFD01g	DFD01g_E4	10	525	260	70	-
+FIT	DFD01g
+CONN	DFD01g	DFD01g_fE4in	-	-	271,530;775,530
+CONN	DFD01g	DFD01g_fE4out	-	-	775,590;271,590
+SHOW	DFD01g	DFD01g_D2	1488	532	340	56	-
+CONN	DFD01g	DFD01g_fD2in	-	-	1489,590;1025,590
+CONN	DFD01g	DFD01g_fD2out	-	-	1025,530;1489,530
+PKG	PDFD01h	DFD01h
+USEPKG	PDFD01h
+DIAG	DFD01h	YD	DFD01h Mức 1, quá trình 8.0 Vận hành mô hình
+PROC	DFD01h_P	8.0	Vận hành mô hình
+EXTENT	DFD01h_E5	Người vận hành mô hình
+NEW	DFD01h_D9	DFDataStore	Phiên bản mô hình	-
+CALL	DFD01h_D9	setDfId	9
+NEW	DFD01h_D2	DFDataStore	Danh mục món và nguyên liệu	-
+CALL	DFD01h_D2	setDfId	2
+FLOW	DFD01h_fE5in	DFD01h_E5	DFD01h_P	tệp ONNX, register, gate, deploy, rollback
+FLOW	DFD01h_fE5out	DFD01h_P	DFD01h_E5	kết quả gate, danh sách phiên bản
+FLOW	DFD01h_fD9in	DFD01h_D9	DFD01h_P	phiên bản, triển khai hiện hành
+FLOW	DFD01h_fD9out	DFD01h_P	DFD01h_D9	phiên bản, bản đồ lớp, con trỏ triển khai
+FLOW	DFD01h_fD2in	DFD01h_D2	DFD01h_P	lớp thị giác
+NOTE	DFD01h_foot	Tastoria | DFD01h
+SHOW	DFD01h	DFD01h_foot	20	1048	260	34	-
+SHOW	DFD01h	DFD01h_P	775	475	250	170	-
+SHOW	DFD01h	DFD01h_E5	1408	335	244	70	-
+FIT	DFD01h
+CONN	DFD01h	DFD01h_fE5in	-	-	1530,405;1025,522
+LORIENT	DFD01h	DFD01h_fE5in	3
+CONN	DFD01h	DFD01h_fE5out	-	-	987,475;1410,405
+LORIENT	DFD01h	DFD01h_fE5out	3
+SHOW	DFD01h	DFD01h_D9	774	912	250	56	-
+CONN	DFD01h	DFD01h_fD9in	-	-	860,912;860,645
+LORIENT	DFD01h	DFD01h_fD9in	3
+CONN	DFD01h	DFD01h_fD9out	-	-	940,645;940,912
+LORIENT	DFD01h	DFD01h_fD9out	3
+SHOW	DFD01h	DFD01h_D2	98	342	340	56	-
+CONN	DFD01h	DFD01h_fD2in	-	-	318,398;775,488
+LORIENT	DFD01h	DFD01h_fD2in	3
+PKG	PDFD01i	DFD01i
+USEPKG	PDFD01i
+DIAG	DFD01i	YD	DFD01i Mức 1, quá trình 9.0 Xử lý yêu cầu dữ liệu
+PROC	DFD01i_P	9.0	Xử lý yêu cầu dữ liệu
+EXTENT	DFD01i_E3	Quản trị viên
+NEW	DFD01i_D10	DFDataStore	Yêu cầu dữ liệu và kiểm toán	-
+CALL	DFD01i_D10	setDfId	10
+NEW	DFD01i_D1	DFDataStore	Tài khoản, hồ sơ và đồng ý	-
+CALL	DFD01i_D1	setDfId	1
+EXTENT	DFD01i_E1	Người dùng
+FLOW	DFD01i_fE3in	DFD01i_E3	DFD01i_P	quyết định xử lý
+FLOW	DFD01i_fE3out	DFD01i_P	DFD01i_E3	hàng đợi yêu cầu, nhật ký kiểm toán
+FLOW	DFD01i_fD10in	DFD01i_D10	DFD01i_P	yêu cầu đang chờ
+FLOW	DFD01i_fD10out	DFD01i_P	DFD01i_D10	trạng thái yêu cầu, kiểm toán
+FLOW	DFD01i_fD1in	DFD01i_D1	DFD01i_P	dữ liệu của chủ thể
+FLOW	DFD01i_fD1out	DFD01i_P	DFD01i_D1	xoá, xoá theo mục đích
+FLOW	DFD01i_fE1out	DFD01i_P	DFD01i_E1	tệp dữ liệu cá nhân
+NOTE	DFD01i_foot	Tastoria | DFD01i
+SHOW	DFD01i	DFD01i_foot	20	936	260	34	-
+SHOW	DFD01i	DFD01i_P	775	475	250	170	-
+SHOW	DFD01i	DFD01i_E3	1237	256	230	70	-
+FIT	DFD01i
+CONN	DFD01i	DFD01i_fE3in	-	-	1374,326;1025,492
+LORIENT	DFD01i	DFD01i_fE3in	3
+CONN	DFD01i	DFD01i_fE3out	-	-	928,475;1261,326
+LORIENT	DFD01i	DFD01i_fE3out	3
+SHOW	DFD01i	DFD01i_D10	1189	800	326	56	-
+CONN	DFD01i	DFD01i_fD10in	-	-	1268,801;928,645
+LORIENT	DFD01i	DFD01i_fD10in	3
+CONN	DFD01i	DFD01i_fD10out	-	-	1025,628;1381,801
+LORIENT	DFD01i	DFD01i_fD10out	3
+SHOW	DFD01i	DFD01i_D1	292	800	310	56	-
+CONN	DFD01i	DFD01i_fD1in	-	-	419,801;775,628
+LORIENT	DFD01i	DFD01i_fD1in	3
+CONN	DFD01i	DFD01i_fD1out	-	-	872,645;532,801
+LORIENT	DFD01i	DFD01i_fD1out	3
+SHOW	DFD01i	DFD01i_E1	332	256	230	70	-
+CONN	DFD01i	DFD01i_fE1out	-	-	815,475;482,326
+LORIENT	DFD01i	DFD01i_fE1out	3
+ELEMFONT	15
+REPOINT
+SANITIZE	Tastoria – Phân tích và thiết kế	Nhóm Tastoria
+SAVEAS	/home/namnx/NamBuw/Tastoria/docs/reports/pttkht/vp/Tastoria-test.vpp

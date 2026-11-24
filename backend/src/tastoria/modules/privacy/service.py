@@ -12,19 +12,21 @@ import io
 import json
 import logging
 import os
+import tempfile
 import uuid
 import zipfile
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Protocol
 
 from fastapi import Request
 from fastapi.responses import Response
-from sqlalchemy import select, text
+from sqlalchemy import and_, or_, select, text, tuple_
 from sqlalchemy.orm import Session, sessionmaker
 
+from tastoria.core import pagination
 from tastoria.core.clock import utcnow
 from tastoria.core.config import Settings
 from tastoria.core.context import get_request_id
@@ -33,6 +35,10 @@ from tastoria.core.errors import ApiError, ProblemCode
 from tastoria.modules.identity import service as identity
 from tastoria.modules.privacy.models import AuditLog, ConsentEvent, ConsentPurpose, DsrRequest, PolicyVersion
 from tastoria.modules.privacy.schemas import (
+    AdminDataRequestOut,
+    AdminDataRequestPage,
+    AuditLogEntryOut,
+    AuditLogEntryPage,
     ConsentDecision,
     ConsentList,
     ConsentPurposeOut,
@@ -49,6 +55,7 @@ PURPOSES = ("health_profile", "personalization", "photo_contribution", "survey")
 USER_PURPOSES = ("health_profile", "personalization", "photo_contribution")  # survey is for respondents (A03)
 AUTO_TYPES = ("export", "delete", "withdraw")  # completed by the system ≤ 24 h (BR-DSR-01)
 MANUAL_TYPES = ("correct", "restrict", "object")  # closed by an admin (UC08, UC27)
+DSR_LEASE_TTL = timedelta(minutes=5)
 DUE = {
     "export": timedelta(hours=24),
     "delete": timedelta(hours=24),
@@ -80,6 +87,7 @@ class PrivacyDeps:
     settings: Settings
     sessionmaker: sessionmaker[Session]
     handlers: list[SubjectDataHandler] = field(default_factory=list)
+    defer_delete: bool = False
 
     @property
     def storage(self) -> Path:
@@ -394,21 +402,28 @@ def create_data_request(
     type_: str,
     note: str | None,
     password: str | None,
+    throttle: Any = None,
+    client_ip: str = "unknown",
 ) -> CreatedRequest:
     session = uow.session
     if type_ == "access":
         raise ApiError(
             422,
             ProblemCode.invalid_request,
-            "Xem dữ liệu ngay trong app (Hồ sơ, Kho, Nhật ký); tải bản sao đầy đủ bằng yêu cầu type = export.",
+            "Xem dữ liệu ngay trong ứng dụng (Hồ sơ, Kho, Nhật ký); tải bản sao đầy đủ bằng yêu cầu type = export.",
         )
     if type_ == "withdraw":
         raise ApiError(422, ProblemCode.invalid_request, "Rút đồng ý bằng POST /me/consents/{purpose}/withdraw (UC05).")
     note = (note or "").strip() or None
     if type_ in MANUAL_TYPES and note is None:
         raise ApiError(422, ProblemCode.invalid_request, "Cần mô tả nội dung yêu cầu.")
-    if type_ == "delete" and (not password or not identity.check_password(session, user_id, password)):
-        raise ApiError(403, ProblemCode.reauth_failed)
+    if type_ == "delete":
+        if throttle is not None:
+            ok = identity.check_password_throttled(session, throttle, user_id, password or "", client_ip)
+        else:
+            ok = bool(password) and identity.check_password(session, user_id, password)
+        if not ok:
+            raise ApiError(403, ProblemCode.reauth_failed)
 
     session.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:k, 0))"), {"k": f"dsr:{user_id}:{type_}"})
     open_req = session.scalars(
@@ -436,7 +451,7 @@ def create_data_request(
     session.flush()
     if type_ == "delete":
         identity.begin_account_deletion(session, user_id)  # UC07 step 5, same transaction
-    if type_ in AUTO_TYPES:
+    if type_ in AUTO_TYPES and not (type_ == "delete" and deps.defer_delete):
         deps.schedule(uow, req.id)
     return CreatedRequest(_out(deps, req), created=True)
 
@@ -468,7 +483,7 @@ def download_export(session: Session, deps: PrivacyDeps, *, user_id: uuid.UUID, 
         media_type="application/zip",
         headers={
             "X-Accel-Redirect": deps.settings.accel_redirect_prefix + r.result_key,
-            "Content-Disposition": f'attachment; filename="tastoria-du-lieu-{r.id}.zip"',
+            "Content-Disposition": f'attachment; filename="my-vi-du-lieu-{r.id}.zip"',
         },
     )
 
@@ -527,6 +542,8 @@ _DESCRIPTIONS = {
     "scans": "Các lần quét tủ lạnh / đồ vừa mua: chế độ, trạng thái, thời điểm.",
     "scan_images": "Ảnh của từng lần quét: kích thước, có góp ảnh không, đã xoá theo hạn 30 ngày chưa (không kèm tệp).",
     "scan_items": "Nguyên liệu nhận được trong mỗi lần quét và chỉnh sửa của bạn (số lượng, mức, đổi nhãn, xoá).",
+    "meal_logs": "Nhật ký bữa ăn đã ghi: món, khẩu phần, năng lượng, đa lượng và ghi chú.",
+    "meal_log_items": "Chi tiết từng món trong các bữa ăn đã ghi.",
 }
 
 
@@ -547,15 +564,43 @@ def _write_export(deps: PrivacyDeps, request_id: uuid.UUID, tables: dict[str, li
         zf.writestr("README.json", json.dumps(manifest, ensure_ascii=False, indent=2))
         for name, rows in tables.items():
             zf.writestr(f"{name}.json", json.dumps(rows, ensure_ascii=False, indent=2, default=str))
-    tmp = path.with_suffix(".zip.tmp")
-    tmp.write_bytes(buf.getvalue())
-    os.replace(tmp, path)  # never leave a half-written archive under the final name
+    payload = buf.getvalue()
+    tmp_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            dir=path.parent, prefix=f".{request_id}.", suffix=".zip.tmp", delete=False
+        ) as fh:
+            tmp_path = Path(fh.name)
+            fh.write(payload)
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp_path, path)  # atomic per-worker temp file avoids concurrent overwrite collisions
+        tmp_path = None
+    finally:
+        if tmp_path is not None:
+            tmp_path.unlink(missing_ok=True)
     return key
 
 
-def _claim(session: Session, request_id: uuid.UUID) -> DsrRequest | None:
-    r = session.get(DsrRequest, request_id, with_for_update=True)
+def _claim_for_processing(session: Session, request_id: uuid.UUID) -> tuple[str, uuid.UUID | None, str | None, datetime] | None:
+    r = session.scalars(
+        select(DsrRequest).where(DsrRequest.id == request_id).with_for_update(skip_locked=True)
+    ).one_or_none()
     if r is None or r.status in ("completed", "rejected") or r.type not in AUTO_TYPES:
+        return None
+    now = utcnow()
+    if r.status == "in_progress" and r.acknowledged_at is not None and (now - r.acknowledged_at) < DSR_LEASE_TTL:
+        return None
+    r.status = "in_progress"
+    r.acknowledged_at = now
+    return r.type, r.user_id, r.note, now
+
+
+def _lock_claimed(session: Session, request_id: uuid.UUID, lease_at: datetime) -> DsrRequest | None:
+    r = session.scalars(
+        select(DsrRequest).where(DsrRequest.id == request_id).with_for_update(skip_locked=True)
+    ).one_or_none()
+    if r is None or r.status != "in_progress" or r.type not in AUTO_TYPES or r.acknowledged_at != lease_at:
         return None
     return r
 
@@ -563,24 +608,20 @@ def _claim(session: Session, request_id: uuid.UUID) -> DsrRequest | None:
 def process_request(deps: PrivacyDeps, request_id: uuid.UUID) -> None:
     """Complete one export / withdraw / delete request. Safe to run again (FR-07-09)."""
 
-    def mark_in_progress(uow: UnitOfWork) -> tuple[str, uuid.UUID | None, str | None] | None:
-        r = _claim(uow.session, request_id)
-        if r is None:
-            return None
-        r.status = "in_progress"
-        return r.type, r.user_id, r.note
+    def mark_in_progress(uow: UnitOfWork) -> tuple[str, uuid.UUID | None, str | None, datetime] | None:
+        return _claim_for_processing(uow.session, request_id)
 
     claimed = run_in_uow(deps.sessionmaker, mark_in_progress)
     if claimed is None:
         return
-    type_, user_id, note = claimed  # type: ignore[misc]
+    type_, user_id, note, lease_at = claimed  # type: ignore[misc]
 
     if type_ == "export":
-        _run_export(deps, request_id, user_id)
+        _run_export(deps, request_id, user_id, lease_at)
     elif type_ == "withdraw":
-        _run_withdraw(deps, request_id, user_id, note)
+        _run_withdraw(deps, request_id, user_id, note, lease_at)
     elif type_ == "delete":
-        _run_delete(deps, request_id, user_id)
+        _run_delete(deps, request_id, user_id, lease_at)
 
 
 def _complete(r: DsrRequest, *, result_key: str | None = None) -> None:
@@ -590,9 +631,9 @@ def _complete(r: DsrRequest, *, result_key: str | None = None) -> None:
         r.result_key = result_key
 
 
-def _run_export(deps: PrivacyDeps, request_id: uuid.UUID, user_id: uuid.UUID | None) -> None:
+def _run_export(deps: PrivacyDeps, request_id: uuid.UUID, user_id: uuid.UUID | None, lease_at: datetime) -> None:
     def work(uow: UnitOfWork) -> None:
-        r = _claim(uow.session, request_id)
+        r = _lock_claimed(uow.session, request_id, lease_at)
         if r is None:
             return
         tables: dict[str, list[dict[str, Any]]] = {}
@@ -605,9 +646,11 @@ def _run_export(deps: PrivacyDeps, request_id: uuid.UUID, user_id: uuid.UUID | N
     run_in_uow(deps.sessionmaker, work)
 
 
-def _run_withdraw(deps: PrivacyDeps, request_id: uuid.UUID, user_id: uuid.UUID | None, purpose: str | None) -> None:
+def _run_withdraw(
+    deps: PrivacyDeps, request_id: uuid.UUID, user_id: uuid.UUID | None, purpose: str | None, lease_at: datetime
+) -> None:
     def work(uow: UnitOfWork) -> None:
-        r = _claim(uow.session, request_id)
+        r = _lock_claimed(uow.session, request_id, lease_at)
         if r is None:
             return
         if user_id is not None and purpose:
@@ -619,7 +662,7 @@ def _run_withdraw(deps: PrivacyDeps, request_id: uuid.UUID, user_id: uuid.UUID |
     run_in_uow(deps.sessionmaker, work)
 
 
-def _run_delete(deps: PrivacyDeps, request_id: uuid.UUID, user_id: uuid.UUID | None) -> None:
+def _run_delete(deps: PrivacyDeps, request_id: uuid.UUID, user_id: uuid.UUID | None, lease_at: datetime) -> None:
     # 1. files first, while user_id still finds them (UC07 step 8); missing files are not errors.
     if user_id is not None:
         for h in deps.handlers:
@@ -637,7 +680,7 @@ def _run_delete(deps: PrivacyDeps, request_id: uuid.UUID, user_id: uuid.UUID | N
     # 2. the users row, with every personal table cascading (UC07 step 9), and the evidence row (step 10).
     def work(uow: UnitOfWork) -> None:
         session = uow.session
-        r = _claim(session, request_id)
+        r = _lock_claimed(session, request_id, lease_at)
         if r is None:
             return
         session.execute(text("SET LOCAL tastoria.erasure = 'on'"))
@@ -645,23 +688,278 @@ def _run_delete(deps: PrivacyDeps, request_id: uuid.UUID, user_id: uuid.UUID | N
             identity.delete_user(session, user_id)
         session.refresh(r)
         _complete(r)
+        export_purpose = None
+        if user_id is not None and deps.settings.training_export_hmac_key:
+            export_alias = hmac.new(
+                deps.settings.training_export_hmac_key.encode(), user_id.bytes, hashlib.sha256
+            ).hexdigest()
+            export_purpose = f"export_alias:{export_alias}"
         write_audit(
             session,
             action="dsr_delete_completed",
             entity="dsr_requests",
             entity_id=str(request_id),
+            purpose=export_purpose,
             actor_role="system",
         )
 
     run_in_uow(deps.sessionmaker, work)
 
 
+# ---------------------------------------------------------------- admin DSR & audit log (UC27)
+
+
+def _admin_dsr_out(r: DsrRequest) -> AdminDataRequestOut:
+    return AdminDataRequestOut(
+        id=r.id,
+        user_id=r.user_id,
+        subject_ref=bytes(r.subject_ref).hex(),
+        type=r.type,  # type: ignore[arg-type]
+        status=r.status,  # type: ignore[arg-type]
+        received_at=r.received_at,
+        acknowledged_at=r.acknowledged_at,
+        completed_at=r.completed_at,
+        due_at=r.received_at + DUE[r.type],
+        note=r.note,
+    )
+
+
+def list_dsr_requests(
+    session: Session,
+    *,
+    statuses: list[str],
+    types: list[str],
+    cursor: str | None,
+    limit: int,
+) -> AdminDataRequestPage:
+    after = pagination.decode_created(cursor)
+    q = select(DsrRequest).order_by(DsrRequest.received_at.asc(), DsrRequest.id.asc()).limit(limit + 1)
+    if statuses:
+        q = q.where(DsrRequest.status.in_(statuses))
+    if types:
+        q = q.where(DsrRequest.type.in_(types))
+    if after is not None:
+        q = q.where(tuple_(DsrRequest.received_at, DsrRequest.id) > after)
+    rows = list(session.scalars(q))
+    page = rows[:limit]
+    nxt = pagination.encode_created(page[-1].received_at, page[-1].id) if len(rows) > limit else None
+    return AdminDataRequestPage(items=[_admin_dsr_out(r) for r in page], next_cursor=nxt)
+
+
+def resolve_dsr_request(
+    session: Session,
+    *,
+    request_id: uuid.UUID,
+    actor_user_id: uuid.UUID,
+    status: str,
+    note: str,
+) -> AdminDataRequestOut:
+    r = session.get(DsrRequest, request_id, with_for_update=True)
+    if r is None:
+        raise ApiError(404, ProblemCode.not_found)
+    if r.type not in MANUAL_TYPES:
+        raise ApiError(409, ProblemCode.request_not_manual)
+    clean_note = note.strip()
+    if not clean_note:
+        raise ApiError(422, ProblemCode.reason_required)
+    if r.status in ("completed", "rejected"):
+        if r.status == status:
+            return _admin_dsr_out(r)
+        raise ApiError(409, ProblemCode.conflict_state, extra={"from": r.status, "to": status})
+    if r.status == "in_progress" and status == "in_progress":
+        return _admin_dsr_out(r)
+    now = utcnow()
+    r.acknowledged_at = r.acknowledged_at or now
+    r.status = status
+    if status in ("completed", "rejected"):
+        r.completed_at = now
+    entry = f"[{status}] {clean_note}"
+    r.note = f"{r.note}\n{entry}" if r.note else entry
+    session.flush()
+    write_audit(
+        session,
+        action="dsr_resolve",
+        entity="dsr_requests",
+        entity_id=str(r.id),
+        purpose=status,
+        actor_user_id=actor_user_id,
+        actor_role="admin",
+    )
+    return _admin_dsr_out(r)
+
+
+def _decode_audit_cursor(cursor: str | None) -> tuple[datetime, int] | None:
+    key = pagination.decode(cursor)
+    if key is None:
+        return None
+    try:
+        if len(key) != 2 or not isinstance(key[1], int) or isinstance(key[1], bool):
+            raise ValueError
+        return datetime.fromisoformat(key[0]), key[1]
+    except (IndexError, TypeError, ValueError):
+        raise ApiError(
+            400,
+            ProblemCode.validation_error,
+            errors=[{"pointer": "#/query/cursor", "code": "invalid_cursor", "message": "Con trỏ trang không hợp lệ."}],
+        ) from None
+
+
+def list_audit_log(
+    session: Session,
+    *,
+    actor_user_id: uuid.UUID | None,
+    entity: str | None,
+    action: str | None,
+    from_dt: datetime | None,
+    to_dt: datetime | None,
+    cursor: str | None,
+    limit: int,
+) -> AuditLogEntryPage:
+    if from_dt is not None and to_dt is not None and from_dt > to_dt:
+        raise ApiError(
+            422,
+            ProblemCode.validation_error,
+            errors=[{"pointer": "#/query/from", "code": "invalid_range", "message": "from phải <= to."}],
+        )
+    after = _decode_audit_cursor(cursor)
+    q = select(AuditLog).order_by(AuditLog.created_at.desc(), AuditLog.id.desc()).limit(limit + 1)
+    if actor_user_id is not None:
+        q = q.where(AuditLog.actor_user_id == actor_user_id)
+    if entity:
+        q = q.where(AuditLog.entity == entity)
+    if action:
+        q = q.where(AuditLog.action == action)
+    if from_dt is not None:
+        q = q.where(AuditLog.created_at >= from_dt)
+    if to_dt is not None:
+        q = q.where(AuditLog.created_at <= to_dt)
+    if after is not None:
+        q = q.where(tuple_(AuditLog.created_at, AuditLog.id) < after)
+    rows = list(session.scalars(q))
+    page = rows[:limit]
+    nxt = pagination.encode([page[-1].created_at.isoformat(), page[-1].id]) if len(rows) > limit else None
+    items = [
+        AuditLogEntryOut(
+            id=r.id,
+            actor_user_id=r.actor_user_id,
+            actor_role=r.actor_role,
+            action=r.action,
+            entity=r.entity,
+            entity_id=r.entity_id,
+            purpose=r.purpose,
+            request_id=r.request_id,
+            created_at=r.created_at,
+        )
+        for r in page
+    ]
+    return AuditLogEntryPage(items=items, next_cursor=nxt)
+
+
+# ---------------------------------------------------------------- training export helpers (UC28)
+
+
+@dataclass(frozen=True)
+class RevocationEvent:
+    user_id: uuid.UUID | None
+    subject_ref_hex: str | None
+    export_alias: str | None
+    reason: str
+    purpose_code: str
+    revoked_at: datetime
+
+
+def consented_user_ids(session: Session, purpose: str) -> set[uuid.UUID]:
+    rows = session.execute(
+        text(
+            "SELECT user_id FROM v_current_consents "
+            "WHERE purpose_code = :p AND is_granted AND on_current_policy"
+        ),
+        {"p": purpose},
+    ).scalars()
+    return set(rows)
+
+
+def revocations_since(session: Session, *, since_utc: datetime) -> list[RevocationEvent]:
+    out: list[RevocationEvent] = []
+    withdraw_rows = session.execute(
+        select(ConsentEvent.user_id, PolicyVersion.purpose_code, ConsentEvent.created_at)
+        .join(PolicyVersion, PolicyVersion.id == ConsentEvent.policy_version_id)
+        .where(
+            ConsentEvent.action == "withdraw",
+            ConsentEvent.created_at >= since_utc,
+            PolicyVersion.purpose_code.in_(("personalization", "photo_contribution")),
+        )
+        .order_by(ConsentEvent.created_at, ConsentEvent.id)
+    ).all()
+    for uid, purpose_code, created_at in withdraw_rows:
+        out.append(
+            RevocationEvent(
+                user_id=uid,
+                subject_ref_hex=None,
+                export_alias=None,
+                reason="withdraw",
+                purpose_code=purpose_code,
+                revoked_at=created_at,
+            )
+        )
+    del_rows = list(
+        session.scalars(
+            select(DsrRequest)
+            .where(
+                DsrRequest.type == "delete",
+                DsrRequest.status == "completed",
+                DsrRequest.completed_at.is_not(None),
+                DsrRequest.completed_at >= since_utc,
+            )
+            .order_by(DsrRequest.completed_at, DsrRequest.id)
+        )
+    )
+    if del_rows:
+        req_ids = [str(r.id) for r in del_rows]
+        alias_map: dict[str, str] = {}
+        for eid, purp in session.execute(
+            select(AuditLog.entity_id, AuditLog.purpose).where(
+                AuditLog.action == "dsr_delete_completed",
+                AuditLog.entity == "dsr_requests",
+                AuditLog.entity_id.in_(req_ids),
+            )
+        ):
+            if eid and purp and purp.startswith("export_alias:"):
+                alias_map[eid] = purp.removeprefix("export_alias:")
+        for r in del_rows:
+            assert r.completed_at is not None
+            out.append(
+                RevocationEvent(
+                    user_id=r.user_id,
+                    subject_ref_hex=bytes(r.subject_ref).hex(),
+                    export_alias=alias_map.get(str(r.id)),
+                    reason="delete",
+                    purpose_code="all",
+                    revoked_at=r.completed_at,
+                )
+            )
+    return out
+
+
 def pending_request_ids(sm: sessionmaker[Session]) -> list[uuid.UUID]:
     def q(uow: UnitOfWork) -> list[uuid.UUID]:
+        now = utcnow()
         return list(
             uow.session.scalars(
                 select(DsrRequest.id)
-                .where(DsrRequest.type.in_(AUTO_TYPES), DsrRequest.status.in_(("received", "in_progress")))
+                .where(
+                    DsrRequest.type.in_(AUTO_TYPES),
+                    or_(
+                        DsrRequest.status == "received",
+                        and_(
+                            DsrRequest.status == "in_progress",
+                            or_(
+                                DsrRequest.acknowledged_at.is_(None),
+                                DsrRequest.acknowledged_at <= now - DSR_LEASE_TTL,
+                            ),
+                        ),
+                    ),
+                )
                 .order_by(DsrRequest.received_at)
             ).all()
         )

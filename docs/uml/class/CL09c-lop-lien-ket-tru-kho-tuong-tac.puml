@@ -1,0 +1,45 @@
+@startuml
+title CL09c — Lớp liên kết: trừ kho và tương tác
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Lô kho" as LO {
+  -ngàyNhập: Thời điểm
+  -gMin: Gam
+  -gMax: Gam
+}
+class "Phiên nấu" as PN {
+  -giờDọn: Thời điểm
+  -trạngThái: TrạngTháiPhiên
+}
+class "Lần trừ kho" as GD {
+  -deltaMin: Gam
+  -deltaMax: Gam
+  -độGấpLúcTrừ: Số thực
+}
+class "Tài khoản" as TK {
+  -email: Email
+  -trạngThái: TrạngTháiTK
+}
+class "Món" as MON {
+  -tên: Chuỗi
+  -slot: Slot
+}
+class "Tương tác" as TT {
+  -loại: LoạiTươngTác
+  -thờiĐiểm: Thời điểm
+}
+
+PN "0..*" -- "0..*" LO : trừ từ
+(PN, LO) .. GD
+TK "0..*" -- "0..*" MON : phản hồi về
+(TK, MON) .. TT
+@enduml

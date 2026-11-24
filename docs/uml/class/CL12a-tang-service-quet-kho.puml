@@ -1,0 +1,48 @@
+@startuml
+title CL12a — Tầng service: quét ảnh và kho
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "scan.service" as SS <<module>> {
+  +create_scan(mode: str, raws: list[bytes]): ScanAccepted
+  +get_scan(scan_id: UUID, wait: int): ScanOut
+  +update_item(scan_id: UUID, item_id: UUID, body: ScanItemPatch): ScanItemOut
+  +confirm(scan_id: UUID, body: ScanConfirmRequest): ScanConfirmResult
+  +discard(scan_id: UUID): ScanOut
+}
+class "pantry.service" as PS <<module>> {
+  +lot_views(user_id: UUID): list[LotView]
+  +apply_scan(user_id: UUID, mode: str, items: list[ScanLotInput]): ScanApplyResult
+  +chip_grams(ing: IngredientView, count: int, level: str): tuple
+}
+class "ScanQueue" as Q <<class>> {
+  +enqueue(scan_id: UUID, attempt: int): None
+  +publish(scan_id: UUID, status: str): None
+}
+class "scan.worker" as WK <<module>> {
+  +infer(scan_id: str): str
+  +run_job(ctx: WorkerContext, scan_id: UUID): str
+}
+class "Detector" as DE <<class>> {
+  -conf: float
+  -iou: float
+  +detect(img: Image): list[Box]
+}
+class "scan.aggregate" as AG <<module>> {
+  +build_chips(found: list[FoundBox], rules: dict): list[Chip]
+}
+
+SS ..> PS
+SS ..> Q
+WK ..> Q
+WK ..> DE
+WK ..> AG
+@enduml

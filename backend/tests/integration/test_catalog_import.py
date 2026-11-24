@@ -62,7 +62,7 @@ def test_kb_import_loads_the_whole_catalog(kb_database_url: str) -> None:
     assert _one(url, "SELECT count(*) FROM recipes WHERE status = 'published'") == 171
     assert _one(url, "SELECT count(*) FROM recipes WHERE status = 'draft'") == 9  # < 2 sources or unmapped main
     assert _one(url, "SELECT count(*) FROM recipes WHERE status = 'retired'") == 0
-    assert _one(url, "SELECT count(*) FROM ingredients WHERE is_active") == 232  # 230 (incl. 7 packaged/snack items for the detector) + 2 made-ahead products
+    assert _one(url, "SELECT count(*) FROM ingredients WHERE is_active") == 233  # 231 (incl. 7 packaged/snack items for the detector) + 2 made-ahead products
     assert _one(url, "SELECT count(*) FROM allergen_groups") == 10
     assert _one(url, "SELECT count(*) FROM nutrient_sources") == 3
     assert _one(url, "SELECT count(*) FROM nutrients") == 7
@@ -115,7 +115,7 @@ def test_rice_bowl_energy_is_set_for_the_journal_view(kb_database_url: str) -> N
 def test_calorie_range_is_calibrated_from_the_validation_file(kb_database_url: str) -> None:
     summary = yaml.safe_load((KB_DIR / "validation/nin_dishes.yaml").read_text(encoding="utf-8"))["summary"]
     assert summary["n"] >= 30
-    stored = _one(kb_database_url, "SELECT current_setting('tastoria.kcal_half_width', true)")
+    stored = _one(kb_database_url, "SELECT app_param('kcal_half_width')")
     assert float(stored) == pytest.approx(summary["p80_abs_rel_error"])  # BR-NUT-06
 
 
@@ -128,7 +128,7 @@ def test_too_few_validated_dishes_leave_the_range_uncalibrated(fresh_database, b
     res = _run(url, bundle_copy)
     assert res.ok and res.report["kcal_half_width"] is None
     assert any("needs ≥ 30" in w for w in res.report["warnings"])
-    assert _one(url, "SELECT current_setting('tastoria.kcal_half_width', true)") in (None, "")
+    assert _one(url, "SELECT app_param('kcal_half_width')") is None
 
 
 def test_reimport_of_the_same_bundle_changes_nothing(kb_database_url: str) -> None:

@@ -21,6 +21,8 @@ class ModelVersionView:
     created_at: datetime
     class_map: dict[int, int] = field(default_factory=dict)  # detector output index -> vision_classes.id
     is_active: bool = False
+    gate_report_key: str | None = None
+    mlflow_run_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -29,6 +31,7 @@ class DeploymentView:
     active_version_id: uuid.UUID
     previous_version_id: uuid.UUID | None
     switched_at: datetime
+    switched_by: uuid.UUID | None = None
 
 
 class MlopsError(Exception):

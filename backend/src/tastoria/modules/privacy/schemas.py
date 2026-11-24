@@ -87,3 +87,43 @@ class DataRequestOut(BaseModel):
     due_at: datetime
     download_available: bool
     note: str | None
+
+
+class AdminDataRequestOut(BaseModel):
+    id: uuid.UUID
+    user_id: uuid.UUID | None
+    subject_ref: str
+    type: DsrType
+    status: DsrStatus
+    received_at: datetime
+    acknowledged_at: datetime | None
+    completed_at: datetime | None
+    due_at: datetime
+    note: str | None
+
+
+class AdminDataRequestPage(BaseModel):
+    items: list[AdminDataRequestOut]
+    next_cursor: str | None
+
+
+class DataRequestResolve(_Req):
+    status: Literal["in_progress", "completed", "rejected"]
+    note: str = Field(max_length=2000)
+
+
+class AuditLogEntryOut(BaseModel):
+    id: int
+    actor_user_id: uuid.UUID | None
+    actor_role: str
+    action: str
+    entity: str
+    entity_id: str | None
+    purpose: str | None
+    request_id: str | None
+    created_at: datetime
+
+
+class AuditLogEntryPage(BaseModel):
+    items: list[AuditLogEntryOut]
+    next_cursor: str | None

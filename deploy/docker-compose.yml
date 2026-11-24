@@ -9,11 +9,15 @@ x-backend: &backend
   environment:
     TASTORIA_ENV: production
     TASTORIA_DATABASE_URL: postgresql+psycopg://tastoria:${POSTGRES_PASSWORD:?set in .env}@postgres:5432/tastoria
-    TASTORIA_VALKEY_URL: redis://valkey:6379/0
+    TASTORIA_VALKEY_URL: redis://:${VALKEY_PASSWORD:?set in .env}@valkey:6379/0
     TASTORIA_STORAGE_DIR: /var/lib/tastoria/storage
     TASTORIA_ACCEL_REDIRECT_PREFIX: /_protected/
   volumes:
     - files:/var/lib/tastoria/storage
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
   networks: [backend]
   logging: &logging
     driver: json-file
@@ -26,17 +30,24 @@ services:
       context: ..
       dockerfile: deploy/web.Dockerfile
     ports:
-      - "127.0.0.1:6880:80"
+      - "127.0.0.1:6880:8080"
     volumes:
       - files:/var/lib/tastoria/storage:ro
       # APK downloads under /tai-ve/ (repo dist/, gitignored)
       - ../dist:/srv/tastoria/dist:ro
+    cpus: 1
+    mem_limit: 512m
+    stop_grace_period: 15s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     depends_on:
       api:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/healthz"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
       interval: 15s
       timeout: 5s
       retries: 3
@@ -49,6 +60,24 @@ services:
     build:
       context: ..
       dockerfile: deploy/backend.Dockerfile
+    environment:
+      TASTORIA_ENV: production
+      TASTORIA_DATABASE_URL: postgresql+psycopg://tastoria_app:${POSTGRES_APP_PASSWORD:?set in .env}@postgres:5432/tastoria
+      TASTORIA_VALKEY_URL: redis://:${VALKEY_PASSWORD:?set in .env}@valkey:6379/0
+      TASTORIA_STORAGE_DIR: /var/lib/tastoria/storage
+      TASTORIA_ACCEL_REDIRECT_PREFIX: /_protected/
+      TASTORIA_MEAL_CALORIE_MODEL_DIR: /app/models/meal_calorie
+      TASTORIA_DISH_CLASSIFIER_MODEL_DIR: /app/models/dish_classifier
+      TASTORIA_KB_DIR: /app/data/kb
+      TASTORIA_KB_PROCESSED_DIR: /app/data/processed/kb
+      TASTORIA_PRELOAD_MEAL_CALORIE: "true"
+    cpus: 2
+    mem_limit: 4g
+    stop_grace_period: 30s
+    volumes:
+      - files:/var/lib/tastoria/storage
+      - ./models/meal_calorie:/app/models/meal_calorie:ro
+      - ./models/dish_classifier:/app/models/dish_classifier:ro
     command:
       - uvicorn
       - tastoria.app:create_app
@@ -73,10 +102,16 @@ services:
       interval: 15s
       timeout: 6s
       retries: 3
-      start_period: 20s
+      start_period: 30s
 
   migrate:
     <<: *backend
+    environment:
+      TASTORIA_ENV: production
+      TASTORIA_DATABASE_URL: postgresql+psycopg://tastoria:${POSTGRES_PASSWORD:?set in .env}@postgres:5432/tastoria
+      TASTORIA_VALKEY_URL: redis://:${VALKEY_PASSWORD:?set in .env}@valkey:6379/0
+      TASTORIA_STORAGE_DIR: /var/lib/tastoria/storage
+      TASTORIA_ACCEL_REDIRECT_PREFIX: /_protected/
     command:
       - sh
       - -ec
@@ -99,9 +134,17 @@ services:
   # Photos and model artifacts are read from the file volume, mounted read-only.
   worker:
     <<: *backend
+    environment:
+      TASTORIA_ENV: production
+      TASTORIA_DATABASE_URL: postgresql+psycopg://tastoria_app:${POSTGRES_APP_PASSWORD:?set in .env}@postgres:5432/tastoria
+      TASTORIA_VALKEY_URL: redis://:${VALKEY_PASSWORD:?set in .env}@valkey:6379/0
+      TASTORIA_STORAGE_DIR: /var/lib/tastoria/storage
+      TASTORIA_ACCEL_REDIRECT_PREFIX: /_protected/
+      TASTORIA_MUSHROOM_CLASSIFIER_MODEL_DIR: /app/models/mushroom_classifier
     command: ["tastoria", "worker"]
     volumes:
       - files:/var/lib/tastoria/storage:ro
+      - ./models/mushroom_classifier:/app/models/mushroom_classifier:ro
     cpus: 2
     mem_limit: 4g
     depends_on:
@@ -123,11 +166,22 @@ services:
   # scheduler = the cron container of ADR 0003, as a plain loop (no cron daemon in a non-root image).
   scheduler:
     <<: *backend
+    environment:
+      TASTORIA_ENV: production
+      TASTORIA_DATABASE_URL: postgresql+psycopg://tastoria_jobs:${POSTGRES_JOBS_PASSWORD:?set in .env}@postgres:5432/tastoria
+      TASTORIA_VALKEY_URL: redis://:${VALKEY_PASSWORD:?set in .env}@valkey:6379/0
+      TASTORIA_STORAGE_DIR: /var/lib/tastoria/storage
+      TASTORIA_ACCEL_REDIRECT_PREFIX: /_protected/
     command: ["sh", "/app/scheduler.sh"]
+    cpus: 1
+    mem_limit: 1g
+    stop_grace_period: 30s
     depends_on:
       migrate:
         condition: service_completed_successfully
       postgres:
+        condition: service_healthy
+      valkey:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
@@ -143,9 +197,29 @@ services:
       POSTGRES_USER: tastoria
       POSTGRES_DB: tastoria
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+    command:
+      - postgres
+      - -c
+      - shared_buffers=512MB
+      - -c
+      - effective_cache_size=1536MB
+      - -c
+      - work_mem=8MB
+      - -c
+      - maintenance_work_mem=128MB
+      - -c
+      - max_connections=100
+      - -c
+      - checkpoint_completion_target=0.9
+      - -c
+      - wal_compression=lz4
+      - -c
+      - log_min_duration_statement=1000
     volumes:
       # PostgreSQL 18 images keep data under /var/lib/postgresql/<major>/; mount the parent.
       - pgdata:/var/lib/postgresql
+    cpus: 2
+    mem_limit: 2g
     restart: unless-stopped
     shm_size: 256m
     stop_grace_period: 60s
@@ -160,14 +234,40 @@ services:
 
   valkey:
     image: valkey/valkey:9
-    # Not a source of truth (ADR 0003): login-lock counters, the RQ scan queue, long-poll channels.
-    # Snapshot so a restart keeps active locks (a lost scan job is re-enqueued by the sweeper).
-    command: ["valkey-server", "--save", "300", "1", "--appendonly", "no", "--maxmemory", "128mb", "--maxmemory-policy", "volatile-ttl"]
+    environment:
+      REDISCLI_AUTH: ${VALKEY_PASSWORD:?set in .env}
+    # AOF + RDB persistence, password-protected, noeviction so rate-limit/lockout keys and RQ state stay safe.
+    command:
+      - valkey-server
+      - --requirepass
+      - ${VALKEY_PASSWORD:?set in .env}
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - everysec
+      - --save
+      - "300"
+      - "1"
+      - --maxmemory
+      - 512mb
+      - --maxmemory-policy
+      - noeviction
     volumes:
       - valkeydata:/data
+    cpus: 1
+    mem_limit: 768m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+      - CHOWN
+      - DAC_OVERRIDE
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "valkey-cli", "ping"]
+      test: ["CMD-SHELL", "valkey-cli ping | grep -q PONG"]
       interval: 10s
       timeout: 3s
       retries: 5

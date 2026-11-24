@@ -175,6 +175,51 @@ def test_shopping_items(kb_client: TestClient, kb_db, h: dict) -> None:
     assert r.status_code == 404  # FR-18-06
 
 
+def test_shopping_item_to_pantry_ledger_and_errors(kb_client: TestClient, kb_db, h: dict) -> None:
+    egg = ingredient_id(kb_db, "trứng gà")
+    tomato = ingredient_id(kb_db, "cà chua")
+    # 1. Bought item with qty_g -> creates lot with initial=0 + 1 manual_edit tx (+qty_g), no double counting
+    bought_item = kb_client.post(f"{API}/shopping-items", json={"ingredient_id": egg, "qty_g": 200}, headers=h).json()
+    kb_client.patch(f"{API}/shopping-items/{bought_item['id']}", json={"status": "bought"}, headers=h)
+    res = kb_client.post(f"{API}/shopping-items/{bought_item['id']}/to-pantry", headers=h)
+    assert res.status_code == 201, res.text
+    body = res.json()
+    lot = body["pantry_lot"]
+    assert res.headers["Location"] == f"/api/v1/pantry/lots/{lot['id']}"
+    assert lot["initial_g_min"] == 0.0 and lot["balance_g_min"] == 200.0
+    assert body["shopping_item"]["pantry_lot_id"] == lot["id"]
+    tx = q(
+        kb_db,
+        "SELECT delta_g_min, reason, ref_type FROM pantry_transactions WHERE lot_id = :l",
+        l=lot["id"],
+    ).one()
+    assert (float(tx.delta_g_min), tx.reason, tx.ref_type) == (200.0, "manual_edit", "user")
+
+    # Re-converting the same item -> 409 conflict_state
+    again = kb_client.post(f"{API}/shopping-items/{bought_item['id']}/to-pantry", headers=h)
+    assert (again.status_code, again.json()["code"]) == (409, "conflict_state")
+
+    # 2. Open item without qty_g -> 422 qty_required; with body qty_g -> promotes to bought + creates lot
+    loose = kb_client.post(f"{API}/shopping-items", json={"ingredient_id": tomato}, headers=h).json()
+    miss = kb_client.post(f"{API}/shopping-items/{loose['id']}/to-pantry", headers=h)
+    assert miss.status_code == 422 and miss.json()["errors"][0]["code"] == "qty_required"
+    ok_loose = kb_client.post(
+        f"{API}/shopping-items/{loose['id']}/to-pantry", json={"qty_g": 350}, headers=h
+    )
+    assert ok_loose.status_code == 201
+    assert ok_loose.json()["shopping_item"]["status"] == "bought"
+    assert ok_loose.json()["shopping_item"]["qty_g"] == 350.0
+    assert ok_loose.json()["pantry_lot"]["balance_g_min"] == 350.0
+
+    # 3. Dropped item -> 409 conflict_state; BOLA -> 404
+    dropped = kb_client.post(f"{API}/shopping-items", json={"ingredient_id": egg, "qty_g": 100}, headers=h).json()
+    kb_client.patch(f"{API}/shopping-items/{dropped['id']}", json={"status": "dropped"}, headers=h)
+    drop_err = kb_client.post(f"{API}/shopping-items/{dropped['id']}/to-pantry", headers=h)
+    assert (drop_err.status_code, drop_err.json()["code"]) == (409, "conflict_state")
+    other = user(kb_client)
+    assert kb_client.post(f"{API}/shopping-items/{dropped['id']}/to-pantry", headers=other).status_code == 404
+
+
 # ---------------------------------------------------------------- events
 
 
@@ -213,3 +258,95 @@ def test_withdrawing_personalization_erases_interactions(kb_client: TestClient, 
     r = kb_client.post(f"{API}/me/consents/personalization/withdraw", json={"channel": "settings"}, headers=h)
     assert r.status_code == 200, r.text
     assert q(kb_db, "SELECT count(*) FROM interactions").scalar() == 0  # BR-CONSENT-04 (the job runs after commit)
+
+
+def test_events_erase_purpose_works_under_tastoria_app_role(kb_client: TestClient, kb_db, kb_engine) -> None:
+    from sqlalchemy import text
+    from sqlalchemy.orm import Session
+
+    from kb_helpers import grant, recipe_id
+    from tastoria.modules.events.service import EventsSubjectData
+
+    h = user(kb_client)
+    grant(kb_client, h, "personalization")
+    ev = {"event_id": str(uuid.uuid4()), "type": "viewed", "recipe_id": recipe_id(kb_db, MAN),
+          "occurred_at": datetime.now(UTC).isoformat()}  # fmt: skip
+    assert kb_client.post(f"{API}/events", json={"events": [ev]}, headers=h).json()["accepted"] == 1
+    uid = q(kb_db, "SELECT user_id FROM interactions LIMIT 1").scalar_one()
+
+    with Session(kb_engine) as session, session.begin():
+        session.execute(
+            text(
+                "INSERT INTO dsr_requests (user_id, subject_ref, type, status, received_at) "
+                "VALUES (:u, '\\x01', 'withdraw', 'in_progress', now())"
+            ),
+            {"u": uid},
+        )
+        session.execute(text("SET LOCAL tastoria.erasure = 'on'"))
+        session.execute(text("SET LOCAL ROLE tastoria_app"))
+        EventsSubjectData().erase_purpose(session, uid, "personalization")
+
+    assert q(kb_db, "SELECT count(*) FROM interactions").scalar() == 0
+
+
+def test_events_rejects_server_only_types_and_enforces_rate_limit(kb_client: TestClient, kb_db) -> None:
+    from kb_helpers import grant, recipe_id
+
+    h = user(kb_client)
+    grant(kb_client, h, "personalization")
+    rid = recipe_id(kb_db, MAN)
+    for bad_type in ("cooked", "served", "swapped", "undone"):
+        ev = {
+            "event_id": str(uuid.uuid4()),
+            "type": bad_type,
+            "recipe_id": rid,
+            "occurred_at": datetime.now(UTC).isoformat(),
+            **({"swap_reason": "khac"} if bad_type == "swapped" else {}),
+        }
+        r = kb_client.post(f"{API}/events", json={"events": [ev]}, headers=h)
+        assert r.status_code == 422, bad_type
+
+    for _ in range(60):
+        ev = {"event_id": str(uuid.uuid4()), "type": "viewed", "recipe_id": rid, "occurred_at": datetime.now(UTC).isoformat()}
+        assert kb_client.post(f"{API}/events", json={"events": [ev]}, headers=h).status_code == 200
+    ev = {"event_id": str(uuid.uuid4()), "type": "viewed", "recipe_id": rid, "occurred_at": datetime.now(UTC).isoformat()}
+    limited = kb_client.post(f"{API}/events", json={"events": [ev]}, headers=h)
+    assert (limited.status_code, limited.json()["code"]) == (429, "rate_limited")
+
+
+def test_concurrent_shopping_item_inserts_merge_without_500(kb_client: TestClient, kb_db, kb_engine) -> None:
+    import concurrent.futures
+
+    from sqlalchemy import text
+    from sqlalchemy.orm import Session
+
+    from tastoria.core.auth import AuthUser
+    from tastoria.modules.substitute.schemas import ShoppingItemCreate
+    from tastoria.modules.substitute.service import SubstituteDeps, create_item
+
+    h = user(kb_client)
+    # Create an open user and fetch UUID directly
+    egg = ingredient_id(kb_db, "trứng gà")
+    uid = q(kb_db, "SELECT id FROM users ORDER BY created_at DESC LIMIT 1").scalar_one()
+    auth = AuthUser(id=uid, role="user", email="race@example.vn")
+    deps = SubstituteDeps(item_owned=lambda *_a: False)
+
+    def _run(qty: float) -> tuple[str, bool]:
+        with Session(kb_engine) as s, s.begin():
+            out, created = create_item(
+                s,
+                deps,
+                auth,
+                ShoppingItemCreate(ingredient_id=uuid.UUID(egg), qty_g=qty),
+            )
+            return str(out.id), created
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(_run, [100.0, 200.0]))
+
+    ids = {r[0] for r in results}
+    created_flags = sorted(r[1] for r in results)
+    assert len(ids) == 1
+    assert created_flags == [False, True]
+    assert q(kb_db, "SELECT count(*) FROM shopping_items WHERE user_id = :u", u=uid).scalar() == 1
+    _ = (h, text)

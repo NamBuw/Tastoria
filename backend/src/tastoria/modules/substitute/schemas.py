@@ -11,6 +11,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from tastoria.modules.catalog.schemas import IngredientView
+from tastoria.modules.pantry.schemas import PantryLotOut
 
 ShopStatus = Literal["open", "bought", "dropped"]
 
@@ -27,6 +28,7 @@ class ShoppingItemOut(BaseModel):
     note: str | None
     status: ShopStatus
     source_meal_plan_item_id: uuid.UUID | None
+    pantry_lot_id: uuid.UUID | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -47,6 +49,16 @@ class ShoppingItemPatch(_Req):
     qty_g: float | None = Field(default=None, gt=0, le=100_000)
     note: str | None = Field(default=None, max_length=500)
     status: ShopStatus | None = None
+
+
+class ShoppingItemToPantryRequest(_Req):
+    qty_g: float | None = Field(default=None, gt=0, le=100_000)
+    acquired_at: datetime | None = None
+
+
+class ShoppingItemToPantryOut(BaseModel):
+    shopping_item: ShoppingItemOut
+    pantry_lot: PantryLotOut
 
 
 @dataclass(frozen=True)

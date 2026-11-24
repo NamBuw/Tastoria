@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0",
+  "generated_on": "2026-11-18",
+  "generated_on_host": "171.226.10.153",
+  "tool": "select_reporting_guidelines.py",
+  "catalog_as_of": "2026-10-01",
+  "disclaimer": "Selection and coverage are non-scoring aids. They do not reproduce an official checklist, appraise study quality, certify compliance, or replace the current guideline and target-journal instructions.",
+  "cli_selections": {
+    "prediction_model_ai": {
+      "command": "python3 ~/.claude/skills/scientific-writing/scripts/select_reporting_guidelines.py select --study-design prediction_model --ai",
+      "status": "pass",
+      "summary": {
+        "disclaimer": "Selection and coverage are non-scoring aids. They do not reproduce an official checklist, appraise study quality, certify compliance, or replace the current guideline and target-journal instructions.",
+        "errors": 0,
+        "extensions": [],
+        "primary": [
+          "tripod-ai-2024"
+        ],
+        "study_design": "prediction_model",
+        "warnings": 0
+      },
+      "issues": []
+    },
+    "diagnostic_accuracy_ai": {
+      "command": "python3 ~/.claude/skills/scientific-writing/scripts/select_reporting_guidelines.py select --study-design diagnostic_accuracy --ai",
+      "status": "pass",
+      "summary": {
+        "disclaimer": "Selection and coverage are non-scoring aids. They do not reproduce an official checklist, appraise study quality, certify compliance, or replace the current guideline and target-journal instructions.",
+        "errors": 0,
+        "extensions": [
+          "stard-ai-2025"
+        ],
+        "primary": [
+          "stard-2015"
+        ],
+        "study_design": "diagnostic_accuracy",
+        "warnings": 0
+      },
+      "issues": []
+    }
+  },
+  "selected_guidelines": [
+    {
+      "guideline_id": "tripod-ai-2024",
+      "name": "TRIPOD+AI",
+      "version": "2024",
+      "role": "primary",
+      "official_url": "https://www.tripod-statement.org/",
+      "applicable_tastoria_studies": [
+        "P1: CV Ingredient Detection & Counting (regression/counting + box prediction)",
+        "P2: CV Produce Freshness & Probability Calibration (3-class ordinal + calibration)",
+        "P3: Meal Recommender Systems (Food.com implicit + VN explicit survey Ranker)",
+        "P4: Ingredient Substitution & Combinatorial Tray Composer"
+      ],
+      "topic_mapping": [
+        {
+          "topic_id": "data-source-and-participants",
+          "label": "Data source, participants, setting, and outcome definition",
+          "tastoria_mapping": "P1: Open Images V7 + Mendeley Bangladesh + LVIS v1 + RPC Checkout + Omorros Kitchen (14,023 v1 / 20,638 v2 images, 5,327 non-commercial); P2: AgriFreshNET (5,183) + Local Spinach Leaf v3 (3,999) = 9,182 originals, 2,366 d8dedup4 groups, 3-class vs backend 4-class kiem_tra gap; P3: Food.com 5-core (16,043x37,851, d_val=2010-06-24, d_test=2012-04-01) & VN Survey (SIMULATED=true, n=90, 180 KB recipes); P4: 232 KB ingredients, 197 pairs (32 dev / 75 test), 90 queries (0 human answers), 150 synthetic composer scenarios (75 tuning / 75 test)."
+        },
+        {
+          "topic_id": "predictors-and-sample-size",
+          "label": "Predictors, sample size, missing data, and class balance",
+          "tastoria_mapping": "P1: 640px RGB inputs (none/GW/CLAHE ablations), 30 covered classes vs 7 zero-box VN classes; P2: 224x224 GrabCut-masked RGB + 81-dim classic features (HSV+LBP+GLCM+Lab+fg), class counts (tuoi=3,809, dung_som=1,643, dung_ngay=3,730, local_spinach has 0 dung_som); P3: Food.com 1,882 item tags/ingredients + temporal interaction history, VN survey 160-dim recipe attributes + 724 never_eaten missingness; P4: 100d Word2Vec + nutrient + PMI vectors, fridge inventory/urgency/TEE constraints."
+        },
+        {
+          "topic_id": "model-development-and-validation",
+          "label": "Model development, tuning, validation, and updating",
+          "tastoria_mapping": "Strict train/val/test isolation: P1 pHash<=4 dedupe in order test->heldout->val->train and 10-frame video block clustering; P2 StratifiedGroupKFold (5 folds x multiple seeds) on d8dedup4 groups with out-of-fold Temperature/Platt calibration; P3 temporal global cutoff on Food.com and 5-fold nested CV on VN survey; P4 dev/test ingredient split (32/75) and tuning/test scenario split (75/75, 71 feasible tuning)."
+        },
+        {
+          "topic_id": "performance-and-clinical-utility",
+          "label": "Performance, uncertainty, calibration, discrimination, and utility",
+          "tastoria_mapping": "Shared tastoria_ml.stats inference: point estimates + 95% bootstrap/cluster CIs + effect sizes (Cohen's dz / Hedges' gz / rank-biserial / Cliff's delta) + Holm-Bonferroni (confirmatory) & BH-FDR (exploratory). P1: mAP50, mAP50-95, size AP, Counting MAE, CPU ONNX p50/p95/p99; P2: Macro-F1, QWK, ECE, adaptive ECE, Brier, NLL; P3: NDCG@10, HR@10, AUC, graded NDCG; P4: MRR, Agreement@3, urgency U(m), taste loss, |Delta E|/E <= 0.15 rate, CP-SAT solve latency."
+        },
+        {
+          "topic_id": "fairness-transparency-and-access",
+          "label": "Subgroups, fairness, interpretability, model access, data, and code",
+          "tastoria_mapping": "Subgroup/gap reporting: 7 VN zero-box classes (thit_lon, thit_ga, su_su, muop, rau_cai, rau_muong, gia_do), Food.com activity bins & 599 cold items, VN survey SIMULATED=true boundary, 5,327 non-commercial CV images & AGPL-3.0 vs Apache-2.0 detector licensing, SHA-256 serving manifests in deploy/models/."
+        }
+      ]
+    },
+    {
+      "guideline_id": "stard-2015",
+      "name": "STARD 2015",
+      "version": "2015",
+      "role": "primary",
+      "official_url": "https://resources.equator-network.org/reporting-guidelines/stard",
+      "applicable_tastoria_studies": [
+        "P1: CV Ingredient Detection & Counting (diagnostic presence/absence + box/count accuracy)",
+        "P2: CV Produce Freshness & Probability Calibration (3-class diagnostic classification + abstention)"
+      ],
+      "topic_mapping": [
+        {
+          "topic_id": "participants-and-design",
+          "label": "Participant selection, setting, design, and data collection",
+          "tastoria_mapping": "Retrospective public dataset assembly with pHash<=4 cross-split deduplication (P1: Open Images V7, Mendeley BD, LVIS v1, RPC, Omorros; P2: AgriFreshNET + Local Spinach Leaf v3, augmented copies excluded, label conflicts excluded)."
+        },
+        {
+          "topic_id": "index-test-and-reference-standard",
+          "label": "Index test, reference standard, thresholds, and blinding",
+          "tastoria_mapping": "Index tests: YOLO detectors (conf chosen strictly on val), Freshness SVM/MobileNetV3/EfficientNet/ResNet + calibrated softmax thresholds. Reference standards: dataset bounding boxes (excluding OI IsGroupOf==1 for counting) and dataset freshness labels mapped to {tuoi, dung_som, dung_ngay}."
+        },
+        {
+          "topic_id": "analysis-and-indeterminate-results",
+          "label": "Accuracy estimates, uncertainty, missing, and indeterminate results",
+          "tastoria_mapping": "Per-class AP, macro-F1, QWK, ECE/Brier/NLL with 95% cluster-bootstrap CIs; explicit handling of indeterminate/abstention zone (kiem_tra uncertainty threshold analysis) and 7 zero-box VN classes."
+        },
+        {
+          "topic_id": "flow-and-applicability",
+          "label": "Participant flow, timing, adverse events, and applicability",
+          "tastoria_mapping": "Dataset filtering flow (e.g., 18,159 manifest rows -> 9,182 originals -> 2,366 d8dedup4 groups; 418/386 CV pHash drops), CPU ONNX runtime latency p50/p95/p99, domain-shift caveats (non-Vietnamese public produce vs local kitchen photos)."
+        }
+      ]
+    },
+    {
+      "guideline_id": "stard-ai-2025",
+      "name": "STARD-AI",
+      "version": "2025",
+      "role": "extension",
+      "official_url": "https://www.nature.com/articles/s41591-025-03953-8",
+      "applicable_tastoria_studies": [
+        "P1: CV Ingredient Detection & Counting",
+        "P2: CV Produce Freshness & Probability Calibration"
+      ],
+      "topic_mapping": [
+        {
+          "topic_id": "dataset-and-model-provenance",
+          "label": "Dataset provenance, model version, training status, and access",
+          "tastoria_mapping": "Dataset versions/licenses (15,311 commercial-ok vs 5,327 NC in yolo_v2; CC BY 4.0 AgriFreshNET/Spinach), package versions (ultralytics==8.4.215, torch==2.8.0+cu126, onnxruntime==1.31.0 in .venv vs onnxruntime==1.32.0 in ml/runs/venv-cv), MLflow SQLite run IDs, ONNX + serving.json SHA-256 provenance."
+        },
+        {
+          "topic_id": "ai-test-conduct",
+          "label": "AI index-test execution, human interaction, thresholds, and reference standard",
+          "tastoria_mapping": "Deterministic inference preprocessing (640px RGB / 224x224 GrabCut letterbox), fixed NMS IoU/conf thresholds selected on val, OOF calibration fit without test leakage, and human-in-the-loop correction/kiem_tra fallback design."
+        },
+        {
+          "topic_id": "fairness-failures-and-generalizability",
+          "label": "Subgroups, fairness, failure cases, uncertainty, and generalizability",
+          "tastoria_mapping": "Size-stratified AP (small/medium/large), per-source and per-produce breakdown (AgriFreshNET vs Local Spinach), 7 VN zero-box failure boundary, and cross-source generalization limits."
+        }
+      ]
+    }
+  ]
+}

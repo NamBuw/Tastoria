@@ -34,13 +34,18 @@ def test_register_creates_user_and_session(client: TestClient, db) -> None:
     row = q(db, "SELECT role, status, token_version, password_hash FROM users WHERE email = 'a@x.vn'").one()
     assert (row.role, row.status, row.token_version) == ("user", "active", 0)
     assert row.password_hash.startswith("$argon2id$") and PASSWORD not in row.password_hash
+    assert s["user"]["email_verified"] is False and s["user"]["mfa_enabled"] is False
     c = _claims(s["access_token"])
     assert c["exp"] - c["iat"] == 900 and c["tv"] == 0 and c["sub"] == s["user"]["id"]
     assert jwt.get_unverified_header(s["access_token"])["kid"] == "k1"
     assert s["token_type"] == "Bearer" and s["expires_in"] == 900
-    rt = q(db, "SELECT token_sha256, expires_at - issued_at AS ttl FROM refresh_tokens").one()
+    rt = q(db, "SELECT token_sha256, ip_address, last_used_at, expires_at - issued_at AS ttl FROM refresh_tokens").one()
     assert bytes(rt.token_sha256) == _sha(s["refresh_token"])
+    assert rt.ip_address is not None and rt.last_used_at is not None
     assert rt.ttl.days == 30
+    outbox = q(db, "SELECT template, status, attempts, sent_at FROM email_outbox WHERE to_email = 'a@x.vn'").one()
+    assert (outbox.template, outbox.status, outbox.attempts) == ("verify_email", "sent", 1)
+    assert outbox.sent_at is not None
     assert q(db, "SELECT count(*) FROM consent_events").scalar() == 0  # FR-01-08
 
 
@@ -121,10 +126,12 @@ def test_lock_is_per_email_and_ip(client: TestClient) -> None:
     login(client, "b@x.vn")  # another email from the same IP is not locked
 
 
-def test_login_fails_closed_without_valkey(make_app, clean_db) -> None:
+def test_login_fails_closed_without_valkey(client: TestClient, make_app, clean_db) -> None:
+    register(client, "a@x.vn")
     app = make_app(valkey_url="redis://127.0.0.1:1/0")
     with TestClient(app) as c:
-        register(c, "a@x.vn")
+        r_reg = c.post(f"{AUTH}/register", json={"email": "b@x.vn", "password": PASSWORD})
+        assert (r_reg.status_code, r_reg.json()["code"]) == (503, "service_unavailable")
         r = c.post(f"{AUTH}/login", json={"email": "a@x.vn", "password": PASSWORD})
         assert (r.status_code, r.json()["code"]) == (503, "service_unavailable")
 
@@ -139,6 +146,17 @@ def test_deletion_pending_cannot_login_or_refresh(client: TestClient, db) -> Non
     assert q(db, "SELECT count(*) FROM refresh_tokens").scalar() == 1
 
 
+def test_deletion_pending_refresh_returns_403_even_when_revoked_by_begin_deletion(client: TestClient, db) -> None:
+    from tastoria.core.db import run_in_uow
+    from tastoria.modules.identity import service as identity
+
+    s = register(client, "a@x.vn")
+    uid = uuid.UUID(s["user"]["id"])
+    run_in_uow(client.app.state.sessionmaker, lambda uow: identity.begin_account_deletion(uow.session, uid))
+    r = client.post(f"{AUTH}/refresh", json={"refresh_token": s["refresh_token"]})
+    assert (r.status_code, r.json()["code"]) == (403, "account_deletion_pending")
+
+
 # ---------------------------------------------------------------- UC02 refresh
 
 
@@ -150,14 +168,44 @@ def test_refresh_rotates_within_family(client: TestClient, db) -> None:
     old = q(db, "SELECT * FROM refresh_tokens WHERE token_sha256 = :h", h=_sha(s["refresh_token"])).one()
     new = q(db, "SELECT * FROM refresh_tokens WHERE token_sha256 = :h", h=_sha(t2)).one()
     assert old.revoked_at is not None and old.replaced_by_id == new.id and old.family_id == new.family_id
+    assert old.last_used_at is not None and new.ip_address is not None and new.last_used_at is not None
     assert new.revoked_at is None
+
+
+def test_refresh_within_10s_grace_returns_409_and_preserves_family(client: TestClient, db) -> None:
+    s = register(client, "a@x.vn")
+    t2 = client.post(f"{AUTH}/refresh", json={"refresh_token": s["refresh_token"]}).json()["refresh_token"]
+
+    # Replay at t=0 and t=9s (within 10s grace) -> 409 refresh_retry_conflict with Retry-After: 1, t2 stays valid
+    for delta in (0, 9):
+        shift_for_tests(delta)
+        try:
+            r_retry = client.post(f"{AUTH}/refresh", json={"refresh_token": s["refresh_token"]})
+        finally:
+            shift_for_tests(0)
+        assert (r_retry.status_code, r_retry.json()["code"]) == (409, "refresh_retry_conflict")
+        assert r_retry.headers["retry-after"] == "1"
+
+    r_t2 = client.post(f"{AUTH}/refresh", json={"refresh_token": t2})
+    assert r_t2.status_code == 200
+
+
+def test_refresh_logged_out_token_within_10s_revokes_family_immediately(client: TestClient, db) -> None:
+    s = register(client, "a@x.vn")
+    assert client.post(f"{AUTH}/logout", json={"refresh_token": s["refresh_token"]}, headers=bearer(s)).status_code == 204
+    r = client.post(f"{AUTH}/refresh", json={"refresh_token": s["refresh_token"]})
+    assert (r.status_code, r.json()["code"]) == (401, "refresh_reused")
 
 
 def test_refresh_reuse_revokes_family(client: TestClient, db) -> None:
     s = register(client, "a@x.vn")
     other = login(client, "a@x.vn")  # a second family on another device
     t2 = client.post(f"{AUTH}/refresh", json={"refresh_token": s["refresh_token"]}).json()["refresh_token"]
-    r = client.post(f"{AUTH}/refresh", json={"refresh_token": s["refresh_token"]})
+    shift_for_tests(11)
+    try:
+        r = client.post(f"{AUTH}/refresh", json={"refresh_token": s["refresh_token"]})
+    finally:
+        shift_for_tests(0)
     assert (r.status_code, r.json()["code"]) == (401, "refresh_reused")
     r = client.post(f"{AUTH}/refresh", json={"refresh_token": t2})
     assert (r.status_code, r.json()["code"]) == (401, "refresh_reused")
@@ -258,15 +306,21 @@ def test_password_reset_flow(client: TestClient, db) -> None:
     r1 = client.post(f"{AUTH}/password-reset/request", json={"email": "a@x.vn"})
     r2 = client.post(f"{AUTH}/password-reset/request", json={"email": "nobody@x.vn"})
     assert r1.status_code == r2.status_code == 204 and r1.content == r2.content == b""
-    mails = client.app.state.mailer.sent
-    assert len(mails) == 1 and mails[0].to == "a@x.vn"
-    token = _reset_token(mails[0].body)
+    reset_mails = [m for m in client.app.state.mailer.sent if "Đặt lại mật khẩu" in m.subject]
+    assert len(reset_mails) == 1 and reset_mails[0].to == "a@x.vn"
+    assert "Mỹ Vị" in reset_mails[0].subject and "Tastoria" not in reset_mails[0].body
+    outbox_row = q(
+        db, "SELECT status, attempts, sent_at FROM email_outbox WHERE template = 'password_reset'"
+    ).one()
+    assert (outbox_row.status, outbox_row.attempts) == ("sent", 1) and outbox_row.sent_at is not None
+    token = _reset_token(reset_mails[0].body)
     row = q(db, "SELECT token_sha256, expires_at - created_at AS ttl FROM password_resets").one()
     assert bytes(row.token_sha256) == _sha(token) and row.ttl.total_seconds() == 1800
 
     # cooldown: no new token, no new mail
     client.post(f"{AUTH}/password-reset/request", json={"email": "a@x.vn"})
-    assert len(mails) == 1 and q(db, "SELECT count(*) FROM password_resets").scalar() == 1
+    reset_mails = [m for m in client.app.state.mailer.sent if "Đặt lại mật khẩu" in m.subject]
+    assert len(reset_mails) == 1 and q(db, "SELECT count(*) FROM password_resets").scalar() == 1
 
     # weak password does not consume the token
     r = client.post(f"{AUTH}/password-reset/confirm", json={"token": token, "new_password": "short"})
@@ -293,7 +347,8 @@ def test_new_reset_token_invalidates_old(make_app, clean_db, engine) -> None:
         register(c, "a@x.vn")
         c.post(f"{AUTH}/password-reset/request", json={"email": "a@x.vn"})
         c.post(f"{AUTH}/password-reset/request", json={"email": "a@x.vn"})
-        t1, t2 = (_reset_token(m.body) for m in app.state.mailer.sent)
+        reset_mails = [m for m in app.state.mailer.sent if "Đặt lại mật khẩu" in m.subject]
+        t1, t2 = (_reset_token(m.body) for m in reset_mails)
         r = c.post(f"{AUTH}/password-reset/confirm", json={"token": t1, "new_password": "mat-khau-moi-123"})
         assert (r.status_code, r.json()["code"]) == (400, "reset_token_invalid")
         assert (
@@ -305,7 +360,8 @@ def test_new_reset_token_invalidates_old(make_app, clean_db, engine) -> None:
 def test_reset_token_invalid_cases(client: TestClient, db) -> None:
     register(client, "a@x.vn")
     client.post(f"{AUTH}/password-reset/request", json={"email": "a@x.vn"})
-    token = _reset_token(client.app.state.mailer.sent[0].body)
+    reset_mails = [m for m in client.app.state.mailer.sent if "Đặt lại mật khẩu" in m.subject]
+    token = _reset_token(reset_mails[0].body)
     q(db, "UPDATE password_resets SET created_at = now() - interval '2 hours', expires_at = now() - interval '1 hour'")
     for t in (token, uuid.uuid4().hex):
         r = client.post(f"{AUTH}/password-reset/confirm", json={"token": t, "new_password": "mat-khau-moi-123"})

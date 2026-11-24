@@ -34,6 +34,9 @@ PERSONAL = {
     "cook_sessions": "SELECT count(*) FROM cook_sessions c JOIN meal_plans m ON m.id = c.meal_plan_id "
     "WHERE m.user_id = :u",
     "interactions": "SELECT count(*) FROM interactions WHERE user_id = :u",
+    "meal_logs": "SELECT count(*) FROM meal_logs WHERE user_id = :u",
+    "meal_log_items": "SELECT count(*) FROM meal_log_items i JOIN meal_logs l ON l.id = i.meal_log_id "
+    "WHERE l.user_id = :u",
 }
 
 
@@ -71,6 +74,18 @@ def _seed_everywhere(db, uid: str, recipe_id: str) -> dict[str, str]:
       id=str(uuid.uuid4()), u=uid, r=recipe_id, p=plan, it=item)  # fmt: skip
     q(db, "INSERT INTO audit_log (actor_user_id, actor_role, action, entity) VALUES (:u, 'user', 'decrypt', 'profiles')",
       u=uid)  # fmt: skip
+    mlog = q(
+        db,
+        "INSERT INTO meal_logs (user_id, logged_date, logged_at, meal_slot, title, source_type) "
+        "VALUES (:u, CURRENT_DATE, now(), 'trua', 'Phở bò', 'manual') RETURNING id",
+        u=uid,
+    ).scalar()
+    q(
+        db,
+        "INSERT INTO meal_log_items (meal_log_id, ordinal, item_kind, label_vi, kcal) "
+        "VALUES (:l, 1, 'manual_item', 'Phở bò', 450)",
+        l=mlog,
+    )
     return {"ingredient": str(ing)}
 
 
@@ -154,6 +169,8 @@ def test_deletion_pending_state_blocks_everything(client: TestClient, db, app) -
     assert client.get(f"{API}/me/consents", headers=bearer(s)).json()["code"] == "token_revoked"
     r = client.post(f"{API}/auth/login", json={"email": s["user"]["email"], "password": PASSWORD})
     assert (r.status_code, r.json()["code"]) == (403, "account_deletion_pending")
+    r = client.post(f"{API}/auth/refresh", json={"refresh_token": s["refresh_token"]})
+    assert (r.status_code, r.json()["code"]) == (403, "account_deletion_pending")
 
     # the recovery job finishes it, and running it twice is harmless (FR-07-09)
     from tastoria.modules.privacy.service import process_pending
@@ -162,3 +179,66 @@ def test_deletion_pending_state_blocks_everything(client: TestClient, db, app) -
     assert process_pending(real) == 0
     assert q(db, "SELECT count(*) FROM users").scalar() == 0
     assert q(db, "SELECT status FROM dsr_requests").scalar() == "completed"
+
+
+def test_deferred_delete_keeps_pending_until_process_pending(make_app, clean_db, db) -> None:
+    from fakes import FakeMailer
+
+    from tastoria.modules.privacy.service import process_pending
+
+    deferred_app = make_app(dsr_defer_delete=True)
+    deferred_app.state.mailer = FakeMailer()
+    with TestClient(deferred_app) as c:
+        s = register(c)
+        r = c.post(f"{API}/me/data-requests", json={"type": "delete", "password": PASSWORD}, headers=bearer(s))
+        assert r.status_code == 202
+        assert r.json()["status"] == "received"
+        login_resp = c.post(f"{API}/auth/login", json={"email": s["user"]["email"], "password": PASSWORD})
+        assert (login_resp.status_code, login_resp.json()["code"]) == (403, "account_deletion_pending")
+        refresh_resp = c.post(f"{API}/auth/refresh", json={"refresh_token": s["refresh_token"]})
+        assert (refresh_resp.status_code, refresh_resp.json()["code"]) == (403, "account_deletion_pending")
+        assert process_pending(deferred_app.state.privacy) == 1
+        assert process_pending(deferred_app.state.privacy) == 0
+        assert q(db, "SELECT count(*) FROM users").scalar() == 0
+        assert q(db, "SELECT status FROM dsr_requests").scalar() == "completed"
+
+
+def test_delete_password_guessing_triggers_lockout_and_app_role_erases_cleanly(
+    client: TestClient, db, engine
+) -> None:
+    from sqlalchemy import text
+    from sqlalchemy.orm import Session
+
+    from tastoria.modules.identity import service as identity
+
+    s = register(client)
+    for _ in range(4):
+        bad = client.post(
+            f"{API}/me/data-requests", json={"type": "delete", "password": "sai-mat-khau-1"}, headers=bearer(s)
+        )
+        assert (bad.status_code, bad.json()["code"]) == (403, "reauth_failed")
+    fifth_bad = client.post(
+        f"{API}/me/data-requests", json={"type": "delete", "password": "sai-mat-khau-1"}, headers=bearer(s)
+    )
+    assert (fifth_bad.status_code, fifth_bad.json()["code"]) == (429, "login_locked")
+    locked = client.post(
+        f"{API}/me/data-requests", json={"type": "delete", "password": PASSWORD}, headers=bearer(s)
+    )
+    assert (locked.status_code, locked.json()["code"]) == (429, "login_locked")
+    assert q(db, "SELECT status FROM users WHERE id = :u", u=s["user"]["id"]).scalar() == "active"
+
+    # Non-superuser tastoria_app role can erase a user account via SECURITY DEFINER erase_user_account
+    victim = register(client)
+    vid = uuid.UUID(victim["user"]["id"])
+    with Session(engine) as sess, sess.begin():
+        sess.execute(
+            text(
+                "INSERT INTO dsr_requests (user_id, subject_ref, type, status, received_at) "
+                "VALUES (:u, '\\x03', 'delete', 'in_progress', now())"
+            ),
+            {"u": vid},
+        )
+        sess.execute(text("SET LOCAL tastoria.erasure = 'on'"))
+        sess.execute(text("SET LOCAL ROLE tastoria_app"))
+        identity.delete_user(sess, vid)
+    assert q(db, "SELECT count(*) FROM users WHERE id = :u", u=vid).scalar() == 0

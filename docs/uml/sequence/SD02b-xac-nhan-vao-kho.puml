@@ -25,8 +25,8 @@ alt đã xác nhận trước đó
 else chưa xong hoặc còn chip cần kiểm tra
   API --> APP : 409 / 422
 else hợp lệ
-  API -> PAN : tạo lô từ chip (mỗi chip một lô)
-  PAN -> DB : ghi lô và giao dịch nhập kho
+  API -> PAN : tạo lô mới hoặc cập nhật lô đang có
+  PAN -> DB : ghi lô (lượng ban đầu, không giao dịch)
   API -> PAN : đánh dấu lô không thấy (chế độ toàn tủ)
   API -> DB : lần quét → «confirmed»; commit
   API --> APP : danh sách lô mới

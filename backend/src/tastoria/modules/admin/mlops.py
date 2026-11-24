@@ -19,6 +19,7 @@ from tastoria.core.db import UnitOfWork, run_in_uow
 from tastoria.modules.mlops import service as mlops
 from tastoria.modules.mlops.schemas import MlopsError, ModelVersionView
 from tastoria.modules.privacy import service as privacy
+from tastoria.modules.substitute import service as substitute
 
 
 def _audit(uow: UnitOfWork, action: str, entity: str, entity_id: str, outcome: str) -> None:
@@ -106,22 +107,60 @@ def gate(sm: sessionmaker[Session], storage_dir: Path, *, name: str, version: st
         raise
 
 
-def deploy(sm: sessionmaker[Session], *, name: str, version: str, only_if_none: bool = False) -> dict[str, Any]:
+def deploy(
+    sm: sessionmaker[Session],
+    *,
+    name: str,
+    version: str,
+    only_if_none: bool = False,
+    storage_dir: Path | None = None,
+) -> dict[str, Any]:
     def work(uow: UnitOfWork) -> dict[str, Any]:
         changed, d = mlops.deploy(uow.session, name=name, version=version, only_if_none=only_if_none)
+        sync_stats: dict[str, int] | None = None
+        if changed and name == "substitution" and storage_dir is not None and d is not None:
+            view = mlops.version_view(uow.session, d.active_version_id)
+            if view is not None:
+                path = mlops.artifact_path(storage_dir, view, verify=True)
+                sync_stats = substitute.sync_embeddings(uow.session, model_version_id=view.id, npz_path=path)
         if changed:
-            _audit(uow, "model_deploy", "model_deployments", name, f"{version}")
-        return {
+            purpose = f"{version}" if sync_stats is None else f"{version} (upserted={sync_stats['upserted']})"
+            _audit(uow, "model_deploy", "model_deployments", name, purpose)
+        out: dict[str, Any] = {
             "changed": changed,
             "name": name,
             "active_version_id": str(d.active_version_id) if d else None,
             "previous_version_id": str(d.previous_version_id) if d and d.previous_version_id else None,
         }
+        if sync_stats is not None:
+            out["embeddings"] = sync_stats
+        return out
 
     try:
         return run_in_uow(sm, work)  # type: ignore[return-value]
     except MlopsError as exc:
         _refused(sm, "model_deploy", "model_deployments", name, exc)
+        raise
+
+
+def import_embeddings(sm: sessionmaker[Session], storage_dir: Path, *, version: str | None = None) -> dict[str, Any]:
+    def work(uow: UnitOfWork) -> dict[str, Any]:
+        if version is not None:
+            views = [v for v in mlops.list_versions(uow.session, "substitution") if v.version == version]
+            view = views[0] if views else None
+        else:
+            view = mlops.active_version(uow.session, "substitution")
+        if view is None:
+            raise MlopsError(f"substitution {version or '(active)'}: không tìm thấy phiên bản")
+        path = mlops.artifact_path(storage_dir, view, verify=True)
+        stats = substitute.sync_embeddings(uow.session, model_version_id=view.id, npz_path=path)
+        _audit(uow, "embeddings_import", "ingredient_embeddings", view.version, f"upserted={stats['upserted']}")
+        return {"version": view.version, "model_version_id": str(view.id), **stats}
+
+    try:
+        return run_in_uow(sm, work)  # type: ignore[return-value]
+    except MlopsError as exc:
+        _refused(sm, "embeddings_import", "ingredient_embeddings", version or "active", exc)
         raise
 
 

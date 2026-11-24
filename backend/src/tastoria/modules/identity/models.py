@@ -1,4 +1,4 @@
-"""Tables owned by identity: users, refresh_tokens, password_resets (db/schema.sql)."""
+"""Tables owned by identity: users, refresh_tokens, password_resets, email_outbox, email_verification_tokens."""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from tastoria.core.db import Base
 
 USER_ROLE = ENUM("user", "admin", "curator", "ml_operator", name="user_role_t", create_type=False)
 USER_STATUS = ENUM("active", "deletion_requested", name="user_status_t", create_type=False)
+EMAIL_OUTBOX_STATUS = ENUM("pending", "sending", "sent", "failed", name="email_outbox_status_t", create_type=False)
 TZ = TIMESTAMP(timezone=True)
 
 
@@ -31,6 +32,10 @@ class User(Base):
     locked_until: Mapped[datetime | None] = mapped_column(TZ)
     created_at: Mapped[datetime] = mapped_column(TZ, nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(TZ, nullable=False, server_default=func.now())
+    email_verified_at: Mapped[datetime | None] = mapped_column(TZ)
+    totp_secret_enc: Mapped[bytes | None] = mapped_column(LargeBinary)
+    totp_key_id: Mapped[str | None] = mapped_column(Text)
+    mfa_enabled_at: Mapped[datetime | None] = mapped_column(TZ)
 
     __table_args__ = (UniqueConstraint("email", name="uq_users_email"),)
 
@@ -51,6 +56,8 @@ class RefreshToken(Base):
     revoked_at: Mapped[datetime | None] = mapped_column(TZ)
     replaced_by_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("refresh_tokens.id"))
     user_agent: Mapped[str | None] = mapped_column(Text)
+    ip_address: Mapped[str | None] = mapped_column(Text)
+    last_used_at: Mapped[datetime | None] = mapped_column(TZ)
 
     __table_args__ = (
         UniqueConstraint("token_sha256", name="uq_refresh_tokens_token_sha256"),
@@ -79,4 +86,52 @@ class PasswordReset(Base):
         UniqueConstraint("token_sha256", name="uq_password_resets_token_sha256"),
         Index("ix_password_resets_user_id", "user_id"),
         Index("ix_password_resets_expires_at", "expires_at"),
+        Index("ix_password_resets_user_created_at", "user_id", text("created_at DESC")),
+    )
+
+
+class EmailOutbox(Base):
+    __tablename__ = "email_outbox"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL")
+    )
+    to_email: Mapped[str] = mapped_column(CITEXT, nullable=False)
+    template: Mapped[str] = mapped_column(Text, nullable=False)
+    subject: Mapped[str] = mapped_column(Text, nullable=False)
+    body_text: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(EMAIL_OUTBOX_STATUS, nullable=False, server_default="pending")
+    attempts: Mapped[int] = mapped_column(SmallInteger, nullable=False, server_default="0")
+    next_attempt_at: Mapped[datetime] = mapped_column(TZ, nullable=False, server_default=func.now())
+    sent_at: Mapped[datetime | None] = mapped_column(TZ)
+    last_error: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(TZ, nullable=False, server_default=func.now())
+
+    __table_args__ = (
+        Index("ix_email_outbox_status_next_attempt_at", "status", "next_attempt_at"),
+        Index("ix_email_outbox_user_id", "user_id"),
+    )
+
+
+class EmailVerificationToken(Base):
+    __tablename__ = "email_verification_tokens"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    token_sha256: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TZ, nullable=False, server_default=func.now())
+    expires_at: Mapped[datetime] = mapped_column(TZ, nullable=False)
+    verified_at: Mapped[datetime | None] = mapped_column(TZ)
+
+    __table_args__ = (
+        UniqueConstraint("token_sha256", name="uq_email_verification_tokens_token_sha256"),
+        Index("ix_email_verification_tokens_user_id", "user_id"),
+        Index("ix_email_verification_tokens_expires_at", "expires_at"),
     )

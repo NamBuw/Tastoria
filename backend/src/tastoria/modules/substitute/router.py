@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Body, Depends, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
@@ -13,7 +13,14 @@ from tastoria.core.auth import CurrentUser
 from tastoria.core.db import Uow
 from tastoria.core.pagination import DEFAULT_LIMIT, MAX_LIMIT
 from tastoria.modules.substitute import service
-from tastoria.modules.substitute.schemas import ShoppingItemCreate, ShoppingItemOut, ShoppingItemPage, ShoppingItemPatch
+from tastoria.modules.substitute.schemas import (
+    ShoppingItemCreate,
+    ShoppingItemOut,
+    ShoppingItemPage,
+    ShoppingItemPatch,
+    ShoppingItemToPantryOut,
+    ShoppingItemToPantryRequest,
+)
 from tastoria.modules.substitute.service import SubstituteDeps, substitute_deps
 
 router = APIRouter(prefix="/shopping-items", tags=["substitute"])
@@ -47,3 +54,20 @@ def create_item(body: ShoppingItemCreate, user: CurrentUser, uow: Uow, deps: Dep
 @router.patch("/{id}", operation_id="substitute_update_shopping_item")
 def update_item(id: uuid.UUID, body: ShoppingItemPatch, user: CurrentUser, uow: Uow) -> ShoppingItemOut:
     return service.update_item(uow.session, user, id, body)
+
+
+@router.post(
+    "/{id}/to-pantry",
+    operation_id="substitute_shopping_item_to_pantry",
+    status_code=201,
+    response_model=ShoppingItemToPantryOut,
+)
+def to_pantry(
+    id: uuid.UUID,
+    user: CurrentUser,
+    uow: Uow,
+    body: ShoppingItemToPantryRequest | None = Body(default=None),
+) -> JSONResponse:
+    res = service.to_pantry(uow.session, user, id, body)
+    headers = {"Location": f"/api/v1/pantry/lots/{res.pantry_lot.id}"}
+    return JSONResponse(jsonable_encoder(res), status_code=201, headers=headers)

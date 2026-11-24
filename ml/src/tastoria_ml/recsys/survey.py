@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import os
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -242,6 +243,22 @@ class SurveyModel:
 
     def score(self, user: int, items: np.ndarray) -> np.ndarray:
         raise NotImplementedError
+
+
+class RandomRanker(SurveyModel):
+    """Preregistered negative control (H3a): deterministic per-(seed, user, item) uniform scores."""
+
+    name = "Random"
+    personalised = False
+    grid = [{}]
+
+    def fit(self, f: Fold) -> RandomRanker:
+        rng = np.random.default_rng(self.seed)
+        self._scores = rng.random((f.n_users, f.n_items), dtype=np.float32)
+        return self
+
+    def score(self, user: int, items: np.ndarray) -> np.ndarray:
+        return self._scores[int(user), items]
 
 
 class ShrunkMean(SurveyModel):
@@ -504,7 +521,80 @@ class LambdaMART(SurveyModel):
         return self.model.predict(Xf)
 
 
-MODELS: list[type[SurveyModel]] = [ShrunkMean, Bias, ContentFav, BiasedMF, BPRPairs, LightFMLogistic, LambdaMART]
+class HybridFactorRanker(SurveyModel):
+    """Calibrated linear blend of BiasedMF (ridge fold-in) + BPRPairs + ContentFav + ShrunkMean."""
+
+    name = "HybridFactorRanker"
+    grid = [
+        {"w_mf": 0.55, "w_bpr": 0.25, "w_cnt": 0.15, "w_pop": 0.05},
+        {"w_mf": 0.30, "w_bpr": 0.50, "w_cnt": 0.15, "w_pop": 0.05},
+        {"w_mf": 0.40, "w_bpr": 0.35, "w_cnt": 0.20, "w_pop": 0.05},
+        {"w_mf": 0.25, "w_bpr": 0.25, "w_cnt": 0.45, "w_pop": 0.05},
+        {"w_mf": 0.10, "w_bpr": 0.10, "w_cnt": 0.75, "w_pop": 0.05},
+        {"w_mf": 0.45, "w_bpr": 0.45, "w_cnt": 0.10, "w_pop": 0.00},
+    ]
+
+    def fit(self, f: Fold) -> HybridFactorRanker:
+        mf_dim = int(self.params.get("mf_dim", 8))
+        mf_lam = float(self.params.get("mf_lam", 0.05))
+        bpr_dim = int(self.params.get("bpr_dim", 8))
+        bpr_lam = float(self.params.get("bpr_lam", 0.01))
+        pop_k = float(self.params.get("pop_k", 3.0))
+
+        self.pop = ShrunkMean(seed=self.seed, k=pop_k).fit(f)
+        self.cnt = ContentFav(seed=self.seed).fit(f)
+        self.mf = BiasedMF(seed=self.seed, dim=mf_dim, lam=mf_lam, lr=0.02, epochs=80).fit(f)
+        self.bpr = BPRPairs(seed=self.seed, dim=bpr_dim, lam=bpr_lam, lr=0.05, epochs=60).fit(f)
+
+        tr_u = f.train.user.to_numpy(dtype=int)
+        tr_i = f.train.item.to_numpy(dtype=int)
+        if len(tr_u):
+            s_mf = self.mf.mu + self.mf.bu[tr_u] + self.mf.bi[tr_i] + np.einsum("nd,nd->n", self.mf.P[tr_u], self.mf.Q[tr_i])
+            s_bpr = self.bpr.b[tr_i] + np.einsum("nd,nd->n", self.bpr.P[tr_u], self.bpr.Q[tr_i])
+            s_pop = self.pop.s[tr_i]
+            s_cnt = np.zeros(len(tr_u), dtype=float)
+            for uu in np.unique(tr_u):
+                m = tr_u == uu
+                s_cnt[m] = self.cnt.score(int(uu), tr_i[m])
+            self.mf_mu, self.mf_sd = float(s_mf.mean()), max(float(s_mf.std()), 1e-3)
+            self.bpr_mu, self.bpr_sd = float(s_bpr.mean()), max(float(s_bpr.std()), 1e-3)
+            self.cnt_mu, self.cnt_sd = float(s_cnt.mean()), max(float(s_cnt.std()), 1e-3)
+            self.pop_mu, self.pop_sd = float(s_pop.mean()), max(float(s_pop.std()), 1e-3)
+        else:
+            self.mf_mu, self.mf_sd = float(self.mf.mu), 1.0
+            self.bpr_mu, self.bpr_sd = 0.0, 1.0
+            self.cnt_mu, self.cnt_sd = 0.0, 1.0
+            self.pop_mu, self.pop_sd = float(self.mf.mu), 1.0
+        return self
+
+    def weights(self) -> tuple[float, float, float, float]:
+        return (
+            float(self.params.get("w_mf", 0.40)),
+            float(self.params.get("w_bpr", 0.35)),
+            float(self.params.get("w_cnt", 0.20)),
+            float(self.params.get("w_pop", 0.05)),
+        )
+
+    def score(self, user: int, items: np.ndarray) -> np.ndarray:
+        w_mf, w_bpr, w_cnt, w_pop = self.weights()
+        s_mf = (self.mf.score(user, items) - self.mf_mu) / self.mf_sd
+        s_bpr = (self.bpr.score(user, items) - self.bpr_mu) / self.bpr_sd
+        s_cnt = (self.cnt.score(user, items) - self.cnt_mu) / self.cnt_sd
+        s_pop = (self.pop.score(user, items) - self.pop_mu) / self.pop_sd
+        return w_mf * s_mf + w_bpr * s_bpr + w_cnt * s_cnt + w_pop * s_pop
+
+
+MODELS: list[type[SurveyModel]] = [
+    RandomRanker,
+    ShrunkMean,
+    Bias,
+    ContentFav,
+    BiasedMF,
+    BPRPairs,
+    LightFMLogistic,
+    LambdaMART,
+    HybridFactorRanker,
+]
 BEST = "Best personalised (chọn trong CV trong)"
 
 
@@ -607,18 +697,68 @@ def run_scenario(sd: SurveyData, scenario: str, seed: int, k_outer: int = 5, mod
     return {"scenario": scenario, "seed": seed, "per_user": agg, "chosen": chosen}
 
 
+def _descriptives(arr: np.ndarray, floor_val: float = 0.0, ceil_val: float = 1.0) -> dict[str, float | int]:
+    arr = np.asarray(arr, dtype=float)
+    n_missing = int(np.isnan(arr).sum())
+    v = arr[~np.isnan(arr)]
+    n = int(len(v))
+    if n == 0:
+        return {
+            "n": 0,
+            "n_missing": n_missing,
+            "mean": float("nan"),
+            "sd": float("nan"),
+            "median": float("nan"),
+            "iqr": float("nan"),
+            "floor_count": 0,
+            "ceiling_count": 0,
+        }
+    q25, med, q75 = np.percentile(v, [25.0, 50.0, 75.0])
+    return {
+        "n": n,
+        "n_missing": n_missing,
+        "mean": float(np.mean(v)),
+        "sd": float(np.std(v, ddof=1)) if n > 1 else 0.0,
+        "median": float(med),
+        "iqr": float(q75 - q25),
+        "floor_count": int(np.sum(np.isclose(v, floor_val, atol=1e-9))),
+        "ceiling_count": int(np.sum(np.isclose(v, ceil_val, atol=1e-9))),
+    }
+
+
+def _paired_inference(a: np.ndarray, b: np.ndarray, seed: int = 7, n_boot: int = 5000) -> dict:
+    boot = stats.paired_bootstrap(a, b, n_boot=n_boot, seed=seed)
+    assump = stats.check_paired_assumptions(a, b)
+    wil = stats.wilcoxon(a, b)
+    dz = stats.cohens_dz(a, b, n_boot=min(2000, n_boot), seed=seed)
+    return {
+        **boot,
+        "assumptions": assump,
+        "wilcoxon": wil,
+        "cohens_dz": dz,
+        "desc_a": _descriptives(a),
+        "desc_b": _descriptives(b),
+    }
+
+
 def summarise(runs: list[dict], baseline: str = "ShrunkMean") -> dict:
-    """Mean ± sd over seeds of the user-mean metrics; per-user (seed-averaged) paired bootstrap vs the baseline."""
+    """Mean ± sd over seeds of the user-mean metrics; per-user (seed-averaged) paired inference vs baseline & Random."""
     names = list(runs[0]["per_user"])
     keys = list(next(iter(runs[0]["per_user"][names[0]].values())))
-    out = {"models": {}, "comparisons": {}}
+    out: dict = {"models": {}, "comparisons": {}}
     for name in names:
         per_seed = {key: [float(np.nanmean([r[key] for r in run["per_user"][name].values()])) for run in runs] for key in keys}
-        out["models"][name] = {key: {"mean": float(np.mean(v)), "sd": float(np.std(v, ddof=1)) if len(v) > 1 else 0.0} for key, v in per_seed.items()}
+        out["models"][name] = {
+            key: {"mean": float(np.mean(v)), "sd": float(np.std(v, ddof=1)) if len(v) > 1 else 0.0} for key, v in per_seed.items()
+        }
     users = sorted(set.intersection(*[set(run["per_user"][baseline]) for run in runs]))
 
-    def user_mean(name, key):
+    def user_mean(name: str, key: str) -> np.ndarray:
         return np.array([np.nanmean([run["per_user"][name].get(u, {}).get(key, np.nan) for run in runs]) for u in users])
+
+    out["user_descriptives"] = {
+        name: {key: _descriptives(user_mean(name, key)) for key in keys} for name in names
+    }
 
     for key in ("ndcg@5", "auc"):
         base = user_mean(baseline, key)
@@ -626,7 +766,7 @@ def summarise(runs: list[dict], baseline: str = "ShrunkMean") -> dict:
         for name in names:
             if name == baseline:
                 continue
-            comp[name] = stats.paired_bootstrap(user_mean(name, key), base, n_boot=5000, seed=7)
+            comp[name] = _paired_inference(user_mean(name, key), base, seed=7, n_boot=5000)
         others = [n for n in comp if n != BEST]
         adj = stats.holm([comp[n]["p"] for n in others]) if others else []
         for n, a in zip(others, adj, strict=True):
@@ -634,7 +774,47 @@ def summarise(runs: list[dict], baseline: str = "ShrunkMean") -> dict:
         if BEST in comp:
             comp[BEST]["role"] = "primary comparison (not in the Holm family)"
         out["comparisons"][key] = comp
+
+    if "Random" in names and baseline != "Random":
+        out["comparisons_vs_random"] = {}
+        for key in ("ndcg@5", "auc"):
+            rnd = user_mean("Random", key)
+            comp_r = {}
+            for name in names:
+                if name == "Random":
+                    continue
+                comp_r[name] = _paired_inference(user_mean(name, key), rnd, seed=11, n_boot=5000)
+            others = [n for n in comp_r if n != BEST]
+            adj_r = stats.holm([comp_r[n]["p"] for n in others]) if others else []
+            for n, a in zip(others, adj_r, strict=True):
+                comp_r[n]["p_holm"] = float(a)
+            if BEST in comp_r:
+                comp_r[BEST]["role"] = "primary comparison (not in the Holm family)"
+            out["comparisons_vs_random"][key] = comp_r
+
+    # Exploratory slot-level breakdown (vs ShrunkMean, BH-FDR adjusted across all model x slot pairs)
+    slot_keys = [k for k in ("ndcg@5_man", "ndcg@5_rau", "ndcg@5_canh") if k in keys]
+    if slot_keys:
+        slot_comp: dict[str, dict] = {}
+        raw_p_items: list[tuple[str, str, float]] = []
+        for sk in slot_keys:
+            base_s = user_mean(baseline, sk)
+            slot_comp[sk] = {}
+            for name in names:
+                if name == baseline:
+                    continue
+                res = _paired_inference(user_mean(name, sk), base_s, seed=13, n_boot=2000)
+                slot_comp[sk][name] = res
+                raw_p_items.append((sk, name, float(res["p"])))
+        if raw_p_items:
+            q_vals = stats.bh_fdr([x[2] for x in raw_p_items])
+            for (sk, name, _), q in zip(raw_p_items, q_vals, strict=True):
+                slot_comp[sk][name]["q_bh"] = float(q)
+        out["slot_comparisons"] = slot_comp
+
     out["n_users"] = len(users)
+    out["n_seeds"] = len(runs)
+    out["d_mde_80"] = float(2.80158 / math.sqrt(len(users))) if len(users) > 0 else float("nan")
     return out
 
 
@@ -642,6 +822,11 @@ def summarise(runs: list[dict], baseline: str = "ShrunkMean") -> dict:
 
 OUT = kb_catalog.REPO / "data" / "processed" / "recsys"
 SCENARIOS = ("warm", "item_cold", "user_cold")
+SIMULATION_DISCLAIMER = (
+    "SIMULATED=true: synthetic data generated from the latent model in survey.py; "
+    "H3a validates ranking/export pipeline behavior and feature-to-ranker calibration, "
+    "NOT real Vietnamese user preferences."
+)
 
 
 def _job(args: tuple) -> dict:
@@ -650,8 +835,14 @@ def _job(args: tuple) -> dict:
     return run_scenario(sd, scenario, seed)
 
 
-def run(source: str = "simulate", seeds: tuple[int, ...] = (0, 1, 2, 3, 4), workers: int = 8) -> dict:
-    """source = 'simulate' or a survey export directory. Writes survey_<sim|real>.json under data/processed/recsys."""
+def run(
+    source: str = "simulate",
+    seeds: tuple[int, ...] = (0, 1, 2, 3, 4),
+    workers: int = 8,
+    out_dir: Path | None = None,
+    write: bool = True,
+) -> dict:
+    """source = 'simulate' or a survey export directory. Writes survey_<sim|real>.json when write=True."""
     from concurrent.futures import ProcessPoolExecutor
 
     sd = load_export(Path(source)) if source != "simulate" else simulate(kb_catalog.load())
@@ -661,6 +852,7 @@ def run(source: str = "simulate", seeds: tuple[int, ...] = (0, 1, 2, 3, 4), work
     out = {
         "SIMULATED": sd.simulated,
         "label": "MÔ PHỎNG — chỉ kiểm đường ống, không phải kết quả" if sd.simulated else "dữ liệu khảo sát thật",
+        "simulation_disclaimer": SIMULATION_DISCLAIMER if sd.simulated else "real survey export",
         "data": {
             "n_users": sd.n_users,
             "n_items": sd.n_items,
@@ -676,9 +868,11 @@ def run(source: str = "simulate", seeds: tuple[int, ...] = (0, 1, 2, 3, 4), work
     for sc in SCENARIOS:
         rs = [r for r in runs if r["scenario"] == sc]
         out["scenarios"][sc] = summarise(rs) | {"chosen": {r["seed"]: r["chosen"] for r in rs}}
-    name = "survey_sim.json" if sd.simulated else "survey_real.json"
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / name).write_text(json.dumps(out, indent=1, ensure_ascii=False, default=float) + "\n", encoding="utf-8")
+    if write:
+        target_dir = Path(out_dir) if out_dir is not None else OUT
+        name = "survey_sim.json" if sd.simulated else "survey_real.json"
+        target_dir.mkdir(parents=True, exist_ok=True)
+        (target_dir / name).write_text(json.dumps(out, indent=1, ensure_ascii=False, default=float) + "\n", encoding="utf-8")
     return out
 
 

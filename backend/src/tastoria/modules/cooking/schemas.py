@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from dataclasses import dataclass
+from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 CookStatus = Literal["in_progress", "completed", "reverted", "abandoned"]
 
@@ -56,6 +57,13 @@ class CookCompleteRequest(_Req):
     completed_at: datetime | None = None
     feedback: list[DishFeedback] = Field(default_factory=list, max_length=3)
 
+    @field_validator("completed_at")
+    @classmethod
+    def _tz_aware_completed_at(cls, v: datetime | None) -> datetime | None:
+        if v is not None and (v.tzinfo is None or v.utcoffset() is None):
+            raise ValueError("Cần múi giờ (ISO 8601).")
+        return v
+
 
 class PantryDeductionOut(BaseModel):
     transaction_id: int
@@ -80,3 +88,11 @@ class CookCompletion(BaseModel):
     deductions: list[PantryDeductionOut]
     interactions_recorded: bool
     shortfalls: list[ShortfallOut] = []
+
+
+@dataclass(frozen=True)
+class CompletedSessionRef:
+    cook_session_id: uuid.UUID
+    meal_plan_id: uuid.UUID
+    completed_at: datetime
+    local_date: date

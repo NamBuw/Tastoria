@@ -15,7 +15,7 @@ export interface paths {
         put?: never;
         /**
          * Đăng ký tài khoản
-         * @description Tạo users (role = user) và trả phiên đăng nhập ngay. Mật khẩu băm Argon2id. Đồng ý theo mục đích được hỏi ở bước sau (POST /me/consents), không tích sẵn.
+         * @description Tạo users (role = user), đưa thư xác minh email vào email_outbox và trả phiên đăng nhập ngay. Mật khẩu băm Argon2id. Đồng ý theo mục đích được hỏi ở bước sau (POST /me/consents), không tích sẵn.
          */
         post: operations["identity_register_user"];
         delete?: never;
@@ -35,7 +35,7 @@ export interface paths {
         put?: never;
         /**
          * Đăng nhập
-         * @description Kiểm mật khẩu, tạo refresh token family mới. Sai 5 lần theo (email, IP) → khoá 15 phút (NFR-SEC-02); trong thời gian khoá trả 429 login_locked kể cả khi mật khẩu đúng.
+         * @description Kiểm mật khẩu (và mã TOTP `totp_code` nếu tài khoản đã bật MFA), tạo refresh token family mới. Sai 5 lần theo (email, IP) hoặc 15 lần theo email trên nhiều IP → khoá 15 phút (NFR-SEC-02); trong thời gian khoá trả 429 login_locked kể cả khi mật khẩu đúng.
          */
         post: operations["identity_login_user"];
         delete?: never;
@@ -55,7 +55,7 @@ export interface paths {
         put?: never;
         /**
          * Làm mới phiên
-         * @description Xoay vòng refresh token: thu hồi token cũ (revoked_at, replaced_by_id), cấp token mới cùng family_id. Dùng lại token đã thu hồi → thu hồi cả family, trả 401 refresh_reused (NFR-SEC-01).
+         * @description Xoay vòng refresh token: thu hồi token cũ (revoked_at, replaced_by_id), cấp token mới cùng family_id. Gọi trùng token vừa xoay trong cửa sổ 10 giây → trả 409 refresh_retry_conflict (không thu hồi family). Dùng lại token sau 10 giây hoặc token đã thu hồi trực tiếp → thu hồi cả family, trả 401 refresh_reused (NFR-SEC-01).
          */
         post: operations["identity_refresh_token"];
         delete?: never;
@@ -138,6 +138,166 @@ export interface paths {
          * @description Đặt password_hash mới, ghi used_at, thu hồi mọi refresh token và tăng token_version. Token sai, đã dùng hoặc hết hạn → 400 reset_token_invalid; mật khẩu mới không đạt chính sách → 422 weak_password (token chưa bị tiêu).
          */
         post: operations["identity_confirm_password_reset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/verify-email/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Gửi lại thư xác minh email
+         * @description Tạo token xác minh email mới (hạn 24 giờ, tuân theo cooldown gửi lại) và xếp vào email_outbox. Lũy đẳng nếu email đã xác minh.
+         */
+        post: operations["identity_request_email_verification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/verify-email/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Xác minh địa chỉ email bằng token
+         * @description Đánh dấu email_verification_tokens.verified_at và users.email_verified_at. Token sai, đã dùng hoặc hết hạn → 400 verification_token_invalid.
+         */
+        post: operations["identity_confirm_email_verification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/change-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Đổi mật khẩu khi đang đăng nhập
+         * @description Xác thực mật khẩu hiện tại (có chống brute-force theo IP), kiểm tra chính sách mật khẩu mới, thu hồi mọi phiên cũ (tăng token_version) và cấp phiên mới cho thiết bị hiện tại.
+         */
+        post: operations["identity_change_password"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Liệt kê các phiên đăng nhập đang hoạt động
+         * @description Trả danh sách refresh token chưa thu hồi và chưa hết hạn của người dùng hiện tại.
+         */
+        get: operations["identity_list_sessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Thu hồi một phiên đăng nhập theo ID
+         * @description Thu hồi cả family của phiên được chọn. Không tồn tại hoặc thuộc người khác → 404 session_not_found.
+         */
+        delete: operations["identity_revoke_session"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/mfa/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Khởi tạo xác thực hai bước (TOTP)
+         * @description Tạo bí mật TOTP mới, mã hoá AES-256-GCM và trả secret + otpauth URI để quét mã QR. Nếu đã bật MFA → 409 conflict_state.
+         */
+        post: operations["identity_mfa_setup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/mfa/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Xác nhận mã TOTP để kích hoạt MFA và nâng cấp phiên
+         * @description Kiểm tra mã TOTP 6 chữ số; đặt mfa_enabled_at, thu hồi toàn bộ phiên tiền-MFA (tăng token_version) và cấp phiên mới có mfa=true.
+         */
+        post: operations["identity_mfa_verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/mfa/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Tắt xác thực hai bước (TOTP)
+         * @description Xác thực mật khẩu và mã TOTP hiện tại; xoá bí mật TOTP và thu hồi toàn bộ phiên hiện có.
+         */
+        post: operations["identity_mfa_disable"];
         delete?: never;
         options?: never;
         head?: never;
@@ -672,7 +832,7 @@ export interface paths {
         post?: never;
         /**
          * Xoá chip nhận nhầm
-         * @description Đặt user_action = deleted (giữ lại làm tín hiệu chọn ảnh cho học chủ động). Lũy đẳng.
+         * @description Chip của mô hình được giữ với user_action = deleted (tín hiệu chọn ảnh cho học chủ động); chip người dùng thêm bị xoá hẳn. Lũy đẳng; gọi lại (kể cả với chip người dùng đã xoá) trả 204.
          */
         delete: operations["scan_delete_item"];
         options?: never;
@@ -695,7 +855,7 @@ export interface paths {
         put?: never;
         /**
          * Xác nhận kết quả quét vào kho
-         * @description Một Unit of Work: tạo pantry_lots + giao dịch scan_add cho mỗi chip còn lại, đánh dấu lô not_seen (fridge), status = confirmed (BR-SCAN-02, BR-PANTRY-01, BR-PANTRY-03). Còn chip needs_check = true chưa xác nhận → 409 freshness_check_required (BR-FRESH-04); chip không đếm được chưa có mức → 422 qty_level_required. Lũy đẳng: gọi lại khi đã confirmed trả kết quả cũ.
+         * @description Một Unit of Work: haul tạo một pantry_lots mới cho mỗi chip còn lại; fridge cập nhật quan sát độ tươi của lô in_stock/not_seen mới nhất cùng nguyên liệu (không tạo lô) hoặc tạo lô mới, rồi đánh dấu lô not_seen; status = confirmed (BR-SCAN-02, BR-PANTRY-01, BR-PANTRY-03). Lô mới mang lượng ở initial_g_min/max và không có giao dịch (như POST /pantry/lots: initial + Σ giao dịch là số dư, thêm scan_add sẽ đếm hai lần); source_scan_item_id trỏ về chip. Chip đếm được có số 0 không tạo lô. Còn chip needs_check = true chưa xác nhận → 409 freshness_check_required (BR-FRESH-04); chip không đếm được chưa có mức → 422 qty_level_required. Lũy đẳng: gọi lại khi đã confirmed trả kết quả cũ.
          */
         post: operations["scan_confirm_scan"];
         delete?: never;
@@ -912,6 +1072,26 @@ export interface paths {
         patch: operations["substitute_update_shopping_item"];
         trace?: never;
     };
+    "/shopping-items/{id}/to-pantry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Đưa mục đi chợ vào kho nguyên liệu
+         * @description Tạo lô pantry_lots (initial=0) cùng giao dịch pantry_transactions manual_edit (+qty_g), đánh dấu shopping_items là bought và gắn pantry_lot_id. Không cho phép nếu trạng thái là dropped hoặc đã gắn pantry_lot_id (409 conflict_state). Nếu thiếu qty_g ở cả mục lẫn body → 422 validation_error (qty_required).
+         */
+        post: operations["substitute_shopping_item_to_pantry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/cook-sessions": {
         parameters: {
             query?: never;
@@ -1026,6 +1206,105 @@ export interface paths {
         get: operations["journal_get_week"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/meal-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Danh sách nhật ký bữa ăn
+         * @description Trả về nhật ký bữa ăn theo khoảng ngày và phân trang keyset.
+         */
+        get: operations["meal_logs_list"];
+        put?: never;
+        /**
+         * Tạo nhật ký bữa ăn
+         * @description Ghi nhận bữa ăn từ ước lượng món, mã vạch, công thức hoặc nhập tay.
+         */
+        post: operations["meal_logs_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/meal-logs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Xem chi tiết nhật ký bữa ăn */
+        get: operations["meal_logs_get"];
+        put?: never;
+        post?: never;
+        /** Xoá nhật ký bữa ăn */
+        delete: operations["meal_logs_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/meal-calorie/dishes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Danh sách món KB và khoảng sai số hiệu chuẩn
+         * @description Trả về danh sách món ăn Việt Nam đã tính dinh dưỡng trong KB kèm hệ số hiệu chuẩn NIN.
+         */
+        get: operations["meal_calorie_list_dishes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/meal-calorie/barcode/{barcode}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tra cứu dinh dưỡng sản phẩm đóng gói theo mã vạch */
+        get: operations["meal_calorie_lookup_barcode"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/meal-calorie/estimate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ước lượng calo và dinh dưỡng bữa ăn
+         * @description Hỗ trợ tra cứu KB theo món/khẩu phần (nho/vua/lon), ước lượng trực quan từ ảnh qua ONNX Nutrition5k, hoặc kết hợp cả hai.
+         */
+        post: operations["meal_calorie_estimate"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1161,7 +1440,7 @@ export interface paths {
         };
         /**
          * Liệt kê yêu cầu dữ liệu
-         * @description Mỗi lần đọc ghi audit_log. Sắp received_at tăng dần để xử lý theo hạn. Chỉ vai trò `admin` (claim `role` trong JWT); vai trò khác → 403 forbidden. Mọi lời gọi ghi audit_log.
+         * @description Sắp received_at tăng dần để xử lý theo hạn. Chỉ vai trò `admin` (claim `role` trong JWT; yêu cầu phiên MFA ở production hoặc khi tài khoản bật MFA → thiếu trả 403 mfa_required); vai trò khác → 403 forbidden. Ghi audit_log hợp nhất theo phiên đọc (bỏ qua khi phân trang cursor hoặc trong vòng 60 giây).
          */
         get: operations["admin_list_data_requests"];
         put?: never;
@@ -1183,7 +1462,7 @@ export interface paths {
         put?: never;
         /**
          * Xử lý yêu cầu dữ liệu thủ công
-         * @description Dùng cho correct/restrict/object (UC08). Đặt status, acknowledged_at/completed_at, note; ghi audit_log. Lũy đẳng: cùng status đã đặt trả 200. Yêu cầu đã completed/rejected không đổi được → 409. Chỉ vai trò `admin` (claim `role` trong JWT); vai trò khác → 403 forbidden. Mọi lời gọi ghi audit_log.
+         * @description Dùng cho correct/restrict/object (UC08). Đặt status, acknowledged_at/completed_at, note; ghi audit_log khi đổi trạng thái. Lũy đẳng: cùng status đã đặt trả 200. Yêu cầu đã completed/rejected không đổi được → 409. Chỉ vai trò `admin` (yêu cầu phiên MFA ở production hoặc khi tài khoản bật MFA → 403 mfa_required); vai trò khác → 403 forbidden.
          */
         post: operations["admin_resolve_data_request"];
         delete?: never;
@@ -1201,7 +1480,7 @@ export interface paths {
         };
         /**
          * Xem nhật ký kiểm toán
-         * @description Chỉ đọc; keyset theo (created_at, id) giảm dần. Chỉ vai trò `admin` (claim `role` trong JWT); vai trò khác → 403 forbidden. Mọi lời gọi ghi audit_log.
+         * @description Chỉ đọc; keyset theo (created_at, id) giảm dần. Chỉ vai trò `admin` (yêu cầu phiên MFA ở production hoặc khi tài khoản bật MFA → 403 mfa_required); vai trò khác → 403 forbidden. Lần gọi 200 không ghi thêm audit_log.
          */
         get: operations["admin_list_audit_log"];
         put?: never;
@@ -1221,7 +1500,7 @@ export interface paths {
         };
         /**
          * Xem phiên bản mô hình và bản đang chạy
-         * @description Đăng ký, kiểm định, triển khai, quay lui thực hiện qua CLI `tastoria mlops ...`; endpoint này chỉ đọc. Chỉ vai trò `ml_operator` (claim `role` trong JWT); vai trò khác → 403 forbidden. Mọi lời gọi ghi audit_log.
+         * @description Đăng ký, kiểm định, triển khai, quay lui thực hiện qua CLI `tastoria mlops ...`; endpoint này chỉ đọc. Chỉ vai trò `ml_operator` (yêu cầu phiên MFA ở production hoặc khi tài khoản bật MFA → 403 mfa_required); vai trò khác → 403 forbidden. Lần gọi 200 không ghi thêm audit_log.
          */
         get: operations["admin_list_models"];
         put?: never;
@@ -1241,7 +1520,7 @@ export interface paths {
         };
         /**
          * Xem các đợt khảo sát
-         * @description Tạo phiếu và xuất kết quả qua CLI `tastoria survey ...`; endpoint này chỉ đọc số liệu tiến độ. Chỉ vai trò `ml_operator` (claim `role` trong JWT); vai trò khác → 403 forbidden. Mọi lời gọi ghi audit_log.
+         * @description Tạo phiếu và xuất kết quả qua CLI `tastoria survey ...`; endpoint này chỉ đọc số liệu tiến độ. Chỉ vai trò `ml_operator` (yêu cầu phiên MFA ở production hoặc khi tài khoản bật MFA → 403 mfa_required); vai trò khác → 403 forbidden. Ghi audit_log hợp nhất theo phiên đọc (bỏ qua khi phân trang cursor hoặc trong vòng 60 giây).
          */
         get: operations["admin_list_surveys"];
         put?: never;
@@ -1323,6 +1602,13 @@ export interface components {
          *     | refresh_invalid | 401 | Refresh token không tồn tại hoặc hết hạn | UC02 |
          *     | refresh_reused | 401 | Refresh token đã thu hồi bị dùng lại; cả family bị thu hồi (NFR-SEC-01) | FR-02-07 |
          *     | reset_token_invalid | 400 | Token đặt lại mật khẩu sai, đã dùng hoặc hết hạn | UC04 |
+         *     | email_not_verified | 403 | Email chưa được xác minh | UC01, UC02 |
+         *     | verification_token_invalid | 400 | Liên kết xác minh email sai, đã dùng hoặc hết hạn | UC01 |
+         *     | mfa_required | 403 | Tài khoản yêu cầu mã xác thực hai bước | UC02 |
+         *     | mfa_invalid | 401 | Mã xác thực hai bước không đúng | UC02 |
+         *     | mfa_not_enabled | 409 | Tài khoản chưa bật xác thực hai bước | UC02 |
+         *     | session_not_found | 404 | Không tìm thấy phiên đăng nhập | UC03 |
+         *     | refresh_retry_conflict | 409 | Phiên đang được làm mới ở yêu cầu khác; hãy thử lại | UC02 |
          *     | purpose_not_found | 404 | Mục đích không có trong `consent_purposes` | UC05 |
          *     | purpose_not_allowed | 422 | Mục đích không ghi được qua endpoint này (`survey`) hoặc mã lạ trong lô quyết định | UC05 |
          *     | policy_outdated | 409 | `policy_version_id` gửi lên không phải bản điều khoản hiện hành | FR-05-04, FR-23-04 |
@@ -1381,7 +1667,7 @@ export interface components {
          *     | internal_error | 500 | Lỗi không lường trước ở server; giao dịch đã rollback; xem `request_id` | NFR-REL-01 |
          * @enum {string}
          */
-        ProblemCode: "validation_error" | "not_found" | "unauthenticated" | "token_revoked" | "forbidden" | "app_too_old" | "rate_limited" | "conflict_state" | "idempotency_key_required" | "idempotency_key_reused" | "idempotency_in_progress" | "service_unavailable" | "temporarily_unavailable" | "email_taken" | "invalid_email" | "weak_password" | "invalid_credentials" | "login_locked" | "account_deletion_pending" | "refresh_invalid" | "refresh_reused" | "reset_token_invalid" | "purpose_not_found" | "purpose_not_allowed" | "policy_outdated" | "consent_required" | "reauth_failed" | "invalid_request" | "reason_required" | "request_not_manual" | "request_not_ready" | "request_not_downloadable" | "export_expired" | "age_below_minimum" | "age_confirmation_required" | "profile_incomplete" | "unknown_code" | "favorites_limit" | "recipe_not_published" | "below_floor_confirmation_required" | "decryption_failed" | "image_too_large" | "unsupported_media_type" | "image_too_many_pixels" | "model_unavailable" | "queue_full" | "scan_not_editable" | "invalid_scan_state" | "duplicate_item" | "unknown_ingredient" | "qty_kind_mismatch" | "qty_level_required" | "unit_conversion_missing" | "freshness_check_required" | "image_purged" | "acquired_at_in_future" | "invalid_lot_transition" | "lot_closed" | "lot_not_check_level" | "no_feasible_tray" | "pin_unsatisfiable" | "no_alternative" | "meal_plan_not_accepted" | "meal_plan_not_cookable" | "cook_session_in_progress" | "cook_session_not_in_progress" | "cook_session_not_completed" | "undo_window_expired" | "recipe_without_steps" | "invalid_iso_week" | "respondent_token_invalid" | "survey_closed" | "survey_already_completed" | "survey_incomplete" | "invalid_rating" | "invalid_favorites" | "survey_form_misconfigured" | "internal_error";
+        ProblemCode: "validation_error" | "not_found" | "unauthenticated" | "token_revoked" | "forbidden" | "app_too_old" | "rate_limited" | "conflict_state" | "idempotency_key_required" | "idempotency_key_reused" | "idempotency_in_progress" | "service_unavailable" | "temporarily_unavailable" | "email_taken" | "invalid_email" | "weak_password" | "invalid_credentials" | "login_locked" | "account_deletion_pending" | "refresh_invalid" | "refresh_reused" | "reset_token_invalid" | "email_not_verified" | "verification_token_invalid" | "mfa_required" | "mfa_invalid" | "mfa_not_enabled" | "session_not_found" | "refresh_retry_conflict" | "purpose_not_found" | "purpose_not_allowed" | "policy_outdated" | "consent_required" | "reauth_failed" | "invalid_request" | "reason_required" | "request_not_manual" | "request_not_ready" | "request_not_downloadable" | "export_expired" | "age_below_minimum" | "age_confirmation_required" | "profile_incomplete" | "unknown_code" | "favorites_limit" | "recipe_not_published" | "below_floor_confirmation_required" | "decryption_failed" | "image_too_large" | "unsupported_media_type" | "image_too_many_pixels" | "model_unavailable" | "queue_full" | "scan_not_editable" | "invalid_scan_state" | "duplicate_item" | "unknown_ingredient" | "qty_kind_mismatch" | "qty_level_required" | "unit_conversion_missing" | "freshness_check_required" | "image_purged" | "acquired_at_in_future" | "invalid_lot_transition" | "lot_closed" | "lot_not_check_level" | "no_feasible_tray" | "pin_unsatisfiable" | "no_alternative" | "meal_plan_not_accepted" | "meal_plan_not_cookable" | "cook_session_in_progress" | "cook_session_not_in_progress" | "cook_session_not_completed" | "undo_window_expired" | "recipe_without_steps" | "invalid_iso_week" | "respondent_token_invalid" | "survey_closed" | "survey_already_completed" | "survey_incomplete" | "invalid_rating" | "invalid_favorites" | "survey_form_misconfigured" | "internal_error";
         FieldError: {
             /**
              * @description JSON Pointer (RFC 6901) tới trường lỗi trong thân, hoặc `#/query/<tên>` cho tham số
@@ -1453,6 +1739,10 @@ export interface components {
             status: "active" | "deletion_requested";
             /** Format: date-time */
             created_at: string;
+            /** @default false */
+            email_verified?: boolean;
+            /** @default false */
+            mfa_enabled?: boolean;
         };
         AuthSession: {
             /** @description JWT, hạn 15 phút, header có `kid` (NFR-SEC-01) */
@@ -1461,8 +1751,8 @@ export interface components {
             token_type: "Bearer";
             /** @constant */
             expires_in: 900;
-            /** @description Chuỗi ngẫu nhiên; server chỉ lưu SHA-256 (refresh_tokens.token_sha256); hạn 30 ngày, xoay vòng mỗi lần dùng */
-            refresh_token: string;
+            /** @description Chuỗi ngẫu nhiên; server chỉ lưu SHA-256 (refresh_tokens.token_sha256); hạn 30 ngày, xoay vòng mỗi lần dùng (null khi trả về qua cookie HttpOnly cho web) */
+            refresh_token: string | null;
             /** Format: date-time */
             refresh_expires_at: string;
             user: components["schemas"]["UserSummary"];
@@ -1476,13 +1766,15 @@ export interface components {
             /** Format: email */
             email: string;
             password: string;
+            /** @description Mã TOTP 6 chữ số (bắt buộc khi tài khoản đã bật MFA) */
+            totp_code?: string | null;
         };
         RefreshRequest: {
-            refresh_token: string;
+            refresh_token?: string | null;
         };
         LogoutRequest: {
             /** @description Token của thiết bị cần đăng xuất; family của nó bị thu hồi */
-            refresh_token: string;
+            refresh_token?: string | null;
         };
         PasswordResetRequest: {
             /** Format: email */
@@ -1492,6 +1784,48 @@ export interface components {
             /** @description Token trong thư; server so với password_resets.token_sha256 */
             token: string;
             new_password: string;
+        };
+        VerifyEmailConfirm: {
+            /** @description Token trong thư xác minh email; server so với email_verification_tokens.token_sha256 */
+            token: string;
+        };
+        ChangePasswordRequest: {
+            current_password: string;
+            new_password: string;
+        };
+        SessionOut: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            family_id: string;
+            user_agent: string | null;
+            ip_address: string | null;
+            /** Format: date-time */
+            issued_at: string;
+            /** Format: date-time */
+            last_used_at: string | null;
+            /** Format: date-time */
+            expires_at: string;
+            /** @default false */
+            is_current?: boolean;
+        };
+        SessionListOut: {
+            items: components["schemas"]["SessionOut"][];
+        };
+        MfaSetupOut: {
+            /** @description Khoá TOTP dạng Base32 để nhập thủ công */
+            secret: string;
+            /** @description URI otpauth://totp/... để quét mã QR */
+            otpauth_uri: string;
+        };
+        MfaVerifyRequest: {
+            /** @description Mã TOTP 6 chữ số từ ứng dụng xác thực */
+            code: string;
+        };
+        MfaDisableRequest: {
+            password: string;
+            /** @description Mã TOTP 6 chữ số hiện tại */
+            code: string;
         };
         /** @enum {string} */
         ConsentPurposeCode: "health_profile" | "personalization" | "photo_contribution" | "survey";
@@ -1827,6 +2161,16 @@ export interface components {
             total_minutes: number;
             /** @description recipe_nutrition (energy_kcal) */
             kcal_per_serving: number | null;
+            /** @description recipe_nutrition (protein_g) */
+            protein_g?: number | null;
+            /** @description recipe_nutrition (glucid_g) */
+            carbs_g?: number | null;
+            /** @description recipe_nutrition (lipid_g) */
+            fat_g?: number | null;
+            /** @description recipe_nutrition (fiber_g) */
+            fiber_g?: number | null;
+            /** @description Tỷ lệ nguyên liệu chính hiện có trong kho của người dùng */
+            pantry_match_ratio?: number | null;
             tag_codes: string[];
         };
         RecipeIngredient: {
@@ -2018,6 +2362,10 @@ export interface components {
             p_dung_som: number | null;
             p_dung_ngay: number | null;
             p_kiem_tra: number | null;
+            sub_species_slug?: string | null;
+            sub_species_conf?: number | null;
+            /** @default false */
+            safety_abstained?: boolean;
         };
         /** @description Chip kết quả quét (scan_items) */
         ScanItem: {
@@ -2047,6 +2395,10 @@ export interface components {
             created_at: string;
             /** Format: date-time */
             updated_at: string;
+            sub_species_slug?: string | null;
+            sub_species_conf?: number | null;
+            /** @default false */
+            safety_abstained?: boolean;
         };
         /** @description Lần quét (scans) */
         Scan: {
@@ -2074,6 +2426,14 @@ export interface components {
             images: components["schemas"]["ScanImage"][];
             /** @description Rỗng khi status ∈ {queued, processing, failed, expired}; không gồm chip user_action = deleted */
             items: components["schemas"]["ScanItem"][];
+            /** @description Chỉ có khi mode = fridge và status = done (FR-12-18): lô in_stock của người dùng có nguyên liệu không xuất hiện ở chip nào (trừ gia vị luôn có); xác nhận quét sẽ chuyển chúng sang not_seen. Không có trường này ở chế độ haul hay trạng thái khác. */
+            unseen_lots?: {
+                /** Format: uuid */
+                lot_id: string;
+                /** Format: uuid */
+                ingredient_id: string;
+                ingredient_name_vi: string;
+            }[];
         };
         /** @description Thêm chip người dùng tự nhập (origin = user_added) */
         ScanItemCreate: {
@@ -2222,8 +2582,8 @@ export interface components {
             origin: "lookup" | "embedding";
             in_pantry: boolean;
             /** @description Lượng khả dụng của đồ thay (lô kiểm tra chưa xác nhận không tính, FR-17-08/09) */
-            available_g_min?: number;
-            available_g_max?: number;
+            available_g_min: number;
+            available_g_max: number;
         };
         MissingIngredient: {
             /** Format: uuid */
@@ -2257,6 +2617,8 @@ export interface components {
             status: "open" | "bought" | "dropped";
             /** Format: uuid */
             source_meal_plan_item_id: string | null;
+            /** Format: uuid */
+            pantry_lot_id?: string | null;
             /** Format: date-time */
             created_at: string;
             /** Format: date-time */
@@ -2276,6 +2638,15 @@ export interface components {
             note?: string | null;
             /** @enum {string} */
             status?: "open" | "bought" | "dropped";
+        };
+        ShoppingItemToPantryRequest: {
+            qty_g?: number | null;
+            /** Format: date-time */
+            acquired_at?: string | null;
+        };
+        ShoppingItemToPantryOut: {
+            shopping_item: components["schemas"]["ShoppingItem"];
+            pantry_lot: components["schemas"]["PantryLot"];
         };
         /** @enum {string} */
         CookSessionStatus: "in_progress" | "completed" | "reverted" | "abandoned";
@@ -2372,15 +2743,54 @@ export interface components {
                 short_g: number;
             }[];
         };
+        JournalMacros: {
+            protein_g: number;
+            carbs_g: number;
+            fat_g: number;
+            fiber_g: number;
+        };
+        CookedDish: {
+            /** Format: uuid */
+            recipe_id: string;
+            name_vi: string;
+            /** @enum {string} */
+            slot: "man" | "rau" | "canh";
+            kcal_per_person: number | null;
+        };
+        CookedMeal: {
+            /** Format: uuid */
+            cook_session_id: string;
+            /** Format: uuid */
+            meal_plan_id: string;
+            /** Format: date */
+            date: string;
+            /** Format: date-time */
+            completed_at: string;
+            /** @enum {string} */
+            meal: "lunch" | "dinner";
+            persons: number;
+            kcal_per_person: number | null;
+            rice_bowls_per_person: number | null;
+            macros: components["schemas"]["JournalMacros"];
+            dishes: components["schemas"]["CookedDish"][];
+        };
         /** @description Một dòng v_journal_days */
         JournalDay: {
             /** Format: date */
             date: string;
             cooked_trays: number;
+            /** @default 0 */
+            meal_logs_count?: number;
+            /** @default 0 */
+            meal_logs_kcal?: number;
             kcal_per_person: number | null;
             e_target_kcal: number | null;
             /** @description Số lô gấp được dùng kịp */
             urgent_lots_used: number;
+            protein_g?: number | null;
+            carbs_g?: number | null;
+            fat_g?: number | null;
+            fiber_g?: number | null;
         };
         JournalWeek: {
             week: string;
@@ -2391,6 +2801,10 @@ export interface components {
              * @enum {string}
              */
             kcal_range_status: "calibrated" | "calibrating";
+            macros: components["schemas"]["JournalMacros"];
+            cooked_history: components["schemas"]["CookedMeal"][];
+            /** @default [] */
+            meal_logs?: components["schemas"]["MealLogOut"][];
         };
         /** @enum {string} */
         InteractionType: "served" | "viewed" | "swapped" | "cooked" | "liked" | "disliked" | "undone";
@@ -2521,7 +2935,7 @@ export interface components {
             created_at: string;
         };
         /** @enum {string} */
-        ModelName: "detector" | "freshness" | "ranker" | "substitution";
+        ModelName: "detector" | "freshness" | "ranker" | "substitution" | "meal_calorie" | "dish_classifier" | "mushroom_classifier";
         /** @description model_versions */
         ModelVersion: {
             /** Format: uuid */
@@ -2640,6 +3054,230 @@ export interface components {
         SurveyFormSummaryPage: {
             items: components["schemas"]["SurveyFormSummary"][];
             /** @description Con trỏ keyset cho trang sau; null khi hết dữ liệu */
+            next_cursor: string | null;
+        };
+        MealCalorieDishOut: {
+            slug: string;
+            name_vi: string;
+            /** @enum {string} */
+            slot: "man" | "rau" | "canh";
+            kcal_per_serving: number;
+            protein_g: number;
+            carbs_g: number;
+            fat_g: number;
+            fiber_g: number;
+        };
+        MealCalorieDishListOut: {
+            data_version: string;
+            calibrated: boolean;
+            half_width_rel: number;
+            dishes: components["schemas"]["MealCalorieDishOut"][];
+        };
+        BarcodeNutritionOut: {
+            barcode: string;
+            product_name: string;
+            brand?: string | null;
+            serving_size?: string | null;
+            serving_g?: number | null;
+            kcal_per_serving?: number | null;
+            protein_g_per_serving?: number | null;
+            carbs_g_per_serving?: number | null;
+            fat_g_per_serving?: number | null;
+            fiber_g_per_serving?: number | null;
+            kcal_per_100g?: number | null;
+            protein_g_per_100g?: number | null;
+            carbs_g_per_100g?: number | null;
+            fat_g_per_100g?: number | null;
+            fiber_g_per_100g?: number | null;
+            source: string;
+            image_url?: string | null;
+            nutrition_score?: number | null;
+            nutrition_grade?: string | null;
+            macro_kcal_split?: components["schemas"]["MacroKcalSplitOut"] | null;
+        };
+        MacroKcalSplitOut: {
+            protein_pct: number;
+            carbs_pct: number;
+            fat_pct: number;
+        };
+        DishCandidateOut: {
+            dish_id: string;
+            name_vi: string;
+            name_en: string;
+            confidence: number;
+            kb_slug?: string | null;
+            kcal_vua?: number | null;
+        };
+        ModifierSuggestionOut: {
+            id: string;
+            label_vi: string;
+            kcal_delta: number;
+            /** @default 0 */
+            fat_delta_g?: number;
+            /** @default 0 */
+            carbs_delta_g?: number;
+            /** @default 0 */
+            protein_delta_g?: number;
+        };
+        MealCalorieEstimateOut: {
+            dish_name_vi?: string | null;
+            kb_slug?: string | null;
+            slot?: string | null;
+            /** @enum {string} */
+            portion: "nho" | "vua" | "lon";
+            portion_multiplier: number;
+            estimated_kcal: number;
+            kcal_low: number;
+            kcal_high: number;
+            estimated_mass_g?: number | null;
+            protein_g: number;
+            carbs_g: number;
+            fat_g: number;
+            fiber_g?: number | null;
+            /** @enum {string} */
+            source: "kb_calibrated" | "onnx_nutrition5k" | "hybrid";
+            calibrated: boolean;
+            half_width_rel: number;
+            latency_ms: number;
+            visual_kcal?: number | null;
+            domain_shift_note?: string | null;
+            /** @default false */
+            ood_clamped?: boolean;
+            recognized_dish_id?: string | null;
+            recognized_confidence?: number | null;
+            /** @default [] */
+            top_candidates?: components["schemas"]["DishCandidateOut"][];
+            nutrition_score: number | null;
+            nutrition_grade: string | null;
+            macro_kcal_split?: components["schemas"]["MacroKcalSplitOut"] | null;
+            serving_desc_vi?: string | null;
+            source_ref?: string | null;
+            /** @default false */
+            disambiguation_required?: boolean;
+            top_margin?: number | null;
+            /** @default Ước lượng trực quan theo khẩu phần */
+            provenance_label_vi?: string;
+            /**
+             * @default visual_fallback
+             * @enum {string}
+             */
+            fusion_mode?: "kb_exact" | "variance_weighted" | "top3_blend" | "visual_fallback";
+            /** @default [] */
+            suggested_modifiers?: components["schemas"]["ModifierSuggestionOut"][];
+        };
+        /** @enum {string} */
+        MealSlot: "sang" | "trua" | "toi" | "phu";
+        /** @enum {string} */
+        MealLogSource: "scan_calorie" | "barcode" | "manual" | "recipe";
+        /** @enum {string} */
+        MealLogSourceIn: "scan_calorie" | "calorie_scan" | "barcode" | "manual" | "recipe";
+        /** @enum {string} */
+        MealLogItemKind: "dish" | "modifier" | "barcode_item" | "manual_item";
+        MealLogItemIn: {
+            /** @default dish */
+            item_kind?: components["schemas"]["MealLogItemKind"];
+            label_vi?: string | null;
+            dish_slug?: string | null;
+            /** Format: uuid */
+            recipe_id?: string | null;
+            /** Format: uuid */
+            ingredient_id?: string | null;
+            barcode?: string | null;
+            grams?: number | null;
+            kcal?: number | null;
+            protein_g?: number | null;
+            carbs_g?: number | null;
+            fat_g?: number | null;
+            fiber_g?: number | null;
+            /** @default [] */
+            modifiers?: string[];
+        };
+        MealLogCreate: {
+            /** Format: date */
+            logged_date?: string | null;
+            /** Format: date-time */
+            logged_at?: string | null;
+            meal_slot: components["schemas"]["MealSlot"];
+            title: string;
+            source_type: components["schemas"]["MealLogSourceIn"];
+            source_ref_id?: string | null;
+            /** @default Vừa */
+            portion_label?: string;
+            /** @default 1 */
+            portion_scale?: number;
+            /** @default [] */
+            modifiers?: string[];
+            /** @default 0 */
+            kcal?: number;
+            kcal_low?: number | null;
+            kcal_high?: number | null;
+            /** @default 0 */
+            protein_g?: number;
+            /** @default 0 */
+            carbs_g?: number;
+            /** @default 0 */
+            fat_g?: number;
+            /** @default 0 */
+            fiber_g?: number;
+            /** @default  */
+            provenance_label_vi?: string;
+            notes?: string | null;
+            /** @default [] */
+            items?: components["schemas"]["MealLogItemIn"][];
+        };
+        MealLogItemOut: {
+            /** Format: uuid */
+            id: string;
+            ordinal: number;
+            item_kind: components["schemas"]["MealLogItemKind"];
+            label_vi: string;
+            dish_slug: string | null;
+            /** Format: uuid */
+            recipe_id: string | null;
+            /** Format: uuid */
+            ingredient_id: string | null;
+            barcode: string | null;
+            grams: number | null;
+            kcal: number;
+            protein_g: number;
+            carbs_g: number;
+            fat_g: number;
+            fiber_g: number;
+            modifiers: unknown[];
+            /** Format: date-time */
+            created_at: string;
+        };
+        MealLogOut: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            logged_date: string;
+            /** Format: date-time */
+            logged_at: string;
+            meal_slot: components["schemas"]["MealSlot"];
+            title: string;
+            source_type: components["schemas"]["MealLogSource"];
+            source_ref_id: string | null;
+            portion_label: string;
+            portion_scale: number;
+            modifiers: unknown[];
+            kcal: number;
+            kcal_low: number;
+            kcal_high: number;
+            protein_g: number;
+            carbs_g: number;
+            fat_g: number;
+            fiber_g: number;
+            provenance_label_vi: string;
+            notes: string | null;
+            items: components["schemas"]["MealLogItemOut"][];
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        MealLogPage: {
+            items: components["schemas"]["MealLogOut"][];
             next_cursor: string | null;
         };
     };
@@ -2843,7 +3481,7 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
-            /** @description Sai thông tin đăng nhập — code: `invalid_credentials` */
+            /** @description Sai thông tin đăng nhập hoặc mã TOTP — code: `invalid_credentials`, `mfa_invalid` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2852,7 +3490,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
-            /** @description Tài khoản đang chờ xoá — code: `account_deletion_pending` */
+            /** @description Tài khoản đang chờ xoá hoặc thiếu mã MFA — code: `account_deletion_pending`, `mfa_required` */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2862,7 +3500,7 @@ export interface operations {
                 };
             };
             412: components["responses"]["AppTooOld"];
-            /** @description Cặp (email, IP) bị khoá tạm hoặc vượt tần suất — code: `login_locked`, `rate_limited` */
+            /** @description Tài khoản/(email, IP) bị khoá tạm hoặc vượt tần suất — code: `login_locked`, `rate_limited` */
             429: {
                 headers: {
                     "Retry-After": components["headers"]["RetryAfter"];
@@ -2894,7 +3532,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
                 "application/json": components["schemas"]["RefreshRequest"];
             };
@@ -2919,9 +3557,19 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
-            /** @description Tài khoản đang chờ xoá — code: `account_deletion_pending` */
+            /** @description Tài khoản đang chờ xoá hoặc thiếu CSRF web — code: `account_deletion_pending`, `forbidden` */
             403: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Token vừa được xoay trong vòng 10 giây ở yêu cầu khác; hãy thử lại — code: `refresh_retry_conflict` */
+            409: {
+                headers: {
+                    "Retry-After": components["headers"]["RetryAfter"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -2942,7 +3590,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
                 "application/json": components["schemas"]["LogoutRequest"];
             };
@@ -3055,6 +3703,311 @@ export interface operations {
                 };
             };
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    identity_request_email_verification: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Đã nhận yêu cầu xác minh */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    identity_confirm_email_verification: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyEmailConfirm"];
+            };
+        };
+        responses: {
+            /** @description Đã xác minh email */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Token xác minh sai, đã dùng hoặc hết hạn — code: `verification_token_invalid`, `validation_error` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    identity_change_password: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangePasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description Đã đổi mật khẩu và cấp phiên mới */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthSession"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            /** @description Chưa xác thực hoặc mật khẩu hiện tại không đúng — code: `unauthenticated`, `token_revoked`, `invalid_credentials` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["AppTooOld"];
+            /** @description Mật khẩu mới không đạt chính sách — code: `weak_password`, `validation_error` */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bị khoá do nhập sai nhiều lần hoặc vượt tần suất — code: `login_locked`, `rate_limited` */
+            429: {
+                headers: {
+                    "Retry-After": components["headers"]["RetryAfter"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    identity_list_sessions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Danh sách phiên đang hoạt động */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionListOut"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    identity_revoke_session: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Đã thu hồi phiên */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            /** @description Không tìm thấy phiên đăng nhập — code: `session_not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    identity_mfa_setup: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bí mật TOTP và URI cấu hình */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MfaSetupOut"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    identity_mfa_verify: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaVerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description Đã xác nhận MFA và cấp phiên mới */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthSession"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            /** @description Chưa xác thực hoặc mã TOTP sai — code: `unauthenticated`, `token_revoked`, `mfa_invalid` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Chưa khởi tạo TOTP — code: `mfa_not_enabled` */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    identity_mfa_disable: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaDisableRequest"];
+            };
+        };
+        responses: {
+            /** @description Đã tắt xác thực hai bước */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            /** @description Sai mật khẩu hoặc mã TOTP — code: `unauthenticated`, `token_revoked`, `invalid_credentials`, `mfa_invalid` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Tài khoản chưa bật MFA — code: `mfa_not_enabled` */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
+            503: components["responses"]["ServiceUnavailable"];
         };
     };
     privacy_get_current_policy: {
@@ -3371,6 +4324,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
             /** @description Không giải mã được cột sức khoẻ — code: `decryption_failed` */
             500: {
                 headers: {
@@ -3764,11 +4718,27 @@ export interface operations {
     catalog_list_recipes: {
         parameters: {
             query?: {
-                /** @description Tìm theo tên (không dấu cũng khớp) */
+                /** @description Tìm theo tên món hoặc nguyên liệu chính (không dấu cũng khớp) */
                 q?: string;
                 slot?: "man" | "rau" | "canh";
                 /** @description Mã thẻ */
                 tag?: string;
+                /** @description Mã nhóm thực phẩm */
+                food_group?: string;
+                /** @description Bí danh của food_group */
+                food_group_code?: string;
+                /** @description Mã cách nấu */
+                method_code?: string;
+                /** @description Tổng thời gian nấu tối đa (phút) */
+                max_minutes?: number;
+                /** @description Calo mỗi khẩu phần tối đa */
+                max_kcal?: number;
+                /** @description Bí danh của max_kcal */
+                kcal_max?: number;
+                /** @description Lọc món làm sẵn trước */
+                make_ahead?: boolean;
+                /** @description Lọc món đủ nguyên liệu chính trong kho (pantry_match_ratio == 1) */
+                pantry_match?: boolean;
                 /** @description Con trỏ keyset lấy từ next_cursor của trang trước */
                 cursor?: components["parameters"]["Cursor"];
                 /** @description Số phần tử mỗi trang */
@@ -4935,6 +5905,58 @@ export interface operations {
             };
         };
     };
+    substitute_shopping_item_to_pantry: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ShoppingItemToPantryRequest"];
+            };
+        };
+        responses: {
+            /** @description Đã tạo lô kho từ mục đi chợ */
+            201: {
+                headers: {
+                    Location: components["headers"]["Location"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShoppingItemToPantryOut"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            /** @description Mục ở trạng thái dropped hoặc đã được đưa vào kho — code: `conflict_state` */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["AppTooOld"];
+            /** @description Thiếu qty_g hoặc dữ liệu không hợp lệ — code: `validation_error`, `acquired_at_in_future`, `unknown_ingredient` */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     cooking_create_session: {
         parameters: {
             query?: never;
@@ -5232,6 +6254,243 @@ export interface operations {
             };
         };
     };
+    meal_logs_list: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+                meal_slot?: components["schemas"]["MealSlot"];
+                cursor?: string;
+                limit?: number;
+            };
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MealLogPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            412: components["responses"]["AppTooOld"];
+        };
+    };
+    meal_logs_create: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MealLogCreate"];
+            };
+        };
+        responses: {
+            /** @description Đã lưu nhật ký bữa ăn */
+            201: {
+                headers: {
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MealLogOut"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            412: components["responses"]["AppTooOld"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    meal_logs_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MealLogOut"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["AppTooOld"];
+        };
+    };
+    meal_logs_delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Đã xoá */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["AppTooOld"];
+        };
+    };
+    meal_calorie_list_dishes: {
+        parameters: {
+            query?: {
+                include_extended?: boolean;
+            };
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MealCalorieDishListOut"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            412: components["responses"]["AppTooOld"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    meal_calorie_lookup_barcode: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path: {
+                barcode: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BarcodeNutritionOut"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["AppTooOld"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    meal_calorie_estimate: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    image?: string;
+                    dish_slug?: string;
+                    dish_name?: string;
+                    /**
+                     * @default vua
+                     * @enum {string}
+                     */
+                    portion?: "nho" | "vua" | "lon";
+                };
+            };
+        };
+        responses: {
+            /** @description Thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MealCalorieEstimateOut"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["AppTooOld"];
+            /** @description Ảnh vượt quá 3 MB — code: `image_too_large` */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Định dạng ảnh không hỗ trợ — code: `unsupported_media_type` */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            422: components["responses"]["Unprocessable"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     events_record_events: {
         parameters: {
             query?: never;
@@ -5357,6 +6616,7 @@ export interface operations {
             };
             404: components["responses"]["NotFound"];
             412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     survey_put_rating: {
@@ -5417,6 +6677,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
         };
     };
     survey_set_favorites: {
@@ -5476,6 +6737,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
         };
     };
     survey_complete_respondent: {
@@ -5531,6 +6793,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
         };
     };
     admin_list_data_requests: {
@@ -5565,6 +6828,7 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     admin_resolve_data_request: {
@@ -5617,6 +6881,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
         };
     };
     admin_list_audit_log: {
@@ -5654,6 +6919,7 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     admin_list_models: {
@@ -5688,6 +6954,7 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     admin_list_surveys: {
@@ -5720,6 +6987,7 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             412: components["responses"]["AppTooOld"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     core_get_health: {

@@ -13,15 +13,18 @@ meal depends on substitute).
 
 from __future__ import annotations
 
+import unicodedata
 import uuid
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+from pathlib import Path
 from typing import Any
 
 from fastapi import Request
-from sqlalchemy import delete, select, tuple_
+from sqlalchemy import delete, select, text, tuple_
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
 from tastoria.core import pagination
@@ -29,6 +32,8 @@ from tastoria.core.auth import AuthUser
 from tastoria.core.clock import utcnow
 from tastoria.core.errors import ApiError, ProblemCode
 from tastoria.modules.catalog import service as catalog
+from tastoria.modules.mlops import service as mlops
+from tastoria.modules.pantry import service as pantry
 from tastoria.modules.substitute.models import ShoppingItem, SubstitutionPair
 from tastoria.modules.substitute.schemas import (
     Candidate,
@@ -37,6 +42,8 @@ from tastoria.modules.substitute.schemas import (
     ShoppingItemOut,
     ShoppingItemPage,
     ShoppingItemPatch,
+    ShoppingItemToPantryOut,
+    ShoppingItemToPantryRequest,
 )
 
 MAX_CANDIDATES = 3
@@ -100,7 +107,95 @@ def candidates(
         out.append(Candidate(sub, float(p.ratio), float(p.score), "lookup"))
         if len(out) >= limit:
             break
+    if len(out) < limit and (sub_ver := mlops.active_version(session, "substitution")) is not None:
+        rows = session.execute(
+            text(
+                "SELECT e2.ingredient_id, 1.0 - (e2.vector <=> e1.vector) AS sim "
+                "FROM ingredient_embeddings e1 "
+                "JOIN ingredient_embeddings e2 "
+                "  ON e2.model_version_id = e1.model_version_id "
+                " AND e2.ingredient_id <> e1.ingredient_id "
+                "JOIN ingredients i ON i.id = e2.ingredient_id "
+                "WHERE e1.model_version_id = :vid "
+                "  AND e1.ingredient_id = :orig_id "
+                "  AND i.is_active "
+                "  AND i.food_group_code = :fg "
+                "ORDER BY e2.vector <=> e1.vector ASC, e2.ingredient_id ASC "
+                "LIMIT :fetch_limit"
+            ),
+            {
+                "vid": sub_ver.id,
+                "orig_id": original.id,
+                "fg": original.food_group_code,
+                "fetch_limit": max(25, limit * 5),
+            },
+        ).all()
+        if rows:
+            emb_subs = catalog.ingredients_by_ids(session, [r.ingredient_id for r in rows])
+            for r in rows:
+                sub = emb_subs.get(r.ingredient_id)
+                if (
+                    sub is None
+                    or sub.id in seen
+                    or sub.id == original.id
+                    or not sub.is_active
+                    or sub.food_group_code != original.food_group_code
+                    or not catalog.ingredient_allowed(sub, banned, excl)
+                ):
+                    continue
+                seen.add(sub.id)
+                score = round(max(0.0, min(1.0, float(r.sim))), 4)
+                out.append(Candidate(sub, 1.0, score, "embedding"))
+                if len(out) >= limit:
+                    break
     return out
+
+
+def sync_embeddings(session: Session, *, model_version_id: uuid.UUID, npz_path: Path) -> dict[str, int]:
+    """Load (N, 100) float vectors from `.npz` and upsert into `ingredient_embeddings` for `model_version_id`."""
+    import numpy as np
+
+    with np.load(npz_path, allow_pickle=False) as z:
+        vectors = np.asarray(z["vectors"], dtype=np.float32)
+        names_vi = [unicodedata.normalize("NFC", str(n)) for n in z["names_vi"]]
+    if vectors.ndim != 2 or vectors.shape[1] != 100:
+        raise ValueError(f"vectors shape {vectors.shape} must be (N, 100)")
+    if not np.all(np.isfinite(vectors)):
+        raise ValueError("vectors contain NaN or Inf")
+
+    by_name = {
+        unicodedata.normalize("NFC", v.name_vi): v.id for v in catalog.active_ingredients(session).values()
+    }
+    matched_ids: list[uuid.UUID] = []
+    unmatched = 0
+    upsert_sql = text(
+        "INSERT INTO ingredient_embeddings (ingredient_id, model_version_id, vector) "
+        "VALUES (:iid, :vid, CAST(:vec AS vector)) "
+        "ON CONFLICT (ingredient_id, model_version_id) DO UPDATE SET vector = EXCLUDED.vector"
+    )
+    for name, row in zip(names_vi, vectors, strict=True):
+        iid = by_name.get(name)
+        if iid is None:
+            unmatched += 1
+            continue
+        matched_ids.append(iid)
+        vec_str = "[" + ",".join(f"{float(x):.8f}" for x in row) + "]"
+        session.execute(upsert_sql, {"iid": iid, "vid": model_version_id, "vec": vec_str})
+    if matched_ids:
+        session.execute(
+            text(
+                "DELETE FROM ingredient_embeddings "
+                "WHERE model_version_id = :vid AND NOT (ingredient_id = ANY(:ids))"
+            ),
+            {"vid": model_version_id, "ids": matched_ids},
+        )
+    else:
+        session.execute(
+            text("DELETE FROM ingredient_embeddings WHERE model_version_id = :vid"),
+            {"vid": model_version_id},
+        )
+    session.flush()
+    return {"upserted": len(matched_ids), "unmatched": unmatched}
 
 
 def pair_ratio(session: Session, original_id: uuid.UUID, substitute_id: uuid.UUID, *, slot: str, method: str) -> float:
@@ -180,6 +275,7 @@ def _out(session: Session, rows: list[ShoppingItem]) -> list[ShoppingItemOut]:
             note=r.note,
             status=r.status,  # type: ignore[arg-type]
             source_meal_plan_item_id=r.source_meal_plan_item_id,
+            pantry_lot_id=r.pantry_lot_id,
             created_at=r.created_at,
             updated_at=r.updated_at,
         )
@@ -222,27 +318,51 @@ def create_item(
     q = q.where(
         ShoppingItem.source_meal_plan_item_id.is_(None) if src is None else ShoppingItem.source_meal_plan_item_id == src
     )
-    existing = session.scalars(q.with_for_update()).first()
     qty = Decimal(str(body.qty_g)) if body.qty_g is not None else None
-    if existing is not None:
-        if existing.qty_g != qty or existing.note != body.note:
-            existing.qty_g, existing.note, existing.updated_at = qty, body.note, now
-        session.flush()
-        return _out(session, [existing])[0], False
-    row = ShoppingItem(
-        id=uuid.uuid4(),
-        user_id=user.id,
-        ingredient_id=ing.id,
-        qty_g=qty,
-        note=body.note,
-        status="open",
-        source_meal_plan_item_id=src,
-        created_at=now,
-        updated_at=now,
-    )
-    session.add(row)
+    for _ in range(3):
+        existing = session.scalars(q.with_for_update()).first()
+        if existing is not None:
+            if existing.qty_g != qty or existing.note != body.note:
+                existing.qty_g, existing.note, existing.updated_at = qty, body.note, now
+            session.flush()
+            return _out(session, [existing])[0], False
+        conflict_cols = (
+            ["user_id", "ingredient_id"]
+            if src is None
+            else ["user_id", "ingredient_id", "source_meal_plan_item_id"]
+        )
+        conflict_where = (
+            text("status = 'open' AND source_meal_plan_item_id IS NULL")
+            if src is None
+            else text("status = 'open' AND source_meal_plan_item_id IS NOT NULL")
+        )
+        new_id = uuid.uuid4()
+        ins = (
+            pg_insert(ShoppingItem)
+            .values(
+                id=new_id,
+                user_id=user.id,
+                ingredient_id=ing.id,
+                qty_g=qty,
+                note=body.note,
+                status="open",
+                source_meal_plan_item_id=src,
+                created_at=now,
+                updated_at=now,
+            )
+            .on_conflict_do_nothing(index_elements=conflict_cols, index_where=conflict_where)
+            .returning(ShoppingItem.id)
+        )
+        inserted_id = session.execute(ins).scalar_one_or_none()
+        if inserted_id is not None:
+            created_row = session.scalars(select(ShoppingItem).where(ShoppingItem.id == inserted_id)).one()
+            return _out(session, [created_row])[0], True
+    existing = session.scalars(q.with_for_update()).first()
+    assert existing is not None
+    if existing.qty_g != qty or existing.note != body.note:
+        existing.qty_g, existing.note, existing.updated_at = qty, body.note, now
     session.flush()
-    return _out(session, [row])[0], True
+    return _out(session, [existing])[0], False
 
 
 def update_item(session: Session, user: AuthUser, item_id: uuid.UUID, body: ShoppingItemPatch) -> ShoppingItemOut:
@@ -272,6 +392,53 @@ def update_item(session: Session, user: AuthUser, item_id: uuid.UUID, body: Shop
         row.updated_at = utcnow()
     session.flush()
     return _out(session, [row])[0]
+
+
+def to_pantry(
+    session: Session,
+    user: AuthUser,
+    item_id: uuid.UUID,
+    body: ShoppingItemToPantryRequest | None = None,
+) -> ShoppingItemToPantryOut:
+    row = session.scalars(
+        select(ShoppingItem).where(ShoppingItem.id == item_id, ShoppingItem.user_id == user.id).with_for_update()
+    ).one_or_none()
+    if row is None:
+        raise ApiError(404, ProblemCode.not_found)
+    if row.status == "dropped":
+        raise ApiError(409, ProblemCode.conflict_state, "Không thể đưa mục đã bỏ vào kho.")
+    if row.pantry_lot_id is not None:
+        raise ApiError(
+            409,
+            ProblemCode.conflict_state,
+            "Mục này đã được đưa vào kho.",
+            extra={"pantry_lot_id": str(row.pantry_lot_id)},
+        )
+    qty = body.qty_g if (body is not None and body.qty_g is not None) else (
+        float(row.qty_g) if row.qty_g is not None else None
+    )
+    if qty is None:
+        raise ApiError(
+            422,
+            ProblemCode.validation_error,
+            errors=[{"pointer": "/qty_g", "code": "qty_required", "message": "Cần nhập khối lượng (gam) để đưa vào kho."}],
+        )
+    lot = pantry.create_lot_with_ledger(
+        session,
+        user,
+        ingredient_id=row.ingredient_id,
+        g_min=qty,
+        g_max=qty,
+        acquired_at=body.acquired_at if body is not None else None,
+        acquired_basis="purchase_date_entered",
+    )
+    row.pantry_lot_id = lot.id
+    row.status = "bought"
+    if body is not None and body.qty_g is not None and row.qty_g is None:
+        row.qty_g = Decimal(str(body.qty_g))
+    row.updated_at = utcnow()
+    session.flush()
+    return ShoppingItemToPantryOut(shopping_item=_out(session, [row])[0], pantry_lot=lot)
 
 
 # ---------------------------------------------------------------- data-subject requests

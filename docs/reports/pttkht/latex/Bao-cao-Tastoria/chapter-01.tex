@@ -1,95 +1,210 @@
-\chapter{KHẢO SÁT HIỆN TRẠNG VÀ XÁC ĐỊNH BÀI TOÁN}
-Pha khảo sát làm rõ bối cảnh sử dụng, vấn đề cần giải quyết, bên liên quan và mục tiêu. Đầu ra là phạm vi bài toán và nhu cầu làm cơ sở cho yêu cầu ở Chương 2.
+\chapter{Requirements Identification}\label{c:req}
 
-\section{Lý do lựa chọn và bài toán}
-Bài toán không chỉ là tìm một công thức. Người nấu cần quyết định nhiều món cùng lúc, chia số nguyên liệu hữu hạn cho cả mâm, sử dụng đồ mua trước và sắp xếp thao tác để bữa ăn hoàn thành trong thời gian cho phép. Nếu hai món cùng cần 200 g thịt nhưng trong tủ chỉ có 300 g, việc kiểm tra riêng từng món đều ``đủ'' vẫn tạo ra một mâm không khả thi.
+\section{Introduction}
+Tastoria là hệ thống giúp một người nấu ăn trong gia đình Việt trả lời câu hỏi hằng ngày ``hôm nay nấu gì từ đồ đang có''. Người dùng chụp 1--2 ảnh tủ lạnh hoặc túi đồ vừa mua; hệ thống nhận diện nguyên liệu, cho người dùng sửa rồi ghi vào kho theo từng lô. Từ kho đó, hệ thống ghép \emph{một} mâm cơm (mặn, rau, canh; hai món khi ăn một mình) vừa đủ nguyên liệu cho cả mâm, tránh nhóm dị ứng đã khai, ưu tiên đồ sắp hỏng, gần mục tiêu năng lượng, rồi lập lịch nấu song song và trừ kho khi nấu xong. Hệ thống đang chạy tại \url{https://tastoria.ctslab.net} với ứng dụng web và bản Android.
 
-Tastoria đặt kho nguyên liệu của người dùng ở trung tâm. Ảnh giúp giảm thao tác nhập, nhưng kết quả nhận diện phải được người dùng xác nhận. Kho lưu theo lô vì hai lần mua cùng một nguyên liệu có ngày nhập, lượng và mức ưu tiên sử dụng khác nhau. Gợi ý mâm xem xét ràng buộc chung; nấu xong mới ghi giảm kho và cho phép hoàn tác khi bấm nhầm.
+Báo cáo phân tích và thiết kế hệ thống thông tin này theo trình tự: Chương~1 xác định bối cảnh, bên liên quan, vấn đề, ranh giới và yêu cầu; Chương~2 xây dựng mô hình use case, đặc tả các use case trọng tâm, quy tắc nghiệp vụ và truy vết; Chương~3 phân tích các chỗ dùng AI (nhận diện nguyên liệu từ ảnh, xếp hạng và ghép mâm, thay thế nguyên liệu); Chương~4 thiết kế lớp, luồng dữ liệu, cơ sở dữ liệu và kiến trúc phân tầng; Chương~5 trình bày bản cài đặt, màn hình thật và số đo. Đặc tả đủ 34 use case ở Phụ lục~A, cấu trúc 63 bảng ở Phụ lục~B, ma trận truy vết ở tài liệu riêng.
 
-Đề tài phù hợp bài tập nhóm vì kết hợp giao diện đa nền tảng, nghiệp vụ có trạng thái, cơ sở dữ liệu quan hệ, xử lý ảnh bất đồng bộ, bài toán tối ưu và quản lý dữ liệu cá nhân. Các phần có thể phân công độc lập nhưng phải thống nhất mã nguyên liệu, trạng thái và hợp đồng API.
+Mọi sơ đồ trong báo cáo được dựng bằng Visual Paradigm CE 18.1 từ một mô hình duy nhất (\code{docs/sad/tools/diagrams/model.py}). Tên lớp, hàm, bảng và mã lỗi giữ nguyên tiếng Anh như trong mã nguồn; số liệu đo lấy từ các báo cáo thí nghiệm và tệp kết quả trong kho mã, ghi nguồn cạnh từng bảng.
 
-\section{Bối cảnh và quy trình hiện tại}
-Đơn vị phân tích là một người quản lý kho và tổ chức bữa ăn, không phải cửa hàng bán thực phẩm. Người đó có thể nấu cho nhiều người, nhưng quyền sở hữu dữ liệu trong phiên bản hiện tại gắn với tài khoản cá nhân. Vì vậy, yêu cầu khai số người và dị ứng người ăn cùng không đồng nghĩa hệ thống đã hỗ trợ nhiều thành viên đồng quản trị một hộ.
+\section{Business Background}
+\subsection{Organization and Operating Model}
+Tastoria do nhóm phát triển tại CTS Lab xây dựng và vận hành trên máy chủ của lab. Hệ thống không bán hàng và không thu phí; người dùng cuối dùng miễn phí qua trình duyệt hoặc tệp APK. Nhân sự vận hành gồm ba vai trò có tài khoản riêng: quản trị viên xử lý yêu cầu về dữ liệu cá nhân, người biên soạn nhập kho công thức và nguyên liệu, người vận hành mô hình đăng ký và triển khai mô hình nhận diện, tổ chức đợt khảo sát gu. Mô hình học máy được huấn luyện ngoài hệ thống trên máy GPU dùng chung của lab; hệ thống phục vụ chỉ nhận tệp mô hình đã xuất và chạy trên CPU.
 
-Trước khi có ứng dụng, người nấu thường kiểm tra nguyên liệu bằng trí nhớ hoặc quan sát trực tiếp, tìm công thức riêng lẻ, tự ước lượng khẩu phần rồi sắp thứ tự nấu. Đây là tình huống phân tích của đề tài, chưa phải kết quả phỏng vấn hay thống kê hành vi. Sau khi có Tastoria, quyết định cuối vẫn thuộc người dùng; hệ thống hỗ trợ ghi nhận kho, kiểm tra tính khả thi của mâm và cập nhật kết quả sau nấu.
+\subsection{Products, Users, and Core Activities}
+``Sản phẩm'' của hệ thống là một mâm cơm đề xuất kèm lịch nấu, dựng từ kho món do nhóm biên soạn: 180 công thức (75 món mặn, 55 món rau, 50 món canh), trong đó 171 món đủ điều kiện xuất bản, và 230 nguyên liệu có số liệu dinh dưỡng theo Bảng thành phần thực phẩm Việt Nam 2007 hoặc USDA. SRS mô tả ba chân dung người dùng (là giả định, chưa kiểm bằng phỏng vấn): người ăn một mình cần món nhanh, ít nguyên liệu; gia đình 2--4 người cần mâm đủ món, nấu song song; người có mục tiêu sức khoẻ cần calo vừa mục tiêu và loại chắc chắn món gây dị ứng.
 
-{\footnotesize\setlength{\tabcolsep}{0pt}
-\begin{longtable}{@{}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{}}
-\caption{Bối cảnh và quy trình hiện tại}\\
-\toprule
-\textbf{Mã quy trình} & \textbf{Đầu vào và người thực hiện} & \textbf{Xử lý chính} & \textbf{Đầu ra và điểm kiểm soát} \\
-\midrule\endfirsthead
-\multicolumn{4}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
-\toprule
-\textbf{Mã quy trình} & \textbf{Đầu vào và người thực hiện} & \textbf{Xử lý chính} & \textbf{Đầu ra và điểm kiểm soát} \\
-\midrule\endhead
-\bottomrule\endfoot
-BP01 Ghi nhận nguyên liệu & Người dùng nhập tay hoặc gửi ảnh & Đề xuất tên, sửa lượng, xác nhận lô & Kho được cập nhật sau xác nhận; nhận diện ảnh chưa làm thay đổi kho \\ \addlinespace[3pt]
-BP02 Chuẩn bị bữa ăn & Kho, số người, thời gian, dị ứng & Lọc món, ghép mâm, kiểm tài nguyên dùng chung & Mâm hợp lệ hoặc thông báo nguyên nhân không có lời giải \\ \addlinespace[3pt]
-BP03 Điều chỉnh và nấu & Mâm đề xuất, lựa chọn người dùng & Đổi món/\allowbreak{}thay nguyên liệu, chấp nhận, lập lịch & Phiên nấu; đổi món phải kiểm lại toàn mâm \\ \addlinespace[3pt]
-BP04 Đóng phiên và rà soát & Xác nhận hoàn tất, đánh giá tùy chọn & Trừ kho, ghi trạng thái, cho phép hoàn tác & Lịch sử có thể truy vết; gửi lại không ghi giảm lần hai \\ \addlinespace[3pt]
-BP05 Quản trị dữ liệu & Yêu cầu quyền dữ liệu, nguồn công thức, phiên bản mô hình & Kiểm quyền, kiểm dữ liệu, kiểm định, triển khai & Dữ liệu có nguồn và phiên bản; thao tác vận hành có dấu vết \\ \addlinespace[3pt]
-\end{longtable}}
-Ranh giới giữa BP01 và BP02 là kho đã được xác nhận. Ranh giới giữa BP03 và BP04 là sự kiện người dùng báo đã nấu xong, không phải thời điểm mở màn hình lịch. Cách xác định này tránh hai sai sót: tự nhập nguyên liệu từ dự đoán chưa được duyệt và tự trừ kho khi người dùng chỉ xem thử một mâm.
+Hoạt động cốt lõi nối tiếp nhau: ghi nhận nguyên liệu (quét ảnh hoặc nhập tay) $\rightarrow$ quản lý kho theo lô $\rightarrow$ nhận và điều chỉnh mâm $\rightarrow$ nấu theo lịch $\rightarrow$ hoàn tất bữa và trừ kho. Hai ranh giới quyết định cách thiết kế: kết quả nhận diện chỉ là đề xuất, kho chỉ thay đổi khi người dùng xác nhận; và mâm đề xuất chỉ đọc kho, kho chỉ bị trừ khi người dùng báo đã nấu xong.
 
-\section{Bên liên quan, vấn đề và mục tiêu}
-{\footnotesize\setlength{\tabcolsep}{0pt}
-\begin{longtable}{@{}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{\hspace{3mm}}L{5.133cm}@{}}
-\caption{Bên liên quan, vấn đề và mục tiêu}\\
-\toprule
-\textbf{Bên liên quan} & \textbf{Nhu cầu} & \textbf{Xung đột cần xử lý} \\
-\midrule\endfirsthead
-\multicolumn{3}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
-\toprule
-\textbf{Bên liên quan} & \textbf{Nhu cầu} & \textbf{Xung đột cần xử lý} \\
-\midrule\endhead
-\bottomrule\endfoot
-Người nấu & Ít nhập liệu, mâm phù hợp nguyên liệu và thời gian & Tự động hóa nhanh có thể giảm khả năng kiểm tra kết quả nhận diện \\ \addlinespace[3pt]
-Người ăn cùng & Bữa ăn đáp ứng các ràng buộc được khai báo & Không trực tiếp dùng app; thông tin do người nấu cung cấp có thể thiếu \\ \addlinespace[3pt]
-Người quản trị dữ liệu & Công thức và đơn vị nhất quán & Dữ liệu phong phú nhưng thiếu cấu trúc làm giảm khả năng tính toán \\ \addlinespace[3pt]
-Người vận hành mô hình & Triển khai đúng artifact, có thể quay lui & Tăng dữ liệu huấn luyện phải tuân theo phạm vi được phép sử dụng \\ \addlinespace[3pt]
-Nhóm phát triển & Chức năng dễ phân công, có thể kiểm thử và bảo trì & Tách module phải giữ nhất quán giao dịch xuyên kho--mâm--phiên nấu \\ \addlinespace[3pt]
-\end{longtable}}
-{\footnotesize\setlength{\tabcolsep}{0pt}
-\begin{longtable}{@{}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{}}
-\caption{Bên liên quan, vấn đề và mục tiêu}\\
-\toprule
-\textbf{Vấn đề} & \textbf{Nguyên nhân và tác động} & \textbf{Nhu cầu} & \textbf{Mục tiêu thiết kế} \\
-\midrule\endfirsthead
-\multicolumn{4}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
-\toprule
-\textbf{Vấn đề} & \textbf{Nguyên nhân và tác động} & \textbf{Nhu cầu} & \textbf{Mục tiêu thiết kế} \\
-\midrule\endhead
-\bottomrule\endfoot
-P01 Khó biết còn bao nhiêu nguyên liệu & Mỗi lần mua khác lượng/\allowbreak{}ngày; cộng gộp làm mất thông tin lô & SN01 Theo dõi lượng và lịch sử theo lô & BO01 Giảm thao tác nhập nhưng giữ quyền xác nhận \\ \addlinespace[3pt]
-P02 Món riêng lẻ phù hợp nhưng cả mâm thiếu nguyên liệu & Nhiều món cùng sử dụng một nguyên liệu & SN02 Kiểm lượng trên tổng tổ hợp & BO02 Chỉ đề xuất mâm thỏa ràng buộc cứng \\ \addlinespace[3pt]
-P03 Nấu không kịp dù tổng thời gian công thức có vẻ đủ & Tranh chấp bếp, phụ thuộc bước và thao tác chủ động & SN03 Lập lịch theo tài nguyên & BO03 Đưa ra lịch có giải thích và phương án dự phòng \\ \addlinespace[3pt]
-P04 Mất mạng hoặc bấm lại làm sai kho & Request có thể đến máy chủ nhiều lần & SN04 Ghi nhận hoàn tất một lần và có hoàn tác & BO04 Giữ nhất quán phiên nấu, mâm và kho \\ \addlinespace[3pt]
-P05 Dữ liệu cá nhân được dùng vượt mục đích & Đồng ý bị gộp với đăng ký hoặc không có lịch sử & SN05 Chọn và rút đồng ý theo mục đích & BO05 Tách quyền dùng app khỏi quyền đóng góp dữ liệu \\ \addlinespace[3pt]
-\end{longtable}}
-Các mục tiêu BO là định hướng thiết kế. Chưa có đo lường trước--sau thì không kết luận đã giảm bao nhiêu phần trăm thời gian hoặc lãng phí thực phẩm.
+\section{Stakeholder Analysis}
+Bảng~\ref{tab:stake} liệt kê các bên liên quan. Người ăn cùng là bên liên quan nhưng không trực tiếp dùng hệ thống: người nấu khai nhóm dị ứng của họ cho từng bữa.
 
-\section{Khảo sát ứng dụng tương tự}
-Khảo sát bàn giấy trên trang chính thức ngày 31/\allowbreak{}10/\allowbreak{}2026. ``Chưa có bằng chứng'' dưới đây là giới hạn khảo sát, không phải kết luận sản phẩm đối thủ hoàn toàn không có tính năng.
+\begin{tabl}{Stakeholders, vai trò và nhu cầu chính\label{tab:stake}}{@{}L{1.0cm}L{2.6cm}L{1.4cm}L{3.6cm}L{5.0cm}L{1.6cm}@{}}{\textbf{Mã} & \textbf{Stakeholder} & \textbf{Nhóm} & \textbf{Vai trò} & \textbf{Nhu cầu chính} & \textbf{Dùng trực tiếp}}
+ST-01 & Người nấu (người dùng) & Bên ngoài & Quản lý kho của mình, nhận mâm, nấu & Ít nhập liệu; mâm nấu được ngay bằng đồ đang có; dùng kịp đồ sắp hỏng; không bị trừ kho sai & Có \\
+ST-02 & Người ăn cùng & Bên ngoài & Ăn bữa do ST-01 nấu & Không bị đề xuất món có chất gây dị ứng của mình & Không \\
+ST-03 & Người tham gia khảo sát & Bên ngoài & Chấm điểm món qua đường dẫn & Phiếu ngắn, ẩn danh, không cần tài khoản & Có \\
+ST-04 & Quản trị viên & Nội bộ & Xử lý yêu cầu dữ liệu cá nhân & Hàng đợi yêu cầu có hạn xử lý; nhật ký kiểm toán & Có \\
+ST-05 & Người biên soạn công thức & Nội bộ & Nhập công thức, nguyên liệu, cặp thay thế & Nhập lại an toàn, báo lỗi dữ liệu trước khi xuất bản & Có \\
+ST-06 & Người vận hành mô hình & Nội bộ & Đăng ký, kiểm định, triển khai mô hình; tổ chức khảo sát & Biết phiên bản nào đang chạy, quay lui được & Có \\
+ST-07 & Nhóm phát triển (CTS Lab) & Nội bộ & Xây dựng, vận hành máy chủ & Ranh giới module rõ, kiểm thử được, tuân thủ luật dữ liệu cá nhân & Không \\
+\end{tabl}
 
-{\footnotesize\setlength{\tabcolsep}{0pt}
-\begin{longtable}{@{}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{\hspace{3mm}}L{3.775cm}@{}}
-\caption{Khảo sát ứng dụng tương tự}\\
-\toprule
-\textbf{Sản phẩm} & \textbf{Điểm mạnh có nguồn} & \textbf{Hạn chế đối với bài toán của nhóm} & \textbf{Hướng riêng của Tastoria} \\
-\midrule\endfirsthead
-\multicolumn{4}{l}{\small\itshape Bảng \thetable{} (tiếp theo)}\\
-\toprule
-\textbf{Sản phẩm} & \textbf{Điểm mạnh có nguồn} & \textbf{Hạn chế đối với bài toán của nhóm} & \textbf{Hướng riêng của Tastoria} \\
-\midrule\endhead
-\bottomrule\endfoot
-Samsung Food /\allowbreak{} Food+ & Lưu công thức, lập kế hoạch ăn, danh sách mua sắm; Food+ có cá nhân hóa và theo dõi dinh dưỡng [W1--W2] & Tài liệu khảo sát chưa chứng minh cơ chế chia tồn kho theo lô cho cấu trúc mặn--rau--canh Việt Nam; một số tính năng thuộc gói trả phí & Gợi ý một mâm cụ thể theo lượng nguyên liệu chung và số người \\ \addlinespace[3pt]
-SuperCook & Tìm công thức dựa trên nguyên liệu người dùng khai báo [W3] & Trang công khai tập trung tìm công thức; chưa có bằng chứng trong nguồn về giao dịch kho và hoàn tác sau nấu & Khép kín nhập kho \ensuremath{\rightarrow} ghép mâm \ensuremath{\rightarrow} nấu \ensuremath{\rightarrow} trừ kho \\ \addlinespace[3pt]
-Cookpad Việt Nam & Cộng đồng công thức và chia sẻ kinh nghiệm nấu; có hỗ trợ viết công thức [W4] & Trọng tâm nguồn khảo sát là tạo/\allowbreak{}chia sẻ công thức, không phải điều phối một phiên nấu theo tồn kho của hộ & Dùng công thức có cấu trúc để kiểm ràng buộc và lập lịch \\ \addlinespace[3pt]
-\end{longtable}}
-Nhóm không tuyên bố ``đầu tiên'', ``duy nhất'' hoặc tốt hơn mọi đối thủ. Điểm khác biệt đề xuất là tích hợp chuỗi nghiệp vụ phù hợp bữa cơm Việt, với khả năng giải thích mâm được chọn và giữ nhất quán dữ liệu kho.
+Theo mức quyền lực và quan tâm, ST-01 phải được gắn kết chặt vì mọi giá trị của hệ thống đi qua họ; ST-04, ST-05, ST-06 được gắn kết qua công cụ vận hành; ST-02 và ST-03 được bảo vệ bằng quy tắc (dị ứng, ẩn danh); ST-07 được thông tin qua kiểm thử và nhật ký.
 
-\section{Phương pháp thu thập và xác minh}
-Nguồn yêu cầu gồm bộ đặc tả Tastoria, tài liệu môn học và khảo sát bàn giấy sản phẩm tương tự. Mã nguồn cùng DDL dùng để kiểm chứng phạm vi hiện thực, không thay thế việc hỏi người dùng. Phương pháp trong báo cáo là đọc tài liệu, phân tích tình huống, lần theo luồng dữ liệu và đối chiếu quy tắc với các điểm ghi trạng thái. Nhóm chưa cung cấp biên bản phỏng vấn hay phiếu khảo sát sử dụng nên báo cáo không mô tả các hoạt động đó như đã thực hiện.
+\section{Business Activity and Information Analysis}
+Bảng~\ref{tab:bp} liệt kê các quy trình nghiệp vụ. BP-01 đến BP-05 là chuỗi của người nấu; BP-06 đến BP-08 do nhân sự thực hiện.
 
-Khi có mâu thuẫn, cần ghi rõ ba lớp thông tin: yêu cầu mong muốn, quyết định mô hình hóa của báo cáo và hành vi mã hiện tại. Ví dụ, mong muốn chống trừ lặp được thực hiện bằng cả khóa yêu cầu tại router và kiểm trạng thái tại service; vì vậy đặc tả ``mọi lần gọi sau hoàn tất đều lỗi'' phải sửa, thay vì ép mã theo một sơ đồ cũ.
+\begin{tabl}{Business process catalogue\label{tab:bp}}{@{}L{1.2cm}L{5.0cm}L{3.2cm}L{6.0cm}@{}}{\textbf{Mã} & \textbf{Quy trình} & \textbf{Người thực hiện} & \textbf{Kết quả}}
+BP-01 & Thiết lập tài khoản, hồ sơ, dị ứng, đồng ý theo mục đích & Người nấu & Hồ sơ và đồng ý hiện hành \\
+BP-02 & Ghi nhận nguyên liệu: quét 1--2 ảnh, sửa chip, xác nhận; hoặc nhập tay & Người nấu & Lô kho mới (mỗi lần thêm một lô) \\
+BP-03 & Quản lý kho: sửa lượng, ngày mua, bỏ lô, kiểm lô ``cần kiểm tra'' & Người nấu & Kho có lượng [g\_min, g\_max] và độ gấp \\
+BP-04 & Nhận mâm cơm, đổi món, xem nguyên liệu thiếu, đi chợ & Người nấu & Mâm đã nhận hoặc danh sách đi chợ \\
+BP-05 & Nấu cả mâm theo lịch, báo nấu xong, hoàn tác trong 10 phút & Người nấu & Kho bị trừ một lần; nhật ký tuần \\
+BP-06 & Biên soạn và nhập kho công thức, cặp thay thế & Người biên soạn & Món xuất bản có nguồn và dinh dưỡng \\
+BP-07 & Tổ chức khảo sát gu; đăng ký, kiểm định, triển khai mô hình & Người vận hành mô hình & Điểm khảo sát; phiên bản mô hình đang chạy \\
+BP-08 & Xử lý yêu cầu dữ liệu (tải về, xoá, rút đồng ý, sửa, hạn chế, phản đối) & Hệ thống, quản trị viên & Yêu cầu hoàn tất trong hạn \\
+\end{tabl}
+
+Kết quả của BP-02 là đầu vào của BP-04, kết quả của BP-04 là đầu vào của BP-05, và BP-05 lại thay đổi kho của BP-03. Bốn tình huống bất thường hệ thống phải xử lý:
+\begin{itemize}
+\item EX-01: mô hình nhận sai, đếm sai hoặc bỏ sót nguyên liệu trong ảnh.
+\item EX-02: không có mâm nào thoả mọi ràng buộc (thiếu nguyên liệu, thời gian quá ngắn, lô ghim không dùng đủ).
+\item EX-03: yêu cầu ``nấu xong'' hoặc ``xác nhận quét'' bị gửi lại do mất mạng hoặc bấm hai lần.
+\item EX-04: kho thay đổi giữa lúc nhận mâm và lúc nấu xong (đồ đã dùng ngoài ứng dụng).
+\end{itemize}
+
+Bảng~\ref{tab:inf} là danh mục thông tin chính, nơi phát sinh, nơi dùng và việc lưu trữ. Mỗi nhóm thông tin trở thành một kho dữ liệu D1--D10 của sơ đồ luồng dữ liệu ở Chương~4.
+
+\begin{tabl}{Information catalogue của Tastoria\label{tab:inf}}{@{}L{1.1cm}L{4.4cm}L{3.2cm}L{5.4cm}L{1.0cm}@{}}{\textbf{Mã} & \textbf{Thông tin} & \textbf{Phát sinh từ} & \textbf{Dùng bởi / mục đích} & \textbf{Kho}}
+INF-01 & Tài khoản, hồ sơ cơ thể (mã hoá), dị ứng, chế độ ăn, cài đặt bếp, sự kiện đồng ý & Người nấu & Ràng buộc mâm, mục tiêu năng lượng, quyền xử lý dữ liệu & D1 \\
+INF-02 & Món, công thức, bước nấu, nguyên liệu, dinh dưỡng, lớp thị giác, cặp thay thế & Người biên soạn & Ghép mâm, quy đổi lượng, lập lịch & D2 \\
+INF-03 & Lần quét, ảnh, khung phát hiện, chip nguyên liệu & Người nấu, mô hình & Xác nhận vào kho; dữ liệu đánh giá mô hình & D3 \\
+INF-04 & Lô kho và giao dịch kho & Người nấu, hệ thống & Lượng khả dụng, độ gấp, trừ và hoàn tác & D4 \\
+INF-05 & Mâm cơm, món trong mâm, thay thế đã chọn, lô ghim & Hệ thống & Hiển thị mâm, nấu, nhật ký & D5 \\
+INF-06 & Phiên nấu và lịch nấu & Hệ thống & Màn hình nấu, hoàn tất, hoàn tác & D6 \\
+INF-07 & Tương tác (served, viewed, swapped, cooked, liked, undone) & Người nấu (khi đồng ý) & Xếp hạng gu, đánh giá & D7 \\
+INF-08 & Phiếu khảo sát, người tham gia ẩn danh, điểm món & Người tham gia & Dữ liệu gu món Việt & D8 \\
+INF-09 & Phiên bản mô hình, bản đồ lớp, con trỏ triển khai & Người vận hành mô hình & Worker nạp đúng mô hình & D9 \\
+INF-10 & Yêu cầu chủ thể dữ liệu, nhật ký kiểm toán & Người nấu, nhân sự & Thực hiện quyền dữ liệu đúng hạn & D10 \\
+\end{tabl}
+
+\section{Current Problems}
+Trước khi có hệ thống, người nấu kiểm nguyên liệu bằng trí nhớ hoặc mở tủ xem, tìm công thức riêng lẻ, tự ước khẩu phần và sắp thứ tự nấu. Đây là tình huống phân tích của đề tài, chưa phải kết quả phỏng vấn hay thống kê. Bảng~\ref{tab:prob} phân tích năm vấn đề.
+
+\begin{tabl}{Problem analysis\label{tab:prob}}{@{}L{0.8cm}L{3.6cm}L{4.6cm}L{4.4cm}L{1.6cm}@{}}{\textbf{Mã} & \textbf{Vấn đề} & \textbf{Nguyên nhân} & \textbf{Hậu quả} & \textbf{Bên bị ảnh hưởng}}
+P1 & Không biết còn bao nhiêu nguyên liệu và lô nào sắp hỏng & Mỗi lần mua khác lượng, khác ngày; cộng gộp làm mất thông tin lô & Đồ bị bỏ phí; mua trùng & ST-01 \\
+P2 & Từng món đủ nguyên liệu nhưng cả mâm thì thiếu & Nhiều món dùng chung một nguyên liệu; tra công thức riêng lẻ & Nấu dở mâm, phải đổi món giữa chừng & ST-01, ST-02 \\
+P3 & Nấu không kịp dù tổng thời gian công thức có vẻ đủ & Một người nấu, số họng bếp có hạn, bước phải làm theo thứ tự & Món xong lệch giờ, món nguội & ST-01 \\
+P4 & Nhập liệu nhiều; mất mạng hoặc bấm lại làm sai kho & Nhập tay từng món; yêu cầu có thể đến máy chủ nhiều lần & Bỏ dùng ứng dụng; kho trừ hai lần & ST-01 \\
+P5 & Dữ liệu sức khoẻ, hành vi bị dùng quá mục đích & Đồng ý gộp với đăng ký; không có lịch sử đồng ý & Vi phạm Luật 91/2025/QH15, NĐ 356/2025 & ST-01, ST-07 \\
+\end{tabl}
+
+Các vấn đề có chung một gốc: thông tin về nguyên liệu, món và bữa ăn nằm rời rạc trong đầu người nấu, không có một nguồn ghi nhận kho theo lô để kiểm tra một mâm cụ thể trước khi nấu.
+
+\section{Proposed Information System}
+\subsection{System Purpose and Scope}
+Tastoria thay việc nhớ và tra cứu rời rạc bằng một kho nguyên liệu theo lô dùng chung cho mọi bước: nhận diện ảnh đổ vào kho, ghép mâm đọc kho, nấu xong trừ kho. Phạm vi được xác định bởi năm quyết định:
+\begin{itemize}
+\item \textbf{Một người sở hữu một kho.} Dữ liệu gắn với tài khoản cá nhân; chưa có hộ nhiều thành viên cùng quản lý.
+\item \textbf{Nhận diện chỉ đề xuất.} Chip nguyên liệu từ ảnh phải được người dùng xác nhận mới thành lô (BR-SCAN-02).
+\item \textbf{Một mâm mỗi lần.} Hệ thống đề xuất đúng một mâm đã kiểm đủ nguyên liệu cho cả mâm, thời gian nấu và dị ứng; người dùng đổi từng món.
+\item \textbf{Trừ kho một lần, hoàn tác được.} Nấu xong trừ kho trong một giao dịch, gửi lại không trừ lần hai; hoàn tác trong 10 phút bằng giao dịch đảo.
+\item \textbf{Đồng ý theo mục đích.} Hồ sơ sức khoẻ, cá nhân hoá, góp ảnh, khảo sát là bốn mục đích riêng, không tích sẵn.
+\end{itemize}
+Ngoài phạm vi: tính calo từ ảnh món đã nấu, mã vạch và hoá đơn, thực đơn tuần, thông báo đẩy, đặt hàng, nhiều hồ sơ trong một hộ, bản iOS. Huấn luyện mô hình là việc ngoài hệ thống; hệ thống chỉ nhận mô hình đã huấn luyện qua quy trình đăng ký và triển khai.
+
+\subsection{System Boundary and Information Flows}
+Bên trong ranh giới là app (Android, web), API, worker nhận diện, bộ lập lịch tác vụ định kỳ, cơ sở dữ liệu và kho tệp. Bên ngoài là năm nhóm người (người dùng, người tham gia khảo sát, quản trị viên, người biên soạn, người vận hành mô hình) và hai hệ thống ngoài (dịch vụ email gửi thư đặt lại mật khẩu, kho sao lưu Google Drive nhận bản sao lưu đã mã hoá). Bộ lập lịch là tác nhân thời gian trong mô hình use case nhưng chạy bên trong hệ thống nên không xuất hiện như thực thể ngoài.
+
+Hình~\ref{fig:DFD00} là sơ đồ ngữ cảnh: một quá trình duy nhất ở tâm, bảy thực thể ngoài và mười hai luồng qua ranh giới. Bảng~\ref{tab:flow} liệt kê nội dung từng luồng.
+
+\vpfig[0.55]{DFD00}{DFD00 --- Sơ đồ ngữ cảnh của Tastoria (DFD mức 0, ký pháp Yourdon--DeMarco)}
+
+\begin{tabl}{Information flows giữa hệ thống và thực thể ngoài\label{tab:flow}}{@{}L{0.9cm}L{3.6cm}L{8.4cm}L{2.0cm}@{}}{\textbf{Mã} & \textbf{Từ $\rightarrow$ đến} & \textbf{Thông tin} & \textbf{Quy trình}}
+F01 & Người dùng $\rightarrow$ Hệ thống & Ảnh tủ lạnh, chip đã sửa, hồ sơ, yêu cầu mâm, lệnh nấu xong, hoàn tác & BP-01 đến BP-05 \\
+F02 & Hệ thống $\rightarrow$ Người dùng & Chip nguyên liệu, kho và độ gấp, mâm cơm và lý do, lịch nấu, phần đã trừ, nhật ký & BP-01 đến BP-05 \\
+F03 & Người tham gia $\rightarrow$ Hệ thống & Đồng ý khảo sát, điểm 1--5 từng món & BP-07 \\
+F04 & Hệ thống $\rightarrow$ Người tham gia & Phiếu khảo sát (danh sách món cần chấm) & BP-07 \\
+F05 & Quản trị viên $\rightarrow$ Hệ thống & Quyết định xử lý yêu cầu dữ liệu thủ công & BP-08 \\
+F06 & Hệ thống $\rightarrow$ Quản trị viên & Hàng đợi yêu cầu, nhật ký kiểm toán & BP-08 \\
+F07 & Người biên soạn $\rightarrow$ Hệ thống & Bộ YAML công thức, nguyên liệu, cặp thay thế & BP-06 \\
+F08 & Hệ thống $\rightarrow$ Người biên soạn & Kết quả kiểm tra khi nhập (số thay đổi, món nháp, lỗi) & BP-06 \\
+F09 & Người vận hành $\rightarrow$ Hệ thống & Tệp mô hình ONNX, lệnh register/gate/deploy/rollback, đợt khảo sát & BP-07 \\
+F10 & Hệ thống $\rightarrow$ Người vận hành & Kết quả kiểm định, danh sách phiên bản, bản xuất khảo sát & BP-07 \\
+F11 & Hệ thống $\rightarrow$ Dịch vụ email & Thư đặt lại mật khẩu & BP-01 \\
+F12 & Hệ thống $\rightarrow$ Kho sao lưu & Bản sao lưu cơ sở dữ liệu và tệp đã mã hoá & Vận hành \\
+\end{tabl}
+
+\subsection{System Objectives}
+Để giải quyết P1--P5, hệ thống đặt năm mục tiêu (Bảng~\ref{tab:so}). Mục tiêu chỉ nói hệ thống phải bảo đảm điều gì, không gắn với công nghệ.
+
+\begin{tabl}{System objectives\label{tab:so}}{@{}L{1.3cm}L{12.0cm}L{1.6cm}@{}}{\textbf{Mã} & \textbf{Mục tiêu hệ thống} & \textbf{Giải quyết}}
+SO-01 & Người dùng thấy kho theo lô với lượng dạng khoảng, ngày mua và nhãn độ gấp, và thêm đồ bằng ảnh thay cho nhập tay từng món & P1, P4 \\
+SO-02 & Mọi mâm trả về đủ nguyên liệu cho cả mâm theo lượng cộng gộp, không chứa nhóm dị ứng hay trái chế độ ăn đã khai & P2 \\
+SO-03 & Mâm có lịch nấu thoả số họng bếp, một người làm một bước chủ động một lúc, các món xong gần giờ dọn & P3 \\
+SO-04 & Mỗi bữa nấu xong trừ kho đúng một lần dù yêu cầu gửi lại bao nhiêu lần; hoàn tác được trong 10 phút & P4 \\
+SO-05 & Dữ liệu cá nhân chỉ được xử lý theo mục đích đã đồng ý; yêu cầu tải về, xoá, rút đồng ý được tự động hoàn tất trong 24 giờ & P5 \\
+\end{tabl}
+
+\section{Stakeholder Needs}
+Hai tình huống định hình nhiều nhu cầu. Thứ nhất, ảnh không đo chính xác khối lượng và mô hình có thể nhận sai, nên lượng trong kho là khoảng [g\_min, g\_max] và người dùng luôn sửa được trước khi ghi kho. Thứ hai, kho có thể thay đổi giữa lúc nhận mâm và lúc nấu xong, nên mâm chỉ đọc kho, còn phần thiếu khi trừ kho được báo lại thay vì làm kho âm. Bảng~\ref{tab:need} nêu nhu cầu và vấn đề tương ứng.
+
+\begin{tabl}{Stakeholder needs\label{tab:need}}{@{}L{0.9cm}L{2.6cm}L{10.0cm}L{1.4cm}@{}}{\textbf{Mã} & \textbf{Stakeholder} & \textbf{Nhu cầu} & \textbf{Vấn đề}}
+N01 & ST-01 & Đăng ký, đăng nhập, khai hồ sơ trong khoảng một phút; chọn riêng từng mục đích đồng ý & P5 \\
+N02 & ST-01 & Thêm đồ vào kho bằng 1--2 ảnh, sửa nhanh chip sai trước khi lưu & P1, P4 \\
+N03 & ST-01 & Thấy lô nào cần dùng trước, lượng còn lại và ngày mua & P1 \\
+N04 & ST-01, ST-02 & Nhận một mâm chắc chắn nấu được bằng đồ đang có và không có chất gây dị ứng của người ăn & P2 \\
+N05 & ST-01 & Đổi một món không hợp ý; biết thiếu gì và thay bằng gì; ghi đồ cần mua & P2 \\
+N06 & ST-01 & Lịch nấu song song cả mâm theo số họng bếp; nấu được khi mất mạng & P3 \\
+N07 & ST-01 & Báo nấu xong một chạm, kho trừ đúng một lần, hoàn tác được khi bấm nhầm & P4 \\
+N08 & ST-03 & Chấm món ẩn danh, không cần tài khoản & --- \\
+N09 & ST-05, ST-06 & Nhập danh mục và triển khai mô hình có kiểm tra, có phiên bản, quay lui được & P2, P4 \\
+N10 & ST-04, ST-07 & Yêu cầu dữ liệu có hàng đợi, hạn xử lý, nhật ký kiểm toán & P5 \\
+\end{tabl}
+
+\section{Functional Requirements}
+SRS của Tastoria có 446 yêu cầu chức năng chi tiết, đánh mã \code{FR-<UC>-<số>} theo use case. Bảng~\ref{tab:fr} gom chúng thành 34 yêu cầu FR01--FR34, mỗi yêu cầu ứng với một use case cùng số; cột ``Chi tiết'' là số yêu cầu \code{FR-xx-*} của SRS. Mức ưu tiên theo MoSCoW lấy từ mô hình use case (\code{model.yaml}).
+
+\begin{tabl}{Functional requirements\label{tab:fr}}{@{}L{1.0cm}L{1.8cm}L{9.6cm}L{1.1cm}L{1.3cm}@{}}{\textbf{ID} & \textbf{Nhóm} & \textbf{Yêu cầu} & \textbf{Chi tiết} & \textbf{Ưu tiên}}
+FR01 & Tài khoản & Hệ thống phải cho khách đăng ký bằng email và mật khẩu, không tích sẵn đồng ý nào. & 8 & Must \\
+FR02 & Tài khoản & Hệ thống phải cho đăng nhập, cấp access token 15 phút và refresh token xoay vòng; khoá 15 phút sau 5 lần sai theo (email, IP). & 10 & Must \\
+FR03 & Tài khoản & Hệ thống phải cho đăng xuất một thiết bị hoặc mọi thiết bị. & 6 & Must \\
+FR04 & Tài khoản & Hệ thống nên cho đặt lại mật khẩu qua thư điện tử. & 12 & Should \\
+FR05 & Quyền riêng tư & Hệ thống phải ghi và cho rút đồng ý theo từng mục đích; rút đồng ý có hiệu lực ngay. & 15 & Must \\
+FR06 & Quyền riêng tư & Hệ thống phải cho tải về toàn bộ dữ liệu cá nhân. & 12 & Must \\
+FR07 & Quyền riêng tư & Hệ thống phải cho xoá tài khoản cùng toàn bộ dữ liệu cá nhân. & 10 & Must \\
+FR08 & Quyền riêng tư & Hệ thống có thể nhận yêu cầu sửa, hạn chế, phản đối xử lý để quản trị viên xử lý. & 11 & Could \\
+FR09 & Hồ sơ & Hệ thống phải cho thiết lập hồ sơ (chỉ số cơ thể, vận động, dị ứng, chế độ ăn, món hay ăn) trong một luồng ngắn. & 13 & Must \\
+FR10 & Hồ sơ & Hệ thống phải cho cập nhật hồ sơ, dị ứng, chế độ ăn và số họng bếp. & 12 & Must \\
+FR11 & Hồ sơ & Hệ thống phải tính mục tiêu năng lượng gợi ý và cho tự nhập hoặc nhận mục tiêu của chuyên gia. & 16 & Must \\
+FR12 & Kho, quét & Hệ thống phải nhận 1--2 ảnh, nhận diện và đếm nguyên liệu, trả chip trong cùng lần quét. & 19 & Must \\
+FR13 & Kho, quét & Hệ thống phải cho sửa, thêm, xoá chip và chỉ ghi kho khi người dùng xác nhận. & 20 & Must \\
+FR14 & Kho, quét & Hệ thống phải cho xem kho theo lô, sửa lượng và ngày mua, bỏ lô, xác nhận lô cần kiểm tra. & 19 & Must \\
+FR15 & Mâm cơm & Hệ thống phải ghép một mâm thoả kho cộng gộp, dị ứng, chế độ ăn, thời gian và lô ghim. & 41 & Must \\
+FR16 & Mâm cơm & Hệ thống phải cho đổi một món, giữ các món còn lại và kiểm lại cả mâm. & 14 & Must \\
+FR17 & Mâm cơm & Hệ thống phải cho xem nguyên liệu thiếu và chọn nguyên liệu thay thế hợp lệ. & 14 & Must \\
+FR18 & Mâm cơm & Hệ thống nên quản lý danh sách đi chợ, không coi đồ cần mua là đồ đã có. & 12 & Should \\
+FR19 & Nấu & Hệ thống phải lập lịch nấu song song cả mâm theo số họng bếp và thứ tự bước. & 13 & Must \\
+FR20 & Nấu & Hệ thống phải trừ kho theo lô gấp trước khi nấu xong, đúng một lần, trong một giao dịch. & 13 & Must \\
+FR21 & Nấu & Hệ thống nên cho hoàn tác trừ kho trong 10 phút bằng giao dịch đảo. & 9 & Should \\
+FR22 & Nấu & Hệ thống nên hiển thị nhật ký tuần: bữa đã nấu, năng lượng, lô gấp đã dùng. & 11 & Should \\
+FR23 & Khảo sát & Hệ thống phải cho người tham gia chấm món ẩn danh qua đường dẫn. & 13 & Must \\
+FR24 & Khảo sát & Hệ thống nên cho tạo phiếu khảo sát và xuất kết quả. & 10 & Should \\
+FR25 & Nội dung & Hệ thống phải nhập và kiểm tra kho công thức, nguyên liệu; món đã xuất bản là bất biến. & 15 & Must \\
+FR26 & Nội dung & Hệ thống nên nhập bảng cặp thay thế nguyên liệu. & 10 & Should \\
+FR27 & Nội dung & Hệ thống nên cho quản trị viên xử lý yêu cầu dữ liệu và xem nhật ký kiểm toán. & 12 & Should \\
+FR28 & Mô hình & Hệ thống nên xuất dữ liệu huấn luyện đã bí danh hoá theo đồng ý. & 12 & Should \\
+FR29 & Mô hình & Hệ thống phải đăng ký và kiểm định phiên bản mô hình trước khi phục vụ. & 12 & Must \\
+FR30 & Mô hình & Hệ thống phải triển khai và quay lui phiên bản mô hình. & 11 & Must \\
+FR31 & Mô hình & Hệ thống có thể đưa ảnh góp sang công cụ gán nhãn. & 10 & Could \\
+FR32 & Tác vụ & Hệ thống phải xoá ảnh quét gốc sau 30 ngày trừ ảnh được đồng ý góp. & 9 & Must \\
+FR33 & Tác vụ & Hệ thống phải sao lưu cơ sở dữ liệu có mã hoá, giữ tối đa 14 ngày. & 10 & Must \\
+FR34 & Tác vụ & Hệ thống phải dọn lần quét kẹt, token và khoá lũy đẳng hết hạn. & 12 & Must \\
+\end{tabl}
+
+\section{Non-Functional Requirements}
+SRS dùng mười mã yêu cầu phi chức năng phân loại theo ISO/IEC 25010 (31 điều khoản kể cả điều khoản con). Các ngưỡng là ngưỡng chấp nhận của SRS; số đo thực tế ở Chương~5.
+\begin{itemize}
+\item \textbf{NFR-PERF-01} Xử lý quét ở máy chủ (từ lúc vào hàng đợi tới khi xong) p95 $\leq$ 3 s với 5 người đồng thời, máy 2 vCPU/4 GB.
+\item \textbf{NFR-PERF-02} \code{POST /meal-plans} p95 $\leq$ 1 s với kho 200 món, 30 lô, 10 người đồng thời; endpoint đọc p95 $\leq$ 300 ms; lập lịch nấu p95 $\leq$ 2 s.
+\item \textbf{NFR-PERF-03} Quét đầu--cuối trên điện thoại p95 $\leq$ 8 s (Wi-Fi), $\leq$ 12 s (4G).
+\item \textbf{NFR-REL-01} Khôi phục từ sao lưu RPO $\leq$ 24 h, RTO $\leq$ 2 h; không mất, không nhân đôi thao tác khi mạng chập chờn; không lần quét nào kẹt quá 6 phút.
+\item \textbf{NFR-SEC-01} Access token 15 phút, refresh 30 ngày xoay vòng; mật khẩu băm Argon2id; mọi endpoint có \code{\{id\}} trả 404 khi đối tượng không thuộc người gọi; phân quyền vai trò nhân sự.
+\item \textbf{NFR-SEC-02} Khoá 15 phút sau 5 lần đăng nhập sai; ảnh tải lên $\leq$ 2 ảnh $\times$ 3 MB, kiểm magic bytes, $\leq$ 4096$\times$4096 điểm ảnh, bỏ metadata.
+\item \textbf{NFR-PRIV-01} Yêu cầu tự động hoàn tất $\leq$ 24 h; ảnh không góp bị xoá $\leq$ 31 ngày; chỉ số sức khoẻ mã hoá AES-GCM ở tầng ứng dụng.
+\item \textbf{NFR-A11Y-01} WCAG 2.2 mức AA; vùng chạm $\geq$ 44 dp; nhãn độ tươi luôn có chữ.
+\item \textbf{NFR-USE-01} SUS $\geq$ 68; $\geq$ 80\% người thử hoàn thành mỗi nhiệm vụ; hồ sơ trung vị $\leq$ 60 s.
+\item \textbf{NFR-MAINT-01} Độ phủ dòng và nhánh $\geq$ 80\% cho \code{meal}, \code{pantry}, \code{profile}, \code{cooking}; import-linter xanh; OpenAPI hợp lệ đủ 70 endpoint.
+\end{itemize}
+
+\section{Requirement Prioritization}
+Mô hình use case gán 24 use case mức Must, 8 mức Should và 2 mức Could.
+\begin{itemize}
+\item \textbf{Must Have}: tài khoản, đồng ý, hồ sơ; quét và xác nhận; kho; ghép mâm, đổi món, thay thế; lập lịch nấu và nấu xong; khảo sát; nhập danh mục; đăng ký và triển khai mô hình; ba tác vụ định kỳ (FR01--FR03, FR05--FR07, FR09--FR17, FR19, FR20, FR23, FR25, FR29, FR30, FR32--FR34). Thiếu nhóm này thì chuỗi ảnh $\rightarrow$ kho $\rightarrow$ mâm $\rightarrow$ nấu $\rightarrow$ trừ kho không khép kín.
+\item \textbf{Should Have}: đặt lại mật khẩu, đi chợ, hoàn tác, nhật ký tuần, quản lý đợt khảo sát, cặp thay thế, xử lý yêu cầu thủ công, xuất dữ liệu huấn luyện (FR04, FR18, FR21, FR22, FR24, FR26--FR28).
+\item \textbf{Could Have}: yêu cầu sửa, hạn chế, phản đối; gán nhãn ảnh góp (FR08, FR31).
+\item \textbf{Won't Have} (bản này): calo từ ảnh món, mã vạch, thực đơn tuần, thông báo đẩy, hộ nhiều thành viên, iOS.
+\end{itemize}
+
+\section{Chapter Summary}
+Thông tin về nguyên liệu và bữa ăn nằm rời rạc là gốc của năm vấn đề P1--P5. Chương này xác định bảy bên liên quan, tám quy trình nghiệp vụ, mười nhóm thông tin, ranh giới hệ thống với bảy thực thể ngoài và mười hai luồng, năm mục tiêu, mười nhu cầu, 34 nhóm yêu cầu chức năng (446 yêu cầu chi tiết trong SRS) và mười mã yêu cầu phi chức năng. Chương~2 chuyển chúng thành tác nhân, use case và đặc tả.

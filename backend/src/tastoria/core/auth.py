@@ -22,6 +22,8 @@ class AuthUser:
     id: uuid.UUID
     role: str
     email: str
+    mfa_verified: bool = False
+    mfa_enabled: bool = False
 
 
 class Authenticator(Protocol):

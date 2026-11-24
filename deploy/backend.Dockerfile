@@ -35,6 +35,7 @@ COPY --from=build /opt/venv /opt/venv
 # Catalog bundle + the composition tables the import reads (data/processed/{fct2007,usda}).
 COPY data/kb /app/data/kb
 COPY data/processed/fct2007 /app/data/processed/fct2007
+COPY data/processed/kb /app/data/processed/kb
 COPY data/processed/usda /app/data/processed/usda
 COPY deploy/scripts/scheduler.sh /app/scheduler.sh
 COPY deploy/scripts/models-bootstrap.sh /app/models-bootstrap.sh

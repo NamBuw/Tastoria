@@ -12,15 +12,19 @@ from __future__ import annotations
 import hashlib
 import uuid
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 from sqlalchemy.orm import Session, sessionmaker
 
+from tastoria.core.clock import utcnow
 from tastoria.core.db import UnitOfWork, run_in_uow
 from tastoria.modules.admin import substitutes as subs_file
+from tastoria.modules.admin.schemas import ModelDeploymentOut, ModelVersionOut, ModelVersionPage
 from tastoria.modules.catalog import service as catalog
+from tastoria.modules.mlops import service as mlops
+from tastoria.modules.privacy import schemas as privacy_schemas
 from tastoria.modules.privacy import service as privacy
 from tastoria.modules.substitute import service as substitute
 from tastoria.modules.survey import schemas as survey_schemas
@@ -116,6 +120,40 @@ def import_substitutes(sm: sessionmaker[Session], path: Path) -> SubstituteImpor
 # for `tastoria catalog import` (actor_role recorded in audit_log). GET /admin/surveys checks the JWT role.
 
 SURVEY_ROLE = "ml_operator"
+PRIVILEGED_ROLES = frozenset({"admin", "curator", "ml_operator"})
+
+
+def _write_coalesced_read_audit(
+    session: Session,
+    *,
+    action: str,
+    entity: str,
+    actor_user_id: uuid.UUID,
+    actor_role: str,
+    cursor: str | None,
+    cooldown_s: int = 60,
+) -> None:
+    if cursor is not None:
+        return
+    recent = privacy.list_audit_log(
+        session,
+        actor_user_id=actor_user_id,
+        entity=entity,
+        action=action,
+        from_dt=utcnow() - timedelta(seconds=cooldown_s),
+        to_dt=None,
+        cursor=None,
+        limit=1,
+    )
+    if recent.items:
+        return
+    privacy.write_audit(
+        session,
+        action=action,
+        entity=entity,
+        actor_user_id=actor_user_id,
+        actor_role=actor_role,
+    )
 
 
 @dataclass
@@ -215,9 +253,122 @@ def export_survey(sm: sessionmaker[Session], version: str, out_base: Path) -> Su
 def list_surveys(
     session: Session, *, actor_user_id: uuid.UUID, cursor: str | None, limit: int
 ) -> survey_schemas.SurveyFormSummaryPage:
-    """GET /admin/surveys (FR-24-10); the role check is in the router. Every call is audited."""
+    """GET /admin/surveys (FR-24-10); the role check is in the router. Coalesced audit (cursor=None + 60s cooldown)."""
     page = survey.list_forms(session, cursor=cursor, limit=limit)
-    privacy.write_audit(
-        session, action="survey.list", entity="survey_forms", actor_user_id=actor_user_id, actor_role=SURVEY_ROLE
+    _write_coalesced_read_audit(
+        session,
+        action="survey.list",
+        entity="survey_forms",
+        actor_user_id=actor_user_id,
+        actor_role=SURVEY_ROLE,
+        cursor=cursor,
     )
     return page
+
+
+# ---------------------------------------------------------------- admin HTTP API (UC27, UC29, UC30)
+
+
+def list_data_requests(
+    session: Session,
+    *,
+    actor_user_id: uuid.UUID,
+    statuses: list[str],
+    types: list[str],
+    cursor: str | None,
+    limit: int,
+) -> privacy_schemas.AdminDataRequestPage:
+    page = privacy.list_dsr_requests(session, statuses=statuses, types=types, cursor=cursor, limit=limit)
+    _write_coalesced_read_audit(
+        session,
+        action="dsr.list",
+        entity="dsr_requests",
+        actor_user_id=actor_user_id,
+        actor_role="admin",
+        cursor=cursor,
+    )
+    return page
+
+
+def resolve_data_request(
+    session: Session,
+    *,
+    actor_user_id: uuid.UUID,
+    request_id: uuid.UUID,
+    body: privacy_schemas.DataRequestResolve,
+) -> privacy_schemas.AdminDataRequestOut:
+    return privacy.resolve_dsr_request(
+        session,
+        request_id=request_id,
+        actor_user_id=actor_user_id,
+        status=body.status,
+        note=body.note,
+    )
+
+
+def list_audit_log(
+    session: Session,
+    *,
+    actor_user_id: uuid.UUID,
+    filter_actor_user_id: uuid.UUID | None,
+    entity: str | None,
+    action: str | None,
+    from_dt: datetime | None,
+    to_dt: datetime | None,
+    cursor: str | None,
+    limit: int,
+) -> privacy_schemas.AuditLogEntryPage:
+    return privacy.list_audit_log(
+        session,
+        actor_user_id=filter_actor_user_id,
+        entity=entity,
+        action=action,
+        from_dt=from_dt,
+        to_dt=to_dt,
+        cursor=cursor,
+        limit=limit,
+    )
+
+
+def list_models(
+    session: Session,
+    *,
+    actor_user_id: uuid.UUID,
+    name: str | None,
+    status: str | None,
+    cursor: str | None,
+    limit: int,
+) -> ModelVersionPage:
+    versions, nxt, deployments = mlops.list_versions_page(
+        session, name=name, status=status, cursor=cursor, limit=limit
+    )
+    return ModelVersionPage(
+        items=[
+            ModelVersionOut(
+                id=v.id,
+                name=v.name,  # type: ignore[arg-type]
+                version=v.version,
+                artifact_key=v.artifact_key,
+                sha256=v.sha256,
+                preprocess_version=v.preprocess_version,
+                metrics=v.metrics,
+                gate_report_key=v.gate_report_key,
+                mlflow_run_id=v.mlflow_run_id,
+                status=v.status,  # type: ignore[arg-type]
+                is_active=v.is_active,
+                created_at=v.created_at,
+            )
+            for v in versions
+        ],
+        next_cursor=nxt,
+        deployments=[
+            ModelDeploymentOut(
+                name=d.name,  # type: ignore[arg-type]
+                active_version_id=d.active_version_id,
+                previous_version_id=d.previous_version_id,
+                switched_at=d.switched_at,
+                switched_by=d.switched_by,
+            )
+            for d in deployments
+        ],
+    )

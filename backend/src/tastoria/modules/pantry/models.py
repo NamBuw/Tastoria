@@ -57,6 +57,7 @@ class PantryLot(Base):
     __table_args__ = (
         Index("ix_pantry_lots_user_id_status", "user_id", "status"),
         Index("ix_pantry_lots_source_scan_item_id", "source_scan_item_id"),
+        Index("ix_pantry_lots_user_status_created", "user_id", "status", "created_at", "id"),
     )
 
 
@@ -81,4 +82,12 @@ class PantryTransaction(Base):
     __table_args__ = (
         Index("ix_pantry_transactions_lot_id", "lot_id"),
         Index("ix_pantry_transactions_ref", "ref_type", "ref_id"),
+        Index(
+            "ix_pantry_transactions_cook_deduct",
+            "ref_type",
+            "ref_id",
+            "lot_id",
+            postgresql_where=text("reason = 'cook_deduct'"),
+        ),
+        Index("ix_pantry_transactions_lot_id_created_at", "lot_id", text("created_at DESC")),
     )

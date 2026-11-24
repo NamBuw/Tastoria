@@ -48,4 +48,6 @@ class Interaction(Base):
         Index("ix_interactions_user_id_occurred_at", "user_id", text("occurred_at DESC")),
         Index("ix_interactions_meal_plan_item_id", "meal_plan_item_id"),
         Index("ix_interactions_meal_plan_id_user_id", "meal_plan_id", "user_id"),
+        Index("ix_interactions_recipe_type_swap", "recipe_id", "type", "swap_reason"),
+        Index("ix_interactions_user_type_recipe_swap", "user_id", "type", "recipe_id", "swap_reason"),
     )

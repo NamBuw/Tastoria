@@ -57,18 +57,43 @@ def get_reference(uow: Uow, deps: Deps, if_none_match: Annotated[str | None, Hea
 def list_recipes(
     user: CurrentUser,
     uow: Uow,
+    deps: Deps,
     q: Annotated[str | None, Query(max_length=100)] = None,
     slot: Literal["man", "rau", "canh"] | None = None,
     tag: str | None = None,
+    food_group: Annotated[str | None, Query(max_length=64)] = None,
+    food_group_code: Annotated[str | None, Query(max_length=64)] = None,
+    method_code: Annotated[str | None, Query(max_length=64)] = None,
+    max_minutes: Annotated[int | None, Query(ge=1, le=600)] = None,
+    max_kcal: Annotated[float | None, Query(ge=0, le=5000)] = None,
+    kcal_max: Annotated[float | None, Query(ge=0, le=5000)] = None,
+    make_ahead: bool | None = None,
+    pantry_match: bool | None = None,
     cursor: str | None = None,
     limit: Limit = DEFAULT_LIMIT,
 ) -> RecipeSummaryPage:
-    return service.list_recipes(uow.session, q=q, slot=slot, tag=tag, cursor=cursor, limit=limit)
+    available_ids = deps.available_ingredient_ids(uow.session, user.id)
+    return service.list_recipes(
+        uow.session,
+        q=q,
+        slot=slot,
+        tag=tag,
+        food_group=food_group or food_group_code,
+        method_code=method_code,
+        max_minutes=max_minutes,
+        max_kcal=max_kcal if max_kcal is not None else kcal_max,
+        make_ahead=make_ahead,
+        pantry_match=pantry_match,
+        available_ids=available_ids,
+        cursor=cursor,
+        limit=limit,
+    )
 
 
 @router.get("/recipes/{id}", operation_id="catalog_get_recipe")
-def get_recipe(id: uuid.UUID, user: CurrentUser, uow: Uow) -> RecipeOut:
-    return service.get_recipe(uow.session, id)
+def get_recipe(id: uuid.UUID, user: CurrentUser, uow: Uow, deps: Deps) -> RecipeOut:
+    available_ids = deps.available_ingredient_ids(uow.session, user.id)
+    return service.get_recipe(uow.session, id, available_ids=available_ids)
 
 
 @router.get("/ingredients", operation_id="catalog_list_ingredients")

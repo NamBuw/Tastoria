@@ -342,8 +342,413 @@ class LightFMWarp:
         return self.U[users] @ self.V.T + self.ib[None, :]
 
 
+def _zscore_rows(arr: np.ndarray) -> np.ndarray:
+    mean = arr.mean(axis=1, keepdims=True)
+    std = np.maximum(arr.std(axis=1, keepdims=True), 1e-6)
+    return ((arr - mean) / std).astype(np.float32)
+
+
+class ContentCosine:
+    """L2-normalized item-feature cosine similarity between user positive history profile and items."""
+
+    name = "ContentCosine"
+    stochastic = False
+
+    def __init__(self) -> None:
+        self.Fn: sp.csr_matrix | None = None
+        self.prof: sp.csr_matrix | None = None
+
+    def fit(self, train: sp.csr_matrix, item_features: sp.csr_matrix | None = None, **_: object) -> ContentCosine:
+        n_items = train.shape[1]
+        F = sp.identity(n_items, dtype=np.float32, format="csr") if item_features is None else item_features.tocsr().astype(np.float32)
+        fn_norms = np.maximum(np.sqrt(np.asarray(F.multiply(F).sum(axis=1)).ravel()), 1e-12)
+        self.Fn = (sp.diags(1.0 / fn_norms).astype(np.float32) @ F).tocsr()
+        prof = train.tocsr().astype(np.float32) @ self.Fn
+        p_norms = np.maximum(np.sqrt(np.asarray(prof.multiply(prof).sum(axis=1)).ravel()), 1e-12)
+        self.prof = (sp.diags(1.0 / p_norms).astype(np.float32) @ prof).tocsr()
+        return self
+
+    def scores(self, users: np.ndarray) -> np.ndarray:
+        return (self.prof[users] @ self.Fn.T).toarray().astype(np.float32)
+
+
+class HybridCFContent:
+    """Per-user z-score fusion of ALS + ContentCosine + log1p(MostPop) prior."""
+
+    name = "HybridCFContent"
+    stochastic = True
+
+    def __init__(
+        self,
+        weights: tuple[float, float, float] = (0.5, 0.3, 0.2),
+        als_params: dict | None = None,
+        seed: int = 0,
+    ) -> None:
+        self.weights = tuple(float(w) for w in weights)
+        self.als_params = dict(als_params or {"factors": 32, "reg": 10.0, "alpha": 5.0, "iterations": 15})
+        self.seed = int(seed)
+        self.cf: ALS | None = None
+        self.content: ContentCosine | None = None
+        self.pop_z: np.ndarray | None = None
+
+    def fit(self, train: sp.csr_matrix, item_features: sp.csr_matrix | None = None, **_: object) -> HybridCFContent:
+        self.cf = ALS(**self.als_params, seed=self.seed).fit(train)
+        self.content = ContentCosine().fit(train, item_features=item_features)
+        pop = np.log1p(np.asarray(train.sum(axis=0)).ravel().astype(np.float64))
+        self.pop_z = ((pop - pop.mean()) / max(float(pop.std()), 1e-6)).astype(np.float32)
+        return self
+
+    def component_scores(self, users: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        cf_z = _zscore_rows(self.cf.scores(users))
+        cnt_z = _zscore_rows(self.content.scores(users))
+        return cf_z, cnt_z, self.pop_z
+
+    def scores(self, users: np.ndarray) -> np.ndarray:
+        w_cf, w_cnt, w_pop = self.weights
+        cf_z, cnt_z, pop_z = self.component_scores(users)
+        return (w_cf * cf_z + w_cnt * cnt_z + w_pop * pop_z[None, :]).astype(np.float32)
+
+
+class TwoStageLGBMReranker:
+    """Two-stage candidate union (MostPop + ALS + ContentCosine top-M) + LGBMRanker(lambdarank).
+
+    Stage-1 features are computed strictly from `train` (pre-cutoff) without future leakage.
+    """
+
+    name = "TwoStageLGBMReranker"
+    stochastic = True
+    FEATURE_NAMES = (
+        "s_als_raw",
+        "s_als_z",
+        "rr_als",
+        "s_cnt_raw",
+        "s_cnt_z",
+        "rr_cnt",
+        "log_pop",
+        "pop_pct",
+        "rr_pop",
+        "user_act",
+        "item_feat_nnz",
+        "als_x_cnt",
+        "als_x_pop",
+        "cnt_x_pop",
+        "in_top_als",
+        "in_top_cnt",
+        "in_top_pop",
+    )
+
+    def __init__(
+        self,
+        top_m: int = 100,
+        als_params: dict | None = None,
+        lgb_params: dict | None = None,
+        seed: int = 0,
+    ) -> None:
+        self.top_m = int(top_m)
+        self.als_params = dict(als_params or {"factors": 32, "reg": 10.0, "alpha": 5.0, "iterations": 15})
+        self.lgb_params = dict(
+            lgb_params or {"num_leaves": 15, "n_estimators": 200, "learning_rate": 0.05, "min_child_samples": 30}
+        )
+        self.seed = int(seed)
+        self.als: ALS | None = None
+        self.content: ContentCosine | None = None
+        self.seen: sp.csr_matrix | None = None
+        self.n_items = 0
+        self.pop_raw: np.ndarray | None = None
+        self.log_pop: np.ndarray | None = None
+        self.pop_pct: np.ndarray | None = None
+        self.pop_order: np.ndarray | None = None
+        self.user_act: np.ndarray | None = None
+        self.item_feat_nnz: np.ndarray | None = None
+        self.ranker = None
+
+    def fit_stage1(
+        self,
+        train: sp.csr_matrix,
+        seen: sp.csr_matrix | None = None,
+        item_features: sp.csr_matrix | None = None,
+    ) -> TwoStageLGBMReranker:
+        tr = train.tocsr()
+        self.n_items = tr.shape[1]
+        self.seen = seen.tocsr() if seen is not None else tr
+        self.als = ALS(**self.als_params, seed=self.seed).fit(tr)
+        self.content = ContentCosine().fit(tr, item_features=item_features)
+        pop_raw = np.asarray(tr.sum(axis=0)).ravel().astype(np.float32)
+        self.pop_raw = pop_raw
+        self.log_pop = np.log1p(pop_raw)
+        order = np.argsort(-pop_raw, kind="stable")
+        self.pop_order = order
+        pct = np.empty_like(pop_raw, dtype=np.float32)
+        pct[order] = np.arange(len(pop_raw), dtype=np.float32) / max(1, len(pop_raw) - 1)
+        self.pop_pct = pct
+        self.user_act = np.log1p(np.diff(tr.indptr).astype(np.float32))
+        if item_features is not None:
+            self.item_feat_nnz = np.asarray((item_features > 0).sum(axis=1)).ravel().astype(np.float32)
+        else:
+            self.item_feat_nnz = np.ones(self.n_items, dtype=np.float32)
+        return self
+
+    def _top_unseen(self, scores_batch: np.ndarray, seen_batch: sp.csr_matrix, m: int) -> tuple[np.ndarray, np.ndarray]:
+        s = scores_batch.copy()
+        rows = np.repeat(np.arange(len(s)), np.diff(seen_batch.indptr))
+        if len(rows):
+            s[rows, seen_batch.indices] = -np.inf
+        k = min(m, s.shape[1])
+        top = np.argpartition(-s, k - 1, axis=1)[:, :k] if k < s.shape[1] else np.broadcast_to(np.arange(s.shape[1]), s.shape).copy()
+        vals = np.take_along_axis(s, top, axis=1)
+        order = np.argsort(-vals, axis=1, kind="stable")
+        top = np.take_along_axis(top, order, axis=1)
+        vals = np.take_along_axis(vals, order, axis=1)
+        return top, np.isfinite(vals)
+
+    def _candidates_and_features(
+        self, users: np.ndarray, batch: int = 256
+    ) -> tuple[list[np.ndarray], np.ndarray, np.ndarray]:
+        users = np.asarray(users, dtype=np.int64)
+        cands_all: list[np.ndarray] = []
+        feats_chunks: list[np.ndarray] = []
+        groups: list[int] = []
+        m = min(self.top_m, self.n_items)
+
+        for b0 in range(0, len(users), batch):
+            ub = users[b0 : b0 + batch]
+            s_als = self.als.scores(ub).astype(np.float32)
+            s_cnt = self.content.scores(ub).astype(np.float32)
+            z_als = _zscore_rows(s_als)
+            z_cnt = _zscore_rows(s_cnt)
+            seen_b = self.seen[ub]
+            top_als, ok_als = self._top_unseen(s_als, seen_b, m)
+            top_cnt, ok_cnt = self._top_unseen(s_cnt, seen_b, m)
+
+            for r, u in enumerate(ub):
+                seen_u = set(seen_b[r].indices.tolist())
+                a_items = top_als[r][ok_als[r]]
+                c_items = top_cnt[r][ok_cnt[r]]
+                p_items_list = []
+                for idx in self.pop_order:
+                    ii = int(idx)
+                    if ii not in seen_u:
+                        p_items_list.append(ii)
+                        if len(p_items_list) >= m:
+                            break
+                p_items = np.asarray(p_items_list, dtype=np.int64)
+
+                cand = np.unique(np.concatenate([a_items, c_items, p_items]))
+                if len(cand) == 0:
+                    cand = np.arange(min(m, self.n_items), dtype=np.int64)
+                cands_all.append(cand)
+                groups.append(len(cand))
+
+                a_rank = {int(it): rk for rk, it in enumerate(a_items)}
+                c_rank = {int(it): rk for rk, it in enumerate(c_items)}
+                p_rank = {int(it): rk for rk, it in enumerate(p_items)}
+
+                rr_a = np.array([1.0 / (1.0 + a_rank[int(it)]) if int(it) in a_rank else 0.0 for it in cand], dtype=np.float32)
+                rr_c = np.array([1.0 / (1.0 + c_rank[int(it)]) if int(it) in c_rank else 0.0 for it in cand], dtype=np.float32)
+                rr_p = np.array([1.0 / (1.0 + p_rank[int(it)]) if int(it) in p_rank else 0.0 for it in cand], dtype=np.float32)
+
+                in_a = (rr_a > 0).astype(np.float32)
+                in_c = (rr_c > 0).astype(np.float32)
+                in_p = (rr_p > 0).astype(np.float32)
+
+                sa_r = s_als[r, cand]
+                za_r = z_als[r, cand]
+                sc_r = s_cnt[r, cand]
+                zc_r = z_cnt[r, cand]
+                lp = self.log_pop[cand]
+                pp = self.pop_pct[cand]
+                ua = np.full(len(cand), self.user_act[int(u)], dtype=np.float32)
+                fn = self.item_feat_nnz[cand]
+
+                X_u = np.column_stack(
+                    [
+                        sa_r,
+                        za_r,
+                        rr_a,
+                        sc_r,
+                        zc_r,
+                        rr_c,
+                        lp,
+                        pp,
+                        rr_p,
+                        ua,
+                        fn,
+                        za_r * zc_r,
+                        za_r * lp,
+                        zc_r * lp,
+                        in_a,
+                        in_c,
+                        in_p,
+                    ]
+                ).astype(np.float32)
+                feats_chunks.append(X_u)
+
+        X_flat = np.vstack(feats_chunks) if feats_chunks else np.zeros((0, len(self.FEATURE_NAMES)), dtype=np.float32)
+        return cands_all, X_flat, np.asarray(groups, dtype=np.int32)
+
+    def build_dataset(
+        self,
+        train: sp.csr_matrix,
+        targets: dict[int, np.ndarray],
+        seen: sp.csr_matrix,
+        item_features: sp.csr_matrix | None = None,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        self.fit_stage1(train, seen=seen, item_features=item_features)
+        users = np.array(sorted(targets), dtype=np.int64)
+        cands, X_flat, groups = self._candidates_and_features(users)
+        keep_X, keep_y, keep_g, keep_u = [], [], [], []
+        offset = 0
+        for u, cand, g in zip(users, cands, groups, strict=True):
+            y_u = np.isin(cand, targets[int(u)]).astype(np.int32)
+            X_u = X_flat[offset : offset + int(g)]
+            offset += int(g)
+            if y_u.sum() > 0 and len(cand) >= 2:
+                keep_X.append(X_u)
+                keep_y.append(y_u)
+                keep_g.append(int(g))
+                keep_u.append(int(u))
+        if not keep_X:
+            return np.zeros((0, len(self.FEATURE_NAMES)), dtype=np.float32), np.zeros(0, dtype=np.int32), np.zeros(0, dtype=np.int32), np.zeros(0, dtype=np.int64)
+        return (
+            np.vstack(keep_X),
+            np.concatenate(keep_y),
+            np.asarray(keep_g, dtype=np.int32),
+            np.asarray(keep_u, dtype=np.int64),
+        )
+
+    def fit_reranker(self, X: np.ndarray, y: np.ndarray, groups: np.ndarray) -> TwoStageLGBMReranker:
+        import lightgbm as lgb
+
+        self.ranker = lgb.LGBMRanker(
+            objective="lambdarank",
+            label_gain=[0, 1],
+            lambdarank_truncation_level=10,
+            random_state=self.seed,
+            n_jobs=N_THREADS,
+            verbose=-1,
+            **self.lgb_params,
+        )
+        self.ranker.fit(X, y, group=groups)
+        return self
+
+    def fit(
+        self,
+        train: sp.csr_matrix,
+        item_features: sp.csr_matrix | None = None,
+        val_targets: dict[int, np.ndarray] | None = None,
+        val_seen: sp.csr_matrix | None = None,
+        **_: object,
+    ) -> TwoStageLGBMReranker:
+        if val_targets is not None:
+            X, y, groups, _ = self.build_dataset(
+                train, val_targets, seen=val_seen if val_seen is not None else train, item_features=item_features
+            )
+            self.fit_reranker(X, y, groups)
+            return self
+        # Standalone internal split fallback (for unit tests)
+        rng = np.random.default_rng(self.seed)
+        coo = train.tocoo()
+        n = len(coo.row)
+        hold = rng.random(n) < 0.25
+        tr_sub = sp.csr_matrix((np.ones((~hold).sum(), np.float32), (coo.row[~hold], coo.col[~hold])), shape=train.shape)
+        tr_sub.sum_duplicates()
+        targets: dict[int, list[int]] = {}
+        for u, i in zip(coo.row[hold], coo.col[hold], strict=True):
+            if tr_sub[u].nnz > 0:
+                targets.setdefault(int(u), []).append(int(i))
+        tg = {u: np.unique(v) for u, v in targets.items()}
+        X, y, groups, _ = self.build_dataset(tr_sub, tg, seen=tr_sub, item_features=item_features)
+        self.fit_reranker(X, y, groups)
+        self.fit_stage1(train, seen=train, item_features=item_features)
+        return self
+
+    def scores(self, users: np.ndarray) -> np.ndarray:
+        cands, X_flat, groups = self._candidates_and_features(users)
+        preds = self.ranker.predict(X_flat).astype(np.float32) if len(X_flat) else np.zeros(0, dtype=np.float32)
+        out = np.full((len(users), self.n_items), -1e6, dtype=np.float32)
+        offset = 0
+        for row, (cand, g) in enumerate(zip(cands, groups, strict=True)):
+            g_int = int(g)
+            out[row, cand] = preds[offset : offset + g_int]
+            offset += g_int
+        return out
+
+
+class ColdHybrid:
+    """Cold-item hybrid blending feature-only LightFM WARP and L2-normalized ContentCosine."""
+
+    name = "ColdHybrid"
+    stochastic = True
+
+    def __init__(
+        self,
+        alpha: float = 0.5,
+        lfm_params: dict | None = None,
+        seed: int = 0,
+    ) -> None:
+        self.alpha = float(alpha)
+        self.lfm_params = dict(lfm_params or {"dim": 64, "lr": 0.02, "item_alpha": 0.0, "epochs": 12})
+        self.seed = int(seed)
+        self.lfm: LightFMWarp | None = None
+        self.content: ContentCosine | None = None
+        self.allowed: np.ndarray | None = None
+
+    def fit(
+        self,
+        train: sp.csr_matrix,
+        item_features: sp.csr_matrix | None = None,
+        allowed: np.ndarray | None = None,
+        **_: object,
+    ) -> ColdHybrid:
+        self.allowed = allowed
+        self.lfm = LightFMWarp(**self.lfm_params, seed=self.seed).fit(train, item_features=item_features)
+        self.content = ContentCosine().fit(train, item_features=item_features)
+        return self
+
+    def _norm_allowed(self, arr: np.ndarray) -> np.ndarray:
+        if self.allowed is None:
+            return _zscore_rows(arr)
+        sub = arr[:, self.allowed]
+        mean = sub.mean(axis=1, keepdims=True)
+        std = np.maximum(sub.std(axis=1, keepdims=True), 1e-6)
+        return ((arr - mean) / std).astype(np.float32)
+
+    def component_scores(self, users: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        s_lfm = self._norm_allowed(self.lfm.scores(users).astype(np.float32))
+        s_cnt = self._norm_allowed(self.content.scores(users).astype(np.float32))
+        return s_lfm, s_cnt
+
+    def scores(self, users: np.ndarray) -> np.ndarray:
+        s_lfm, s_cnt = self.component_scores(users)
+        return (self.alpha * s_lfm + (1.0 - self.alpha) * s_cnt).astype(np.float32)
+
+
+def cold_feature_matrix(
+    n_items: int,
+    item_features_only: sp.csr_matrix,
+    feature_names: list[str],
+    variant: str,
+) -> sp.csr_matrix:
+    """Build cold-item feature matrix for Food.com ablations: id_only, tags_only, ing_only, tags_ing."""
+    if variant == "id_only":
+        return sp.identity(n_items, dtype=np.float32, format="csr")
+    if variant == "tags_ing":
+        return item_features_only.tocsr().astype(np.float32)
+    if variant == "tags_only":
+        cols = [j for j, name in enumerate(feature_names) if name.startswith("tag:")]
+    elif variant == "ing_only":
+        cols = [j for j, name in enumerate(feature_names) if name.startswith("ing:")]
+    else:
+        raise ValueError(f"unknown cold feature variant: {variant!r}")
+    sub = item_features_only[:, cols].tocsr().astype(np.float32)
+    deg = np.asarray(sub.sum(axis=1)).ravel()
+    scale = np.where(deg > 0, 1.0 / np.maximum(deg, 1e-12), 0.0).astype(np.float32)
+    return (sp.diags(scale) @ sub).tocsr()
+
+
 def make(name: str, **params: object):
     return {
+        "Random": Random,
         "MostPop": MostPop,
         "ItemKNN": ItemKNN,
         "EASE": EASE,
@@ -351,4 +756,8 @@ def make(name: str, **params: object):
         "BPR (implicit)": ImplicitBPR,
         "ALS (implicit)": ALS,
         "LightFM WARP": LightFMWarp,
+        "ContentCosine": ContentCosine,
+        "HybridCFContent": HybridCFContent,
+        "TwoStageLGBMReranker": TwoStageLGBMReranker,
+        "ColdHybrid": ColdHybrid,
     }[name](**params)

@@ -10,10 +10,12 @@ summary without touching the pantry again (FR-20-04).
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from typing import Any
+from zoneinfo import ZoneInfo
 
-from sqlalchemy import select
+from sqlalchemy import column, select, table
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Session
 
 from tastoria.core.auth import AuthUser
@@ -22,6 +24,7 @@ from tastoria.core.errors import ApiError, ProblemCode
 from tastoria.modules.catalog import service as catalog
 from tastoria.modules.cooking.models import CookScheduleEntry, CookSession
 from tastoria.modules.cooking.schemas import (
+    CompletedSessionRef,
     CookCompleteRequest,
     CookCompletion,
     CookSessionCreate,
@@ -39,6 +42,12 @@ from tastoria.modules.pantry.schemas import Deduction
 
 UNDO_WINDOW = timedelta(minutes=10)  # BR-PANTRY-02
 CLOCK_SKEW = timedelta(minutes=5)
+MAX_SERVE_AHEAD = timedelta(days=7)
+_MEAL_PLANS_TABLE = table(
+    "meal_plans",
+    column("id", PG_UUID(as_uuid=True)),
+    column("user_id", PG_UUID(as_uuid=True)),
+)
 
 
 def has_live_cook_session(session: Session, meal_plan_id: uuid.UUID) -> bool:
@@ -100,17 +109,30 @@ def _out(session: Session, cs: CookSession) -> CookSessionOut:
 
 
 def create_session(session: Session, deps: MealDeps, user: AuthUser, body: CookSessionCreate) -> CookSessionOut:
-    if body.serve_at.tzinfo is None:
+    if body.serve_at.tzinfo is None or body.serve_at.utcoffset() is None:
         raise ApiError(
             422,
             ProblemCode.validation_error,
             errors=[{"pointer": "/serve_at", "code": "timezone_required", "message": "Cần múi giờ (ISO 8601)."}],
         )
-    plan = meal.plan_for_cooking(session, deps, user.id, body.meal_plan_id)
+    now_check = utcnow()
+    if body.serve_at > now_check + MAX_SERVE_AHEAD:
+        raise ApiError(
+            422,
+            ProblemCode.validation_error,
+            errors=[
+                {
+                    "pointer": "/serve_at",
+                    "code": "too_far_in_future",
+                    "message": "Thời điểm phục vụ tối đa sau 7 ngày.",
+                }
+            ],
+        )
+    plan = meal.plan_for_cooking(session, deps, user.id, body.meal_plan_id, lock=False)
     if plan.status == "proposed":
         raise ApiError(409, ProblemCode.meal_plan_not_accepted)  # FR-19-01
     if plan.status != "accepted":
-        raise ApiError(409, ProblemCode.meal_plan_not_cookable, extra={"status": plan.status})
+        raise ApiError(409, ProblemCode.meal_plan_not_cookable, extra={"plan_status": plan.status})
     live = session.scalar(
         select(CookSession.id).where(CookSession.meal_plan_id == plan.id, CookSession.status == "in_progress")
     )
@@ -128,6 +150,19 @@ def create_session(session: Session, deps: MealDeps, user: AuthUser, body: CookS
             f"Lịch cần {sched.makespan} phút, quá {over} phút đã chọn; gửi lại với confirm_over_time = true.",
             extra={"over_time_minutes": over, "makespan_s": sched.makespan * 60, "solver_status": sched.status},
         )
+    # Acquire row lock only after CP-SAT finishes and verify plan state/composition is unchanged.
+    locked = meal.plan_for_cooking(session, deps, user.id, body.meal_plan_id, lock=True)
+    if locked.status == "proposed":
+        raise ApiError(409, ProblemCode.meal_plan_not_accepted)
+    if locked.status != "accepted":
+        raise ApiError(409, ProblemCode.meal_plan_not_cookable, extra={"plan_status": locked.status})
+    if tuple((d.item_id, d.recipe.id) for d in locked.dishes) != tuple((d.item_id, d.recipe.id) for d in plan.dishes) or locked.burners != plan.burners:
+        raise ApiError(409, ProblemCode.conflict_state, "Mâm vừa thay đổi, vui lòng thử lại.")
+    live = session.scalar(
+        select(CookSession.id).where(CookSession.meal_plan_id == locked.id, CookSession.status == "in_progress")
+    )
+    if live is not None:
+        raise ApiError(409, ProblemCode.cook_session_in_progress, extra={"cook_session_id": str(live)})
     now = utcnow()
     serve_at = max(body.serve_at, now + timedelta(minutes=sched.makespan))  # UC19 1a: the earliest possible
     lead = int((serve_at - now).total_seconds()) - sched.makespan * 60
@@ -165,7 +200,7 @@ def abandon_session(session: Session, user: AuthUser, cook_session_id: uuid.UUID
     if cs.status == "in_progress":
         cs.status = "abandoned"  # FR-19-12: the pantry is untouched, the plan stays accepted
     elif cs.status != "abandoned":
-        raise ApiError(409, ProblemCode.cook_session_not_in_progress, extra={"status": cs.status})
+        raise ApiError(409, ProblemCode.cook_session_not_in_progress, extra={"cook_session_status": cs.status})
     session.flush()
     return _out(session, cs)
 
@@ -199,7 +234,7 @@ def complete_session(
     if cs.status == "completed":
         return _summary(session, user.id, cs)  # FR-20-04: completed already, nothing deducted twice
     if cs.status != "in_progress":
-        raise ApiError(409, ProblemCode.cook_session_not_in_progress, extra={"status": cs.status})
+        raise ApiError(409, ProblemCode.cook_session_not_in_progress, extra={"cook_session_status": cs.status})
     plan = meal.plan_for_cooking(session, deps, user.id, cs.meal_plan_id)
     items = {d.item_id: d for d in plan.dishes}
     for f in body.feedback:
@@ -209,6 +244,12 @@ def complete_session(
                 ProblemCode.validation_error,
                 errors=[{"pointer": "/feedback", "code": "unknown_item", "message": "Món không thuộc mâm này."}],
             )
+    if body.completed_at is not None and (body.completed_at.tzinfo is None or body.completed_at.utcoffset() is None):
+        raise ApiError(
+            422,
+            ProblemCode.validation_error,
+            errors=[{"pointer": "/completed_at", "code": "timezone_required", "message": "Cần múi giờ (ISO 8601)."}],
+        )
     now = utcnow()
     occurred = (
         body.completed_at if body.completed_at and cs.started_at <= body.completed_at <= now + CLOCK_SKEW else now
@@ -254,7 +295,7 @@ def undo_session(session: Session, user: AuthUser, cook_session_id: uuid.UUID) -
     if cs.status == "reverted":
         return _out(session, cs)  # FR-21-06
     if cs.status != "completed":
-        raise ApiError(409, ProblemCode.cook_session_not_completed, extra={"status": cs.status})
+        raise ApiError(409, ProblemCode.cook_session_not_completed, extra={"cook_session_status": cs.status})
     now = utcnow()
     assert cs.completed_at is not None
     if now > cs.completed_at + UNDO_WINDOW:  # FR-21-02
@@ -284,9 +325,11 @@ class CookingSubjectData:
     name = "cooking"
 
     def export(self, session: Session, user_id: uuid.UUID) -> dict[str, list[dict[str, Any]]]:
-        plan_ids = meal.plan_ids_of(session, user_id)
         rows = session.scalars(
-            select(CookSession).where(CookSession.meal_plan_id.in_(plan_ids)).order_by(CookSession.created_at)
+            select(CookSession)
+            .join(_MEAL_PLANS_TABLE, _MEAL_PLANS_TABLE.c.id == CookSession.meal_plan_id)
+            .where(_MEAL_PLANS_TABLE.c.user_id == user_id)
+            .order_by(CookSession.created_at)
         )
         return {
             "cook_sessions": [
@@ -308,3 +351,41 @@ class CookingSubjectData:
 
     def erase_files(self, user_id: uuid.UUID) -> None:
         return None
+
+
+def completed_sessions_between(
+    session: Session,
+    user_id: uuid.UUID,
+    tz_name: str,
+    start_date: date,
+    end_date: date,
+) -> list[CompletedSessionRef]:
+    z = ZoneInfo(tz_name)
+    utc_lo = datetime.combine(start_date, time(0, 0), z)
+    utc_hi = datetime.combine(end_date + timedelta(days=1), time(0, 0), z)
+    rows = session.scalars(
+        select(CookSession)
+        .join(_MEAL_PLANS_TABLE, _MEAL_PLANS_TABLE.c.id == CookSession.meal_plan_id)
+        .where(
+            _MEAL_PLANS_TABLE.c.user_id == user_id,
+            CookSession.status == "completed",
+            CookSession.completed_at.is_not(None),
+            CookSession.completed_at >= utc_lo,
+            CookSession.completed_at < utc_hi,
+        )
+        .order_by(CookSession.completed_at.desc(), CookSession.id.desc())
+    ).all()
+    out: list[CompletedSessionRef] = []
+    for cs in rows:
+        assert cs.completed_at is not None
+        ld = cs.completed_at.astimezone(z).date()
+        if start_date <= ld <= end_date:
+            out.append(
+                CompletedSessionRef(
+                    cook_session_id=cs.id,
+                    meal_plan_id=cs.meal_plan_id,
+                    completed_at=cs.completed_at,
+                    local_date=ld,
+                )
+            )
+    return out

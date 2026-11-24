@@ -186,6 +186,10 @@ def w_class(d):
     for kind, x, y, lab, ma, mb in d["rels"]:
         l = f'"{ma}" ' if ma and kind != "comp" else ""
         r = f' "{mb}"' if mb else ""
+        if kind.startswith("acls:"):
+            o.append(f"{x} {l}--{r} {y}" + (f" : {lab}" if lab else ""))
+            o.append(f"({x}, {y}) .. {kind[5:]}")
+            continue
         o.append(f"{x} {l}{ARROW[kind]}{r} {y}" + (f" : {lab}" if lab else ""))
     o.append("@enduml")
     return "\n".join(o)
@@ -228,7 +232,23 @@ def w_struct(d):
     return "\n".join(o)
 
 
-W = {"uc": w_uc, "ctx": w_ctx, "seq": w_seq, "act": w_act, "state": w_state, "class": w_class,
+
+# ---------------------------------------------------------------- luồng dữ liệu
+def w_dfd(d):
+    o = [HEAD.format(title=d["title"]), "left to right direction", ""]
+    dfid, name = d["center"]
+    o.append(f'usecase "{dfid}\\n{q(name)}" as P')
+    for k, typ, name, ins, outs in d["sats"]:
+        o.append(f'rectangle "{q(name)}" as {k}' if typ == "E" else f'database "{k} {q(name)}" as {k}')
+    for k, typ, name, ins, outs in d["sats"]:
+        if ins:
+            o.append(f"{k} --> P : {q(ins)}")
+        if outs:
+            o.append(f"P --> {k} : {q(outs)}")
+    o.append("@enduml")
+    return "\n".join(o)
+
+W = {"dfd": w_dfd, "uc": w_uc, "ctx": w_ctx, "seq": w_seq, "act": w_act, "state": w_state, "class": w_class,
      "comp": w_struct, "deploy": w_struct, "pkg": w_struct}
 
 

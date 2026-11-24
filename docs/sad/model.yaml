@@ -79,10 +79,12 @@ modules:
   - {id: M10, name: substitute, desc: "Cặp thay thế, embedding nguyên liệu, gợi ý thay thế có lọc cứng, danh sách đi chợ", deps: [core, catalog, profile, pantry, mlops]}
   - {id: M11, name: meal, desc: "Lọc cứng, xếp hạng gu, ghép mâm, đổi món, nhận thay thế, dòng lý do", deps: [core, catalog, profile, pantry, substitute, events, mlops, privacy]}
   - {id: M12, name: cooking, desc: "Lịch nấu CP-SAT, phiên nấu, nấu xong (UoW), hoàn tác", deps: [core, catalog, meal, pantry, events]}
-  - {id: M13, name: journal, desc: "Nhật ký tuần (view chỉ đọc)", deps: [core, cooking, meal, pantry, profile]}
+  - {id: M13, name: journal, desc: "Nhật ký tuần (view chỉ đọc)", deps: [core, cooking, meal, meal_logs, pantry, profile]}
   - {id: M14, name: survey, desc: "Phiếu khảo sát khối không đầy đủ, người tham gia ẩn danh, điểm, món hay ăn", deps: [core, catalog, privacy]}
   - {id: M15, name: admin, desc: "Endpoint/CLI nhân sự: yêu cầu dữ liệu, kiểm toán, nhập kho món, mô hình, khảo sát", deps: [core, identity, privacy, catalog, mlops, survey, substitute]}
   - {id: M16, name: jobs, desc: "Tác vụ định kỳ: xoá ảnh, sao lưu, sweeper, dọn hết hạn", deps: [core, scan, identity, privacy]}
+  - {id: M17, name: meal_calorie, desc: "Ước lượng calo và dinh dưỡng món ăn tách biệt (tra cứu KB + ONNX Nutrition5k)", deps: [core]}
+  - {id: M18, name: meal_logs, desc: "Nhật ký bữa ăn đồng bộ server (meal_logs, meal_log_items)", deps: [core, profile, catalog]}
 
 # Kiểu: uuid, text, citext, int, smallint, bigint, numeric, real, bool, date, timestamptz, bytea, jsonb, vector(n), enum(...)
 # Ký hiệu: PK, FK->bảng(cột), UQ, NN (not null), CK(...) check, D=default. Bảng không có user_id thì truy chủ sở hữu qua FK.
@@ -90,21 +92,34 @@ tables:
   # ---------- core
   - name: idempotency_keys
     module: core
-    columns: ["user_id uuid NN FK->users(id) ON DELETE CASCADE", "key text NN", "request_sha256 bytea NN", "status_code smallint NN", "response_body jsonb NN", "created_at timestamptz NN D now()"]
+    columns: ["user_id uuid NN FK->users(id) ON DELETE CASCADE", "key text NN", "request_sha256 bytea NN", "status_code smallint NN", "response_body jsonb NN", "created_at timestamptz NN D now()", "response_headers jsonb NN D '{}'"]
     pk: [user_id, key]
     notes: "jsonb chỉ lưu phản hồi để trả lại nguyên văn, không truy vấn; xoá sau 48 giờ (UC34)"
+  - name: app_params
+    module: core
+    columns: ["key text PK", "value_num double precision NULL", "value_text text NULL", "updated_at timestamptz NN D now()"]
+    pk: [key]
+    notes: "tham số nghiệp vụ bền vững qua pg_dump/pg_restore"
   # ---------- identity
   - name: users
     module: identity
-    columns: ["id uuid PK", "email citext NN UQ", "password_hash text NN", "role enum(user,admin,curator,ml_operator) NN D user", "status enum(active,deletion_requested) NN D active", "token_version int NN D 0", "failed_logins smallint NN D 0", "locked_until timestamptz NULL", "created_at timestamptz NN", "updated_at timestamptz NN"]
+    columns: ["id uuid PK", "email citext NN UQ", "password_hash text NN", "role enum(user,admin,curator,ml_operator) NN D user", "status enum(active,deletion_requested) NN D active", "token_version int NN D 0", "failed_logins smallint NN D 0", "locked_until timestamptz NULL", "created_at timestamptz NN", "updated_at timestamptz NN", "email_verified_at timestamptz NULL", "totp_secret_enc bytea NULL", "totp_key_id text NULL", "mfa_enabled_at timestamptz NULL"]
     pk: [id]
   - name: refresh_tokens
     module: identity
-    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "family_id uuid NN", "token_sha256 bytea NN UQ", "issued_at timestamptz NN", "expires_at timestamptz NN", "revoked_at timestamptz NULL", "replaced_by_id uuid NULL FK->refresh_tokens(id)", "user_agent text NULL"]
+    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "family_id uuid NN", "token_sha256 bytea NN UQ", "issued_at timestamptz NN", "expires_at timestamptz NN", "revoked_at timestamptz NULL", "replaced_by_id uuid NULL FK->refresh_tokens(id)", "user_agent text NULL", "ip_address text NULL", "last_used_at timestamptz NULL"]
     pk: [id]
   - name: password_resets
     module: identity
     columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "token_sha256 bytea NN UQ", "created_at timestamptz NN", "expires_at timestamptz NN", "used_at timestamptz NULL"]
+    pk: [id]
+  - name: email_outbox
+    module: identity
+    columns: ["id uuid PK", "user_id uuid NULL FK->users(id) ON DELETE SET NULL", "to_email citext NN", "template text NN", "subject text NN", "body_text text NN", "status enum(pending,sending,sent,failed) NN D pending", "attempts smallint NN D 0", "next_attempt_at timestamptz NN D now()", "sent_at timestamptz NULL", "last_error text NULL", "created_at timestamptz NN D now()"]
+    pk: [id]
+  - name: email_verification_tokens
+    module: identity
+    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "token_sha256 bytea NN UQ", "created_at timestamptz NN D now()", "expires_at timestamptz NN", "verified_at timestamptz NULL"]
     pk: [id]
   # ---------- privacy
   - name: consent_purposes
@@ -297,7 +312,7 @@ tables:
     notes: "chip; ghi vào kho chỉ khi xác nhận (BR-SCAN-02)"
   - name: detections
     module: scan
-    columns: ["id bigint PK identity", "scan_image_id uuid NN FK->scan_images(id) ON DELETE CASCADE", "scan_item_id uuid NULL FK->scan_items(id) ON DELETE SET NULL", "vision_class_id smallint NN FK->vision_classes(id)", "x1 real NN", "y1 real NN", "x2 real NN", "y2 real NN", "confidence real NN", "p_tuoi real NULL", "p_dung_som real NULL", "p_dung_ngay real NULL", "p_kiem_tra real NULL", "CK(0<=x1<x2<=1 AND 0<=y1<y2<=1)"]
+    columns: ["id bigint PK identity", "scan_image_id uuid NN FK->scan_images(id) ON DELETE CASCADE", "scan_item_id uuid NULL FK->scan_items(id) ON DELETE SET NULL", "vision_class_id smallint NN FK->vision_classes(id)", "x1 real NN", "y1 real NN", "x2 real NN", "y2 real NN", "confidence real NN", "p_tuoi real NULL", "p_dung_som real NULL", "p_dung_ngay real NULL", "p_kiem_tra real NULL", "sub_species_slug text NULL", "sub_species_conf real NULL", "safety_abstained bool NN D false", "CK(0<=x1<x2<=1 AND 0<=y1<y2<=1)"]
     pk: [id]
   # ---------- substitute
   - name: substitution_pairs
@@ -311,7 +326,7 @@ tables:
     pk: [ingredient_id, model_version_id]
   - name: shopping_items
     module: substitute
-    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "ingredient_id uuid NN FK->ingredients(id)", "qty_g numeric NULL", "note text NULL", "status enum(open,bought,dropped) NN D open", "source_meal_plan_item_id uuid NULL FK->meal_plan_items(id) ON DELETE SET NULL", "created_at timestamptz NN", "updated_at timestamptz NN"]
+    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "ingredient_id uuid NN FK->ingredients(id)", "qty_g numeric NULL", "note text NULL", "status enum(open,bought,dropped) NN D open", "source_meal_plan_item_id uuid NULL FK->meal_plan_items(id) ON DELETE SET NULL", "created_at timestamptz NN", "updated_at timestamptz NN", "pantry_lot_id uuid NULL FK->pantry_lots(id) ON DELETE SET NULL"]
     pk: [id]
   # ---------- meal
   - name: meal_plans
@@ -382,6 +397,16 @@ tables:
     module: survey
     columns: ["respondent_id uuid NN FK->survey_respondents(id) ON DELETE CASCADE", "recipe_id uuid NN FK->recipes(id)"]
     pk: [respondent_id, recipe_id]
+  # ---------- meal_logs
+  - name: meal_logs
+    module: meal_logs
+    columns: ["id uuid PK", "user_id uuid NN FK->users(id) ON DELETE CASCADE", "logged_date date NN", "logged_at timestamptz NN D now()", "meal_slot enum(sang,trua,toi,phu) NN", "title text NN", "source_type enum(scan_calorie,barcode,manual,recipe) NN", "source_ref_id text NULL", "portion_label text NN D 'Vừa'", "portion_scale numeric NN D 1", "modifiers jsonb NN D '[]'", "kcal numeric NN D 0", "kcal_low numeric NN D 0", "kcal_high numeric NN D 0", "protein_g numeric NN D 0", "carbs_g numeric NN D 0", "fat_g numeric NN D 0", "fiber_g numeric NN D 0", "provenance_label_vi text NN D ''", "notes text NULL", "created_at timestamptz NN D now()", "updated_at timestamptz NN D now()"]
+    pk: [id]
+  - name: meal_log_items
+    module: meal_logs
+    columns: ["id uuid PK", "meal_log_id uuid NN FK->meal_logs(id) ON DELETE CASCADE", "ordinal smallint NN D 1", "item_kind enum(dish,modifier,barcode_item,manual_item) NN D dish", "label_vi text NN", "dish_slug text NULL", "recipe_id uuid NULL FK->recipes(id) ON DELETE SET NULL", "ingredient_id uuid NULL FK->ingredients(id) ON DELETE SET NULL", "barcode text NULL", "grams numeric NULL", "kcal numeric NN D 0", "protein_g numeric NN D 0", "carbs_g numeric NN D 0", "fat_g numeric NN D 0", "fiber_g numeric NN D 0", "modifiers jsonb NN D '[]'", "created_at timestamptz NN D now()"]
+    pk: [id]
+    unique: [[meal_log_id, ordinal]]
 
 views:
   - {name: v_current_consents, module: privacy, desc: "đồng ý hiện hành theo (user, mục đích) = consent_event mới nhất"}
@@ -447,6 +472,12 @@ endpoints:
   - [POST, "/cook-sessions/{id}/undo", cooking, [UC21], true, user]
   - [POST, "/cook-sessions/{id}/abandon", cooking, [UC19], true, user]
   - [GET, "/journal", journal, [UC22], true, user]
+  - [GET, "/meal-logs", meal_logs, [UC22], true, user]
+  - [POST, "/meal-logs", meal_logs, [UC22], false, user]
+  - [GET, "/meal-logs/{id}", meal_logs, [UC22], true, user]
+  - [DELETE, "/meal-logs/{id}", meal_logs, [UC22], true, user]
+  - [GET, "/meal-calorie/dishes", meal_calorie, [UC22], true, user]
+  - [POST, "/meal-calorie/estimate", meal_calorie, [UC22], false, user]
   - [POST, "/events", events, [UC15, UC16, UC19, UC20], "event_id", user]
   - [POST, "/survey/respondents", survey, [UC23], false, public]
   - [GET, "/survey/respondents/{id}", survey, [UC23], true, "public+respondent_token"]

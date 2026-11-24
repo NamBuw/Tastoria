@@ -320,3 +320,60 @@ def test_data_export_covers_pantry_plans_cooking_and_interactions(
         assert files[f"{name}.json"], name
     readme = files["README.json"]["files"]
     assert all(f["description_vi"] != f["file"].removesuffix(".json") for f in readme)
+
+
+def test_naive_completed_at_far_future_serve_at_and_tz_pushdown(kb_client: TestClient, kb_db, kb_engine, h: dict) -> None:
+    from datetime import date
+
+    from sqlalchemy import text
+
+    from tastoria.modules.cooking.service import completed_sessions_between
+
+    p = _accepted(kb_client, h, kb_db)
+
+    # Far future serve_at (> 7 days) rejected cleanly with 422 (never int32 overflow 500)
+    far = kb_client.post(
+        f"{API}/cook-sessions",
+        json={"meal_plan_id": p["id"], "serve_at": (datetime.now(UTC) + timedelta(days=8)).isoformat()},
+        headers=h | key(),
+    )
+    assert far.status_code == 422 and far.json()["errors"][0]["code"] == "too_far_in_future"
+
+    cs = cook(kb_client, h, p["id"])
+    # Naive completed_at rejected cleanly with 422 (never 500 TypeError)
+    naive = kb_client.post(
+        f"{API}/cook-sessions/{cs['id']}/complete",
+        json={"completed_at": "2026-11-24T12:00:00"},
+        headers=h | key(),
+    )
+    assert naive.status_code == 422
+
+    done = kb_client.post(f"{API}/cook-sessions/{cs['id']}/complete", headers=h | key())
+    assert done.status_code == 200
+    uid = q(kb_db, "SELECT user_id FROM meal_plans WHERE id = :p", p=p["id"]).scalar()
+    # Insert a historical completed session at 2025-11-23T18:00:00Z = Nov 24 01:00 in Asia/Ho_Chi_Minh, Nov 23 13:00 in America/New_York
+    start_utc = datetime(2025, 11, 23, 17, 30, tzinfo=UTC)
+    boundary_utc = datetime(2025, 11, 23, 18, 0, tzinfo=UTC)
+    hist_plan = q(
+        kb_db,
+        "INSERT INTO meal_plans (user_id, meal, persons, max_minutes, status, reason_vi, params_version) "
+        "VALUES (:u, 'dinner', 2, 45, 'cooked', 'x', 'p1') RETURNING id",
+        u=uid,
+    ).scalar()
+    hist_cs = q(
+        kb_db,
+        "INSERT INTO cook_sessions (meal_plan_id, status, serve_at, burners, started_at, completed_at) "
+        "VALUES (:mp, 'completed', :ts, 2, :st, :ts) RETURNING id",
+        mp=hist_plan,
+        st=start_utc,
+        ts=boundary_utc,
+    ).scalar()
+
+    with Session(kb_engine) as s:
+        vn_hit = completed_sessions_between(s, uid, "Asia/Ho_Chi_Minh", date(2025, 11, 24), date(2025, 11, 24))
+        ny_miss = completed_sessions_between(s, uid, "America/New_York", date(2025, 11, 24), date(2025, 11, 24))
+        ny_hit = completed_sessions_between(s, uid, "America/New_York", date(2025, 11, 23), date(2025, 11, 23))
+    assert [x.cook_session_id for x in vn_hit] == [hist_cs]
+    assert ny_miss == []
+    assert [x.cook_session_id for x in ny_hit] == [hist_cs]
+    _ = text

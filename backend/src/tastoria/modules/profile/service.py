@@ -10,13 +10,14 @@ from __future__ import annotations
 import uuid
 import zoneinfo
 from dataclasses import dataclass
+from datetime import timedelta
 from decimal import Decimal
 from typing import Any
 
 from fastapi import Request
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, text
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.exc import DBAPIError
+from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.orm import Session
 
 from tastoria.core.auth import AuthUser
@@ -97,16 +98,38 @@ def _has_metrics(p: Profile | None) -> bool:
     return p is not None and any(getattr(p, f"{m}_enc") is not None for m in METRICS)
 
 
-def _decrypt(session: Session, deps: ProfileDeps, p: Profile, *, purpose: str, actor: uuid.UUID | None) -> Metrics:
-    privacy.write_audit(
-        session,
-        action="decrypt",
-        entity="profiles",
-        entity_id=str(p.user_id),
-        purpose=purpose,
-        actor_user_id=actor,
-        actor_role="user" if actor else "system",
-    )
+def _decrypt(
+    session: Session,
+    deps: ProfileDeps,
+    p: Profile,
+    *,
+    purpose: str,
+    actor: uuid.UUID | None,
+    coalesce_audit: bool = False,
+) -> Metrics:
+    skip_audit = False
+    if coalesce_audit and actor is not None:
+        recent = privacy.list_audit_log(
+            session,
+            actor_user_id=actor,
+            entity="profiles",
+            action="decrypt",
+            from_dt=utcnow() - timedelta(seconds=60),
+            to_dt=None,
+            cursor=None,
+            limit=20,
+        )
+        skip_audit = any(it.entity_id == str(p.user_id) and it.purpose == purpose for it in recent.items)
+    if not skip_audit:
+        privacy.write_audit(
+            session,
+            action="decrypt",
+            entity="profiles",
+            entity_id=str(p.user_id),
+            purpose=purpose,
+            actor_user_id=actor,
+            actor_role="user" if actor else "system",
+        )
     try:
         vals = {
             m: deps.cipher.decrypt(p.enc_key_id, p.user_id, f"{m}_enc", blob)
@@ -130,13 +153,13 @@ def _missing(m: Metrics, activity: str | None) -> list[str]:
     return missing
 
 
-def _age(birth_year: int, settings: Settings) -> int:
-    return local_year(settings.timezone) - birth_year
+def _age(birth_year: int, tz_name: str) -> int:
+    return local_year(tz_name) - birth_year
 
 
-def _suggest(m: Metrics, activity: str, goal: str, settings: Settings, *, mifflin: bool = False) -> energy.EnergyResult:
+def _suggest(m: Metrics, activity: str, goal: str, tz_name: str, *, mifflin: bool = False) -> energy.EnergyResult:
     assert m.sex and m.birth_year and m.weight_kg
-    age = _age(m.birth_year, settings)
+    age = _age(m.birth_year, tz_name)
     if age < energy.MIN_AGE:
         raise ApiError(422, ProblemCode.age_below_minimum)
     return energy.suggest(
@@ -154,26 +177,26 @@ def _formula_goal(goal: str | None) -> str:
     return goal if goal in ("maintain", "lose") else "maintain"
 
 
-def _stale(m: Metrics, p: Profile, settings: Settings) -> tuple[bool, int | None]:
+def _stale(m: Metrics, p: Profile, tz_name: str) -> tuple[bool, int | None]:
     if p.kcal_source != "suggested" or _missing(m, p.activity_level):
         return False, None
     try:
-        e = _suggest(m, p.activity_level, _formula_goal(p.goal), settings).suggested_kcal  # type: ignore[arg-type]
+        e = _suggest(m, p.activity_level, _formula_goal(p.goal), tz_name).suggested_kcal  # type: ignore[arg-type]
     except ApiError:
         return False, None
     return e != p.kcal_target, e
 
 
 def _out(
-    session: Session, user_id: uuid.UUID, p: Profile | None, m: Metrics, consented: bool, settings: Settings
+    session: Session, user_id: uuid.UUID, p: Profile | None, m: Metrics, consented: bool, tz_name: str
 ) -> ProfileOut:
-    stale, suggested = _stale(m, p, settings) if p is not None and consented else (False, None)
+    stale, suggested = _stale(m, p, tz_name) if p is not None and consented else (False, None)
     return ProfileOut(
         sex=m.sex,  # type: ignore[arg-type]
         birth_year=m.birth_year,
         height_cm=m.height_cm,
         weight_kg=m.weight_kg,
-        activity_level=p.activity_level if p else None,  # type: ignore[arg-type]
+        activity_level=p.activity_level if (p and consented) else None,  # type: ignore[arg-type]
         goal=p.goal if p else None,  # type: ignore[arg-type]
         kcal_target=p.kcal_target if p else None,
         kcal_source=p.kcal_source if p else None,  # type: ignore[arg-type]
@@ -218,8 +241,8 @@ def get_profile(session: Session, deps: ProfileDeps, user: AuthUser) -> ProfileO
     p = session.get(Profile, user.id)
     m = Metrics()
     if consented and _has_metrics(p):
-        m = _decrypt(session, deps, p, purpose=HEALTH, actor=user.id)  # type: ignore[arg-type]
-    return _out(session, user.id, p, m, consented, deps.settings)
+        m = _decrypt(session, deps, p, purpose=HEALTH, actor=user.id, coalesce_audit=True)  # type: ignore[arg-type]
+    return _out(session, user.id, p, m, consented, get_settings_tz(session, user.id))
 
 
 def update_profile(session: Session, deps: ProfileDeps, user: AuthUser, body: ProfileUpdate) -> ProfileOut:
@@ -228,8 +251,9 @@ def update_profile(session: Session, deps: ProfileDeps, user: AuthUser, body: Pr
     )  # FR-10-02: activity and goal are health_profile data too
     if gives_health:
         _require_health_consent(session, user.id)
+    tz_name = get_settings_tz(session, user.id)
     if body.birth_year is not None:
-        age = _age(body.birth_year, deps.settings)
+        age = _age(body.birth_year, tz_name)
         if age < energy.MIN_AGE:
             raise ApiError(422, ProblemCode.age_below_minimum)
         if age == energy.MIN_AGE and not body.adult_confirmed:  # may still be 17 this year (FR-09-13)
@@ -256,7 +280,7 @@ def update_profile(session: Session, deps: ProfileDeps, user: AuthUser, body: Pr
     p.updated_at = utcnow()
     session.flush()
     m = Metrics(**values)
-    return _out(session, user.id, p, m, gives_health or privacy.has_consent(session, user.id, HEALTH), deps.settings)
+    return _out(session, user.id, p, m, gives_health or privacy.has_consent(session, user.id, HEALTH), tz_name)
 
 
 # ---------------------------------------------------------------- energy (UC11)
@@ -271,8 +295,9 @@ def suggest_energy(
     missing = _missing(m, p.activity_level if p else None)
     if missing:
         raise ApiError(422, ProblemCode.profile_incomplete, extra={"missing": missing})
+    tz_name = get_settings_tz(session, user.id)
     goal = body.goal or _formula_goal(p.goal if p else None)
-    r = _suggest(m, p.activity_level, goal, deps.settings, mifflin=body.formula == "mifflin_st_jeor")  # type: ignore[union-attr,arg-type]
+    r = _suggest(m, p.activity_level, goal, tz_name, mifflin=body.formula == "mifflin_st_jeor")  # type: ignore[union-attr,arg-type]
     return EnergySuggestion(
         formula="fao_who_unu_1985",
         bmr_kcal=float(r.bmr_kcal),
@@ -283,7 +308,7 @@ def suggest_energy(
         e_lunch_kcal=r.e_lunch_kcal,
         e_dinner_kcal=r.e_dinner_kcal,
         goal=goal,  # type: ignore[arg-type]
-        age_years=_age(m.birth_year, deps.settings),  # type: ignore[arg-type]
+        age_years=_age(m.birth_year, tz_name),  # type: ignore[arg-type]
         equation=energy.EQUATION_LABEL,
         source=energy.SOURCE,
         bmr_mifflin_kcal=float(r.bmr_mifflin_kcal) if r.bmr_mifflin_kcal is not None else None,
@@ -303,7 +328,7 @@ def set_energy_target(session: Session, deps: ProfileDeps, user: AuthUser, body:
         if missing:
             raise ApiError(422, ProblemCode.profile_incomplete, extra={"missing": missing})
         goal = body.goal or _formula_goal(p.goal)
-        kcal = _suggest(m, p.activity_level, goal, deps.settings).suggested_kcal  # type: ignore[arg-type]
+        kcal = _suggest(m, p.activity_level, goal, get_settings_tz(session, user.id)).suggested_kcal  # type: ignore[arg-type]
         if not 800 <= kcal <= 5000:
             raise _field_error("/kcal_target", "out_of_range", f"{kcal} ngoài [800, 5000]")
     elif body.kcal_source == "expert":
@@ -371,18 +396,27 @@ def set_favorites(session: Session, user: AuthUser, body: FavoriteSet) -> Favori
     bad = catalog.not_published_recipe_ids(session, ids)
     if bad:
         raise ApiError(422, ProblemCode.recipe_not_published, extra={"recipe_ids": [str(b) for b in bad]})
-    session.execute(
-        delete(UserFavoriteRecipe).where(
-            UserFavoriteRecipe.user_id == user.id, UserFavoriteRecipe.recipe_id.not_in(ids)
-        )
-    )
-    if ids:
-        now = utcnow()
-        session.execute(
-            insert(UserFavoriteRecipe)
-            .values([{"user_id": user.id, "recipe_id": rid, "created_at": now} for rid in ids])
-            .on_conflict_do_nothing()
-        )
+    if session.get_bind().dialect.name == "postgresql":
+        session.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:k, 0))"), {"k": f"fav:{user.id}"})
+    try:
+        with session.begin_nested():
+            session.execute(
+                delete(UserFavoriteRecipe).where(
+                    UserFavoriteRecipe.user_id == user.id, UserFavoriteRecipe.recipe_id.not_in(ids)
+                )
+            )
+            if ids:
+                now = utcnow()
+                session.execute(
+                    insert(UserFavoriteRecipe)
+                    .values([{"user_id": user.id, "recipe_id": rid, "created_at": now} for rid in ids])
+                    .on_conflict_do_nothing()
+                )
+    except IntegrityError as exc:
+        msg = str(exc).lower()
+        if "favorites_max" in msg or "23000" in msg:
+            raise ApiError(422, ProblemCode.favorites_limit, extra={"max": FAVORITES_MAX}) from None
+        raise
     return FavoriteSet(recipe_ids=_favorites(session, user.id))
 
 
@@ -508,9 +542,10 @@ class ProfileSubjectData:
         p = session.get(Profile, user_id, with_for_update=True)
         if p is None:
             return
-        # FR-05-11: the seven columns go to NULL; goal stays (it does not reveal a metric on its own).
+        # FR-05-11 / P1-8: all health_profile columns go to NULL (including activity_level); goal stays.
         p.sex_enc = p.birth_year_enc = p.height_cm_enc = p.weight_kg_enc = None
         p.enc_key_id = None
+        p.activity_level = None
         p.kcal_target = None
         p.kcal_source = None
         p.updated_at = utcnow()

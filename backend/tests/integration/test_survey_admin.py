@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import base64
 import csv
 import hashlib
+import hmac
 import json
+import struct
 from collections import Counter
 from datetime import date
 from pathlib import Path
@@ -12,8 +15,10 @@ from pathlib import Path
 import pytest
 from conftest import q
 from fastapi.testclient import TestClient
+from helpers import bearer, register
 from sqlalchemy.engine import Engine
 
+from tastoria.core.clock import utcnow
 from tastoria.core.db import make_sessionmaker
 from tastoria.modules.admin import service as admin
 
@@ -186,7 +191,7 @@ def test_export_has_completed_respondents_only_and_a_verifiable_manifest(
     keep = {c["respondent"]["id"] for c in done}
     respondents = read("respondents.csv")
     assert {r["respondent_id"] for r in respondents} == keep  # FR-24-07
-    assert {r["policy_version"] for r in respondents} == {"2026-10-17"} and {r["channel"] for r in respondents} == {
+    assert {r["policy_version"] for r in respondents} == {"2026-11-24"} and {r["channel"] for r in respondents} == {
         "qr"
     }
     ratings = read("ratings.csv")
@@ -221,3 +226,36 @@ def test_export_of_a_form_without_completions_has_headers_only(sm, kb_db, tmp_pa
     assert res.ok and res.report["respondents"] == 0
     d = Path(res.report["directory"])
     assert (d / "ratings.csv").read_text(encoding="utf-8") == "respondent_id,recipe_id,rating,never_eaten,answered_at\n"
+
+
+def test_admin_surveys_mfa_guard_and_rate_limit(kb_client: TestClient, kb_db, kb_app) -> None:
+    u = register(kb_client)
+    q(kb_db, "UPDATE users SET role = 'ml_operator' WHERE id = :i", i=u["user"]["id"])
+    op_s = kb_client.post(f"{API}/auth/login", json={"email": u["user"]["email"], "password": u["password"]}).json()
+
+    # In production mode, non-MFA ml_operator gets 403 mfa_required and writes 0 audit_log rows
+    audits_before = q(kb_db, "SELECT count(*) FROM audit_log").scalar()
+    prev_env = kb_app.state.settings.env
+    kb_app.state.settings.env = "production"
+    try:
+        r_block = kb_client.get(f"{API}/admin/surveys", headers=bearer(op_s))
+        assert (r_block.status_code, r_block.json()["code"]) == (403, "mfa_required")
+        assert q(kb_db, "SELECT count(*) FROM audit_log").scalar() == audits_before
+    finally:
+        kb_app.state.settings.env = prev_env
+
+    # Enroll MFA -> verified token gets 200
+    setup = kb_client.post(f"{API}/auth/mfa/setup", headers=bearer(op_s)).json()
+    padded = setup["secret"] + "=" * ((-len(setup["secret"])) % 8)
+    secret = base64.b32decode(padded)
+    counter = int(utcnow().timestamp()) // 30
+    digest = hmac.new(secret, struct.pack(">Q", counter), hashlib.sha1).digest()
+    offset = digest[-1] & 0x0F
+    code = f"{(struct.unpack('>I', digest[offset : offset + 4])[0] & 0x7FFFFFFF) % 1_000_000:06d}"
+    mfa_s = kb_client.post(f"{API}/auth/mfa/verify", json={"code": code}, headers=bearer(op_s)).json()
+
+    kb_app.state.settings.env = "production"
+    try:
+        assert kb_client.get(f"{API}/admin/surveys", headers=bearer(mfa_s)).status_code == 200
+    finally:
+        kb_app.state.settings.env = prev_env

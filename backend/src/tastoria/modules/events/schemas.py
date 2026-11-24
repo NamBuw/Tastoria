@@ -10,6 +10,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 InteractionType = Literal["served", "viewed", "swapped", "cooked", "liked", "disliked", "undone"]
+SERVER_ONLY_INTERACTION_TYPES = frozenset({"cooked", "served", "swapped", "undone"})
 SwapReason = Literal["khong_hop_gu", "moi_an", "thieu_thoi_gian", "khac"]
 
 
@@ -29,6 +30,8 @@ class InteractionEventIn(BaseModel):
     def _consistent(self) -> InteractionEventIn:
         if self.swap_reason is not None and self.type != "swapped":
             raise ValueError("swap_reason only goes with type = swapped")
+        if self.type in SERVER_ONLY_INTERACTION_TYPES:
+            raise ValueError("server-authoritative interaction type cannot be submitted by clients")
         if self.meal_plan_item_id is not None and self.meal_plan_id is None:
             raise ValueError("meal_plan_item_id needs meal_plan_id")
         return self
@@ -68,3 +71,17 @@ class RecipeSignal:
 
     positive: int = 0
     negative: int = 0
+
+
+@dataclass(frozen=True)
+class TrainingInteractionRow:
+    user_id: uuid.UUID
+    recipe_id: uuid.UUID
+    meal_plan_id: uuid.UUID | None
+    meal_plan_item_id: uuid.UUID | None
+    type: str
+    position: int | None
+    swap_reason: str | None
+    ranker_version_id: uuid.UUID | None
+    propensity: float | None
+    occurred_at: datetime

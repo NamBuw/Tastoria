@@ -13,12 +13,10 @@ component "Cloudflare Tunnel" as CF <<external>>
 component "API (FastAPI)" as Api <<process>>
 component "Scheduler (cron)" as Sched <<process>>
 component "Dịch vụ email (SMTP)" as Smtp <<external>>
-component "Công cụ gán nhãn (Label Studio)" as Ls <<external>>
 component "Google Drive (rclone)" as Drive <<external>>
 
 App ..> CF : HTTPS
 CF ..> Api : tunnel
 Api ..> Smtp : SMTP
-Api ..> Ls : REST
 Sched ..> Drive : sao lưu
 @enduml

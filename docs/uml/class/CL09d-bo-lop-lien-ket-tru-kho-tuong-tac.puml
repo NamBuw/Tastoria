@@ -1,0 +1,46 @@
+@startuml
+title CL09d — Sau khi bỏ lớp liên kết: giao dịch kho và tương tác
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "Lô kho" as LO {
+  -ngàyNhập: Thời điểm
+  -gMin: Gam
+  -gMax: Gam
+}
+class "Phiên nấu" as PN {
+  -giờDọn: Thời điểm
+  -trạngThái: TrạngTháiPhiên
+}
+class "Giao dịch kho" as GD {
+  -lýDo: LýDoGiaoDịch
+  -deltaMin: Gam
+  -deltaMax: Gam
+  -độGấpLúcTrừ: Số thực
+}
+class "Tài khoản" as TK {
+  -email: Email
+  -trạngThái: TrạngTháiTK
+}
+class "Món" as MON {
+  -tên: Chuỗi
+  -slot: Slot
+}
+class "Tương tác" as TT {
+  -loại: LoạiTươngTác
+  -thờiĐiểm: Thời điểm
+}
+
+LO *-- "1..*" GD
+PN "0..1" -- "0..*" GD : phát sinh
+TK "1" -- "0..*" TT : ghi
+TT "0..*" -- "1" MON : về
+@enduml

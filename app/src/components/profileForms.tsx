@@ -32,14 +32,45 @@ export function profileToDraft(p?: Schemas['Profile'] | null): BodyDraft {
   };
 }
 
-const num = (s: string) => (s.trim() === '' ? null : Number(s.replace(',', '.')));
+export function sanitizeDecimalInput(raw: string): string {
+  const normalized = raw.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+  const dotIdx = normalized.indexOf('.');
+  if (dotIdx < 0) return normalized;
+  return normalized.slice(0, dotIdx + 1) + normalized.slice(dotIdx + 1).replace(/\./g, '');
+}
+
+export function parseFinitePositive(s: string): number | null {
+  const trimmed = s.trim();
+  if (trimmed === '') return null;
+  const n = Number(trimmed.replace(',', '.'));
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+export function validateBodyDraft(d: BodyDraft): Record<string, string> {
+  const errs: Record<string, string> = {};
+  if (d.birth_year.trim() !== '') {
+    const by = Number(d.birth_year.trim());
+    if (!Number.isFinite(by) || !Number.isInteger(by) || by < 1900 || by > 2100) {
+      errs.birth_year = 'Năm sinh chưa hợp lệ.';
+    }
+  }
+  if (d.height_cm.trim() !== '') {
+    const h = parseFinitePositive(d.height_cm);
+    if (h === null) errs.height_cm = 'Chiều cao phải là số dương hợp lệ.';
+  }
+  if (d.weight_kg.trim() !== '') {
+    const w = parseFinitePositive(d.weight_kg);
+    if (w === null) errs.weight_kg = 'Cân nặng phải là số dương hợp lệ.';
+  }
+  return errs;
+}
 
 export function draftToUpdate(d: BodyDraft, adult = false): Schemas['ProfileUpdate'] {
   return {
     sex: d.sex,
-    birth_year: num(d.birth_year),
-    height_cm: num(d.height_cm),
-    weight_kg: num(d.weight_kg),
+    birth_year: parseFinitePositive(d.birth_year),
+    height_cm: parseFinitePositive(d.height_cm),
+    weight_kg: parseFinitePositive(d.weight_kg),
     activity_level: d.activity_level,
     goal: d.goal,
     ...(adult ? { adult_confirmed: true } : {}),
@@ -77,7 +108,7 @@ export function BodyFields({
             label="Chiều cao (cm)"
             testID="body-height"
             value={d.height_cm}
-            onChangeText={(v) => set({ height_cm: v })}
+            onChangeText={(v) => set({ height_cm: sanitizeDecimalInput(v) })}
             keyboardType="decimal-pad"
             inputMode="decimal"
             error={errors.height_cm}
@@ -88,7 +119,7 @@ export function BodyFields({
             label="Cân nặng (kg)"
             testID="body-weight"
             value={d.weight_kg}
-            onChangeText={(v) => set({ weight_kg: v })}
+            onChangeText={(v) => set({ weight_kg: sanitizeDecimalInput(v) })}
             keyboardType="decimal-pad"
             inputMode="decimal"
             error={errors.weight_kg}
@@ -156,6 +187,10 @@ export function EnergyTargetPanel({
   const [needFloor, setNeedFloor] = useState(false);
 
   const save = async (body: Schemas['EnergyTarget']) => {
+    if (!Number.isFinite(body.kcal_target) || body.kcal_target <= 0) {
+      setErr(new Error('invalid_kcal'));
+      return;
+    }
     setBusy(true);
     setErr(null);
     try {
@@ -169,8 +204,11 @@ export function EnergyTargetPanel({
     }
   };
 
+  const parsedKcal = Number(kcal);
+  const kcalValid = kcal.trim() !== '' && Number.isFinite(parsedKcal) && parsedKcal >= 800 && parsedKcal <= 5000;
+
   const typedBody = (confirm = false): Schemas['EnergyTarget'] => ({
-    kcal_target: Number(kcal),
+    kcal_target: Number.isFinite(parsedKcal) ? parsedKcal : 0,
     kcal_source: goal === 'expert' ? 'expert' : 'user',
     ...(goal === 'expert' ? { goal: 'expert' as const } : {}),
     ...(confirm ? { confirm_below_floor: true } : {}),
@@ -234,8 +272,8 @@ export function EnergyTargetPanel({
           label="Lưu mục tiêu"
           testID="energy-save-typed"
           loading={busy}
-          disabled={!kcal || Number(kcal) < 800 || Number(kcal) > 5000}
-          onPress={() => save(typedBody())}
+          disabled={!kcalValid}
+          onPress={() => kcalValid && save(typedBody())}
         />
       )}
       {onLater ? <Button label="Để sau" kind="ghost" onPress={onLater} /> : null}

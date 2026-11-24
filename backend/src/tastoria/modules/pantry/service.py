@@ -17,11 +17,13 @@ import uuid
 from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from sqlalchemy import select, text
+from sqlalchemy import Float, Numeric, and_, case, cast, column, func, literal, null, select, table, text, tuple_
+from sqlalchemy.dialects.postgresql import TIMESTAMP as PG_TIMESTAMP, UUID as PG_UUID
 from sqlalchemy.orm import Session
 
 from tastoria.core import pagination
@@ -161,29 +163,150 @@ def _sort_key(x: _Lot) -> tuple[float, str, str]:
     return (-(u if u is not None else -1.0), x.row.created_at.isoformat(), str(x.row.id))
 
 
+DEFAULT_TIMEZONE = "Asia/Ho_Chi_Minh"
+_INGREDIENTS_TABLE = table("ingredients", column("id", PG_UUID(as_uuid=True)), column("shelf_life_days", Numeric))
+_TZ_COL = PG_TIMESTAMP(timezone=True)
+
+
+def user_zone(session: Session, user_id: uuid.UUID) -> ZoneInfo:
+    """Resolve user's configured ZoneInfo from user_settings (fallback to Asia/Ho_Chi_Minh)."""
+    tz_name = session.execute(
+        text("SELECT timezone FROM user_settings WHERE user_id = :u"),
+        {"u": user_id},
+    ).scalar_one_or_none()
+    try:
+        return ZoneInfo(tz_name or DEFAULT_TIMEZONE)
+    except ZoneInfoNotFoundError:
+        return ZoneInfo(DEFAULT_TIMEZONE)
+
+
+def resolve_purchase_date(
+    session: Session, user_id: uuid.UUID, purchase_date: date, *, now: datetime | None = None
+) -> datetime:
+    """Convert a client purchase date to an acquired_at instant in the user's configured timezone."""
+    ref = now or utcnow()
+    tz = user_zone(session, user_id)
+    today = ref.astimezone(tz).date()
+    if purchase_date > today:
+        raise ApiError(422, ProblemCode.acquired_at_in_future)
+    return ref if purchase_date == today else datetime.combine(purchase_date, time(12), tz)
+
+
+def _decode_urgency_cursor(cursor: str | None) -> tuple[float, datetime, uuid.UUID, datetime] | None:
+    key = pagination.decode(cursor)
+    if key is None:
+        return None
+    if not (
+        len(key) == 4
+        and isinstance(key[0], (int, float))
+        and not isinstance(key[0], bool)
+        and math.isfinite(key[0])
+        and isinstance(key[1], str)
+        and isinstance(key[2], str)
+        and isinstance(key[3], str)
+    ):
+        raise ApiError(
+            400,
+            ProblemCode.validation_error,
+            errors=[{"pointer": "#/query/cursor", "code": "invalid_cursor", "message": "Con trỏ trang không hợp lệ."}],
+        )
+    try:
+        created_at = datetime.fromisoformat(key[1])
+        as_of = datetime.fromisoformat(key[3])
+        if created_at.tzinfo is None or created_at.utcoffset() is None or as_of.tzinfo is None or as_of.utcoffset() is None:
+            raise ValueError("naive datetime")
+        lot_id = uuid.UUID(key[2])
+    except ValueError:
+        raise ApiError(
+            400,
+            ProblemCode.validation_error,
+            errors=[{"pointer": "#/query/cursor", "code": "invalid_cursor", "message": "Con trỏ trang không hợp lệ."}],
+        ) from None
+    return float(key[0]), created_at, lot_id, as_of
+
+
+def _urgency_sort_expr(as_of: datetime):
+    f64 = Float(precision=53)
+    elapsed_days = func.greatest(
+        literal(0.0, type_=f64),
+        func.extract("epoch", literal(as_of, type_=_TZ_COL) - PantryLot.acquired_at) / literal(86400.0, type_=f64),
+    )
+    u_time_expr = case(
+        (
+            and_(_INGREDIENTS_TABLE.c.shelf_life_days.is_not(None), _INGREDIENTS_TABLE.c.shelf_life_days > 0),
+            elapsed_days / cast(_INGREDIENTS_TABLE.c.shelf_life_days, f64),
+        ),
+        else_=null(),
+    )
+    p_tuoi = cast(PantryLot.p_tuoi, f64)
+    p_dung_som = func.coalesce(cast(PantryLot.p_dung_som, f64), 0.0)
+    p_dung_ngay = func.coalesce(cast(PantryLot.p_dung_ngay, f64), 0.0)
+    p_kiem_tra = func.coalesce(cast(PantryLot.p_kiem_tra, f64), 0.0)
+    u_img_expr = (
+        p_tuoi * fresh.M["tuoi"]
+        + p_dung_som * fresh.M["dung_som"]
+        + p_dung_ngay * fresh.M["dung_ngay"]
+        + p_kiem_tra * fresh.M["kiem_tra"]
+    )
+    max_p_expr = func.greatest(p_tuoi, p_dung_som, p_dung_ngay, p_kiem_tra)
+    u_expr = case(
+        (PantryLot.p_tuoi.is_(None), u_time_expr),
+        (u_time_expr.is_(None), u_img_expr),
+        (and_(PantryLot.acquired_basis == "first_seen", max_p_expr >= fresh.P_TRUST_IMAGE), u_img_expr),
+        else_=func.greatest(u_time_expr, u_img_expr),
+    )
+    return -func.coalesce(u_expr, literal(-1.0, type_=f64))
+
+
 def list_lots(
     session: Session, user: AuthUser, *, statuses: list[str], sort: str, cursor: str | None, limit: int
 ) -> PantryLotPage:
-    rows = list(
-        session.scalars(
-            select(PantryLot).where(PantryLot.user_id == user.id, PantryLot.status.in_(statuses or OPEN_STATUSES))
-        )
-    )
-    lots = _load(session, user.id, rows, utcnow())
-    after = pagination.decode(cursor)
-    if sort == "urgency":
-        lots.sort(key=_sort_key)
-        keys = [list(_sort_key(x)) for x in lots]
+    target_statuses = tuple(statuses or OPEN_STATUSES)
+    if sort == "created_at":
+        after = pagination.decode_created(cursor)
+        stmt = select(PantryLot).where(PantryLot.user_id == user.id, PantryLot.status.in_(target_statuses))
+        if after is not None:
+            stmt = stmt.where(tuple_(PantryLot.created_at, PantryLot.id) > after)
+        rows = list(session.scalars(stmt.order_by(PantryLot.created_at.asc(), PantryLot.id.asc()).limit(limit + 1)))
+        has_more = len(rows) > limit
+        page_rows = rows[:limit]
+        lots = _load(session, user.id, page_rows, utcnow())
+        nxt = pagination.encode_created(page_rows[-1].created_at, page_rows[-1].id) if has_more else None
     else:
-        lots.sort(key=lambda x: (x.row.created_at, x.row.id))
-        keys = [[x.row.created_at.isoformat(), str(x.row.id)] for x in lots]
-    if after is not None:
-        start = next((i for i, k in enumerate(keys) if k > after), len(keys))
-        lots, keys = lots[start:], keys[start:]
-    page = lots[:limit]
-    names = {k: v.name_vi for k, v in catalog.ingredients_by_ids(session, [x.row.ingredient_id for x in page]).items()}
-    nxt = pagination.encode(keys[limit - 1]) if len(lots) > limit else None
-    return PantryLotPage(items=[_out(session, x, names) for x in page], next_cursor=nxt)
+        decoded = _decode_urgency_cursor(cursor)
+        as_of = decoded[3] if decoded is not None else utcnow()
+        sort_u_expr = _urgency_sort_expr(as_of)
+        stmt = (
+            select(PantryLot, sort_u_expr.label("sort_u"))
+            .join(_INGREDIENTS_TABLE, _INGREDIENTS_TABLE.c.id == PantryLot.ingredient_id)
+            .where(PantryLot.user_id == user.id, PantryLot.status.in_(target_statuses))
+        )
+        if decoded is not None:
+            cur_u, cur_ts, cur_id, _ = decoded
+            stmt = stmt.where(
+                tuple_(sort_u_expr, PantryLot.created_at, PantryLot.id)
+                > tuple_(
+                    literal(cur_u, type_=Float(precision=53)),
+                    literal(cur_ts, type_=_TZ_COL),
+                    literal(cur_id, type_=PG_UUID(as_uuid=True)),
+                )
+            )
+        res = session.execute(
+            stmt.order_by(sort_u_expr.asc(), PantryLot.created_at.asc(), PantryLot.id.asc()).limit(limit + 1)
+        ).all()
+        has_more = len(res) > limit
+        page_pairs = res[:limit]
+        page_rows = [r[0] for r in page_pairs]
+        lots = _load(session, user.id, page_rows, as_of)
+        nxt = (
+            pagination.encode(
+                [float(page_pairs[-1][1]), page_rows[-1].created_at.isoformat(), str(page_rows[-1].id), as_of.isoformat()]
+            )
+            if has_more
+            else None
+        )
+    names = {k: v.name_vi for k, v in catalog.ingredients_by_ids(session, [x.row.ingredient_id for x in lots]).items()}
+    return PantryLotPage(items=[_out(session, x, names) for x in lots], next_cursor=nxt)
 
 
 def lot_views(session: Session, user_id: uuid.UUID, *, statuses: Iterable[str] = OPEN_STATUSES) -> list[LotView]:
@@ -200,6 +323,10 @@ def owned_lots(session: Session, user_id: uuid.UUID, ids: Iterable[uuid.UUID]) -
         return {}
     rows = list(session.scalars(select(PantryLot).where(PantryLot.user_id == user_id, PantryLot.id.in_(wanted))))
     return {x.row.id: _view(x) for x in _load(session, user_id, rows, utcnow())}
+
+
+def available_ingredient_ids(session: Session, user_id: uuid.UUID) -> set[uuid.UUID]:
+    return {v.ingredient_id for v in lot_views(session, user_id) if v.available}
 
 
 # ---------------------------------------------------------------- UC14 writes
@@ -219,16 +346,19 @@ def _one(session: Session, user_id: uuid.UUID, lot: PantryLot) -> _Lot:
     return _load(session, user_id, [lot], utcnow())[0]
 
 
-def _check_acquired(at: datetime) -> datetime:
-    if at.tzinfo is None:
+def _check_acquired(
+    session: Session, user_id: uuid.UUID, at: datetime, *, now: datetime | None = None
+) -> datetime:
+    if at.tzinfo is None or at.utcoffset() is None:
         raise ApiError(
             422,
             ProblemCode.validation_error,
             errors=[{"pointer": "/acquired_at", "code": "timezone_required", "message": "Cần múi giờ (ISO 8601)."}],
         )
-    if at > utcnow() + FUTURE_SKEW:
+    ref = now or utcnow()
+    if at > ref + FUTURE_SKEW:
         raise ApiError(422, ProblemCode.acquired_at_in_future)
-    return at
+    return at.astimezone(user_zone(session, user_id))
 
 
 def _tx(
@@ -266,7 +396,7 @@ def create_lot(session: Session, user: AuthUser, body: PantryLotCreate) -> Pantr
     g_min, g_max = to_grams(session, ing, body.quantity)
     now = utcnow()
     if body.acquired_at is not None:
-        acquired, basis = _check_acquired(body.acquired_at), "purchase_date_entered"
+        acquired, basis = _check_acquired(session, user.id, body.acquired_at, now=now), "purchase_date_entered"
     else:
         acquired, basis = now, "first_seen"  # BR-PANTRY-01
     lot = PantryLot(
@@ -282,6 +412,40 @@ def create_lot(session: Session, user: AuthUser, body: PantryLotCreate) -> Pantr
         updated_at=now,
     )
     session.add(lot)
+    return _out(session, _one(session, user.id, lot))
+
+
+def create_lot_with_ledger(
+    session: Session,
+    user: AuthUser,
+    *,
+    ingredient_id: uuid.UUID,
+    g_min: float,
+    g_max: float,
+    acquired_at: datetime | None = None,
+    acquired_basis: str = "purchase_date_entered",
+) -> PantryLotOut:
+    """Create a lot with initial=0 and a positive `manual_edit` transaction so v_pantry_lot_balance == g_min/g_max."""
+    ing = catalog.ingredients_by_ids(session, [ingredient_id]).get(ingredient_id)
+    if ing is None or not ing.is_active:
+        raise ApiError(422, ProblemCode.unknown_ingredient)
+    now = utcnow()
+    acquired = _check_acquired(session, user.id, acquired_at, now=now) if acquired_at is not None else now
+    lot = PantryLot(
+        id=uuid.uuid4(),
+        user_id=user.id,
+        ingredient_id=ing.id,
+        initial_g_min=Decimal("0"),
+        initial_g_max=Decimal("0"),
+        acquired_at=acquired,
+        acquired_basis=acquired_basis,
+        status="in_stock",
+        created_at=now,
+        updated_at=now,
+    )
+    session.add(lot)
+    session.flush()
+    _tx(session, lot, g_min, g_max, "manual_edit", ref_type="user", ref_id=user.id)
     return _out(session, _one(session, user.id, lot))
 
 
@@ -305,7 +469,7 @@ def update_lot(session: Session, user: AuthUser, lot_id: uuid.UUID, body: Pantry
             _tx(session, lot, dmin, dmax, "manual_edit", ref_type="user", ref_id=user.id, urgency=cur.f.urgency)
             changed = True
     if "acquired_at" in fields and body.acquired_at is not None:
-        lot.acquired_at = _check_acquired(body.acquired_at)
+        lot.acquired_at = _check_acquired(session, user.id, body.acquired_at, now=now)
         lot.acquired_basis = "purchase_date_entered"  # FR-14-12
         changed = True
     if "acquired_basis" in fields and body.acquired_basis is not None and lot.acquired_basis != body.acquired_basis:
@@ -458,8 +622,10 @@ def deductions_of(session: Session, cook_session_id: uuid.UUID) -> list[Deductio
 
 def reverse(session: Session, user_id: uuid.UUID, cook_session_id: uuid.UUID) -> list[Deduction]:
     """UC21: one `undo` row per not yet reversed cook_deduct of the session; used-up lots with stock again return to
-    in_stock (FR-21-05); discarded lots stay discarded (4a)."""
+    in_stock (FR-21-05); discarded lots stay discarded (4a). Locks lots in id order to prevent deadlocks."""
     originals = [d for d in deductions_of(session, cook_session_id)]
+    if not originals:
+        return []
     done = set(
         session.scalars(
             select(PantryTransaction.reverses_id).where(
@@ -472,6 +638,7 @@ def reverse(session: Session, user_id: uuid.UUID, cook_session_id: uuid.UUID) ->
         for lot in session.scalars(
             select(PantryLot)
             .where(PantryLot.user_id == user_id, PantryLot.id.in_([d.lot_id for d in originals]))
+            .order_by(PantryLot.id)
             .with_for_update()
         )
     }
@@ -567,14 +734,17 @@ def apply_scan(
     created: list[uuid.UUID] = []
     updated: list[uuid.UUID] = []
     open_lots: dict[uuid.UUID, PantryLot] = {}
+    locked_rows: list[PantryLot] = []
     if mode == "fridge":
-        rows = session.scalars(
-            select(PantryLot)
-            .where(PantryLot.user_id == user_id, PantryLot.status.in_(OPEN_STATUSES))
-            .order_by(PantryLot.acquired_at, PantryLot.created_at)
-            .with_for_update()
+        locked_rows = list(
+            session.scalars(
+                select(PantryLot)
+                .where(PantryLot.user_id == user_id, PantryLot.status.in_(OPEN_STATUSES))
+                .order_by(PantryLot.id)
+                .with_for_update()
+            )
         )
-        for r in rows:
+        for r in sorted(locked_rows, key=lambda row: (row.acquired_at, row.created_at, row.id)):
             open_lots[r.ingredient_id] = r  # last = newest acquired_at
     for it in items:
         probs = it.probs
@@ -615,15 +785,10 @@ def apply_scan(
     not_seen: list[uuid.UUID] = []
     if mode == "fridge":
         seen = {it.ingredient_id for it in items}
-        unseen = [
-            r
-            for r in session.scalars(
-                select(PantryLot)
-                .where(PantryLot.user_id == user_id, PantryLot.status == "in_stock")
-                .order_by(PantryLot.created_at, PantryLot.id)
-            )
-            if r.ingredient_id not in seen
-        ]
+        unseen = sorted(
+            (r for r in locked_rows if r.status == "in_stock" and r.ingredient_id not in seen),
+            key=lambda r: (r.created_at, r.id),
+        )
         ings = catalog.ingredients_by_ids(session, [r.ingredient_id for r in unseen])
         for r in unseen:
             if ings[r.ingredient_id].is_staple:

@@ -298,3 +298,31 @@ def _fake_cook_session(session: Session, user_id) -> uuid.UUID:
                            {"u": user_id}).scalar()  # fmt: skip
     return session.execute(text("INSERT INTO cook_sessions (meal_plan_id, serve_at, burners, started_at) "
                                 "VALUES (:p, now(), 2, now()) RETURNING id"), {"p": plan}).scalar()  # fmt: skip
+
+
+def test_keyset_pagination_for_urgency_and_created_at(kb_client: TestClient, kb_db, s: dict) -> None:
+    leafy = _ing(kb_db, "cải ngọt")  # L = 4
+    salt = _ing(kb_db, "muối")  # unknown urgency -> always last
+    u3 = _lot(kb_client, s, leafy, {"g_min": 50, "g_max": 50}, acquired_at=_ago(3.6))
+    u1 = _lot(kb_client, s, leafy, {"g_min": 50, "g_max": 50}, acquired_at=_ago(0.4))
+    u2 = _lot(kb_client, s, leafy, {"g_min": 50, "g_max": 50}, acquired_at=_ago(2.0))
+    unk = _lot(kb_client, s, salt, {"g_min": 100, "g_max": 100})
+
+    for sort, expected in (("urgency", [u3["id"], u2["id"], u1["id"], unk["id"]]), ("created_at", [u3["id"], u1["id"], u2["id"], unk["id"]])):
+        got: list[str] = []
+        cursor: str | None = None
+        while True:
+            params: dict[str, object] = {"sort": sort, "limit": 2}
+            if cursor:
+                params["cursor"] = cursor
+            page = kb_client.get(f"{API}/pantry/lots", params=params, headers=s)
+            assert page.status_code == 200
+            body = page.json()
+            got.extend(x["id"] for x in body["items"])
+            cursor = body["next_cursor"]
+            if cursor is None:
+                break
+        assert got == expected
+
+    bad = kb_client.get(f"{API}/pantry/lots", params={"sort": "urgency", "cursor": "not-valid"}, headers=s)
+    assert (bad.status_code, bad.json()["code"]) == (400, "validation_error")

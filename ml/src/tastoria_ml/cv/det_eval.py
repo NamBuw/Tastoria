@@ -172,7 +172,11 @@ def weighted_map(P: Prepared, w_img: np.ndarray | None = None) -> tuple[np.ndarr
 
 def summary_map(ap: np.ndarray) -> tuple[float, float]:
     """(mAP50, mAP50-95) averaged over classes with GT."""
-    return float(np.nanmean(ap[:, 0])), float(np.nanmean(ap.mean(1)))
+    ap50_col = ap[:, 0]
+    ap_mean = ap.mean(1)
+    m50 = float(np.nanmean(ap50_col)) if np.any(~np.isnan(ap50_col)) else float("nan")
+    m50_95 = float(np.nanmean(ap_mean)) if np.any(~np.isnan(ap_mean)) else float("nan")
+    return m50, m50_95
 
 
 def paired_cluster_bootstrap(prepared_a: list[Prepared], prepared_b: list[Prepared], cl: np.ndarray,
@@ -203,13 +207,139 @@ def paired_cluster_bootstrap(prepared_a: list[Prepared], prepared_b: list[Prepar
     out = {}
     for j, key in enumerate(("map50", "map50_95")):
         d = diffs[:, j]
+        p_val = float(min(1.0, (np.sum(np.abs(d - point[j]) >= abs(point[j])) + 1) / (n_boot + 1)))
         out[key] = {
             "diff": float(point[j]),
             "ci95": [float(np.percentile(d, 2.5)), float(np.percentile(d, 97.5))],
             "ci90": [float(np.percentile(d, 5)), float(np.percentile(d, 95))],
+            "p": p_val,
         }
     out["n_boot"], out["n_clusters"] = n_boot, n_cl
     return out
+
+
+def _as_name_list(names: list[str] | np.ndarray | dict[int, str]) -> list[str]:
+    if isinstance(names, dict):
+        return [str(names[k]) for k in sorted(names)]
+    return [str(n) for n in names]
+
+
+def remap_pred_classes(
+    pred: dict,
+    src_names: list[str] | np.ndarray | dict[int, str],
+    dst_names: list[str] | np.ndarray | dict[int, str],
+) -> dict:
+    """Project predictions from ``src_names`` class indices onto ``dst_names`` class indices.
+
+    Detections whose class name does not appear in ``dst_names`` are dropped.
+    """
+    src_list = _as_name_list(src_names)
+    dst_list = _as_name_list(dst_names)
+    dst_idx = {name: i for i, name in enumerate(dst_list)}
+    lut = np.array([dst_idx.get(name, -1) for name in src_list], dtype=np.int32)
+
+    cls_arr = np.asarray(pred["cls"], dtype=np.int32)
+    valid_src = (cls_arr >= 0) & (cls_arr < len(lut))
+    mapped = np.full(len(cls_arr), -1, dtype=np.int32)
+    mapped[valid_src] = lut[cls_arr[valid_src]]
+    keep = mapped >= 0
+
+    out = dict(pred)
+    out["boxes"] = np.asarray(pred["boxes"], dtype=np.float32)[keep]
+    out["scores"] = np.asarray(pred["scores"], dtype=np.float32)[keep]
+    out["cls"] = mapped[keep].astype(np.int16)
+    out["img"] = np.asarray(pred["img"], dtype=np.int32)[keep]
+    out["names"] = np.array(dst_list)
+    return out
+
+
+def per_image_detection_metrics(
+    pred: dict,
+    gt: list[tuple[np.ndarray, np.ndarray]],
+    conf: float,
+    iou: float = 0.5,
+) -> dict[str, np.ndarray]:
+    """Per-image greedy-matched TP/FP/FN, precision, recall, and F1 at ``scores >= conf`` and ``iou``."""
+    n = len(gt)
+    tp = np.zeros(n, dtype=np.int64)
+    fp = np.zeros(n, dtype=np.int64)
+    fn = np.zeros(n, dtype=np.int64)
+    n_gt = np.zeros(n, dtype=np.int64)
+    n_pred = np.zeros(n, dtype=np.int64)
+
+    scores = np.asarray(pred["scores"], dtype=np.float64)
+    keep = scores >= conf
+    p_img = np.asarray(pred["img"], dtype=np.int64)[keep]
+    p_cls = np.asarray(pred["cls"], dtype=np.int64)[keep]
+    p_box = np.asarray(pred["boxes"], dtype=np.float64).reshape(-1, 4)[keep]
+    p_sc = scores[keep]
+
+    by_img = np.argsort(p_img, kind="mergesort")
+    starts = np.searchsorted(p_img[by_img], np.arange(n + 1))
+
+    for i in range(n):
+        sel = by_img[starts[i] : starts[i + 1]]
+        gb, gc = gt[i]
+        n_gt[i] = len(gc)
+        n_pred[i] = len(sel)
+        if len(sel) == 0 and len(gc) == 0:
+            continue
+        classes = set(gc.tolist()) | set(p_cls[sel].tolist())
+        for c in classes:
+            g_c = gb[gc == c]
+            d_mask = p_cls[sel] == c
+            d_sel = sel[d_mask]
+            if len(d_sel) == 0:
+                fn[i] += len(g_c)
+                continue
+            if len(g_c) == 0:
+                fp[i] += len(d_sel)
+                continue
+            _, tp_mat = match_greedy(p_box[d_sel], p_sc[d_sel], g_c, thrs=(iou,))
+            matched = int(tp_mat[:, 0].sum())
+            tp[i] += matched
+            fp[i] += len(d_sel) - matched
+            fn[i] += len(g_c) - matched
+
+    denom_f1 = 2 * tp + fp + fn
+    f1 = np.where(denom_f1 > 0, (2.0 * tp) / np.maximum(denom_f1, 1), 1.0)
+    precision = np.where((tp + fp) > 0, tp / np.maximum(tp + fp, 1), np.where(fn == 0, 1.0, 0.0))
+    recall = np.where((tp + fn) > 0, tp / np.maximum(tp + fn, 1), np.where(fp == 0, 1.0, 0.0))
+    return {
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "n_gt": n_gt,
+        "n_pred": n_pred,
+        "precision": precision.astype(np.float64),
+        "recall": recall.astype(np.float64),
+        "f1": f1.astype(np.float64),
+    }
+
+
+def aggregate_cluster_metrics(metrics: dict[str, np.ndarray], cl: np.ndarray) -> dict[str, np.ndarray]:
+    """Aggregate per-image TP/FP/FN counts onto independent cluster units ``cl``."""
+    cl_arr = np.asarray(cl, dtype=np.int64)
+    n_cl = int(cl_arr.max()) + 1 if len(cl_arr) else 0
+    tp = np.bincount(cl_arr, weights=metrics["tp"], minlength=n_cl).astype(np.int64)
+    fp = np.bincount(cl_arr, weights=metrics["fp"], minlength=n_cl).astype(np.int64)
+    fn = np.bincount(cl_arr, weights=metrics["fn"], minlength=n_cl).astype(np.int64)
+    n_gt = np.bincount(cl_arr, weights=metrics["n_gt"], minlength=n_cl).astype(np.int64)
+    n_pred = np.bincount(cl_arr, weights=metrics["n_pred"], minlength=n_cl).astype(np.int64)
+    denom_f1 = 2 * tp + fp + fn
+    f1 = np.where(denom_f1 > 0, (2.0 * tp) / np.maximum(denom_f1, 1), 1.0)
+    precision = np.where((tp + fp) > 0, tp / np.maximum(tp + fp, 1), np.where(fn == 0, 1.0, 0.0))
+    recall = np.where((tp + fn) > 0, tp / np.maximum(tp + fn, 1), np.where(fp == 0, 1.0, 0.0))
+    return {
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "n_gt": n_gt,
+        "n_pred": n_pred,
+        "precision": precision.astype(np.float64),
+        "recall": recall.astype(np.float64),
+        "f1": f1.astype(np.float64),
+    }
 
 
 def equivalence(ci90: list[float], margin: float) -> str:

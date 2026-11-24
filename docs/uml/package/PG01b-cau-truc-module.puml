@@ -10,16 +10,18 @@ skinparam componentStyle rectangle
 
 package "tastoria.modules.meal" as M <<M11>> {
   file "router.py" as Router
-  file "service.py" as Service <<public>>
-  file "repository.py" as Repo
-  file "domain.py" as Domain
   file "schemas.py" as Schemas
-  file "tables.py" as Tables
+  file "service.py" as Service <<public>>
+  file "models.py" as Models
+  file "composer.py" as Composer
+  file "schedule.py" as Schedule
+  file "ranker.py" as Ranker
 }
 
 Router ..> Service
 Router ..> Schemas
-Service ..> Repo
-Service ..> Domain
-Repo ..> Tables
+Service ..> Models
+Service ..> Composer
+Service ..> Schedule
+Service ..> Ranker
 @enduml

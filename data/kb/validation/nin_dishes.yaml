@@ -209,13 +209,13 @@ dishes:
   - nin: Muối
     grams: 1
     ingredient: muối
-  our_kcal: 84.1
-  our_protein_g: 8.3
-  our_lipid_g: 2.7
+  our_kcal: 126.5
+  our_protein_g: 7.5
+  our_lipid_g: 7.8
   our_glucid_g: 6.8
-  our_kcal_ap: 77.6
+  our_kcal_ap: 119.1
   uncovered_gram_share: 0.0
-  rel_error: -0.3378
+  rel_error: -0.0039
 - dish: Canh rau cua
   nin_name: Canh rau cua
   nin_code: VPF-000035
@@ -285,13 +285,13 @@ dishes:
   - nin: Muối
     grams: 1
     ingredient: muối
-  our_kcal: 220.8
-  our_protein_g: 20.6
-  our_lipid_g: 14.4
+  our_kcal: 257.1
+  our_protein_g: 19.8
+  our_lipid_g: 18.8
   our_glucid_g: 2.1
-  our_kcal_ap: 219.7
+  our_kcal_ap: 255.2
   uncovered_gram_share: 0.0
-  rel_error: -0.1097
+  rel_error: 0.0367
 - dish: Đậu phụ sốt cà chua
   nin_name: Đậu phụ sốt cà chua
   nin_code: VPF-000125
@@ -419,13 +419,13 @@ dishes:
   - nin: Trứng vịt
     grams: 2
     ingredient: trứng vịt
-  our_kcal: 96.3
-  our_protein_g: 4.3
-  our_lipid_g: 5.5
+  our_kcal: 116.9
+  our_protein_g: 3.9
+  our_lipid_g: 8.0
   our_glucid_g: 7.4
-  our_kcal_ap: 92.9
+  our_kcal_ap: 113.1
   uncovered_gram_share: 0.0
-  rel_error: -0.0559
+  rel_error: 0.1461
 - dish: Thịt chân giò luộc
   nin_name: Thịt chân giò luộc
   nin_code: VPF-000093
@@ -458,7 +458,7 @@ dishes:
   composition:
   - nin: Thịt lợn thăn
     grams: 36
-    ingredient: thịt nạc vai
+    ingredient: thịt nạc
     note: FCT 7017 thịt lợn nạc
   our_kcal: 50.0
   our_protein_g: 6.8
@@ -500,13 +500,13 @@ dishes:
   - nin: Ngũ vị hương
     grams: 3
     ingredient: ngũ vị hương
-  our_kcal: 499.5
-  our_protein_g: 58.7
-  our_lipid_g: 26.2
+  our_kcal: 862.5
+  our_protein_g: 51.2
+  our_lipid_g: 69.7
   our_glucid_g: 7.3
-  our_kcal_ap: 485.1
+  our_kcal_ap: 840.9
   uncovered_gram_share: 0.008
-  rel_error: -0.4096
+  rel_error: 0.0195
 - dish: Trứng đúc thịt rán
   nin_name: Trứng đúc thịt rán
   nin_code: VPF-000146
@@ -527,13 +527,13 @@ dishes:
   - nin: Dầu TV
     grams: 15
     ingredient: dầu ăn
-  our_kcal: 265.4
-  our_protein_g: 11.1
-  our_lipid_g: 24.3
+  our_kcal: 289.6
+  our_protein_g: 10.6
+  our_lipid_g: 27.2
   our_glucid_g: 0.6
-  our_kcal_ap: 252.5
+  our_kcal_ap: 276.2
   uncovered_gram_share: 0.0
-  rel_error: -0.0589
+  rel_error: 0.027
 - dish: Vịt om sấu
   nin_name: Vịt om sấu
   nin_code: VPF-000062
@@ -689,13 +689,13 @@ dishes:
     grams: 6
     ingredient: null
     note: không rõ thành phần
-  our_kcal: 356.9
-  our_protein_g: 32.8
-  our_lipid_g: 24.2
+  our_kcal: 453.7
+  our_protein_g: 30.8
+  our_lipid_g: 35.9
   our_glucid_g: 1.9
-  our_kcal_ap: 354.5
+  our_kcal_ap: 449.3
   uncovered_gram_share: 0.022
-  rel_error: -0.2104
+  rel_error: 0.0038
 - dish: Thịt lợn ba chỉ kho tàu
   nin_name: Thịt lợn ba chỉ kho tàu
   nin_code: VPF-000056
@@ -981,13 +981,13 @@ dishes:
   - nin: Muối
     grams: 1
     ingredient: muối
-  our_kcal: 90.2
-  our_protein_g: 6.4
-  our_lipid_g: 6.4
+  our_kcal: 114.3
+  our_protein_g: 5.9
+  our_lipid_g: 9.3
   our_glucid_g: 1.7
-  our_kcal_ap: 85.6
+  our_kcal_ap: 109.3
   uncovered_gram_share: 0.0
-  rel_error: -0.2088
+  rel_error: 0.0026
 - dish: Canh bí đỏ thịt nạc
   nin_name: Canh bí đỏ thịt nạt
   nin_code: VPF-000020
@@ -1004,7 +1004,7 @@ dishes:
     ingredient: bí đỏ
   - nin: Thịt lợn nạc
     grams: 50
-    ingredient: thịt nạc vai
+    ingredient: thịt nạc
   - nin: Dầu TV
     grams: 5
     ingredient: dầu ăn
@@ -1034,7 +1034,7 @@ dishes:
     ingredient: cải bẹ xanh
   - nin: Thịt nạc băm
     grams: 20
-    ingredient: thịt nạc vai
+    ingredient: thịt nạc
     note: thịt nạc, không dùng thịt băm nửa nạc nửa mỡ
   - nin: Hạt nêm
     grams: 3
@@ -1351,7 +1351,7 @@ dishes:
     ingredient: đậu phụ
   - nin: Thịt nạc băm
     grams: 50
-    ingredient: thịt nạc vai
+    ingredient: thịt nạc
   - nin: Cà chua
     grams: 50
     ingredient: cà chua
@@ -1387,7 +1387,7 @@ dishes:
     ingredient: nấm hương tươi
   - nin: Thịt nạc băm
     grams: 30
-    ingredient: thịt nạc vai
+    ingredient: thịt nạc
   - nin: Bột canh
     grams: 2
     ingredient: muối
@@ -1453,15 +1453,705 @@ dishes:
   our_kcal_ap: 57.1
   uncovered_gram_share: 0.0
   rel_error: 0.0018
+- dish: Canh bí đao nấu sườn lợn
+  nin_name: Canh bí đao nấu sườn lợn
+  nin_code: VPF-000019
+  kb_slug: canh-bi-dao-tom
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/11/screenshot_133.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 168
+  nin_lipid_g: 12.2
+  nin_glucid_g: 6.2
+  composition:
+  - nin: Bí đao
+    grams: 250
+    ingredient: bí đao
+  - nin: Sườn lợn bỏ xương
+    grams: 60
+    ingredient: sườn non
+  - nin: Hành lá
+    grams: 5
+    ingredient: hành lá
+  - nin: Muối
+    grams: 1
+    ingredient: muối
+  our_kcal: 143.3
+  our_protein_g: 12.3
+  our_lipid_g: 7.7
+  our_glucid_g: 6.2
+  our_kcal_ap: 71.6
+  uncovered_gram_share: 0.0
+  rel_error: -0.147
+- dish: Canh khoai sọ nấu xương, rau rút
+  nin_name: Canh khoai sọ nấu xương, rau rút
+  nin_code: VPF-000030
+  kb_slug: canh-khoai-so-suon
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/11/screenshot_144.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 384
+  nin_protein_g: 13.5
+  nin_lipid_g: 12.4
+  nin_glucid_g: 54.5
+  composition:
+  - nin: Khoai sọ
+    grams: 200
+    ingredient: khoai sọ
+  - nin: Sườn lợn bỏ xương
+    grams: 40
+    ingredient: sườn non
+  - nin: Rau muống
+    grams: 40
+    ingredient: rau muống
+  - nin: Rau rút
+    grams: 30
+    ingredient: null
+  - nin: Dầu TV
+    grams: 5
+    ingredient: dầu ăn
+  - nin: Muối
+    grams: 1
+    ingredient: muối
+  our_kcal: 357.7
+  our_protein_g: 12.0
+  our_lipid_g: 10.5
+  our_glucid_g: 53.8
+  our_kcal_ap: 270.2
+  uncovered_gram_share: 0.095
+  rel_error: -0.0685
+- dish: Canh mướp lạc
+  nin_name: Canh mướp lạc
+  nin_code: VPF-000032
+  kb_slug: canh-muop-nau-tom
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/11/screenshot_146.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 141
+  nin_protein_g: 6.2
+  nin_lipid_g: 10
+  nin_glucid_g: 6.7
+  composition:
+  - nin: Mướp
+    grams: 100
+    ingredient: mướp
+  - nin: Lạc hạt
+    grams: 20
+    ingredient: lạc
+  - nin: Hành lá
+    grams: 10
+    ingredient: hành lá
+  - nin: Hạt nêm
+    grams: 5
+    ingredient: hạt nêm
+  our_kcal: 147.1
+  our_protein_g: 7.4
+  our_lipid_g: 9.8
+  our_glucid_g: 7.2
+  our_kcal_ap: 141.2
+  uncovered_gram_share: 0.0
+  rel_error: 0.0433
+- dish: Cá Ngừ kho dứa
+  nin_name: Cá Ngừ kho dứa
+  nin_code: VPF-000042
+  kb_slug: ca-ngu-kho-thom
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/11/screenshot_156.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 159
+  nin_protein_g: 36.4
+  nin_lipid_g: 0.5
+  nin_glucid_g: 2.2
+  composition:
+  - nin: Cá ngừ
+    grams: 170
+    ingredient: cá ngừ
+  - nin: Dứa
+    grams: 30
+    ingredient: dứa
+  - nin: Hành lá
+    grams: 5
+    ingredient: hành lá
+  - nin: Mắm
+    grams: 5
+    ingredient: nước mắm
+  our_kcal: 162.2
+  our_protein_g: 36.2
+  our_lipid_g: 0.5
+  our_glucid_g: 3.0
+  our_kcal_ap: 95.3
+  uncovered_gram_share: 0.0
+  rel_error: 0.0201
+- dish: Cá quả (Cá lóc) kho
+  nin_name: Cá quả (Cá lóc) kho
+  nin_code: VPF-000044
+  kb_slug: ca-kho-to
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/11/screenshot_158.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 54
+  nin_protein_g: 10.2
+  nin_lipid_g: 1.5
+  composition:
+  - nin: Cá quả
+    grams: 56
+    ingredient: cá lóc
+  - nin: Nước mắm
+    grams: 5
+    ingredient: nước mắm
+  our_kcal: 56.1
+  our_protein_g: 10.4
+  our_lipid_g: 1.5
+  our_glucid_g: 0.2
+  our_kcal_ap: 34.3
+  uncovered_gram_share: 0.0
+  rel_error: 0.0389
+- dish: Cá thu kho
+  nin_name: Cá thu kho
+  nin_code: VPF-000045
+  kb_slug: ca-thu-sot-ca-chua
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/11/screenshot_159.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 116
+  nin_protein_g: 13
+  nin_lipid_g: 7.2
+  nin_glucid_g: 0.3
+  composition:
+  - nin: Cá thu
+    grams: 70
+    ingredient: cá thu
+  - nin: Nước mắm
+    grams: 7.5
+    ingredient: nước mắm
+  our_kcal: 118.8
+  our_protein_g: 13.1
+  our_lipid_g: 7.2
+  our_glucid_g: 0.3
+  our_kcal_ap: 78.2
+  uncovered_gram_share: 0.0
+  rel_error: 0.0241
+- dish: Thịt lợn ba chỉ kho trứng cút
+  nin_name: Thịt lợn ba chỉ kho trứng cút
+  nin_code: VPF-000057
+  kb_slug: thit-kho-tau
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/11/screenshot_171.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 473
+  nin_protein_g: 26.3
+  nin_lipid_g: 36.3
+  nin_glucid_g: 10.1
+  composition:
+  - nin: Thịt ba chỉ
+    grams: 120
+    ingredient: thịt ba chỉ
+  - nin: Trứng cút
+    grams: 50
+    ingredient: trứng cút
+  - nin: Đường kính
+    grams: 10
+    ingredient: đường
+  - nin: Dầu TV
+    grams: 5
+    ingredient: dầu ăn
+  - nin: Bột canh
+    grams: 2.5
+    ingredient: muối
+  our_kcal: 473.6
+  our_protein_g: 26.4
+  our_lipid_g: 36.3
+  our_glucid_g: 10.1
+  our_kcal_ap: 458.8
+  uncovered_gram_share: 0.0
+  rel_error: 0.0013
+- dish: Gan lợn luộc
+  nin_name: Gan lợn luộc
+  nin_code: VPF-000074
+  kb_slug: gan-lon-xao-hanh
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/11/screenshot_188.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 371
+  nin_protein_g: 60.2
+  nin_lipid_g: 11.5
+  nin_glucid_g: 6.4
+  composition:
+  - nin: Gan lợn
+    grams: 320
+    ingredient: gan lợn
+  our_kcal: 371.2
+  our_protein_g: 60.2
+  our_lipid_g: 11.5
+  our_glucid_g: 6.4
+  our_kcal_ap: 371.2
+  uncovered_gram_share: 0.0
+  rel_error: 0.0005
+- dish: Gà nướng
+  nin_name: Gà nướng
+  nin_code: VPF-000105
+  kb_slug: ga-nuong-mat-ong
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_219.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 242
+  nin_protein_g: 14.2
+  nin_lipid_g: 19.5
+  nin_glucid_g: 1.9
+  composition:
+  - nin: Thịt gà (cả xương)
+    grams: 150
+    ingredient: thịt gà
+    as_purchased: true
+  - nin: Sả
+    grams: 10
+    ingredient: sả
+  - nin: Ngũ vị hương
+    grams: 2
+    ingredient: ngũ vị hương
+  - nin: Ớt
+    grams: 1
+    ingredient: ớt
+  - nin: Dầu hào
+    grams: 10
+    ingredient: dầu hào
+  our_kcal: 158.7
+  our_protein_g: 15.0
+  our_lipid_g: 9.5
+  our_glucid_g: 3.7
+  our_kcal_ap: 158.7
+  uncovered_gram_share: 0.012
+  rel_error: -0.3442
+- dish: Cá nục rán
+  nin_name: Cá nục rán
+  nin_code: VPF-000112
+  kb_slug: ca-basa-chien-sa
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_226.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 156
+  nin_protein_g: 15.2
+  nin_lipid_g: 10.6
+  composition:
+  - nin: Cá nục
+    grams: 75
+    ingredient: cá nục
+  - nin: Dầu TV
+    grams: 7
+    ingredient: dầu ăn
+  our_kcal: 146.0
+  our_protein_g: 15.2
+  our_lipid_g: 9.5
+  our_glucid_g: 0.0
+  our_kcal_ap: 116.9
+  uncovered_gram_share: 0.0
+  rel_error: -0.0641
+- dish: Cá rô phi rán
+  nin_name: Cá rô phi rán
+  nin_code: VPF-000114
+  kb_slug: ca-ro-phi-chien
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_228.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 622
+  nin_protein_g: 104.8
+  nin_lipid_g: 22.3
+  nin_glucid_g: 0.4
+  composition:
+  - nin: Cá rô phi (cả xương)
+    grams: 530
+    ingredient: cá rô phi
+    as_purchased: true
+  - nin: Rau thì là
+    grams: 15
+    ingredient: thì là
+  - nin: Dầu thực vật
+    grams: 10
+    ingredient: dầu ăn
+    note: ảnh ghi 10 ml
+  our_kcal: 396.0
+  our_protein_g: 59.9
+  our_lipid_g: 17.1
+  our_glucid_g: 0.3
+  our_kcal_ap: 394.9
+  uncovered_gram_share: 0.0
+  rel_error: -0.3633
+- dish: Cá thu rán
+  nin_name: Cá thu rán
+  nin_code: VPF-000116
+  kb_slug: ca-thu-sot-ca-chua
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_230.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 338
+  nin_protein_g: 27.3
+  nin_lipid_g: 25.4
+  composition:
+  - nin: Cá thu
+    grams: 150
+    ingredient: cá thu
+  - nin: Dầu TV
+    grams: 10
+    ingredient: dầu ăn
+  our_kcal: 338.7
+  our_protein_g: 27.3
+  our_lipid_g: 25.4
+  our_glucid_g: 0.0
+  our_kcal_ap: 251.6
+  uncovered_gram_share: 0.0
+  rel_error: 0.0021
+- dish: Cá trắm rán
+  nin_name: Cá trắm rán
+  nin_code: VPF-000118
+  kb_slug: ca-tram-kho-rieng
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_232.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 227
+  nin_protein_g: 25.5
+  nin_lipid_g: 13.9
+  composition:
+  - nin: Cá trắm cỏ
+    grams: 150
+    ingredient: cá trắm
+  - nin: Dầu TV
+    grams: 10
+    ingredient: dầu ăn
+  our_kcal: 226.2
+  our_protein_g: 25.5
+  our_lipid_g: 13.9
+  our_glucid_g: 0.0
+  our_kcal_ap: 178.4
+  uncovered_gram_share: 0.0
+  rel_error: -0.0035
+- dish: Cánh gà tẩm bột rán
+  nin_name: Cánh gà tẩm bột rán
+  nin_code: VPF-000120
+  kb_slug: canh-ga-chien-nuoc-mam
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_234.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 205
+  nin_protein_g: 11.7
+  nin_lipid_g: 14.9
+  nin_glucid_g: 9.6
+  composition:
+  - nin: Cánh gà (cả xương)
+    grams: 79
+    ingredient: cánh gà
+    as_purchased: true
+  - nin: Bột chiên Aji quick
+    grams: 16
+    ingredient: bột chiên giòn
+  - nin: Dầu TV
+    grams: 10
+    ingredient: dầu ăn
+  our_kcal: 217.5
+  our_protein_g: 8.3
+  our_lipid_g: 15.0
+  our_glucid_g: 11.8
+  our_kcal_ap: 217.5
+  uncovered_gram_share: 0.0
+  rel_error: 0.061
+- dish: Chả cá rán
+  nin_name: Chả cá rán
+  nin_code: VPF-000121
+  kb_slug: ca-ro-phi-chien
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_235.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 235
+  nin_protein_g: 19.7
+  nin_lipid_g: 17.3
+  composition:
+  - nin: Cá rô phi
+    grams: 100
+    ingredient: cá rô phi
+  - nin: Dầu TV
+    grams: 15
+    ingredient: dầu ăn
+  - nin: Muối
+    grams: 0.5
+    ingredient: muối
+  our_kcal: 234.6
+  our_protein_g: 19.7
+  our_lipid_g: 17.3
+  our_glucid_g: 0.0
+  our_kcal_ap: 191.6
+  uncovered_gram_share: 0.0
+  rel_error: -0.0017
+- dish: Tôm đồng rang
+  nin_name: Tôm đồng rang
+  nin_code: VPF-000152
+  kb_slug: tep-rang-khe
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_266.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 103
+  nin_protein_g: 7.4
+  nin_lipid_g: 3.7
+  nin_glucid_g: 10
+  composition:
+  - nin: Tôm đồng
+    grams: 40
+    ingredient: tôm
+  - nin: Đường kính
+    grams: 10
+    ingredient: đường
+  - nin: Dầu TV
+    grams: 3
+    ingredient: dầu ăn
+  - nin: Bột canh
+    grams: 1
+    ingredient: muối
+  our_kcal: 99.4
+  our_protein_g: 7.0
+  our_lipid_g: 3.4
+  our_glucid_g: 10.3
+  our_kcal_ap: 81.7
+  uncovered_gram_share: 0.0
+  rel_error: -0.035
+- dish: Ếch xào măng
+  nin_name: Ếch xào măng
+  nin_code: VPF-000160
+  kb_slug: ech-xao-sa-ot
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_274.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 203
+  nin_protein_g: 23.6
+  nin_lipid_g: 11.2
+  nin_glucid_g: 2
+  composition:
+  - nin: Thịt ếch
+    grams: 110
+    ingredient: ếch
+  - nin: Măng chua
+    grams: 100
+    ingredient: măng tươi
+  - nin: Dầu TV
+    grams: 10
+    ingredient: dầu ăn
+  - nin: Bột nêm
+    grams: 3
+    ingredient: hạt nêm
+  our_kcal: 211.7
+  our_protein_g: 24.2
+  our_lipid_g: 11.9
+  our_glucid_g: 1.9
+  our_kcal_ap: 204.2
+  uncovered_gram_share: 0.0
+  rel_error: 0.0429
+- dish: Khoai tây xào
+  nin_name: Khoai tây xào
+  nin_code: VPF-000162
+  kb_slug: khoai-tay-xao-hanh-tay
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_276.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 246
+  nin_protein_g: 3.9
+  nin_lipid_g: 9.1
+  nin_glucid_g: 39.8
+  composition:
+  - nin: Khoai tây
+    grams: 180
+    ingredient: khoai tây
+  - nin: Tỏi
+    grams: 5
+    ingredient: tỏi
+  - nin: Dầu TV
+    grams: 8
+    ingredient: dầu ăn
+  - nin: Hạt nêm
+    grams: 2
+    ingredient: hạt nêm
+  - nin: Mì chính
+    grams: 3
+    ingredient: bột ngọt
+  our_kcal: 250.6
+  our_protein_g: 4.2
+  our_lipid_g: 8.5
+  our_glucid_g: 39.1
+  our_kcal_ap: 227.6
+  uncovered_gram_share: 0.0
+  rel_error: 0.0187
+- dish: Mực xào dưa
+  nin_name: Mực xào dưa
+  nin_code: VPF-000166
+  kb_slug: muc-xao-hanh-can
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_280.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 175
+  nin_lipid_g: 11.1
+  nin_glucid_g: 4.1
+  composition:
+  - nin: Mực tươi
+    grams: 85
+    ingredient: mực
+  - nin: Dưa cải
+    grams: 60
+    ingredient: dưa cải chua
+  - nin: Dầu TV
+    grams: 10
+    ingredient: dầu ăn
+  - nin: Bột canh
+    grams: 1.8
+    ingredient: muối
+  our_kcal: 161.9
+  our_protein_g: 14.9
+  our_lipid_g: 10.7
+  our_glucid_g: 1.4
+  our_kcal_ap: 147.8
+  uncovered_gram_share: 0.0
+  rel_error: -0.0749
+- dish: Mực xào dứa
+  nin_name: Mực xào dứa
+  nin_code: VPF-000167
+  kb_slug: muc-xao-hanh-can
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_281.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 203
+  nin_protein_g: 14.5
+  nin_lipid_g: 11.1
+  nin_glucid_g: 11.1
+  composition:
+  - nin: Mực
+    grams: 85
+    ingredient: mực
+  - nin: Dứa
+    grams: 130
+    ingredient: dứa
+  - nin: Dầu TV
+    grams: 10
+    ingredient: dầu ăn
+  - nin: Muối
+    grams: 0.8
+    ingredient: muối
+  our_kcal: 201.1
+  our_protein_g: 14.5
+  our_lipid_g: 10.9
+  our_glucid_g: 11.4
+  our_kcal_ap: 167.7
+  uncovered_gram_share: 0.0
+  rel_error: -0.0094
+- dish: Mực xào thập cẩm
+  nin_name: Mực xào thập cẩm
+  nin_code: VPF-000168
+  kb_slug: muc-xao-hanh-can
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_282.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 154
+  nin_protein_g: 11.3
+  nin_lipid_g: 6.2
+  nin_glucid_g: 13.3
+  composition:
+  - nin: Mực
+    grams: 54
+    ingredient: mực
+  - nin: Ngô bao tử
+    grams: 18
+    ingredient: ngô bao tử
+  - nin: Hành tây
+    grams: 30
+    ingredient: hành tây
+  - nin: Cần tây
+    grams: 40
+    ingredient: cần tây
+  - nin: Dầu TV
+    grams: 10
+    ingredient: dầu ăn
+  - nin: Hạt nêm
+    grams: 1.5
+    ingredient: hạt nêm
+  our_kcal: 171.8
+  our_protein_g: 11.5
+  our_lipid_g: 10.8
+  our_glucid_g: 7.2
+  our_kcal_ap: 158.0
+  uncovered_gram_share: 0.0
+  rel_error: 0.1156
+- dish: Rau cải bắp xào
+  nin_name: Rau cải bắp xào
+  nin_code: VPF-000173
+  kb_slug: bap-cai-xao-ca-chua
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_288.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 72
+  nin_protein_g: 1.5
+  nin_lipid_g: 5
+  nin_glucid_g: 5.4
+  composition:
+  - nin: Rau bắp cải
+    grams: 80
+    ingredient: bắp cải
+  - nin: Dầu TV
+    grams: 5
+    ingredient: dầu ăn
+  - nin: Bột canh
+    grams: 1
+    ingredient: muối
+  - nin: Mì chính
+    grams: 2
+    ingredient: bột ngọt
+  our_kcal: 68.0
+  our_protein_g: 1.4
+  our_lipid_g: 5.1
+  our_glucid_g: 4.2
+  our_kcal_ap: 65.7
+  uncovered_gram_share: 0.0
+  rel_error: -0.0556
+- dish: Rau cải chíp xào nấm
+  nin_name: Rau cải chíp xào nấm
+  nin_code: VPF-000174
+  kb_slug: cai-thia-xao-nam-huong
+  url: https://viendinhduong.vn/storage/app/uploads/public/2025/12/12/screenshot_289.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 216
+  nin_protein_g: 14.3
+  nin_lipid_g: 11.7
+  nin_glucid_g: 13.6
+  composition:
+  - nin: Cải chíp
+    grams: 250
+    ingredient: cải thìa
+  - nin: Nấm
+    grams: 30
+    ingredient: nấm hương khô
+  - nin: Dầu TV
+    grams: 10
+    ingredient: dầu ăn
+  - nin: Muối
+    grams: 1
+    ingredient: muối
+  our_kcal: 214.4
+  our_protein_g: 14.3
+  our_lipid_g: 11.7
+  our_glucid_g: 13.1
+  our_kcal_ap: 195.6
+  uncovered_gram_share: 0.0
+  rel_error: -0.0074
+- dish: Trứng vịt rán
+  nin_name: Trứng vịt rán
+  nin_code: VPF-000381
+  kb_slug: trung-chien-hanh
+  url: https://viendinhduong.vn/storage/app/uploads/public/2026/02/06/screenshot_333.webp
+  accessed_on: 2026-11-22
+  nin_kcal: 218
+  nin_protein_g: 15.3
+  nin_lipid_g: 17
+  nin_glucid_g: 1
+  composition:
+  - nin: Trứng vịt (2 quả)
+    grams: 120
+    ingredient: trứng vịt
+  - nin: Hành lá
+    grams: 3
+    ingredient: hành lá
+  - nin: Dầu TV
+    grams: 5
+    ingredient: dầu ăn
+  - nin: Bột canh
+    grams: 3
+    ingredient: muối
+  our_kcal: 266.3
+  our_protein_g: 15.6
+  our_lipid_g: 22.0
+  our_glucid_g: 1.3
+  our_kcal_ap: 239.7
+  uncovered_gram_share: 0.0
+  rel_error: 0.2216
 summary:
-  n: 45
-  p80_abs_rel_error: 0.2135
+  n: 69
+  p80_abs_rel_error: 0.1197
   p80_bootstrap_95ci:
-  - 0.0879
-  - 0.3352
-  median_abs_rel_error: 0.0466
-  mean_rel_error: -0.0432
-  median_rel_error: -0.0016
-  within_10pct: 31
-  within_20pct: 34
-  data_version: nut-r1+kb1:7e32e13b+fct2007:6dbf6d58+usda:1c93c3cb
+  - 0.0654
+  - 0.2258
+  median_abs_rel_error: 0.035
+  mean_rel_error: -0.0131
+  median_rel_error: 0.0013
+  within_10pct: 54
+  within_20pct: 59
+  data_version: nut-r1+kb1:1d2c61cc+fct2007:6dbf6d58+usda:1c93c3cb

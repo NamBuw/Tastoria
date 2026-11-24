@@ -29,7 +29,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <Screen>
+    <Screen variant="focused">
       <T v="h2" accessibilityRole="header">
         Đặt mật khẩu mới
       </T>

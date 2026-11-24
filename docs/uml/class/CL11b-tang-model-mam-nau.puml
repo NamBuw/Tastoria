@@ -1,0 +1,56 @@
+@startuml
+title CL11b — Tầng model: mâm cơm và phiên nấu (SQLAlchemy)
+' Sinh từ docs/sad/tools/diagrams/model.py — sửa ở đó rồi chạy gen_puml.py, không sửa tay.
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 13
+skinparam dpi 110
+
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor White
+
+class "MealPlanPin" as PIN <<ORM>> {
+  -lot_id: UUID
+}
+class "MealPlan" as MP <<ORM>> {
+  -meal: str
+  -persons: int
+  -max_minutes: int
+  -status: str
+  -e_target_kcal: Decimal
+}
+class "MealPlanItem" as MI <<ORM>> {
+  -slot: str
+  -recipe_id: UUID
+  -status: str
+  -servings_scale: Decimal
+  -replaced_item_id: UUID
+}
+class "MealPlanItemSubstitution" as SUB <<ORM>> {
+  -original_ingredient_id: UUID
+  -substitute_ingredient_id: UUID
+  -grams: Decimal
+  -origin: str
+}
+class "CookSession" as CS <<ORM>> {
+  -status: str
+  -serve_at: datetime
+  -burners: int
+  -completed_at: datetime
+  -reverted_at: datetime
+}
+class "CookScheduleEntry" as SE <<ORM>> {
+  -recipe_id: UUID
+  -step_no: int
+  -start_offset_s: int
+  -end_offset_s: int
+}
+
+MP *-- "0..2" PIN
+MP *-- "1..*" MI
+MI *-- "0..*" SUB
+MP "1" -- "0..*" CS : được nấu
+CS *-- "1..*" SE
+@enduml

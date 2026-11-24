@@ -1,19 +1,36 @@
 #!/bin/sh
-# Periodic jobs (ADR 0003): sweep every minute (UC34, incl. stuck scans), finish open data-subject requests every
-# 10 minutes (crash recovery for UC06/UC07), delete scan photos past 30 days every hour (UC32, BR-RETAIN-01). Each run is a fresh process; a failing run is logged and retried next tick.
-# Backups run on the host (deploy/scripts/backup.sh), not here: they need docker and rclone.
+# Periodic jobs (ADR 0003): sweep & email outbox every minute, DSR every 10 minutes, image/export retention every hour.
+# Writes /tmp/scheduler.beat ONLY when all jobs in the tick succeed within timeout.
 set -u
 trap "exit 0" TERM INT
 i=0
 while :; do
-  date +%s > /tmp/scheduler.beat
-  tastoria jobs sweep || echo "scheduler: sweep failed (exit $?)" >&2
+  ok=1
+  if ! timeout 50 tastoria jobs sweep; then
+    echo "scheduler: sweep failed (exit $?)" >&2
+    ok=0
+  fi
+  if ! timeout 50 tastoria jobs drain-outbox; then
+    echo "scheduler: drain-outbox failed (exit $?)" >&2
+    ok=0
+  fi
   if [ $((i % 10)) -eq 0 ]; then
-    tastoria jobs process-dsr || echo "scheduler: process-dsr failed (exit $?)" >&2
+    if ! timeout 240 tastoria jobs process-dsr; then
+      echo "scheduler: process-dsr failed (exit $?)" >&2
+      ok=0
+    fi
   fi
   if [ $((i % 60)) -eq 0 ]; then
-    tastoria jobs purge-images || echo "scheduler: purge-images failed (exit $?)" >&2
+    if ! timeout 240 tastoria jobs purge-images; then
+      echo "scheduler: purge-images failed (exit $?)" >&2
+      ok=0
+    fi
+    if ! timeout 120 tastoria jobs purge-exports; then
+      echo "scheduler: purge-exports failed (exit $?)" >&2
+      ok=0
+    fi
   fi
+  [ "$ok" = 1 ] && date +%s > /tmp/scheduler.beat
   i=$((i + 1))
   sleep 60 &
   wait $!

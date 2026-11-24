@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { api, call, type Schemas } from '@/api/client';
@@ -7,7 +7,7 @@ import { errorText } from '@/api/errors';
 import { useReference } from '@/lib/queries';
 import { space } from '@/theme';
 
-import { Chip, ErrorBox, Field, Loading, Radio, Row, Stepper, T } from './ui';
+import { Button, Chip, ErrorBox, Field, Loading, Radio, Row, Sheet, Stepper, T } from './ui';
 
 const UNIT_LABEL: Record<string, string> = {
   qua: 'quả',
@@ -22,6 +22,8 @@ const UNIT_LABEL: Record<string, string> = {
   con: 'con',
 };
 export const LEVEL_LABEL = { it: 'Ít', vua: 'Vừa', nhieu: 'Nhiều' } as const;
+
+export const QUICK_STAPLES = ['Trứng gà', 'Đậu phụ', 'Thịt lợn', 'Rau muống', 'Cà chua', 'Hành lá'] as const;
 
 type Ingredient = Schemas['Ingredient'];
 type Qty = Schemas['QuantityInput'];
@@ -73,7 +75,7 @@ export function IngredientSearch({
 type Mode = 'count' | 'level' | 'grams';
 
 /**
- * The three ways to give an amount (QuantityInput): count × unit (any `ingredient_units` row), ít/vừa/nhiều
+ * The three ways to give an amount (QuantityInput): count * unit (any `ingredient_units` row), it/vua/nhieu
  * (only for non-countable ingredients), or grams. The server converts to [g_min, g_max].
  */
 export function QuantityEditor({ ingredient, onChange }: { ingredient: Ingredient; onChange: (q: Qty | null) => void }) {
@@ -126,7 +128,7 @@ export function QuantityEditor({ ingredient, onChange }: { ingredient: Ingredien
             </Row>
           ) : null}
           {unitInfo ? (
-            <T v="small" tone="muted">
+            <T v="small" tone="muted" tabular>
               1 {UNIT_LABEL[unitInfo.unit_code] ?? unitInfo.unit_code} ≈ {Math.round(unitInfo.grams_per_unit)} g ({unitInfo.source})
             </T>
           ) : null}
@@ -139,7 +141,7 @@ export function QuantityEditor({ ingredient, onChange }: { ingredient: Ingredien
             return (
               <Radio
                 key={l}
-                label={`${LEVEL_LABEL[l]}${info ? ` (${Math.round(info.g_min)}–${Math.round(info.g_max)} g)` : ''}`}
+                label={`${LEVEL_LABEL[l]}${info ? ` (${Math.round(info.g_min)} đến ${Math.round(info.g_max)} g)` : ''}`}
                 selected={level === l}
                 onPress={() => setLevel(l)}
               />
@@ -192,4 +194,106 @@ export function daysAgoIso(n: number): string {
   if (n > 0) d.setHours(12, 0, 0, 0);
   else d.setMinutes(d.getMinutes() - 1); // never in the future (acquired_at_in_future)
   return d.toISOString();
+}
+
+// ---- reusable AddLotSheet -----------------------------------------------------------------------
+
+export function AddLotSheet({
+  visible,
+  onClose,
+  initialIngredient = null,
+  onCustomSubmit,
+  title = 'Thêm đồ vào kho',
+}: {
+  visible: boolean;
+  onClose: () => void;
+  initialIngredient?: Ingredient | null;
+  onCustomSubmit?: (body: { ingredient_id: string; quantity: Qty; acquired_at?: string }) => Promise<void>;
+  title?: string;
+}) {
+  const qc = useQueryClient();
+  const [ing, setIng] = useState<Ingredient | null>(null);
+  const activeIng = initialIngredient ?? ing;
+  const [qty, setQty] = useState<Qty | null>(null);
+  const [days, setDays] = useState<number | null>(0);
+  const [stapleBusy, setStapleBusy] = useState<string | null>(null);
+  const [stapleErr, setStapleErr] = useState<unknown>(null);
+
+  const onQty = useCallback((q: Qty | null) => setQty(q), []);
+
+  const pickStaple = async (name: string) => {
+    setStapleBusy(name);
+    setStapleErr(null);
+    try {
+      const r = await call(api.GET('/ingredients', { params: { query: { q: name, limit: 5 } } }));
+      const exact = r.items.find((i) => i.name_vi.toLowerCase() === name.toLowerCase()) ?? r.items[0] ?? null;
+      if (exact) setIng(exact);
+    } catch (e) {
+      setStapleErr(e);
+    } finally {
+      setStapleBusy(null);
+    }
+  };
+
+  const add = useMutation({
+    mutationFn: async () => {
+      const body = {
+        ingredient_id: activeIng!.id,
+        quantity: qty!,
+        ...(days !== null ? { acquired_at: daysAgoIso(days) } : {}),
+      };
+      if (onCustomSubmit) {
+        await onCustomSubmit(body);
+        return;
+      }
+      await call(api.POST('/pantry/lots', { body }));
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['lots'] });
+      setIng(null);
+      setQty(null);
+      onClose();
+    },
+  });
+
+  return (
+    <Sheet visible={visible} onClose={onClose} title={title} testID="sheet-add-lot">
+      {!initialIngredient ? (
+        <>
+          <View style={{ gap: space.xs }}>
+            <T v="label">Chọn nhanh đồ hay dùng</T>
+            <Row gap={space.sm}>
+              {QUICK_STAPLES.map((name, idx) => (
+                <Chip
+                  key={name}
+                  testID={`pantry-quick-${idx}`}
+                  label={stapleBusy === name ? `${name}…` : name}
+                  selected={activeIng?.name_vi.toLowerCase() === name.toLowerCase()}
+                  disabled={!!stapleBusy}
+                  onPress={() => void pickStaple(name)}
+                />
+              ))}
+            </Row>
+            {stapleErr ? <ErrorBox message={errorText(stapleErr)} /> : null}
+          </View>
+          <IngredientSearch onPick={setIng} picked={activeIng} testID="add-lot-search" />
+        </>
+      ) : null}
+      {activeIng ? (
+        <>
+          <T v="title">{activeIng.name_vi}</T>
+          <QuantityEditor key={activeIng.id} ingredient={activeIng} onChange={onQty} />
+          <PurchaseDate value={days} onChange={setDays} />
+        </>
+      ) : null}
+      {add.error ? <ErrorBox message={errorText(add.error)} /> : null}
+      <Button
+        label="Thêm vào kho"
+        testID="add-lot-submit"
+        onPress={() => add.mutate()}
+        loading={add.isPending}
+        disabled={!activeIng || !qty}
+      />
+    </Sheet>
+  );
 }

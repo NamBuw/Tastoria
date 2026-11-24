@@ -80,7 +80,7 @@ def run():
         tid('add-lot-submit').click()
         tid('sheet-add-lot').wait_for(state='detached')
         pg.wait_for_timeout(300)
-    pg.get_by_text('10 lô trong kho').wait_for()
+    pg.get_by_text('10/10 lô').wait_for()
     shot('12-kho')
     # tray
     pg.goto(BASE+'/mam'); tid('screen-tray').wait_for()
@@ -112,7 +112,7 @@ def run():
     pg.get_by_role('button', name='Xem công thức').count()
     pg.get_by_label('Đóng').last.click()
     # recipe detail
-    tid('tray-dish-man').click(); pg.get_by_role('button', name='Xem công thức').click()
+    tid('tray-dish-man').click(); tid('sheet-dish').get_by_role('button', name='Xem công thức').click()
     tid('screen-recipe').wait_for(); shot('19-cong-thuc')
     pg.go_back(); tid('plan-view').wait_for()
     # cook
@@ -138,10 +138,12 @@ def run():
     pg.goto(BASE+'/bep'); tid('screen-home').wait_for(); pg.wait_for_timeout(800); shot('28-trang-chu')
     pg.goto(BASE+'/cai-dat'); tid('screen-settings').wait_for(); shot('29-cai-dat')
     tid('settings-consent').click(); pg.wait_for_timeout(800); shot('30-cai-dat-dong-y')
+    pg.goto(BASE+'/kham-pha'); tid('screen-explore').wait_for(); shot('34-kham-pha')
     pg.goto(BASE+'/quet?mode=fridge'); tid('screen-scan').wait_for(); shot('31-quet')
     pg.goto(BASE+'/khao-sat'); tid('screen-survey-start').wait_for(); shot('32-khao-sat')
     tid('survey-consent').click(); tid('survey-start').click()
-    tid('screen-survey-closed').wait_for(); shot('33-khao-sat-chua-mo')
+    pg.locator('[data-testid="screen-survey-closed"], [data-testid="screen-survey-form"]').first.wait_for()
+    shot('33-khao-sat-tiep')
     b.close()
 try:
     run()

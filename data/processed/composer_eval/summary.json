@@ -7512,5 +7512,20 @@
   "diversity": 0.09859154929577464,
   "share_kcal_ok": 0.9014084507042254,
   "share_uses_urgent": 1.0
+ },
+ "protocol_id": "TASTORIA-ML-PREREG-2026-11-18",
+ "analysis_intent": "exploratory",
+ "chosen_knee_tuning": {
+  "alpha": 16.0,
+  "beta": 2.0,
+  "gamma": 1.0,
+  "n": 71,
+  "urgency": 0.32047200252906566,
+  "taste": 0.5752910618772459,
+  "taste_loss": 0.16321795111198195,
+  "kcal_dev": 0.05487500866765932,
+  "diversity": 0.06572769953051642,
+  "share_kcal_ok": 0.9295774647887324,
+  "share_uses_urgent": 1.0
  }
 }
