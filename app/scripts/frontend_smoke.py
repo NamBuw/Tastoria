@@ -23,19 +23,27 @@ with sync_playwright() as p:
     for width in (320, 390, 1440):
         page.set_viewport_size({'width': width, 'height': 900})
         page.goto(BASE + '/')
-        page.get_by_role('heading', name='Taste and write your story.').wait_for()
+        page.get_by_role('heading', name='Hiểu rõ bữa cơm mình ăn mỗi ngày').wait_for()
         assert page.url == BASE + '/'
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
-        assert page.get_by_role('link', name='Đăng nhập', exact=True).get_attribute('href') == '/dang-nhap'
-        page.locator('[data-ingredient=tofu]').click()
-        assert page.locator('#recipe-name').inner_text() == 'Đậu phụ sốt nấm'
-    assert page.locator('#food-stage canvas').count() == 0
+        assert page.locator('a[href="/dang-nhap"]').first.get_attribute('href') == '/dang-nhap'
+
+    # Switch to the 3-dish tray simulator tab at desktop width and toggle ingredients.
+    page.locator('#wb-tab-tray').click()
+    page.locator('#wb-panel-tray').wait_for(state='visible')
+    page.locator('[data-ingredient=egg]').click()
+    page.locator('[data-ingredient=tomato]').click()
+    page.locator('[data-ingredient=tofu]').click()
+    assert page.locator('#recipe-name').inner_text() == 'Đậu phụ non sốt nấm'
+    assert page.locator('#wb-panel-tray canvas').count() == 0
+
     plain = browser.new_context(java_script_enabled=False).new_page()
     plain.goto(BASE + '/')
-    assert plain.get_by_role('heading', name='Taste and write your story.').is_visible()
-    assert plain.locator('#food-stage img').is_visible()
+    assert plain.get_by_role('heading', name='Hiểu rõ bữa cơm mình ăn mỗi ngày').is_visible()
+    assert plain.locator('#main img').first.is_visible()
     plain.close()
-    page.get_by_role('link', name='Đăng nhập', exact=True).click()
+
+    page.locator('a[href="/dang-nhap"]:visible').first.click()
     page.get_by_test_id('screen-login').wait_for()
     for width in (320, 390, 1440):
         page.set_viewport_size({'width': width, 'height': 900})
@@ -45,20 +53,27 @@ with sync_playwright() as p:
     assert page.get_by_test_id('login-password').evaluate('el => el.type') == 'text'
     page.get_by_role('button', name='Ẩn mật khẩu', exact=True).click()
     assert page.get_by_test_id('login-password').evaluate('el => el.type') == 'password'
-    page.get_by_role('link', name='← Về trang giới thiệu Tastoria').click()
-    page.get_by_role('heading', name='Taste and write your story.').wait_for()
-    page.get_by_role('link', name='Đăng ký', exact=False).first.click()
+    page.get_by_role('link', name='Về trang giới thiệu Mỹ Vị').click()
+    page.get_by_role('heading', name='Hiểu rõ bữa cơm mình ăn mỗi ngày').wait_for()
+    page.locator('a[href="/dang-nhap"]:visible').first.click()
+    page.get_by_test_id('screen-login').wait_for()
+    page.get_by_test_id('go-register').click()
     page.get_by_test_id('screen-register').wait_for()
     page.goto(BASE + '/bep')
     page.get_by_test_id('screen-login').wait_for()
-    # A separate browser context simulates an existing account, using no server data.
+
+    # A separate browser context simulates an existing cookie-backed session without hitting the DB.
     ctx = browser.new_context(viewport={'width': 390, 'height': 844})
-    ctx.add_init_script("sessionStorage.setItem('tastoria.refresh', 'fixture-only')")
+
     def api(route):
         url = route.request.url
         status = 200
         if '/auth/refresh' in url:
-            body = {'access_token': 'fixture', 'refresh_token': 'fixture', 'user': {'id': 'fixture', 'email': 'fixture@example.com'}}
+            body = {
+                'access_token': 'fixture',
+                'refresh_token': '',
+                'user': {'id': 'fixture', 'email': 'fixture@example.com'},
+            }
         elif '/me/profile' in url:
             body = {'updated_at': '2026-10-30', 'allergen_codes': [], 'favorite_recipe_ids': [], 'diet_code': None}
         elif '/meal-plans/latest' in url:
@@ -66,6 +81,7 @@ with sync_playwright() as p:
         else:
             body = {'items': []}
         route.fulfill(status=status, content_type='application/json', body=json.dumps(body))
+
     ctx.route('**/api/**', api)
     signed = ctx.new_page()
     signed.on('pageerror', lambda e: errors.append(str(e)))
@@ -76,7 +92,7 @@ with sync_playwright() as p:
     signed.get_by_test_id('screen-home').wait_for()
     for scheme in ('light', 'dark'):
         signed.emulate_media(color_scheme=scheme)
-        assert signed.get_by_text('Taste and write your story').is_visible()
+        assert signed.get_by_text('Bữa tối hôm nay').is_visible()
         assert signed.evaluate('document.documentElement.scrollWidth <= innerWidth')
     signed.get_by_test_id('home-scan-fridge').click()
     signed.wait_for_url('**/quet?mode=fridge')
