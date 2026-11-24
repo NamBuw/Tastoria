@@ -5,8 +5,15 @@ import * as RN from 'react-native';
 
 import { ThemeProvider } from '@/theme';
 
+const activeQueryClients = new Set<QueryClient>();
+
+afterEach(() => {
+  activeQueryClients.forEach((qc) => qc.clear());
+  activeQueryClients.clear();
+});
+
 export function makeQueryClient() {
-  return new QueryClient({
+  const qc = new QueryClient({
     defaultOptions: {
       queries: {
         retry: false,
@@ -17,6 +24,8 @@ export function makeQueryClient() {
       },
     },
   });
+  activeQueryClients.add(qc);
+  return qc;
 }
 
 export async function renderWithProviders(

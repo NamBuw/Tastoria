@@ -800,13 +800,15 @@ export function Rise({ children, delay = 0, style }: { children: ReactNode; dela
   const [v] = useState(() => new Animated.Value(reduceMotion.current ? 1 : 0));
   useEffect(() => {
     if (reduceMotion.current) return;
-    Animated.timing(v, {
+    const anim = Animated.timing(v, {
       toValue: 1,
       duration: 300,
       delay,
       easing: Easing.bezier(0.22, 1, 0.36, 1),
       useNativeDriver: Platform.OS !== 'web',
-    }).start();
+    });
+    anim.start();
+    return () => anim.stop();
   }, [v, delay]);
   return (
     <Animated.View style={[style, { opacity: v, transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) }] }]}>
