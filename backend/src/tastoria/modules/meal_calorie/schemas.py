@@ -78,6 +78,15 @@ class BarcodeNutritionOut(BaseModel):
     macro_kcal_split: MacroKcalSplitOut | None = None
 
 
+class DetectedPlateOut(BaseModel):
+    label: str
+    confidence: float
+    x1: float
+    y1: float
+    x2: float
+    y2: float
+
+
 class MealCalorieEstimateOut(BaseModel):
     dish_name_vi: str | None = None
     kb_slug: str | None = None
@@ -112,3 +121,4 @@ class MealCalorieEstimateOut(BaseModel):
     provenance_label_vi: str = "Ước lượng trực quan theo khẩu phần"
     fusion_mode: FusionMode = "visual_fallback"
     suggested_modifiers: list[ModifierSuggestionOut] = Field(default_factory=list)
+    detected_plates: list[DetectedPlateOut] = Field(default_factory=list)

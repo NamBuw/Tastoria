@@ -964,7 +964,7 @@
 
   var downloadBtn = document.getElementById('android-download');
   if (downloadBtn) {
-    var apkHref = downloadBtn.getAttribute('data-apk-href') || '/tai-ve/tastoria-0.1.4.apk';
+    var apkHref = downloadBtn.getAttribute('data-apk-href') || '/tai-ve/tastoria-0.1.5.apk';
     var apkLabel = downloadBtn.getAttribute('data-apk-label') || 'Tải bản Android (.apk)';
     fetch(apkHref, { method: 'GET', headers: { Range: 'bytes=0-15' } })
       .then(function (resp) {

@@ -45,6 +45,7 @@ class DishClassification:
     max_logit: float = 0.0
     raps_set_size: int = 1
     is_ood: bool = False
+    from_open_vocab: bool = False
 
 
 def center_crop_rgb(img: Image.Image, size: int = DEFAULT_SIZE) -> np.ndarray:
@@ -158,8 +159,9 @@ class DishClassifier:
             top_margin=margin,
             energy_score=0.0,
             max_logit=round(max_sim, 4),
-            raps_set_size=1 if confident else 3,
+            raps_set_size=max(3, len(candidates)),
             is_ood=not confident,
+            from_open_vocab=True,
         )
 
     def predict(self, img: Image.Image, *, top_k: int = 3) -> DishClassification:
@@ -254,6 +256,7 @@ class DishClassifier:
                     max_logit=round(max_logit, 4),
                     raps_set_size=ov.raps_set_size,
                     is_ood=ov.is_ood,
+                    from_open_vocab=ov.from_open_vocab,
                 )
         return DishClassification(
             top_k=candidates,

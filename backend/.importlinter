@@ -646,6 +646,7 @@ protected_modules =
     tastoria.modules.meal_calorie.dish_classifier
     tastoria.modules.meal_calorie.estimator
     tastoria.modules.meal_calorie.kb_lookup
+    tastoria.modules.meal_calorie.plate_detector
     tastoria.modules.meal_calorie.router
 allowed_importers =
     tastoria.modules.meal_calorie

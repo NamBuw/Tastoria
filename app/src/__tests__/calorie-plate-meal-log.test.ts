@@ -124,6 +124,8 @@ describe('mealLog week validation and concurrency', () => {
   });
 
   it('serializes concurrent addQuickMealLog calls so no entry is lost', async () => {
+    const postSpy = jest.spyOn(api, 'POST').mockRejectedValue(new Error('offline'));
+    const getSpy = jest.spyOn(api, 'GET').mockRejectedValue(new Error('offline'));
     const common = {
       date: '2026-11-24',
       meal_slot: 'trua' as const,
@@ -138,13 +140,18 @@ describe('mealLog week validation and concurrency', () => {
       fiber_g: 2,
       provenance_label_vi: 'Viện Dinh dưỡng Quốc gia & Ảnh',
     };
-    await Promise.all([
-      addQuickMealLog({ ...common, title_vi: 'Phở bò', kcal: 420 }, 'u-conc'),
-      addQuickMealLog({ ...common, title_vi: 'Bún chả', kcal: 480 }, 'u-conc'),
-    ]);
-    const list = await listQuickMealLogs('u-conc');
-    expect(list).toHaveLength(2);
-    expect(list.map((e) => e.title_vi).sort()).toEqual(['Bún chả', 'Phở bò']);
+    try {
+      await Promise.all([
+        addQuickMealLog({ ...common, title_vi: 'Phở bò', kcal: 420 }, 'u-conc'),
+        addQuickMealLog({ ...common, title_vi: 'Bún chả', kcal: 480 }, 'u-conc'),
+      ]);
+      const list = await listQuickMealLogs('u-conc');
+      expect(list).toHaveLength(2);
+      expect(list.map((e) => e.title_vi).sort()).toEqual(['Bún chả', 'Phở bò']);
+    } finally {
+      postSpy.mockRestore();
+      getSpy.mockRestore();
+    }
   });
 });
 

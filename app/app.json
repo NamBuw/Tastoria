@@ -2,7 +2,7 @@
   "expo": {
     "name": "Mỹ Vị",
     "slug": "tastoria",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "tastoria",
@@ -10,7 +10,7 @@
     "backgroundColor": "#E3CFA6",
     "android": {
       "package": "net.ctslab.tastoria",
-      "versionCode": 5,
+      "versionCode": 6,
       "adaptiveIcon": {
         "backgroundColor": "#FAF2E0",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

@@ -12,8 +12,12 @@ export type AuthSession = Omit<Schemas['AuthSession'], 'refresh_token'> & {
   refresh_token?: string | null;
 };
 
+const DEFAULT_NATIVE_API_URL = 'https://tastoria.ctslab.net/api/v1';
+
 /** Base URL of the API (`/api/v1` on the same origin when the web app is served by nginx). */
-export const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? (Platform.OS === 'web' ? '/api/v1' : '')).replace(/\/$/, '');
+export const API_URL = (
+  process.env.EXPO_PUBLIC_API_URL || (Platform.OS === 'web' ? '/api/v1' : DEFAULT_NATIVE_API_URL)
+).replace(/\/$/, '');
 const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
 
 // ---- tokens & cross-tab sync --------------------------------------------------------------------
@@ -235,7 +239,7 @@ export async function refreshSession(): Promise<AuthSession | null> {
 
         if (res.status === 409) {
           const prob = (await res.json().catch(() => null)) as Problem | null;
-          if (!prob) await res.body?.cancel().catch(() => {});
+          if (!prob) await res.body?.cancel().catch(() => { });
           if (
             currentSession &&
             accessToken &&
@@ -254,7 +258,7 @@ export async function refreshSession(): Promise<AuthSession | null> {
           return null;
         }
 
-        await res.body?.cancel().catch(() => {});
+        await res.body?.cancel().catch(() => { });
         if ((res.status === 401 || res.status === 403) && sessionEpoch === startEpoch) {
           await setSession(null);
         }
@@ -292,13 +296,13 @@ async function authFetch(input: Request): Promise<Response> {
 
   // Another concurrent call or tab already updated accessToken since this request started.
   if (accessToken && accessToken !== usedToken) {
-    void res.body?.cancel().catch(() => {});
+    void res.body?.cancel().catch(() => { });
     return fetch(withHeaders(retry));
   }
 
   const s = await refreshSession();
   if (!s) return res;
-  void res.body?.cancel().catch(() => {});
+  void res.body?.cancel().catch(() => { });
   return fetch(withHeaders(retry));
 }
 

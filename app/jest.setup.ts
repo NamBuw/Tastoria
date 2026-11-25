@@ -21,7 +21,7 @@ jest.mock('react-native-safe-area-context', () => {
 
 jest.mock('expo-constants', () => ({
   __esModule: true,
-  default: { expoConfig: { version: '0.1.4' } },
+  default: { expoConfig: { version: '0.1.5' } },
 }));
 
 let mockUuidCounter = 0;
@@ -78,7 +78,12 @@ jest.mock('expo-image-manipulator', () => {
   const makeRef = (uri: string) => ({
     width: 800,
     height: 600,
-    saveAsync: jest.fn(async () => ({ uri, width: 800, height: 600 })),
+    saveAsync: jest.fn(async (opts?: { base64?: boolean }) => ({
+      uri,
+      width: 800,
+      height: 600,
+      ...(opts?.base64 ? { base64: '/9j/4AAQ' } : {}),
+    })),
   });
   interface MockImageCtx {
     resize: jest.Mock<MockImageCtx, []>;
@@ -99,15 +104,15 @@ jest.mock('expo-image-manipulator', () => {
 
 jest.mock('expo-keep-awake', () => ({
   useKeepAwake: jest.fn(),
-  activateKeepAwakeAsync: jest.fn(async () => {}),
-  deactivateKeepAwake: jest.fn(async () => {}),
+  activateKeepAwakeAsync: jest.fn(async () => { }),
+  deactivateKeepAwake: jest.fn(async () => { }),
 }));
 
 jest.mock('react-native-svg', () => {
   const React = require('react');
   const { View } = require('react-native');
   const mk = (name: string) => {
-    const Comp = ({ children, ...props }: { children?: React.ReactNode; [k: string]: unknown }) =>
+    const Comp = ({ children, ...props }: { children?: React.ReactNode;[k: string]: unknown }) =>
       React.createElement(View, { ...props, accessibilityRole: props.accessibilityRole ?? undefined }, children);
     Comp.displayName = name;
     return Comp;
@@ -158,9 +163,9 @@ export const mockSessionState = {
     role: 'user' | 'curator' | 'ml_operator' | 'admin';
     onboarding_completed: boolean;
   } | null,
-  signIn: jest.fn(async () => {}),
-  register: jest.fn(async () => {}),
-  signOut: jest.fn(async () => {}),
+  signIn: jest.fn(async () => { }),
+  register: jest.fn(async () => { }),
+  signOut: jest.fn(async () => { }),
 };
 
 jest.mock('@/auth/session', () => ({

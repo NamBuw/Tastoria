@@ -36,8 +36,10 @@ from tastoria.modules.meal_calorie.estimator import (
     sanitize_meal_image,
 )
 from tastoria.modules.meal_calorie.kb_lookup import PORTION_MULTIPLIERS, KBDishCatalog
+from tastoria.modules.meal_calorie.plate_detector import PlateDetector, load_plate_detector
 from tastoria.modules.meal_calorie.schemas import (
     BarcodeNutritionOut,
+    DetectedPlateOut,
     DishCandidateOut,
     FusionMode,
     MacroKcalSplitOut,
@@ -140,8 +142,10 @@ class MealCalorieDeps:
     kb_dir: Path
     kb_processed_dir: Path
     dish_classifier_model_dir: Path | None = None
+    plate_detector_model_dir: Path | None = None
     estimator: MealCalorieEstimator | None = None
     dish_classifier: DishClassifier | None = None
+    plate_detector: PlateDetector | None = None
     kb_catalog: KBDishCatalog | None = None
     barcode_catalog: BarcodeCatalog | None = None
     estimator_probe: OnnxProbe | None = None
@@ -156,6 +160,7 @@ class MealCalorieDeps:
         *,
         model_dir: str | Path | None = None,
         dish_classifier_model_dir: str | Path | None = None,
+        plate_detector_model_dir: str | Path | None = None,
         kb_dir: str | Path | None = None,
         kb_processed_dir: str | Path | None = None,
         preload: bool = False,
@@ -170,11 +175,18 @@ class MealCalorieDeps:
             if dish_classifier_model_dir
             else (default_cls if (default_cls / "serving.json").exists() else None)
         )
+        default_plate = resolved_model.parent / "plate_detector"
+        resolved_plate = (
+            Path(plate_detector_model_dir)
+            if plate_detector_model_dir
+            else (default_plate if (default_plate / "serving.json").exists() else None)
+        )
         resolved_kb = Path(kb_dir) if kb_dir else root / "data" / "kb"
         resolved_proc = Path(kb_processed_dir) if kb_processed_dir else root / "data" / "processed" / "kb"
         deps = cls(
             model_dir=resolved_model,
             dish_classifier_model_dir=resolved_cls,
+            plate_detector_model_dir=resolved_plate,
             kb_dir=resolved_kb,
             kb_processed_dir=resolved_proc,
             estimator_probe=estimator_probe,
@@ -184,6 +196,7 @@ class MealCalorieDeps:
             deps.get_kb()
             deps.get_estimator(required=False)
             deps.get_dish_classifier(required=False)
+            deps.get_plate_detector()
             deps.get_barcode_catalog()
         return deps
 
@@ -275,6 +288,19 @@ class MealCalorieDeps:
                     raise ApiError(503, ProblemCode.model_unavailable, str(exc)) from exc
                 return None
             return self.dish_classifier
+
+    def get_plate_detector(self) -> PlateDetector | None:
+        with self._lock:
+            if self.plate_detector is not None:
+                return self.plate_detector
+            if self.plate_detector_model_dir is None:
+                return None
+            try:
+                self.plate_detector = load_plate_detector(self.plate_detector_model_dir, verify_sha256=True)
+            except (ArtifactIntegrityError, Exception) as exc:  # noqa: BLE001
+                log.warning("plate_detector ONNX unavailable: %s", exc)
+                return None
+            return self.plate_detector
 
     def get_barcode_catalog(self) -> BarcodeCatalog:
         with self._lock:
@@ -485,7 +511,8 @@ def _needs_disambiguation(cls_res: DishClassification | None, top_margin: float 
     if explicit_query or cls_res is None:
         return False
     return bool(
-        cls_res.is_ood
+        cls_res.from_open_vocab
+        or cls_res.is_ood
         or (not cls_res.confident)
         or (top_margin is not None and top_margin < 0.15)
         or cls_res.top1_confidence < 0.55
@@ -805,13 +832,37 @@ def estimate_meal_calories(
     )
     ood_clamped = vis.ood_clamped or post_mult_clamped
     base_note = estimator.domain_shift_note or DEFAULT_DOMAIN_SHIFT_NOTE
+    detected_plates: list[DetectedPlateOut] = []
+    plate_latency_ms = 0.0
+    if vis.multi_dish_score is not None and vis.multi_dish_score >= 0.55:
+        pdet = deps.get_plate_detector()
+        if pdet is not None:
+            try:
+                raw_plates, plate_latency_ms = pdet.detect(img)
+                detected_plates = [
+                    DetectedPlateOut(
+                        label=pl.label,
+                        confidence=pl.confidence,
+                        x1=pl.x1,
+                        y1=pl.y1,
+                        x2=pl.x2,
+                        y2=pl.y2,
+                    )
+                    for pl in raw_plates
+                ]
+            except Exception as exc:  # noqa: BLE001 — optional plate detector degrades cleanly
+                log.warning("plate_detector inference failed: %s", exc)
     multi_dish_note = (
-        " Phát hiện khẩu phần nhiều món, bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
-        if (vis.multi_dish_score is not None and vis.multi_dish_score >= 0.55)
-        else ""
+        f" Phát hiện mâm nhiều món ({len(detected_plates)} đĩa/bát), bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
+        if len(detected_plates) >= 2
+        else (
+            " Phát hiện khẩu phần nhiều món, bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
+            if (vis.multi_dish_score is not None and vis.multi_dish_score >= 0.55)
+            else ""
+        )
     )
     note = (f"{base_note} {OOD_WARNING_NOTE}" if ood_clamped else base_note) + multi_dish_note
-    total_latency = round(vis.latency_ms + (cls_res.latency_ms if cls_res else 0.0), 3)
+    total_latency = round(vis.latency_ms + (cls_res.latency_ms if cls_res else 0.0) + plate_latency_ms, 3)
 
     top_margin = _compute_top_margin(cls_res)
 
@@ -861,6 +912,7 @@ def estimate_meal_calories(
             provenance_label_vi=_provenance_label_vi(src_ref_h, with_image=True),
             fusion_mode="kb_exact",
             suggested_modifiers=_suggest_modifiers(kb_est.slot, kb_est.slug, kb_est.name_vi),
+            detected_plates=detected_plates,
         )
 
     # Photo-only mode: run principled visual+KB fusion
@@ -873,6 +925,7 @@ def estimate_meal_calories(
         domain_shift_note=base_note,
         total_latency_ms=total_latency,
         top_candidates=top_candidates,
+        detected_plates=detected_plates,
     )
 
 
@@ -886,6 +939,7 @@ def fuse_photo_estimate(
     domain_shift_note: str = DEFAULT_DOMAIN_SHIFT_NOTE,
     total_latency_ms: float | None = None,
     top_candidates: list[DishCandidateOut] | None = None,
+    detected_plates: list[DetectedPlateOut] | None = None,
 ) -> MealCalorieEstimateOut:
     """Fuse visual prediction + DishClassification + KB priors (shared by API service & offline eval)."""
     mult = PORTION_MULTIPLIERS[portion]
@@ -925,11 +979,16 @@ def fuse_photo_estimate(
         or vis_fat < raw_vis_fat
     )
     ood_clamped = vis.ood_clamped or post_mult_clamped or bool(cls_res is not None and cls_res.is_ood)
+    plates_out = list(detected_plates or ())
     base_note = domain_shift_note or DEFAULT_DOMAIN_SHIFT_NOTE
     multi_dish_note = (
-        " Phát hiện khẩu phần nhiều món, bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
-        if (vis.multi_dish_score is not None and vis.multi_dish_score >= 0.55)
-        else ""
+        f" Phát hiện mâm nhiều món ({len(plates_out)} đĩa/bát), bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
+        if len(plates_out) >= 2
+        else (
+            " Phát hiện khẩu phần nhiều món, bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
+            if (vis.multi_dish_score is not None and vis.multi_dish_score >= 0.55)
+            else ""
+        )
     )
     note = (f"{base_note} {OOD_WARNING_NOTE}" if ood_clamped else base_note) + multi_dish_note
     total_latency = (
@@ -1101,6 +1160,15 @@ def fuse_photo_estimate(
                     },
                 )
                 ood_note_suffix = f" {OOD_WARNING_NOTE}" if ood_clamped else ""
+                ov_note_suffix = (
+                    " (Nhận diện mở — vui lòng xác nhận đúng món trong danh sách gợi ý.)"
+                    if cls_res.from_open_vocab
+                    else ""
+                )
+                if cls_res.from_open_vocab:
+                    hw = round(max(hw, 0.25), 4)
+                    kcal_low = round(min(kcal_low, max(0.0, est_kcal * (1.0 - hw))), 1)
+                    kcal_high = round(min(MAX_KCAL, max(kcal_high, est_kcal * (1.0 + hw))), 1)
                 cls_note = (
                     f"Gợi ý món: {rec_est.name_vi}. "
                     + (
@@ -1110,6 +1178,7 @@ def fuse_photo_estimate(
                     )
                     + "Ước lượng theo ảnh chụp và bảng thành phần thực phẩm."
                     + ood_note_suffix
+                    + ov_note_suffix
                     + multi_dish_note
                 )
                 score, grade, split = _compute_nutrition_intelligence(
@@ -1156,6 +1225,7 @@ def fuse_photo_estimate(
                     provenance_label_vi=_provenance_label_vi(src_ref_p, with_image=True),
                     fusion_mode=mode,
                     suggested_modifiers=_suggest_modifiers(rec_est.slot, cls_res.top1_id, rec_est.name_vi),
+                    detected_plates=plates_out,
                 )
 
     # Cascade stage 2: classifier below threshold (non-OOD, VN candidate in top-2)
@@ -1309,6 +1379,7 @@ def fuse_photo_estimate(
                 provenance_label_vi="Bảng món ăn Mỹ Vị & Ảnh",
                 fusion_mode="top3_blend",
                 suggested_modifiers=_suggest_modifiers(top_slot, top_id, top_name),
+                detected_plates=plates_out,
             )
 
     score, grade, split = _compute_nutrition_intelligence(
@@ -1351,4 +1422,5 @@ def fuse_photo_estimate(
         provenance_label_vi="Ước lượng trực quan theo khẩu phần",
         fusion_mode="visual_fallback",
         suggested_modifiers=_suggest_modifiers(None, None, dish_name),
+        detected_plates=plates_out,
     )

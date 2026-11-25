@@ -78,6 +78,7 @@ services:
       - files:/var/lib/tastoria/storage
       - ./models/meal_calorie:/app/models/meal_calorie:ro
       - ./models/dish_classifier:/app/models/dish_classifier:ro
+      - ./models/plate_detector:/app/models/plate_detector:ro
     command:
       - uvicorn
       - tastoria.app:create_app

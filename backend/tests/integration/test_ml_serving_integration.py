@@ -8,6 +8,7 @@ import uuid
 from pathlib import Path
 
 import pytest
+import sqlalchemy as sa
 from conftest import REPO_ROOT
 from fastapi.testclient import TestClient
 from kb_helpers import API, grant, ingredient_id, key, plan, q, stock_for, user
@@ -87,6 +88,11 @@ def test_pgvector_embeddings_sync_and_substitute_fallback(
     sm = kb_app.state.sessionmaker
     art = tmp_path / "ingredient_embeddings.npz"
     shutil.copyfile(EMB_NPZ, art)
+    expected_emb_count = int(
+        json.loads((REPO_ROOT / "deploy/models/embeddings/manifest.json").read_text(encoding="utf-8"))[
+            "embedded_count"
+        ]
+    )
     v, _ = ops.register(
         sm,
         storage_dir,
@@ -100,15 +106,15 @@ def test_pgvector_embeddings_sync_and_substitute_fallback(
     ok, reasons = ops.gate(sm, storage_dir, name="substitution", version="sub_hybrid_v1")
     assert ok, reasons
     dep = ops.deploy(sm, name="substitution", version="sub_hybrid_v1", storage_dir=storage_dir)
-    assert dep["changed"] is True and dep["embeddings"]["upserted"] == 219
-    assert q(kb_db, "SELECT count(*) FROM ingredient_embeddings WHERE model_version_id = :v", v=str(v.id)).scalar() == 219
+    assert dep["changed"] is True and dep["embeddings"]["upserted"] == expected_emb_count
+    assert q(kb_db, "SELECT count(*) FROM ingredient_embeddings WHERE model_version_id = :v", v=str(v.id)).scalar() == expected_emb_count
     assert kb_client.get("/readyz").json()["checks"]["models"] == "ok"
 
     h = user(kb_client)
     stock_for(kb_client, h, kb_db, MAN, RAU, CANH)
     p = plan(kb_client, h)
     canh = next(i for i in p["items"] if i["slot"] == "canh" and i["status"] == "active")
-    # Curated substitution_pairs is empty; deployed substitution embeddings should return origin="embedding"
+    # Curated substitution_pairs is empty in seeded test DB; deployed embeddings should return origin="embedding"
     r = kb_client.get(
         f"{API}/meal-plans/{p['id']}/items/{canh['id']}/substitutes",
         params={"ingredient_id": ingredient_id(kb_db, "rau ngót")},
@@ -199,8 +205,17 @@ def test_freshness_onnx_worker_populates_detections_and_abstains(
 
     s = kb_client.get(f"{API}/scans/{sid}", headers=h).json()
     assert s["status"] == "done" and s["classifier_version_id"] == str(fv.id)
+    fresh_codes = {
+        code
+        for (code,) in kb_db.execute(
+            sa.text("SELECT code FROM vision_classes WHERE has_freshness_model = true")
+        ).all()
+    }
     for it in s["items"]:
         for d in it["detections"]:
             probs = (d["p_tuoi"], d["p_dung_som"], d["p_dung_ngay"], d["p_kiem_tra"])
-            assert all(p is not None and 0.0 <= p <= 1.0 for p in probs)
-            assert sum(probs) == pytest.approx(1.0, abs=0.01)
+            if d["vision_class_code"] in fresh_codes:
+                assert all(p is not None and 0.0 <= p <= 1.0 for p in probs)
+                assert sum(probs) == pytest.approx(1.0, abs=0.01)
+            else:
+                assert all(p is None for p in probs)

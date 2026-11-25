@@ -905,6 +905,18 @@ def test_dual_head_open_vocab_prototype_fallback() -> None:
     assert res_ov.top1_id == "dau_phu_non"
     assert res_ov.confident is True
     assert res_ov.is_ood is False
+    assert res_ov.from_open_vocab is True
+    assert res_ov.raps_set_size >= 3
+
+    from tastoria.modules.meal_calorie.estimator import VisualPrediction
+    from tastoria.modules.meal_calorie.service import fuse_photo_estimate
+
+    cat_real = KBDishCatalog.from_dirs(REPO_ROOT / "data" / "kb", REPO_ROOT / "data" / "processed" / "kb")
+    vis_stub = VisualPrediction(kcal=160.0, mass_g=140.0, fat_g=6.0, carb_g=8.0, protein_g=14.0, latency_ms=4.0)
+    ov_est = fuse_photo_estimate(kb=cat_real, vis=vis_stub, cls_res=res_ov, portion="vua")
+    assert ov_est.disambiguation_required is True
+    assert ov_est.half_width_rel >= 0.25
+    assert "Nhận diện mở" in (ov_est.domain_shift_note or "")
 
     # High-margin confident closed prediction stays on closed head
     clf_conf = DishClassifier(
@@ -916,6 +928,7 @@ def test_dual_head_open_vocab_prototype_fallback() -> None:
     res_closed = clf_conf.predict(textured, top_k=2)
     assert res_closed.top1_id == "pho"
     assert res_closed.confident is True
+    assert res_closed.from_open_vocab is False
 
     # Flat solid-color OOD input never triggers open-vocab rescue
     res_flat = clf_ambig.predict(Image.new("RGB", (224, 224), (120, 90, 60)), top_k=2)

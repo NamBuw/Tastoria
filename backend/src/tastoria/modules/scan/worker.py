@@ -332,7 +332,7 @@ class _Photo:
     storage_key: str
 
 
-def _claim(ctx: WorkerContext, scan_id: uuid.UUID) -> tuple[int, list[_Photo], int | None] | None:
+def _claim(ctx: WorkerContext, scan_id: uuid.UUID) -> tuple[int, list[_Photo], int | None, frozenset[int]] | None:
     with ctx.sessionmaker() as s:
         now = utcnow()
         row = s.execute(
@@ -358,13 +358,19 @@ def _claim(ctx: WorkerContext, scan_id: uuid.UUID) -> tuple[int, list[_Photo], i
             _Photo(i.id, i.ordinal, i.shelf_group, i.storage_key)
             for i in s.scalars(select(ScanImage).where(ScanImage.scan_id == scan_id).order_by(ScanImage.ordinal))
         ]
-        nam_vid = catalog.vision_class_ids_by_code(s).get("nam")
+        classes = catalog.vision_classes(s)
+        nam_vid = next((vid for vid, vc in classes.items() if vc.code == "nam"), None)
+        freshness_vids = frozenset(vid for vid, vc in classes.items() if vc.has_freshness_model)
         s.commit()
-    return int(row.attempts), photos, nam_vid
+    return int(row.attempts), photos, nam_vid, freshness_vids
 
 
 def _detect(
-    ctx: WorkerContext, photos: list[_Photo], *, nam_vid: int | None = None
+    ctx: WorkerContext,
+    photos: list[_Photo],
+    *,
+    nam_vid: int | None = None,
+    freshness_vids: frozenset[int] | None = None,
 ) -> list[tuple[_Photo, Box, Probs | None, MushroomPrediction | None]]:
     out: list[tuple[_Photo, Box, Probs | None, MushroomPrediction | None]] = []
     nam_indices = {ci for ci, vid in ctx.detector_version.class_map.items() if nam_vid is not None and vid == nam_vid}
@@ -372,24 +378,33 @@ def _detect(
         with Image.open(ctx.storage_dir / p.storage_key) as im:
             rgb = im.convert("RGB")
         boxes = ctx.detector.detect(rgb)[:MAX_DETECTIONS_PER_PHOTO]
-        need_crops = bool(boxes) and (ctx.freshness is not None or any(b.class_index in nam_indices for b in boxes))
-        crops = [rgb.crop(crop_box_pixels(b, rgb.width, rgb.height)) for b in boxes] if need_crops else []
-        if ctx.freshness is not None and boxes:
-            raw_probs = list(ctx.freshness.predict_crops(crops))
-            probs_list: list[Probs | None] = [
-                pr if (pr is not None and len(pr) == 4 and all(math.isfinite(x) for x in pr)) else (0.0, 0.0, 0.0, 1.0)
-                for pr in raw_probs
-            ]
-        else:
-            probs_list = [None] * len(boxes)
+        fresh_positions = [
+            idx
+            for idx, b in enumerate(boxes)
+            if ctx.freshness is not None
+            and (freshness_vids is None or ctx.detector_version.class_map.get(b.class_index) in freshness_vids)
+        ]
+        nam_positions = [idx for idx, b in enumerate(boxes) if b.class_index in nam_indices]
+        needed_positions = sorted(set(fresh_positions) | set(nam_positions))
+        crops_by_pos = (
+            {idx: rgb.crop(crop_box_pixels(boxes[idx], rgb.width, rgb.height)) for idx in needed_positions}
+            if needed_positions
+            else {}
+        )
+        probs_list: list[Probs | None] = [None] * len(boxes)
+        if ctx.freshness is not None and fresh_positions:
+            raw_probs = list(ctx.freshness.predict_crops([crops_by_pos[idx] for idx in fresh_positions]))
+            for pos, pr in zip(fresh_positions, raw_probs, strict=True):
+                probs_list[pos] = (
+                    pr if (pr is not None and len(pr) == 4 and all(math.isfinite(x) for x in pr)) else (0.0, 0.0, 0.0, 1.0)
+                )
 
         mush_list: list[MushroomPrediction | None] = [None] * len(boxes)
-        nam_positions = [idx for idx, b in enumerate(boxes) if b.class_index in nam_indices]
         if nam_positions:
             mclf = _get_mushroom_classifier(ctx)
             if mclf is not None:
                 try:
-                    nam_preds = mclf.predict_crops([crops[idx] for idx in nam_positions])
+                    nam_preds = mclf.predict_crops([crops_by_pos[idx] for idx in nam_positions])
                     log.info(
                         "mushroom sub-classifier",
                         extra={
@@ -545,10 +560,10 @@ def run_job(ctx: WorkerContext, scan_id: uuid.UUID) -> str:
     if claimed is None:
         metrics.inc_scan_job("skipped")
         return "skipped"
-    attempts, photos, nam_vid = claimed
+    attempts, photos, nam_vid, freshness_vids = claimed
     try:
         t1 = time.perf_counter()
-        found = _detect(ctx, photos, nam_vid=nam_vid)
+        found = _detect(ctx, photos, nam_vid=nam_vid, freshness_vids=freshness_vids)
         t2 = time.perf_counter()
         ok = _write(ctx, scan_id, found)
         t3 = time.perf_counter()
