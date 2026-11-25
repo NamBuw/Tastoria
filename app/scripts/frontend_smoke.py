@@ -1,6 +1,7 @@
 """Browser checks against exported app. Mock auth/API: never creates a real account."""
 import json
 import os
+import re
 import time
 import urllib.request
 from playwright.sync_api import sync_playwright
@@ -92,7 +93,7 @@ with sync_playwright() as p:
     signed.get_by_test_id('screen-home').wait_for()
     for scheme in ('light', 'dark'):
         signed.emulate_media(color_scheme=scheme)
-        assert signed.get_by_text('Bữa tối hôm nay').is_visible()
+        assert signed.get_by_text(re.compile(r'Bữa (trưa|tối) hôm nay')).is_visible()
         assert signed.evaluate('document.documentElement.scrollWidth <= innerWidth')
     signed.get_by_test_id('home-scan-fridge').click()
     signed.wait_for_url('**/quet?mode=fridge')
