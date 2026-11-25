@@ -156,8 +156,7 @@ export function Card({
 }
 
 /**
- * Broadsheet double-rule + dashed-inset frame inspired by vintage Vietnamese broadsheet print.
- * Outer 1.5px solid sepia border (#5A432B) + 4px paper gutter + 1px dashed inner hairline (#6E5438).
+ * Clean elevated card container for meal summary or nutrition highlights.
  */
 export function BroadsheetLedgerFrame({
   title,
@@ -183,21 +182,17 @@ export function BroadsheetLedgerFrame({
       testID={testID}
       style={[
         {
-          borderWidth: 1.5,
-          borderColor: c.border,
-          borderRadius: radius.sm,
+          borderWidth: 1,
+          borderColor: c.hairline,
+          borderRadius: radius.lg,
           backgroundColor: c.surfaceCard,
-          padding: 4,
+          overflow: 'hidden',
         },
         style,
       ]}>
       <View
         style={[
           {
-            borderWidth: 1,
-            borderStyle: 'dashed',
-            borderColor: c.borderDashed,
-            borderRadius: radius.sm,
             padding: space.lg,
             gap: space.md,
           },
@@ -211,19 +206,18 @@ export function BroadsheetLedgerFrame({
               justifyContent: 'space-between',
               alignItems: 'baseline',
               borderBottomWidth: 1,
-              borderStyle: 'dotted',
-              borderBottomColor: c.borderDashed,
-              paddingBottom: space.xs,
+              borderBottomColor: c.hairline,
+              paddingBottom: space.sm,
               gap: space.sm,
             }}>
             <T
               v="h2"
               accessibilityRole="header"
-              style={{ color: titleColor, fontFamily: font.displaySemibold, flexShrink: 1 }}>
+              style={{ color: titleColor, fontFamily: font.semibold, flexShrink: 1 }}>
               {title}
             </T>
             {rightText ? (
-              <T v="small" tone="muted" tabular style={{ flexShrink: 0 }}>
+              <T v="small" tone="accent" tabular style={{ flexShrink: 0, fontFamily: font.semibold }}>
                 {rightText}
               </T>
             ) : null}
@@ -961,7 +955,7 @@ const styles = StyleSheet.create({
   inner: { width: '100%', alignSelf: 'center', gap: space.xl },
   footer: { borderTopWidth: 1, paddingHorizontal: space.lg, paddingVertical: space.md },
   footerInner: { width: '100%', alignSelf: 'center', gap: space.sm },
-  card: { borderRadius: radius.md, borderWidth: 1, padding: space.lg, gap: space.sm },
+  card: { borderRadius: radius.lg, borderWidth: 1, padding: space.lg, gap: space.sm },
   btn: {
     minHeight: TOUCH,
     maxWidth: '100%',

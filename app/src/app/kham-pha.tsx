@@ -292,7 +292,7 @@ export default function ExploreRecipes() {
 
       {isOffline ? (
         <Notice tone="info">
-          <T>Đang xem từ bộ nhớ đệm ngoại tuyến.</T>
+          <T>Đang xem ngoại tuyến (chưa có mạng).</T>
         </Notice>
       ) : null}
 

@@ -357,7 +357,7 @@ def test_T3_07_barcode_lookup_nutrition_score_to_ui(
     ledger = card.get_by_test_id("macro-nutrition-ledger")
     ledger.wait_for(state="visible", timeout=10000)
     card_text = card.inner_text()
-    assert "Chỉ số dinh dưỡng Mỹ Vị" in card_text
+    assert "Dinh dưỡng bữa này" in card_text
     assert_no_banned_copy(card_text, context="T3-07 barcode card")
 
     before_ledger = ledger.inner_text()

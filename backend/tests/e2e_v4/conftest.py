@@ -135,6 +135,8 @@ def e2e_detector(e2e_cfg: BackendE2EConfig) -> DetectorBundle:
     class_map = {i: 1000 + i for i in range(len(classes))}
     code_by_vid = {1000 + i: code for i, code in enumerate(classes)}
     cc = resolve_class_conf(serving.get("class_conf"), class_map, code_by_vid)
+    ccc = resolve_class_conf(serving.get("class_count_conf"), class_map, code_by_vid)
+    zoom_rescue = serving.get("zoom_rescue") if isinstance(serving.get("zoom_rescue"), dict) else None
     raw_ag = serving.get("agnostic_iou")
     agnostic_iou = float(raw_ag) if raw_ag is not None else None
 
@@ -145,6 +147,8 @@ def e2e_detector(e2e_cfg: BackendE2EConfig) -> DetectorBundle:
         preprocess_version=serving.get("preprocess_version") or manifest.get("preprocess_version"),
         agnostic_iou=agnostic_iou,
         class_conf=cc,
+        class_count_conf=ccc,
+        zoom_rescue=zoom_rescue,
     )
     return DetectorBundle(
         detector=det,

@@ -64,16 +64,26 @@ export default function ConsentStep() {
       footer={
         <>
           <Button label="Tiếp tục" testID="consent-continue" onPress={() => submit(false)} loading={busy} disabled={loading || !!failed} />
-          <Button label="Bỏ qua, không đồng ý mục nào" kind="ghost" testID="consent-skip" onPress={() => submit(true)} disabled={busy || loading} />
+          <Button
+            label="Dùng thử ngay, thiết lập sau →"
+            kind="ghost"
+            testID="onboarding-skip-all"
+            onPress={async () => {
+              if (!user) return;
+              await saveProgress(user.id, { consent: true, done: true });
+              router.replace('/bep');
+            }}
+            disabled={busy}
+          />
+          <Button label="Không tích mục nào, sang bước tiếp" kind="ghost" testID="consent-skip" onPress={() => submit(true)} disabled={busy || loading} />
         </>
       }>
-      <BrandHeader subtitle="Hồ sơ 60 giây" />
+      <BrandHeader subtitle="Thiết lập nhanh (không bắt buộc)" />
       <T v="h2" accessibilityRole="header">
-        Bạn đồng ý cho Mỹ Vị dùng dữ liệu nào?
+        Bạn có muốn bật các tuỳ chọn hỗ trợ sau không?
       </T>
       <T tone="muted">
-        Mỗi mục là một mục đích riêng, không bắt buộc. Không tích mục nào bạn vẫn dùng được quét tủ lạnh và ghép mâm. Đổi lại
-        bất cứ lúc nào trong Cài đặt › Đồng ý.
+        Không chọn mục nào bạn vẫn chụp ảnh tủ lạnh, tính calo và xem công thức bình thường. Thay đổi bất cứ lúc nào trong Cài đặt.
       </T>
       {loading ? <Loading label="Đang tải điều khoản…" /> : null}
       {failed ? (

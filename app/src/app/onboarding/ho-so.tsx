@@ -217,7 +217,24 @@ export default function ProfileSteps() {
   }
 
   return (
-    <Screen testID={`screen-onboarding-${step}`} variant="focused" footer={footer}>
+    <Screen
+      testID={`screen-onboarding-${step}`}
+      variant="focused"
+      footer={
+        <>
+          {footer}
+          <Button
+            label="Dùng thử ngay, thiết lập sau →"
+            kind="ghost"
+            testID="onboarding-skip-all"
+            onPress={async () => {
+              if (user) await saveProgress(user.id, { consent: true, done: true });
+              router.replace('/bep');
+            }}
+            disabled={busy}
+          />
+        </>
+      }>
       <ProgressDots step={idx + 1} total={steps.length} label={LABEL[step]} />
       <T v="h1" accessibilityRole="header">
         {step === 'activity' && energyFor ? 'Mục tiêu năng lượng' : LABEL[step]}

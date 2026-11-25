@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
 import { api } from '@/api/client';
@@ -23,6 +23,7 @@ jest.mock('@/api/client', () => {
 });
 
 const mockedGet = api.GET as jest.Mock;
+const mockedPost = api.POST as jest.Mock;
 
 describe('analyzeMacroNutrition & MacroPieLedger', () => {
   it('computes macro energy, 100%-exact percentage shares, density tag, AMDR balance & fiber %', () => {
@@ -77,7 +78,7 @@ describe('analyzeMacroNutrition & MacroPieLedger', () => {
     expect(res.warningsVi.some((w) => w.includes('Chất xơ còn ít'))).toBe(true);
   });
 
-  it('renders Pure-SVG macro-pie-chart and Nutrition Facts ledger', async () => {
+  it('renders compact Pure-SVG macro-pie-chart and expands technical details on tap', async () => {
     await renderWithProviders(
       <MacroPieLedger
         proteinG={25}
@@ -93,8 +94,12 @@ describe('analyzeMacroNutrition & MacroPieLedger', () => {
     expect(screen.getByTestId('macro-donut-outer-ring')).toBeTruthy();
     expect(screen.getByTestId('macro-donut-inner-ring')).toBeTruthy();
     expect(screen.getByTestId('macro-nutrition-ledger')).toBeTruthy();
-    expect(screen.getByText(/135 kcal\/100g/)).toBeTruthy();
     expect(screen.getByText(/5 g \(20% \/ 25g ngày\)/)).toBeTruthy();
+    // Technical conversion formula & density stay collapsed until expanded
+    expect(screen.queryByTestId('macro-tech-details')).toBeNull();
+    await fireEvent.press(screen.getByTestId('macro-tech-toggle'));
+    expect(await screen.findByTestId('macro-tech-details')).toBeTruthy();
+    expect(screen.getByText(/135 kcal\/100g/)).toBeTruthy();
     expect(screen.getByText('1g đạm, tinh bột ≈ 4 kcal, 1g béo ≈ 9 kcal')).toBeTruthy();
     expect(screen.getAllByText(/Viện Dinh dưỡng Quốc gia/).length).toBeGreaterThanOrEqual(1);
   });
@@ -127,25 +132,28 @@ describe('analyzeMacroNutrition & MacroPieLedger', () => {
   });
 });
 
-describe('Brand recipePhotoFor Vietnamese matching & slot fallback', () => {
-  it('matches Cá nục kho thơm, avoids cà/cá false positives, and falls back for trang_mieng', () => {
+describe('Brand recipePhotoFor honest Vietnamese dish matching', () => {
+  it('matches genuine dish photos and returns null rather than showing misleading unrelated photos', () => {
     expect(recipePhotoFor('Cá nục kho thơm', 'man')).toBe(FOOD_PHOTOS.caramelTrout);
     expect(recipePhotoFor('Canh chua cá lóc', 'canh')).toBe(FOOD_PHOTOS.freshBowl);
-    expect(recipePhotoFor('Món đặc biệt mới', 'rau')).toBeTruthy();
+    expect(recipePhotoFor('Rau muống xào tỏi', 'rau')).toBe(FOOD_PHOTOS.morningGlory);
     expect(recipePhotoFor('Cà ri gà', 'man')).toBe(FOOD_PHOTOS.caramelPork);
-    expect(recipePhotoFor('Cà tím nướng mỡ hành', 'rau')).toBe(FOOD_PHOTOS.morningGlory);
-    expect(recipePhotoFor('', 'trang_mieng')).toBeTruthy();
+    expect(recipePhotoFor('Bí đỏ xào tỏi', 'rau')).toBeNull();
+    expect(recipePhotoFor('Cà tím nướng mỡ hành', 'rau')).toBeNull();
+    expect(recipePhotoFor('Món đặc biệt mới', 'rau')).toBeNull();
+    expect(recipePhotoFor('', 'trang_mieng')).toBeNull();
   });
 });
 
-describe('mon/[id] (RecipeDetail editorial cleanup)', () => {
+describe('mon/[id] (Actionable RecipeDetail)', () => {
   beforeEach(() => {
     setWindowWidth(1280, 900);
     mockNavState.params = { id: 'rec-ca-nuc' };
     mockedGet.mockReset();
+    mockedPost.mockReset();
   });
 
-  it('renders single MacroPieLedger without duplicate macro block or unvalidated internal source text', async () => {
+  it('scales servings live, adds missing ingredients to shopping list, and logs meal in 1 tap', async () => {
     mockedGet.mockImplementation(async (path: string) => {
       if (path === '/me/consents') return okRes({ items: [] });
       if (path === '/reference') {
@@ -194,17 +202,53 @@ describe('mon/[id] (RecipeDetail editorial cleanup)', () => {
       }
       return okRes({});
     });
+    mockedPost.mockResolvedValue(okRes({ id: 'ok-1' }));
 
     await renderWithProviders(<RecipeDetail />);
 
     expect(await screen.findByTestId('screen-recipe')).toBeTruthy();
     expect(screen.getByText('Cá nục kho thơm')).toBeTruthy();
+    expect(screen.getByText('400 g')).toBeTruthy();
     expect(screen.getByTestId('macro-pie-chart')).toBeTruthy();
-    expect(screen.getByText('Phân tích dinh dưỡng mỗi người')).toBeTruthy();
-    expect(screen.queryByText('Thành phần dinh dưỡng / người')).toBeNull();
-    expect(screen.queryByText('Chi tiết dinh dưỡng mỗi người')).toBeNull();
     expect(screen.queryByText(/Tài liệu nội bộ/)).toBeNull();
     expect(screen.getByText('Viện Dinh dưỡng Quốc gia')).toBeTruthy();
-    expect(screen.getByLabelText('Ảnh món Cá nục kho thơm')).toBeTruthy();
+
+    // Scale from 2 -> 3 servings: 400g -> 600g
+    await fireEvent.press(screen.getByTestId('recipe-servings-plus'));
+    expect(screen.getByText('600 g')).toBeTruthy();
+
+    // 1-tap add missing ingredient to shopping list
+    await fireEvent.press(screen.getByTestId('recipe-shop-i1'));
+    await waitFor(() => {
+      expect(mockedPost).toHaveBeenCalledWith('/shopping-items', { body: { ingredient_id: 'i1', qty_g: 600 } });
+    });
+
+    // 1-tap log meal
+    mockedPost.mockResolvedValueOnce(
+      okRes({
+        id: 'ml-rec-1',
+        user_id: 'user-1',
+        logged_at: '2026-11-25T12:00:00Z',
+        logged_date: '2026-11-25',
+        meal_slot: 'trua',
+        title: 'Cá nục kho thơm',
+        source_type: 'recipe',
+        source_ref_id: 'rec-ca-nuc',
+        portion_label: '1 khẩu phần',
+        portion_scale: 1,
+        modifiers: [],
+        kcal: 360,
+        kcal_low: 306,
+        kcal_high: 414,
+        protein_g: 26,
+        carbs_g: 22,
+        fat_g: 16,
+        fiber_g: 3,
+        provenance_label_vi: 'Công thức cơm nhà Mỹ Vị',
+        items: [],
+      }),
+    );
+    await fireEvent.press(screen.getByTestId('recipe-log-meal'));
+    expect(await screen.findByTestId('recipe-logged-notice')).toBeTruthy();
   });
 });

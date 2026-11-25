@@ -3,7 +3,7 @@ import { type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { useSession } from '@/auth/session';
-import { BroadsheetCrest, VermilionSeal, Wordmark } from '@/components/Brand';
+import { BroadsheetCrest, Wordmark } from '@/components/Brand';
 import { Icon, type IconName } from '@/components/domain';
 import { T } from '@/components/ui';
 import { radius, space, TOUCH, useLayout, useTheme } from '@/theme';
@@ -17,10 +17,11 @@ type NavItem = {
 };
 
 const PRIMARY_NAV: NavItem[] = [
-  { key: 'bep', href: '/bep', label: 'Bếp nhà', icon: 'home', testID: 'sidebar-nav-bep' },
-  { key: 'quet', href: '/quet', label: 'Quét & Calo', icon: 'camera', testID: 'sidebar-nav-quet' },
-  { key: 'mam', href: '/mam', label: 'Mâm cơm', icon: 'tray', testID: 'sidebar-nav-mam' },
-  { key: 'kho', href: '/kho', label: 'Kho bếp', icon: 'box', testID: 'sidebar-nav-kho' },
+  { key: 'bep', href: '/bep', label: 'Hôm nay', icon: 'home', testID: 'sidebar-nav-bep' },
+  { key: 'quet', href: '/quet', label: 'Quét & Ghi bữa', icon: 'camera', testID: 'sidebar-nav-quet' },
+  { key: 'mam', href: '/mam', label: 'Nấu ăn', icon: 'tray', testID: 'sidebar-nav-mam' },
+  { key: 'kho', href: '/kho', label: 'Tủ lạnh', icon: 'box', testID: 'sidebar-nav-kho' },
+  { key: 'di-cho', href: '/di-cho', label: 'Đi chợ', icon: 'cart', testID: 'sidebar-nav-di-cho' },
   { key: 'nhat-ky', href: '/nhat-ky', label: 'Nhật ký', icon: 'book', testID: 'sidebar-nav-nhat-ky' },
 ];
 
@@ -53,19 +54,18 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const isStaff = user?.role === 'admin' || user?.role === 'ml_operator';
   const utilityIcons: NavItem[] = [
-    { key: 'di-cho', href: '/di-cho', label: 'Đi chợ', icon: 'cart', testID: 'sidebar-nav-di-cho' },
     ...(isStaff
       ? [{ key: 'quan-tri', href: '/quan-tri', label: 'Quản trị', icon: 'shield' as const, testID: 'sidebar-nav-quan-tri' }]
       : []),
     { key: 'cai-dat', href: '/cai-dat', label: 'Cài đặt', icon: 'gear', testID: 'sidebar-nav-cai-dat' },
   ];
 
-  const activeKey = pathname.startsWith('/mon') || pathname.startsWith('/kham-pha')
+  const activeKey = pathname.startsWith('/mon') || pathname.startsWith('/kham-pha') || pathname.startsWith('/nau')
     ? 'mam'
-    : pathname.startsWith('/nau')
-      ? 'mam'
-      : pathname.startsWith('/quet')
-        ? 'quet'
+    : pathname.startsWith('/quet') || first === 'quet-tab'
+      ? 'quet'
+      : pathname.startsWith('/di-cho')
+        ? 'di-cho'
         : first || 'bep';
 
   const renderPrimaryItem = (item: NavItem) => {
@@ -102,6 +102,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   };
 
   const renderUtilityIcon = (item: NavItem) => {
+    if (isDesktop) return renderPrimaryItem(item);
     const active = activeKey === item.key;
     return (
       <Pressable
@@ -132,21 +133,17 @@ export function AppShell({ children }: { children: ReactNode }) {
           isDesktop ? styles.desktopRail : styles.tabletRail,
           {
             backgroundColor: c.surfaceCard,
-            borderRightColor: c.border,
+            borderRightColor: c.hairline,
           },
         ]}>
         <View style={[styles.brandRowWrap, !isDesktop && { alignItems: 'center', paddingHorizontal: 0 }]}>
-          <View style={[styles.brandRow, { borderBottomColor: c.border }, !isDesktop && { justifyContent: 'center', paddingHorizontal: 0 }]}>
+          <View style={[styles.brandRow, { borderBottomColor: c.hairline }, !isDesktop && { justifyContent: 'center', paddingHorizontal: 0 }]}>
             {isDesktop ? (
-              <View style={{ gap: space.xs }}>
-                <Wordmark size="md" masthead />
-                <VermilionSeal />
-              </View>
+              <Wordmark size="md" subtitle="Bếp nhà hằng ngày" />
             ) : (
               <BroadsheetCrest size="sm" />
             )}
           </View>
-          <View style={{ height: 1, backgroundColor: c.hairline, marginTop: 2 }} />
         </View>
 
         <ScrollView
@@ -157,7 +154,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </ScrollView>
 
         <View style={[styles.railFooter, { borderTopColor: c.hairline }, !isDesktop && { alignItems: 'center', paddingHorizontal: space.xs }]}>
-          <View style={[styles.utilityRow, !isDesktop && { flexDirection: 'column' }]}>
+          <View style={isDesktop ? { gap: 2 } : [styles.utilityRow, { flexDirection: 'column' }]}>
             {utilityIcons.map(renderUtilityIcon)}
           </View>
           {isDesktop && user ? (

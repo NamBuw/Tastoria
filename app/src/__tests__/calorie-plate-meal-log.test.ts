@@ -103,13 +103,16 @@ describe('caloriePlate edge cases', () => {
     }
   });
 
-  it('collapses multi-whitespace when deduplicating modifiers', () => {
+  it('collapses multi-whitespace and avoids duplicating generic fallback modifiers when backend already supplies per-dish suggestions', () => {
     const merged = mergeModifiers([
       { id: 'c1', label_vi: 'Thêm   nước tương', kcal_delta: 20, fat_delta_g: 0, carbs_delta_g: 2, protein_delta_g: 1 },
       { id: 'c2', label_vi: 'Thêm nước tương', kcal_delta: 25, fat_delta_g: 0, carbs_delta_g: 2, protein_delta_g: 1 },
+      { id: 'it_com', label_vi: 'Bớt 1/3 cơm / bún / phở', kcal_delta: -110, fat_delta_g: 0, carbs_delta_g: -24, protein_delta_g: -2.2 },
     ]);
     const matching = merged.filter((m) => m.id === 'c1' || m.id === 'c2');
     expect(matching).toHaveLength(1);
+    expect(merged.some((m) => m.id === 'it_com_bun')).toBe(false);
+    expect(mergeModifiers(undefined).some((m) => m.id === 'mo_hanh')).toBe(true);
   });
 });
 

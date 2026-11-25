@@ -28,17 +28,70 @@ import { radius, space, TOUCH, useTheme } from '@/theme';
 export default function Settings() {
   const { user, signOut } = useSession();
   const { c } = useTheme();
+  const qc = useQueryClient();
   const router = useRouter();
   const [open, setOpen] = useState<string | null>(null);
   const isStaff = user?.role === 'admin' || user?.role === 'ml_operator';
+  const cachedProfile = qc.getQueryData<Schemas['Profile']>(qk.profile);
+  const cachedSettings = qc.getQueryData<Schemas['UserSettings']>(qk.settings);
+
+  const summaryFor = (k: string): string | undefined => {
+    if (k === 'profile') {
+      return cachedProfile?.kcal_target ? `Mục tiêu: ${cachedProfile.kcal_target.toLocaleString('vi-VN')} kcal/ngày` : 'Chiều cao, cân nặng & mục tiêu calo';
+    }
+    if (k === 'allergen') {
+      if (cachedProfile) {
+        return cachedProfile.allergen_codes.length ? `Đã chọn ${cachedProfile.allergen_codes.length} nhóm dị ứng` : 'Không dị ứng';
+      }
+      return 'Lọc tự động khi gợi ý món';
+    }
+    if (k === 'favs') {
+      return cachedProfile?.favorite_recipe_ids?.length ? `Đã chọn ${cachedProfile.favorite_recipe_ids.length} món` : 'Gợi ý sát khẩu vị gia đình';
+    }
+    if (k === 'kitchen') {
+      return cachedSettings ? `${cachedSettings.default_persons} người ăn · ${cachedSettings.burners} bếp` : 'Số người ăn & số bếp nấu';
+    }
+    if (k === 'verify-email') {
+      return user?.email_verified ? 'Đã xác minh' : 'Chưa xác minh';
+    }
+    if (k === 'mfa') {
+      return user?.mfa_enabled ? 'Đang bật' : 'Đang tắt';
+    }
+    return undefined;
+  };
+
+  const renderSectionGroup = (title: string, keys: readonly string[]) => {
+    const items = GROUPS.filter(([k]) => keys.includes(k));
+    return (
+      <View style={{ gap: space.xs }}>
+        <T v="small" tone="muted" style={{ fontWeight: '600', paddingHorizontal: space.xs }}>
+          {title}
+        </T>
+        <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
+          {items.map(([k, rowTitle, Body], idx) => (
+            <Group
+              key={k}
+              k={k}
+              title={rowTitle}
+              summary={summaryFor(k)}
+              divided={idx > 0}
+              open={open === k}
+              toggle={() => setOpen(open === k ? null : k)}>
+              <Body />
+            </Group>
+          ))}
+        </Card>
+      </View>
+    );
+  };
 
   return (
     <Screen testID="screen-settings" variant="focused">
       <View style={{ gap: 4 }}>
         <T v="h1" accessibilityRole="header">
-          Cài đặt tài khoản
+          Cài đặt
         </T>
-        <T tone="muted">Đăng nhập bằng {user?.email ? maskEmail(user.email) : ''}</T>
+        <T tone="muted">Tài khoản: {user?.email ? maskEmail(user.email) : ''}</T>
       </View>
 
       {isStaff ? (
@@ -59,19 +112,9 @@ export default function Settings() {
         </Card>
       ) : null}
 
-      <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
-        {GROUPS.filter(([k]) => k !== 'delete').map(([k, title, Body], idx) => (
-          <Group
-            key={k}
-            k={k}
-            title={title}
-            divided={idx > 0}
-            open={open === k}
-            toggle={() => setOpen(open === k ? null : k)}>
-            <Body />
-          </Group>
-        ))}
-      </Card>
+      {renderSectionGroup('Bếp & Dinh dưỡng', ['profile', 'allergen', 'favs', 'kitchen'])}
+      {renderSectionGroup('Tài khoản & Bảo mật', ['verify-email', 'password', 'sessions', 'mfa'])}
+      {renderSectionGroup('Quyền riêng tư & Dữ liệu', ['consent', 'export', 'dsr'])}
 
       {GROUPS.filter(([k]) => k === 'delete').map(([k, title, Body]) => (
         <Card key={k} style={{ padding: 0, gap: 0, overflow: 'hidden', borderColor: c.danger, borderWidth: 1 }}>
@@ -85,7 +128,7 @@ export default function Settings() {
           </Group>
         </Card>
       ))}
-      <Button label="Làm khảo sát gu món ăn" kind="secondary" onPress={() => router.push('/khao-sat')} />
+      <Button label="Làm khảo sát khẩu vị món ăn" kind="secondary" onPress={() => router.push('/khao-sat')} />
       <Button label="Đăng xuất" kind="secondary" testID="sign-out" onPress={() => signOut(false)} />
       <Button label="Đăng xuất mọi thiết bị" kind="ghost" onPress={() => signOut(true)} />
     </Screen>
@@ -95,6 +138,7 @@ export default function Settings() {
 function Group({
   k,
   title,
+  summary,
   danger,
   divided,
   open: isOpen,
@@ -103,6 +147,7 @@ function Group({
 }: {
   k: string;
   title: string;
+  summary?: string;
   danger?: boolean;
   divided?: boolean;
   open: boolean;
@@ -118,17 +163,25 @@ function Group({
         testID={`settings-${k}`}
         onPress={toggle}
         style={({ pressed }) => ({
-          minHeight: TOUCH + 8,
+          minHeight: TOUCH + 10,
           paddingHorizontal: space.lg,
+          paddingVertical: space.sm,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: space.sm,
           backgroundColor: pressed ? c.surfaceAlt : 'transparent',
         })}>
-        <T v="title" tone={danger ? 'danger' : 'text'} style={{ flexShrink: 1 }}>
-          {title}
-        </T>
+        <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+          <T v="title" tone={danger ? 'danger' : 'text'}>
+            {title}
+          </T>
+          {summary && !isOpen ? (
+            <T v="small" tone="muted" numberOfLines={1}>
+              {summary}
+            </T>
+          ) : null}
+        </View>
         <Icon name={isOpen ? 'minus' : 'plus'} size={20} color={danger ? c.danger : c.accent} />
       </Pressable>
       {isOpen ? <View style={{ paddingHorizontal: space.lg, paddingBottom: space.lg, gap: space.md }}>{children}</View> : null}
@@ -982,16 +1035,16 @@ function DeleteSection() {
 }
 
 const GROUPS: [string, string, () => ReactNode][] = [
-  ['profile', 'Hồ sơ và mục tiêu năng lượng', ProfileSection],
-  ['allergen', 'Dị ứng và chế độ ăn', AllergenSection],
-  ['favs', '5 món hay ăn', FavsSection],
-  ['kitchen', 'Bếp', KitchenSection],
+  ['profile', 'Hồ sơ & mục tiêu calo', ProfileSection],
+  ['allergen', 'Dị ứng & chế độ ăn', AllergenSection],
+  ['favs', '5 món nhà hay ăn', FavsSection],
+  ['kitchen', 'Bếp & số người ăn', KitchenSection],
   ['verify-email', 'Xác minh email', VerifyEmailSection],
   ['password', 'Đổi mật khẩu', ChangePasswordSection],
-  ['sessions', 'Quản lý phiên đăng nhập', SessionsSection],
-  ['mfa', 'Xác thực hai bước (TOTP)', MfaSection],
-  ['consent', 'Đồng ý sử dụng dữ liệu', ConsentSection],
-  ['export', 'Tải dữ liệu của tôi', ExportSection],
-  ['dsr', 'Yêu cầu sửa, hạn chế hoặc phản đối', ManualDsrSection],
+  ['sessions', 'Thiết bị đang đăng nhập', SessionsSection],
+  ['mfa', 'Bảo mật hai lớp (OTP)', MfaSection],
+  ['consent', 'Quyền sử dụng dữ liệu', ConsentSection],
+  ['export', 'Tải bản sao dữ liệu', ExportSection],
+  ['dsr', 'Yêu cầu sửa hoặc hạn chế dữ liệu', ManualDsrSection],
   ['delete', 'Xoá tài khoản', DeleteSection],
 ];

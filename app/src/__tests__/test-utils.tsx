@@ -21,6 +21,7 @@ export function makeQueryClient() {
       },
       mutations: {
         retry: false,
+        gcTime: Infinity,
       },
     },
   });

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -6,26 +6,36 @@ import { Linking, Pressable, View } from 'react-native';
 
 import { api, call } from '@/api/client';
 import { errorText } from '@/api/errors';
+import { useSession } from '@/auth/session';
 import { recipePhotoFor } from '@/components/Brand';
 import { Icon, SLOT_LABEL } from '@/components/domain';
 import { MacroPieLedger } from '@/components/MacroPieLedger';
-import { Card, ErrorBox, Loading, Notice, Row, Screen, Section, T } from '@/components/ui';
+import { Button, Card, ErrorBox, Loading, Notice, Row, Screen, Section, Stepper, T } from '@/components/ui';
 import { useCatalog } from '@/lib/catalog';
+import { addQuickMealLog, defaultMealSlot, MEAL_SLOT_LABEL, type QuickMealLogEntry, removeQuickMealLog } from '@/lib/mealLog';
+import { goTab } from '@/lib/nav';
 import { enqueueEvents } from '@/lib/outbox';
 import { qk, useHasConsent, useLots, useReference } from '@/lib/queries';
 import { radius, space, TOUCH, useLayout, useTheme } from '@/theme';
 
-/** Recipe detail (GET /recipes/{id}, falls back to stored catalog offline); pantry match + macros + viewed event. */
+/** Chi tiết món ăn: chỉnh số người ăn, thêm đồ thiếu vào đi chợ 1 chạm, và ghi bữa vào Nhật ký. */
 export default function RecipeDetail() {
   const { id, plan, item } = useLocalSearchParams<{ id: string; plan?: string; item?: string }>();
   const { c } = useTheme();
   const { isDesktop } = useLayout();
+  const { user } = useSession();
+  const qc = useQueryClient();
   const nav = useNavigation();
   const personalization = useHasConsent('personalization');
   const catalog = useCatalog();
   const ref = useReference();
   const lots = useLots();
   const [offlineFallback, setOfflineFallback] = useState(false);
+  const [servingsCount, setServingsCount] = useState<number | null>(null);
+  const [shopAddedIds, setShopAddedIds] = useState<Record<string, boolean>>({});
+  const [batchShopDone, setBatchShopDone] = useState(false);
+  const [loggedEntry, setLoggedEntry] = useState<QuickMealLogEntry | null>(null);
+  const [logBusy, setLogBusy] = useState(false);
 
   const q = useQuery({
     queryKey: qk.recipe(id),
@@ -62,9 +72,40 @@ export default function RecipeDetail() {
     return m;
   }, [lots.data]);
 
+  const addShopItem = useMutation({
+    mutationFn: ({ ingredient_id, qty_g }: { ingredient_id: string; qty_g: number }) =>
+      call(api.POST('/shopping-items', { body: { ingredient_id, qty_g: Math.max(1, Math.round(qty_g)) } })),
+    onSuccess: (_res, vars) => {
+      setShopAddedIds((prev) => ({ ...prev, [vars.ingredient_id]: true }));
+      qc.invalidateQueries({ queryKey: qk.shopping });
+    },
+  });
+
+  const addAllMissing = useMutation({
+    mutationFn: async (items: { ingredient_id: string; qty_g: number }[]) => {
+      await Promise.all(
+        items.map((x) =>
+          call(api.POST('/shopping-items', { body: { ingredient_id: x.ingredient_id, qty_g: Math.max(1, Math.round(x.qty_g)) } })),
+        ),
+      );
+      return items;
+    },
+    onSuccess: (items) => {
+      const next: Record<string, boolean> = {};
+      items.forEach((x) => {
+        next[x.ingredient_id] = true;
+      });
+      setShopAddedIds((prev) => ({ ...prev, ...next }));
+      setBatchShopDone(true);
+      qc.invalidateQueries({ queryKey: qk.shopping });
+    },
+  });
+
   if (q.isLoading) return <Screen><Loading /></Screen>;
   if (q.error || !q.data) return <Screen><ErrorBox message={errorText(q.error)} onRetry={() => q.refetch()} /></Screen>;
   const r = q.data;
+  const activeServings = servingsCount ?? r.servings;
+  const scale = activeServings / Math.max(1, r.servings);
 
   const macroNum = (direct: number | null | undefined, code: string) =>
     direct ?? r.nutrition.find((n) => n.nutrient_code === code)?.per_serving ?? null;
@@ -88,6 +129,46 @@ export default function RecipeDetail() {
     (n) => !['energy_kcal', 'protein_g', 'glucid_g', 'lipid_g', 'fiber_g'].includes(n.nutrient_code),
   );
 
+  const missingToShop = r.ingredients
+    .filter((i) => !i.is_staple && !i.is_optional)
+    .map((i) => {
+      const scaledG = Math.round(i.grams * scale);
+      const have = pantryTotals.get(i.ingredient_id) ?? 0;
+      return { ingredient_id: i.ingredient_id, qty_g: Math.max(0, scaledG - have) };
+    })
+    .filter((x) => x.qty_g > 0 && !shopAddedIds[x.ingredient_id]);
+
+  const logDishNow = async () => {
+    if (logBusy) return;
+    setLogBusy(true);
+    try {
+      const slot = defaultMealSlot();
+      const entry = await addQuickMealLog(
+        {
+          meal_slot: slot,
+          title_vi: r.name_vi,
+          source_kind: 'recipe',
+          source_ref_id: r.id,
+          portion_label: '1 khẩu phần',
+          modifiers_vi: [],
+          kcal: Math.round(r.kcal_per_serving ?? 280),
+          kcal_low: Math.round((r.kcal_per_serving ?? 280) * 0.85),
+          kcal_high: Math.round((r.kcal_per_serving ?? 280) * 1.15),
+          protein_g: proteinG,
+          carbs_g: carbsG,
+          fat_g: fatG,
+          fiber_g: fiberG,
+          provenance_label_vi: 'Công thức cơm nhà Mỹ Vị',
+        },
+        user?.id,
+      );
+      setLoggedEntry(entry);
+      await Promise.all([qc.invalidateQueries({ queryKey: ['quick-logs'] }), qc.invalidateQueries({ queryKey: ['journal'] })]);
+    } finally {
+      setLogBusy(false);
+    }
+  };
+
   const validSources = r.sources
     .map((s) => {
       if (!/^https?:\/\//i.test(s.url)) return null;
@@ -108,18 +189,30 @@ export default function RecipeDetail() {
       {r.make_ahead ? (
         <View style={{ borderRadius: radius.md, borderWidth: 1, borderColor: c.hairline, backgroundColor: c.surfaceAlt, padding: space.lg }}>
           <T>
-            Cần có sẵn {r.make_ahead.item_name_vi} (làm từ trước{r.make_ahead.whole_dish ? '' : `, bước 1 đến ${r.make_ahead.through_step_no}`}); lịch nấu
-            chỉ tính phần còn lại.
+            Cần chuẩn bị trước {r.make_ahead.item_name_vi} ({r.make_ahead.whole_dish ? 'cả món' : `bước 1 đến ${r.make_ahead.through_step_no}`}).
           </T>
         </View>
       ) : null}
 
       <Section title="Nguyên liệu">
-        <Card style={{ gap: space.sm }}>
+        <Card style={{ gap: space.md }}>
+          <Stepper
+            label="Số người ăn"
+            value={activeServings}
+            onChange={(next) => {
+              setServingsCount(next);
+              setBatchShopDone(false);
+            }}
+            min={1}
+            max={8}
+            testID="recipe-servings"
+          />
           {r.ingredients.map((i) => {
+            const scaledGrams = Math.round(i.grams * scale);
             const have = pantryTotals.get(i.ingredient_id) ?? 0;
-            const short = Math.max(0, Math.round(i.grams - have));
+            const short = Math.max(0, Math.round(scaledGrams - have));
             const enough = short <= 0;
+            const addedShop = Boolean(shopAddedIds[i.ingredient_id]);
             return (
               <Row key={i.ingredient_id} style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }} gap={space.sm}>
                 <View style={{ flex: 1, minWidth: 0 }}>
@@ -142,13 +235,39 @@ export default function RecipeDetail() {
                       </T>
                     </View>
                   ) : null}
+                  {!i.is_staple && short > 0 ? (
+                    addedShop ? (
+                      <T v="small" tone="herb">Đã thêm</T>
+                    ) : (
+                      <Button
+                        label="+ Đi chợ"
+                        kind="ghost"
+                        compact
+                        testID={`recipe-shop-${i.ingredient_id}`}
+                        onPress={() => addShopItem.mutate({ ingredient_id: i.ingredient_id, qty_g: short })}
+                        style={{ paddingHorizontal: space.xs }}
+                      />
+                    )
+                  ) : null}
                   <T v="label" tabular>
-                    {Math.round(i.grams)} g
+                    {scaledGrams} g
                   </T>
                 </Row>
               </Row>
             );
           })}
+          {missingToShop.length > 0 ? (
+            <Button
+              label={`Thêm ${missingToShop.length} đồ thiếu vào Đi chợ`}
+              kind="secondary"
+              compact
+              testID="recipe-shop-all"
+              loading={addAllMissing.isPending}
+              onPress={() => addAllMissing.mutate(missingToShop)}
+            />
+          ) : batchShopDone ? (
+            <T v="small" tone="herb">Đã thêm toàn bộ nguyên liệu còn thiếu vào danh sách Đi chợ.</T>
+          ) : null}
         </Card>
       </Section>
 
@@ -156,7 +275,7 @@ export default function RecipeDetail() {
         <Section title="Phân tích dinh dưỡng mỗi người">
           <View style={{ gap: space.sm }}>
             <MacroPieLedger
-              title="Cấu trúc đa lượng khẩu phần"
+              title="Dinh dưỡng 1 khẩu phần"
               proteinG={proteinG}
               carbsG={carbsG}
               fatG={fatG}
@@ -195,7 +314,7 @@ export default function RecipeDetail() {
 
   const rightCol = (
     <View style={{ gap: space.lg }}>
-      <Section title="Các bước">
+      <Section title="Các bước thực hiện">
         <View style={{ borderRadius: radius.md, borderWidth: 1, borderColor: c.hairline, backgroundColor: c.surface, padding: space.lg, gap: space.md }}>
           {r.steps.map((s) => (
             <View key={s.step_no} style={{ flexDirection: 'row', gap: space.md }}>
@@ -256,13 +375,43 @@ export default function RecipeDetail() {
   const heroPhoto = recipePhotoFor(r.name_vi, r.slot);
 
   return (
-    <Screen testID="screen-recipe">
+    <Screen
+      testID="screen-recipe"
+      footer={
+        loggedEntry ? (
+          <Notice tone="ok" testID="recipe-logged-notice">
+            <T v="label">
+              Đã ghi {loggedEntry.title_vi} ({loggedEntry.kcal} kcal, bữa {MEAL_SLOT_LABEL[loggedEntry.meal_slot]}) vào Nhật ký.
+            </T>
+            <Row gap={space.xs}>
+              <Button label="Xem Nhật ký" kind="secondary" compact onPress={() => goTab('/nhat-ky')} />
+              <Button
+                label="Hoàn tác"
+                kind="ghost"
+                compact
+                onPress={async () => {
+                  await removeQuickMealLog(loggedEntry.id, user?.id);
+                  setLoggedEntry(null);
+                  await Promise.all([qc.invalidateQueries({ queryKey: ['quick-logs'] }), qc.invalidateQueries({ queryKey: ['journal'] })]);
+                }}
+              />
+            </Row>
+          </Notice>
+        ) : (
+          <Button
+            label={`Tôi vừa nấu / ăn món này${r.kcal_per_serving ? ` (${Math.round(r.kcal_per_serving)} kcal)` : ''}`}
+            testID="recipe-log-meal"
+            loading={logBusy}
+            onPress={() => void logDishNow()}
+          />
+        )
+      }>
       {offlineFallback ? (
         <Notice tone="info">
-          <T>Đang xem từ bộ nhớ đệm ngoại tuyến.</T>
+          <T>Đang xem ngoại tuyến (chưa có mạng).</T>
         </Notice>
       ) : null}
-      <Card variant="ledger" style={{ padding: 0, overflow: 'hidden' }}>
+      <Card style={{ padding: 0, overflow: 'hidden' }}>
         {heroPhoto ? (
           <Image
             source={heroPhoto}
@@ -286,7 +435,7 @@ export default function RecipeDetail() {
             {r.name_vi}
           </T>
           <T tone="muted" tabular>
-            Khẩu phần {r.servings} người, khoảng {r.total_minutes} phút{r.kcal_per_serving ? `, ${Math.round(r.kcal_per_serving)} kcal/người` : ''}
+            Gốc {r.servings} người · Đang chỉnh {activeServings} người · ~{r.total_minutes} phút{r.kcal_per_serving ? ` · ${Math.round(r.kcal_per_serving)} kcal/người` : ''}
           </T>
         </View>
       </Card>

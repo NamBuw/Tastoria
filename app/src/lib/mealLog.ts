@@ -32,7 +32,7 @@ export function localDateString(d = new Date()): string {
   return `${y}-${m}-${day}`;
 }
 
-function isoWeekKey(dt: Date): string {
+export function isoWeekKey(dt: Date): string {
   const t = new Date(Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate()));
   const day = t.getUTCDay() || 7;
   t.setUTCDate(t.getUTCDate() + 4 - day);
@@ -64,7 +64,7 @@ export type QuickMealLogEntry = {
   logged_at: string;
   meal_slot: MealSlot;
   title_vi: string;
-  source_kind: 'scan_calorie' | 'barcode';
+  source_kind: 'scan_calorie' | 'barcode' | 'recipe';
   portion_label: string;
   modifiers_vi: string[];
   kcal: number;
@@ -118,7 +118,7 @@ export function mealLogOutToEntry(m: Schemas['MealLogOut']): QuickMealLogEntry {
     logged_at: m.logged_at,
     meal_slot: m.meal_slot,
     title_vi: m.title,
-    source_kind: m.source_type === 'barcode' ? 'barcode' : 'scan_calorie',
+    source_kind: m.source_type === 'barcode' ? 'barcode' : m.source_type === 'recipe' ? 'recipe' : 'scan_calorie',
     portion_label: m.portion_label,
     modifiers_vi: (m.modifiers ?? []).map((x) => String(x)),
     kcal: m.kcal,

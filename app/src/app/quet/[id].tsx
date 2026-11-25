@@ -11,6 +11,7 @@ import { IngredientSearch, LEVEL_LABEL } from '@/components/pantryForms';
 import { Button, Card, Chip, ErrorBox, Loading, Notice, Row, Screen, Section, Segmented, Sheet, Stepper, T } from '@/components/ui';
 import { useCatalog } from '@/lib/catalog';
 import { goTab } from '@/lib/nav';
+import { UNIT_LABEL } from '@/lib/pantryDisplay';
 import { useLots, useReference } from '@/lib/queries';
 import { radius, size, space, TOUCH, useLayout, useTheme } from '@/theme';
 
@@ -266,7 +267,7 @@ export default function ConfirmScan() {
           <T>{s.error_code ? codeText(s.error_code) : 'Ảnh chưa xử lý được.'}</T>
         </Notice>
         <Button label="Quét lại" onPress={() => router.replace({ pathname: '/quet', params: { mode: s.mode } })} />
-        <Button label="Nhập tay trong Kho" kind="secondary" onPress={() => goTab('/kho')} />
+        <Button label="Nhập tay vào Tủ lạnh" kind="secondary" onPress={() => goTab('/kho')} />
       </Screen>
     );
   }
@@ -277,10 +278,10 @@ export default function ConfirmScan() {
           Đã bỏ lần quét này
         </T>
         <Notice>
-          <T>Kết quả quét này đã được bỏ và không đưa vào kho bếp.</T>
+          <T>Kết quả quét này đã được bỏ và không thêm vào tủ lạnh.</T>
         </Notice>
         <Button label="Quét lại" onPress={() => router.replace({ pathname: '/quet', params: { mode: s.mode } })} />
-        <Button label="Về Kho bếp" kind="secondary" onPress={() => goTab('/kho')} />
+        <Button label="Mở Tủ lạnh" kind="secondary" onPress={() => goTab('/kho')} />
       </Screen>
     );
   }
@@ -288,19 +289,19 @@ export default function ConfirmScan() {
     return (
       <Screen testID="screen-scan-done" variant="focused">
         <T v="h1" accessibilityRole="header">
-          Đã lưu vào kho
+          Đã lưu vào Tủ lạnh
         </T>
         <Notice tone="ok">
-          <T v="title">Đã đưa vào kho</T>
+          <T v="title">Đã lưu xong</T>
           {result ? (
             <T tabular>
-              {result.created_lot_ids.length} lô mới
-              {result.not_seen_lot_ids.length ? `, ${result.not_seen_lot_ids.length} lô lần này không thấy (xác nhận ở Kho)` : ''}.
+              Đã thêm {result.created_lot_ids.length} nguyên liệu mới
+              {result.not_seen_lot_ids.length ? `, ${result.not_seen_lot_ids.length} nguyên liệu chưa thấy lần này (xem lại ở Tủ lạnh)` : ''}.
             </T>
           ) : null}
         </Notice>
-        <Button label="Ra mâm cơm" onPress={() => goTab('/mam')} />
-        <Button label="Xem kho" kind="secondary" onPress={() => goTab('/kho')} />
+        <Button label="Xem gợi ý nấu ăn" onPress={() => goTab('/mam')} />
+        <Button label="Mở Tủ lạnh" kind="secondary" onPress={() => goTab('/kho')} />
       </Screen>
     );
   }
@@ -332,19 +333,21 @@ export default function ConfirmScan() {
     const conf = Math.max(0, ...i.detections.map((d) => d.confidence));
     const low = i.origin === 'model' && conf > 0 && conf < 0.5;
     const qty = i.final_count ?? i.model_count;
+    const unitCode = ing?.units?.[0]?.unit_code;
+    const unitName = unitCode ? (UNIT_LABEL[unitCode] ?? unitCode) : 'cái';
     const qtyText = countable
       ? qty
-        ? `, ${qty} đơn vị`
+        ? `, ${qty} ${unitName}`
         : ''
       : i.qty_level
         ? `, ${LEVEL_LABEL[i.qty_level].toLowerCase()}`
-        : ', chọn lượng';
+        : ', chưa rõ lượng';
     return (
       <View key={i.id} style={{ opacity: low ? 0.75 : 1, maxWidth: '100%', flexShrink: 1 }}>
         <Chip
           testID={`scan-chip-${i.ingredient_name_vi}`}
           onPress={() => setEditing({ item: i })}
-          label={`${itemDisplayName(i)}${qtyText}${low ? ', chưa chắc' : ''}`}
+          label={`${itemDisplayName(i)}${qtyText}${low ? ', cần xem lại' : ''}`}
           left={<FreshBadge value={fresh(i)} small />}
         />
       </View>
@@ -531,7 +534,7 @@ export default function ConfirmScan() {
       {check.length ? (
         <Section title="Cần kiểm tra trước khi dùng">
           <T v="small" tone="muted">
-            Xem, ngửi thử rồi chọn độ tươi. Mỹ Vị không dùng đồ ở mức này khi ghép mâm.
+            Xem, ngửi thử rồi chọn độ tươi. Hệ thống sẽ không gợi ý nấu món cần nguyên liệu này cho tới khi bạn xác nhận.
           </T>
           <Row>{check.map(chip)}</Row>
         </Section>
@@ -551,9 +554,9 @@ export default function ConfirmScan() {
       </T>
       <Button label="+ Thêm nguyên liệu bị sót" kind="secondary" onPress={() => setAdding(true)} />
       {unseen.length ? (
-        <Section title="Lần này không thấy">
+        <Section title="Chưa thấy trong lần kiểm kê này">
           <T v="small" tone="muted">
-            Sẽ được đánh dấu &quot;chưa thấy&quot;; bạn xác nhận lại ở Kho.
+            Các món này đang có trong tủ nhưng không thấy trong ảnh; bạn có thể xác nhận lại ở Tủ lạnh.
           </T>
           <T>{unseen.map((l) => l.ingredient_name_vi).join(', ')}</T>
         </Section>
@@ -568,7 +571,7 @@ export default function ConfirmScan() {
         <>
           {confirm.error ? <ErrorBox message={errorText(confirm.error)} /> : null}
           <Button
-            label="Đưa vào kho"
+            label="Lưu vào Tủ lạnh"
             testID="scan-confirm"
             onPress={() => confirm.mutate()}
             loading={confirm.isPending}

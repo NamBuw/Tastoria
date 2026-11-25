@@ -44,6 +44,7 @@ import {
   type MealSlot,
   type QuickMealLogEntry,
   removeQuickMealLog,
+  useQuickMealLogs,
 } from '@/lib/mealLog';
 import { goTab } from '@/lib/nav';
 import { useHasConsent, useProfile } from '@/lib/queries';
@@ -136,8 +137,8 @@ export default function Scan() {
   const section: ScanSection = tabPick && tabPick.base === params.tab ? tabPick.value : paramTab;
   const setSection = (value: ScanSection) => setTabPick({ base: params.tab, value });
 
-  // ---- Tab 1: Nguyên liệu tủ lạnh / đồ vừa mua ----
-  const paramMode: Schemas['ScanMode'] = params.mode === 'haul' ? 'haul' : 'fridge';
+  // ---- Tab 1: Thêm đồ mới / kiểm kê tủ lạnh ----
+  const paramMode: Schemas['ScanMode'] = params.mode === 'fridge' ? 'fridge' : 'haul';
   const [modePick, setModePick] = useState<{ base: string | undefined; value: Schemas['ScanMode'] } | null>(null);
   const mode: Schemas['ScanMode'] = modePick && modePick.base === params.mode ? modePick.value : paramMode;
   const setMode = (value: Schemas['ScanMode']) => setModePick({ base: params.mode, value });
@@ -149,7 +150,7 @@ export default function Scan() {
   const photoConsent = useHasConsent('photo_contribution');
   const idem = useIdempotencyKey();
 
-  // ---- Tab 2: Món ăn & Calo (ảnh + tìm món Việt, mì gói, đồ uống) ----
+  // ---- Tab 2: Món ăn & Calo (ảnh + nhiều đĩa trên mâm + ghi nhanh 1 chạm) ----
   const [mealImg, setMealImg] = useState<PreparedImage | null>(null);
   const [portion, setPortion] = useState<Portion>('vua');
   const [dishQuery, setDishQuery] = useState('');
@@ -158,6 +159,7 @@ export default function Scan() {
   const [calErr, setCalErr] = useState<unknown>(null);
   const [calOut, setCalOut] = useState<MealCalorieEstimateView | null>(null);
   const [activeModIds, setActiveModIds] = useState<string[]>([]);
+  const [selectedPlates, setSelectedPlates] = useState<number[]>([]);
   const [calSlot, setCalSlot] = useState<MealSlot>(() => defaultMealSlot());
   const [loggedCalEntry, setLoggedCalEntry] = useState<QuickMealLogEntry | null>(null);
   const [calLogBusy, setCalLogBusy] = useState(false);
@@ -167,6 +169,19 @@ export default function Scan() {
   const calReqSeq = useRef(0);
   const calAbortRef = useRef<AbortController | null>(null);
   const lastCalQueryRef = useRef<{ img: PreparedImage | null; dishName: string; dishSlug: string | null } | null>(null);
+  const recentLogsQ = useQuickMealLogs();
+  const recentQuickDishes = useMemo(() => {
+    const out: QuickMealLogEntry[] = [];
+    const seen = new Set<string>();
+    for (const item of recentLogsQ.data ?? []) {
+      const k = foldText(item.title_vi.trim());
+      if (!k || seen.has(k)) continue;
+      seen.add(k);
+      out.push(item);
+      if (out.length >= 6) break;
+    }
+    return out;
+  }, [recentLogsQ.data]);
 
   useEffect(() => () => calAbortRef.current?.abort(), []);
 
@@ -306,6 +321,7 @@ export default function Scan() {
       )) as MealCalorieEstimateView;
       if (ctrl.signal.aborted || seq !== calReqSeq.current) return;
       setCalOut(out);
+      setSelectedPlates((out.detected_plates ?? []).map((_, idx) => idx));
       if (!opts?.preserveModifiers) setActiveModIds([]);
       setLoggedCalEntry(null);
       setCalLogErr(null);
@@ -366,15 +382,6 @@ export default function Scan() {
   const scanBarcodePhoto = async (camera: boolean) => {
     setBcErr(null);
     setBcNote(null);
-    const DetectorCtor = (
-      globalThis as unknown as {
-        BarcodeDetector?: new (o?: object) => { detect: (src: unknown) => Promise<{ rawValue?: string }[]> };
-      }
-    ).BarcodeDetector;
-    if (!DetectorCtor || typeof document === 'undefined') {
-      setBcNote('Trình duyệt hiện tại chưa hỗ trợ tự đọc mã vạch từ ảnh. Vui lòng nhập trực tiếp dãy số mã vạch bên dưới.');
-      return;
-    }
     const opts: ImagePicker.ImagePickerOptions = { mediaTypes: ['images'], quality: 1, allowsMultipleSelection: false };
     if (camera) {
       const perm = await ImagePicker.requestCameraPermissionsAsync();
@@ -387,24 +394,52 @@ export default function Scan() {
     if (res.canceled || !res.assets[0]) return;
     setBcBusy(true);
     try {
-      const imgEl = new window.Image();
-      imgEl.crossOrigin = 'anonymous';
-      await new Promise<void>((resolve, reject) => {
-        imgEl.onload = () => resolve();
-        imgEl.onerror = () => reject(new Error('load'));
-        imgEl.src = res.assets[0].uri;
-      });
-      const det = new DetectorCtor({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'] });
-      const found = await det.detect(imgEl);
-      const val = found.find((x) => x.rawValue && /^[0-9]{8,14}$/.test(x.rawValue))?.rawValue;
-      if (!val) {
-        setBcNote('Chưa nhận ra mã vạch rõ nét trong ảnh. Hãy chụp gần hơn hoặc nhập dãy số thủ công.');
-        setBcBusy(false);
-        return;
+      const DetectorCtor = (
+        globalThis as unknown as {
+          BarcodeDetector?: new (o?: object) => { detect: (src: unknown) => Promise<{ rawValue?: string }[]> };
+        }
+      ).BarcodeDetector;
+      if (DetectorCtor && typeof window !== 'undefined' && typeof document !== 'undefined') {
+        try {
+          const imgEl = new window.Image();
+          imgEl.crossOrigin = 'anonymous';
+          await new Promise<void>((resolve, reject) => {
+            imgEl.onload = () => resolve();
+            imgEl.onerror = () => reject(new Error('load'));
+            imgEl.src = res.assets[0].uri;
+          });
+          const det = new DetectorCtor({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'] });
+          const found = await det.detect(imgEl);
+          const val = found.find((x) => x.rawValue && /^[0-9]{8,14}$/.test(x.rawValue))?.rawValue;
+          if (val) {
+            await lookupBarcode(val);
+            return;
+          }
+        } catch {
+          // Fall through to server-side decoder
+        }
       }
-      await lookupBarcode(val);
-    } catch {
-      setBcNote('Không đọc được mã vạch từ ảnh. Vui lòng nhập trực tiếp dãy số mã vạch.');
+
+      const prepared = await prepareImage(res.assets[0].uri);
+      const part = await imagePart(prepared, 'ma-vach.jpg');
+      const out = await call(
+        api.POST('/meal-calorie/barcode-image', {
+          body: { image: '' } as never,
+          bodySerializer: () => {
+            const fd = new FormData();
+            fd.append('image', part as Blob, 'ma-vach.jpg');
+            return fd;
+          },
+        }),
+      );
+      setBarcode(out.barcode);
+      setBcOut(out);
+      setBcUnit(out.kcal_per_serving != null ? 'serving' : '100g');
+      setLoggedBcEntry(null);
+    } catch (e) {
+      setBcOut(null);
+      setBcErr(e);
+    } finally {
       setBcBusy(false);
     }
   };
@@ -414,6 +449,39 @@ export default function Scan() {
     () => (calOut ? applyPlateModifiers(calOut, activeModIds, plateModifiers) : null),
     [calOut, activeModIds, plateModifiers],
   );
+  const detectedPlates = useMemo(() => calOut?.detected_plates ?? [], [calOut?.detected_plates]);
+  const multiPlateActive = detectedPlates.length > 1;
+  const effectivePlate = useMemo(() => {
+    if (!calOut || !adjustedPlate) return null;
+    if (!multiPlateActive) return adjustedPlate;
+    const checked = detectedPlates
+      .map((plate, idx) => ({ plate, idx }))
+      .filter(({ idx }) => selectedPlates.includes(idx));
+    const modKcal = adjustedPlate.estimated_kcal - Math.round(calOut.estimated_kcal);
+    const fallbackPerPlate = Math.round(calOut.estimated_kcal / detectedPlates.length);
+    const checkedRaw = checked.reduce((s, { plate }) => s + (plate.estimated_kcal_vua ?? fallbackPerPlate), 0);
+    const baseMultiKcal = Math.max(0, Math.round(checkedRaw * calOut.portion_multiplier));
+    const ratio = calOut.estimated_kcal > 0 ? baseMultiKcal / calOut.estimated_kcal : checked.length / detectedPlates.length;
+    const estKcal = Math.max(0, baseMultiKcal + modKcal);
+    const halfW = Math.max(0.12, calOut.half_width_rel ?? 0.15);
+    const round1 = (x: number) => Math.max(0, Math.round(x * 10) / 10);
+    const modP = adjustedPlate.protein_g - calOut.protein_g;
+    const modC = adjustedPlate.carbs_g - calOut.carbs_g;
+    const modF = adjustedPlate.fat_g - calOut.fat_g;
+    const modFib = adjustedPlate.fiber_g - (calOut.fiber_g ?? 0);
+    return {
+      ...adjustedPlate,
+      estimated_kcal: estKcal,
+      kcal_low: Math.max(0, Math.round(estKcal * (1 - halfW))),
+      kcal_high: Math.max(estKcal, Math.round(estKcal * (1 + halfW))),
+      estimated_mass_g:
+        adjustedPlate.estimated_mass_g != null ? Math.max(20, Math.round(adjustedPlate.estimated_mass_g * ratio)) : null,
+      protein_g: round1(calOut.protein_g * ratio + modP),
+      carbs_g: round1(calOut.carbs_g * ratio + modC),
+      fat_g: round1(calOut.fat_g * ratio + modF),
+      fiber_g: round1((calOut.fiber_g ?? 0) * ratio + modFib),
+    };
+  }, [calOut, adjustedPlate, multiPlateActive, detectedPlates, selectedPlates]);
   const disambig = useMemo(() => (calOut ? needsDisambiguation(calOut) : { required: false }), [calOut]);
   const provenanceLabel = calOut ? resolveProvenanceLabel(calOut) : '';
   const dailyTarget = profile.data?.kcal_target ?? null;
@@ -423,32 +491,88 @@ export default function Scan() {
     setActiveModIds((prev) => (prev.includes(modId) ? prev.filter((id) => id !== modId) : [...prev, modId]));
   };
 
+  const togglePlateIdx = (idx: number) => {
+    setLoggedCalEntry(null);
+    setSelectedPlates((prev) => (prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]));
+  };
+
   const logCalorieToJournal = async () => {
-    if (!calOut || !adjustedPlate || calLogBusyRef.current) return;
+    if (!calOut || !effectivePlate || calLogBusyRef.current) return;
     calLogBusyRef.current = true;
     setCalLogBusy(true);
     setCalLogErr(null);
     try {
       const portionText = PLATE_PORTIONS.find(([k]) => k === portion)?.[1] ?? 'Vừa 1.0×';
+      const checkedPlatesList = multiPlateActive
+        ? detectedPlates.filter((_, idx) => selectedPlates.includes(idx))
+        : [];
+      const plateTitles = checkedPlatesList.map((p) => p.dish_name_vi || p.label).filter(Boolean);
+      const titleVi =
+        plateTitles.length > 1
+          ? plateTitles.slice(0, 3).join(' + ')
+          : plateTitles.length === 1
+            ? plateTitles[0]
+            : (calOut.dish_name_vi ?? 'Món ăn quét calo');
       const payload = {
         meal_slot: calSlot,
-        title_vi: calOut.dish_name_vi ?? 'Món ăn quét calo',
+        title_vi: titleVi,
         source_kind: 'scan_calorie' as const,
         source_ref_id: calOut.kb_slug ?? calOut.recognized_dish_id ?? null,
         portion_label: portionText,
         portion_scale: calOut.portion_multiplier,
-        modifiers_vi: adjustedPlate.activeModifiers.map((m) => `${m.label_vi} (${formatModifierDelta(m.kcal_delta)})`),
-        kcal: adjustedPlate.estimated_kcal,
-        kcal_low: adjustedPlate.kcal_low,
-        kcal_high: adjustedPlate.kcal_high,
-        protein_g: adjustedPlate.protein_g,
-        carbs_g: adjustedPlate.carbs_g,
-        fat_g: adjustedPlate.fat_g,
-        fiber_g: adjustedPlate.fiber_g,
+        modifiers_vi: effectivePlate.activeModifiers.map((m) => `${m.label_vi} (${formatModifierDelta(m.kcal_delta)})`),
+        kcal: effectivePlate.estimated_kcal,
+        kcal_low: effectivePlate.kcal_low,
+        kcal_high: effectivePlate.kcal_high,
+        protein_g: effectivePlate.protein_g,
+        carbs_g: effectivePlate.carbs_g,
+        fat_g: effectivePlate.fat_g,
+        fiber_g: effectivePlate.fiber_g,
         provenance_label_vi: provenanceLabel,
+        items: checkedPlatesList.map((p) => ({
+          item_kind: 'dish' as const,
+          label_vi: p.dish_name_vi || p.label,
+          dish_slug: p.dish_id ?? null,
+          kcal: p.estimated_kcal_vua != null ? Math.round(p.estimated_kcal_vua * calOut.portion_multiplier) : null,
+        })),
       };
-      const entry = await addQuickMealLog(payload, user?.id, calLogIdem.keyFor(payload));
+      const entry = await addQuickMealLog(payload, user?.id, calLogIdem.keyFor({ ...payload, nonce: loggedCalEntry ? Date.now() : 0 }));
       calLogIdem.reset();
+      setLoggedCalEntry(entry);
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ['quick-logs'] }),
+        qc.invalidateQueries({ queryKey: ['journal'] }),
+      ]);
+    } catch (e) {
+      setCalLogErr(e);
+    } finally {
+      calLogBusyRef.current = false;
+      setCalLogBusy(false);
+    }
+  };
+
+  const quickRelogDish = async (recent: QuickMealLogEntry) => {
+    if (calLogBusyRef.current) return;
+    calLogBusyRef.current = true;
+    setCalLogBusy(true);
+    setCalLogErr(null);
+    try {
+      const payload = {
+        meal_slot: calSlot,
+        title_vi: recent.title_vi,
+        source_kind: recent.source_kind,
+        portion_label: recent.portion_label,
+        modifiers_vi: recent.modifiers_vi,
+        kcal: recent.kcal,
+        kcal_low: recent.kcal_low,
+        kcal_high: recent.kcal_high,
+        protein_g: recent.protein_g,
+        carbs_g: recent.carbs_g,
+        fat_g: recent.fat_g,
+        fiber_g: recent.fiber_g,
+        provenance_label_vi: recent.provenance_label_vi,
+      };
+      const entry = await addQuickMealLog(payload, user?.id);
       setLoggedCalEntry(entry);
       await Promise.all([
         qc.invalidateQueries({ queryKey: ['quick-logs'] }),
@@ -686,26 +810,55 @@ export default function Scan() {
           testID="calorie-estimate-btn"
         />
       </Card>
+
+      {recentQuickDishes.length > 0 ? (
+        <Card testID="recent-quick-dishes" style={{ padding: space.lg, gap: space.sm }}>
+          <T v="label">Món bạn hay ăn gần đây (1 chạm ghi lại)</T>
+          <Row gap={space.xs}>
+            {recentQuickDishes.map((recent) => (
+              <Pressable
+                key={recent.id}
+                accessibilityRole="button"
+                disabled={calLogBusy}
+                onPress={() => void quickRelogDish(recent)}
+                style={({ pressed }) => ({
+                  minHeight: 36,
+                  maxWidth: '100%',
+                  flexShrink: 1,
+                  paddingHorizontal: space.sm,
+                  paddingVertical: 6,
+                  borderRadius: radius.sm,
+                  borderWidth: 1,
+                  borderColor: c.hairline,
+                  backgroundColor: pressed ? c.surfaceAlt : c.surface,
+                  justifyContent: 'center',
+                })}>
+                <T v="small" tabular style={{ flexShrink: 1 }}>
+                  + {recent.title_vi} ({Math.round(recent.kcal)} kcal)
+                </T>
+              </Pressable>
+            ))}
+          </Row>
+        </Card>
+      ) : null}
     </View>
   );
 
   const calorieResultCol = (
     <View style={{ gap: space.md }}>
-      {calOut && adjustedPlate ? (
+      {calOut && effectivePlate ? (
         <Card
           variant="ledger"
           style={{
             padding: space.lg,
             gap: space.md,
-            borderTopWidth: 3,
-            borderTopColor: c.text,
           }}
           testID="calorie-result-card">
-          {/* Header: provenance & Mỹ Vị nutrition index */}
+          {/* Header: Dish name & readable balance badge */}
           <View style={{ gap: space.xs, paddingBottom: space.sm, borderBottomWidth: 1, borderBottomColor: c.hairline }}>
             <Row style={{ justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }} gap={space.xs}>
-              <T v="label" tone="accent" style={{ flexShrink: 1 }}>
-                {provenanceLabel}
+              <T v="h1" style={{ flex: 1, minWidth: 180 }}>
+                {calOut.dish_name_vi ?? 'Món ăn từ ảnh chụp'}
               </T>
               {(calOut.nutrition_grade != null || calOut.nutrition_score != null) ? (
                 <View
@@ -714,33 +867,58 @@ export default function Scan() {
                     paddingHorizontal: space.sm,
                     paddingVertical: 4,
                     borderRadius: radius.sm,
-                    maxWidth: '100%',
-                    flexShrink: 1,
+                    flexShrink: 0,
                   }}>
-                  <T v="small" tabular tone={gradeTone(calOut.nutrition_grade).fgKey}>
-                    Chỉ số dinh dưỡng Mỹ Vị: {gradeTone(calOut.nutrition_grade).label}
+                  <T v="small" tone={gradeTone(calOut.nutrition_grade).fgKey} style={{ fontWeight: '600' }}>
+                    {gradeTone(calOut.nutrition_grade).label}
                   </T>
                 </View>
               ) : null}
             </Row>
 
-            <T v="h1">{calOut.dish_name_vi ?? 'Món ăn phân tích từ ảnh chụp'}</T>
-
-            <Row gap={space.sm}>
-              {calOut.serving_desc_vi ? (
-                <T v="small" tone="muted" style={{ flexShrink: 1 }}>
-                  Khẩu phần chuẩn: {calOut.serving_desc_vi}
-                </T>
-              ) : null}
-              {calOut.source_ref ? (
-                <T v="small" tone="muted" style={{ flexShrink: 1 }}>
-                  Nguồn: {sanitizeProvenanceText(calOut.source_ref)}
-                </T>
-              ) : null}
-            </Row>
+            {calOut.serving_desc_vi ? (
+              <T v="small" tone="muted">
+                Khẩu phần tham khảo: {calOut.serving_desc_vi}
+                {calOut.source === 'hybrid' && mealImg ? ' (đã quy đổi theo lượng thức ăn trong ảnh)' : ''}
+              </T>
+            ) : null}
           </View>
 
-          {/* Top-2 Disambiguation Banner (borderless soft-tinted inline banner) */}
+          {/* Multi-Dish Tray Detection (when 2+ plates detected in the photo) */}
+          {multiPlateActive ? (
+            <View
+              testID="detected-plates-panel"
+              style={{
+                backgroundColor: c.surfaceAlt,
+                borderWidth: 1,
+                borderColor: c.hairline,
+                borderRadius: radius.md,
+                padding: space.md,
+                gap: space.xs,
+              }}>
+              <T v="label">
+                Phát hiện {detectedPlates.length} món trên mâm — chọn các món bạn ăn:
+              </T>
+              {detectedPlates.map((plate, idx) => {
+                const checked = selectedPlates.includes(idx);
+                const kcalVal =
+                  plate.estimated_kcal_vua != null
+                    ? Math.round(plate.estimated_kcal_vua * calOut.portion_multiplier)
+                    : Math.round((calOut.estimated_kcal / detectedPlates.length) * calOut.portion_multiplier);
+                return (
+                  <Checkbox
+                    key={`${plate.label}-${idx}`}
+                    testID={`detected-plate-${idx}`}
+                    checked={checked}
+                    onChange={() => togglePlateIdx(idx)}
+                    label={`${plate.dish_name_vi || plate.label} (~${kcalVal} kcal)`}
+                  />
+                );
+              })}
+            </View>
+          ) : null}
+
+          {/* Top-2 Disambiguation Banner */}
           {disambig.required && disambig.c1 && disambig.c2 ? (
             <View
               testID="calorie-disambiguation-banner"
@@ -758,7 +936,8 @@ export default function Scan() {
               <Row gap={space.xs}>
                 {[disambig.c1, disambig.c2].map((cand) => {
                   const selected = calOut.recognized_dish_id === cand.dish_id || calOut.dish_name_vi === cand.name_vi;
-                  const label = `${cand.name_vi}${cand.kcal_vua != null ? ` (${Math.round(cand.kcal_vua)} kcal)` : ''}`;
+                  const candKcal = selected ? Math.round(effectivePlate.estimated_kcal) : cand.kcal_vua != null ? Math.round(cand.kcal_vua) : null;
+                  const label = `${cand.name_vi}${candKcal != null ? ` (${candKcal} kcal)` : ''}`;
                   return (
                     <Pressable
                       key={cand.dish_id}
@@ -796,30 +975,30 @@ export default function Scan() {
             <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: space.sm }}>
               <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: space.sm, flexWrap: 'wrap' }}>
                 <T v="huge" tabular tone="accent">
-                  {Math.round(adjustedPlate.estimated_kcal)} kcal
+                  {Math.round(effectivePlate.estimated_kcal)} kcal
                 </T>
                 <T v="small" tone="muted" tabular>
-                  Ước tính từ {Math.round(adjustedPlate.kcal_low)} đến {Math.round(adjustedPlate.kcal_high)} kcal
+                  Ước tính từ {Math.round(effectivePlate.kcal_low)} đến {Math.round(effectivePlate.kcal_high)} kcal
                 </T>
               </View>
-              {adjustedPlate.estimated_mass_g != null ? (
+              {effectivePlate.estimated_mass_g != null ? (
                 <T v="small" tone="muted" tabular>
-                  Khối lượng ước tính ~{Math.round(adjustedPlate.estimated_mass_g)}g
+                  Khối lượng ước tính ~{Math.round(effectivePlate.estimated_mass_g)}g
                 </T>
               ) : null}
             </View>
 
             {(() => {
-              const scaleMax = Math.max(adjustedPlate.kcal_high, dailyTarget ? Math.round(dailyTarget * 0.5) : 0, 100) * 1.15;
-              const lowPct = Math.min(95, Math.max(0, (adjustedPlate.kcal_low / scaleMax) * 100));
-              const highPct = Math.min(100, Math.max(lowPct + 4, (adjustedPlate.kcal_high / scaleMax) * 100));
-              const midPct = Math.min(98, Math.max(2, (adjustedPlate.estimated_kcal / scaleMax) * 100));
-              const sharePct = dailyTarget ? Math.round((adjustedPlate.estimated_kcal / dailyTarget) * 100) : null;
+              const scaleMax = Math.max(effectivePlate.kcal_high, dailyTarget ? Math.round(dailyTarget * 0.5) : 0, 100) * 1.15;
+              const lowPct = Math.min(95, Math.max(0, (effectivePlate.kcal_low / scaleMax) * 100));
+              const highPct = Math.min(100, Math.max(lowPct + 4, (effectivePlate.kcal_high / scaleMax) * 100));
+              const midPct = Math.min(98, Math.max(2, (effectivePlate.estimated_kcal / scaleMax) * 100));
+              const sharePct = dailyTarget ? Math.round((effectivePlate.estimated_kcal / dailyTarget) * 100) : null;
               return (
                 <View testID="calorie-range-bar" style={{ gap: 4 }}>
                   <View
                     style={{ height: 8, borderRadius: radius.sm, backgroundColor: c.surfaceAlt, overflow: 'hidden', position: 'relative' }}
-                    accessibilityLabel={`Khoảng ${adjustedPlate.kcal_low} đến ${adjustedPlate.kcal_high} kcal, trung vị ${adjustedPlate.estimated_kcal} kcal`}>
+                    accessibilityLabel={`Khoảng ${effectivePlate.kcal_low} đến ${effectivePlate.kcal_high} kcal, trung vị ${effectivePlate.estimated_kcal} kcal`}>
                     <View
                       style={{
                         position: 'absolute',
@@ -846,15 +1025,15 @@ export default function Scan() {
                   </View>
                   <Row style={{ justifyContent: 'space-between' }}>
                     <T v="small" tone="muted" tabular>
-                      {adjustedPlate.kcal_low} kcal
+                      {effectivePlate.kcal_low} kcal
                     </T>
                     <T v="small" tone="muted" tabular>
                       {sharePct != null
                         ? `Chiếm ~${sharePct}% mục tiêu ${Math.round(dailyTarget!)} kcal/ngày`
-                        : `Biên độ ±${Math.round(Math.max(0, (adjustedPlate.kcal_high - adjustedPlate.kcal_low) / 2))} kcal`}
+                        : `Biên độ ±${Math.round(Math.max(0, (effectivePlate.kcal_high - effectivePlate.kcal_low) / 2))} kcal`}
                     </T>
                     <T v="small" tone="muted" tabular>
-                      {adjustedPlate.kcal_high} kcal
+                      {effectivePlate.kcal_high} kcal
                     </T>
                   </Row>
                 </View>
@@ -862,10 +1041,10 @@ export default function Scan() {
             })()}
           </View>
 
-          {/* Inline Staging Plate Portion Multiplier (3-column Hairline Segmented Control) */}
+          {/* Inline Staging Plate Portion Multiplier */}
           <HairlineSegmented
             testID="plate-portion-selector"
-            label="Chỉnh kích cỡ suất ăn:"
+            label="Kích cỡ suất ăn:"
             options={PLATE_PORTIONS}
             value={portion}
             disabled={calBusy}
@@ -885,7 +1064,7 @@ export default function Scan() {
           {/* 1-Tap VN Hidden-Calorie Receipt Checklist Rows */}
           <View testID="plate-modifiers" style={{ gap: space.xs }}>
             <T v="small" tone="muted">
-              Điều chỉnh nhanh phần ăn kèm &amp; cách chế biến:
+              Điều chỉnh nhanh phần ăn kèm &amp; dầu mỡ:
             </T>
             <View>
               {plateModifiers.map((mod, idx) => (
@@ -902,14 +1081,14 @@ export default function Scan() {
             </View>
           </View>
 
-          {/* Pure-SVG Macro Pie/Donut Chart + Expanded Nutrition Facts Ledger */}
+          {/* Pure-SVG Macro Pie/Donut Chart */}
           <MacroPieLedger
-            proteinG={adjustedPlate.protein_g}
-            carbsG={adjustedPlate.carbs_g}
-            fatG={adjustedPlate.fat_g}
-            fiberG={adjustedPlate.fiber_g}
-            totalKcal={adjustedPlate.estimated_kcal}
-            massG={adjustedPlate.estimated_mass_g}
+            proteinG={effectivePlate.protein_g}
+            carbsG={effectivePlate.carbs_g}
+            fatG={effectivePlate.fat_g}
+            fiberG={effectivePlate.fiber_g}
+            totalKcal={effectivePlate.estimated_kcal}
+            massG={effectivePlate.estimated_mass_g}
             nutritionGrade={calOut.nutrition_grade}
             context="meal"
           />
@@ -922,6 +1101,7 @@ export default function Scan() {
               <Row gap={space.xs}>
                 {calOut.top_candidates.map((cand) => {
                   const selected = calOut.recognized_dish_id === cand.dish_id;
+                  const candKcal = selected ? Math.round(effectivePlate.estimated_kcal) : cand.kcal_vua != null ? Math.round(cand.kcal_vua) : null;
                   return (
                     <Pressable
                       key={cand.dish_id}
@@ -945,7 +1125,7 @@ export default function Scan() {
                         justifyContent: 'center',
                       })}>
                       <T v={selected ? 'label' : 'body'} tone={selected ? 'accent' : 'text'} tabular style={{ flexShrink: 1 }}>
-                        {`${cand.name_vi}${cand.kcal_vua != null ? ` (${Math.round(cand.kcal_vua)} kcal)` : ''}`}
+                        {`${cand.name_vi}${candKcal != null ? ` (${candKcal} kcal)` : ''}`}
                       </T>
                     </Pressable>
                   );
@@ -965,22 +1145,49 @@ export default function Scan() {
             </View>
           ) : null}
 
+          <T v="small" tone="muted">
+            Nguồn: {provenanceLabel}{calOut.source_ref ? ` · ${sanitizeProvenanceText(calOut.source_ref)}` : ''}
+          </T>
+
           {/* 1-Tap Meal Slot + Ghi vào Nhật ký hôm nay */}
           <View style={{ borderTopWidth: 1, borderTopColor: c.hairline, paddingTop: space.md, gap: space.sm }}>
             <HairlineSegmented
               label="Lưu vào bữa:"
               options={MEAL_SLOTS.map((s) => [s, MEAL_SLOT_LABEL[s]] as const)}
               value={calSlot}
-              onChange={setCalSlot}
+              onChange={(s) => {
+                setCalSlot(s);
+                setLoggedCalEntry(null);
+              }}
             />
-            <Button
-              label="Ghi vào Nhật ký hôm nay"
-              testID="calorie-log-to-journal"
-              icon={<Icon name="check" size={18} color={calLogBusy ? c.muted : c.onAccent} />}
-              disabled={calLogBusy}
-              loading={calLogBusy}
-              onPress={() => void logCalorieToJournal()}
-            />
+            {loggedCalEntry ? (
+              <Row gap={space.sm}>
+                <Button
+                  label="Đã ghi vào Nhật ký"
+                  kind="secondary"
+                  disabled
+                  testID="calorie-log-to-journal"
+                  icon={<Icon name="check" size={18} color={c.herb} />}
+                  style={{ flex: 1 }}
+                />
+                <Button
+                  label="Ghi thêm 1 suất"
+                  kind="ghost"
+                  compact
+                  loading={calLogBusy}
+                  onPress={() => void logCalorieToJournal()}
+                />
+              </Row>
+            ) : (
+              <Button
+                label="Ghi vào Nhật ký hôm nay"
+                testID="calorie-log-to-journal"
+                icon={<Icon name="check" size={18} color={calLogBusy ? c.muted : c.onAccent} />}
+                disabled={calLogBusy || (multiPlateActive && selectedPlates.length === 0)}
+                loading={calLogBusy}
+                onPress={() => void logCalorieToJournal()}
+              />
+            )}
             {calLogErr ? <ErrorBox message={errorText(calLogErr)} /> : null}
             {loggedCalEntry ? (
               <View
@@ -1027,16 +1234,16 @@ export default function Scan() {
       }>
       <View style={{ gap: 2 }}>
         <T v="huge" accessibilityRole="header">
-          {section === 'ingredients' ? 'Quét nguyên liệu' : section === 'calorie' ? 'Xem dinh dưỡng bữa ăn' : 'Quét mã vạch'}
+          {section === 'ingredients' ? 'Quét nguyên liệu' : section === 'calorie' ? 'Tính calo bữa ăn' : 'Quét mã vạch'}
         </T>
         <T tone="muted">
           {section === 'ingredients'
             ? mode === 'fridge'
-              ? 'Mở cửa tủ lạnh, chụp thẳng từng ngăn đủ ánh sáng (tối đa 2 ảnh).'
-              : 'Bày đồ vừa mua ra bàn, không chồng lên nhau. Ngày mua sẽ tự động ghi là hôm nay.'
+              ? 'Mở cửa tủ lạnh, chụp đủ sáng từng ngăn để rà soát xem món nào còn hay đã hết (tối đa 2 ảnh).'
+              : 'Chụp đồ vừa mua hoặc từng món riêng lẻ — chỉ thêm mới, không đánh dấu "chưa thấy" lên đồ sẵn có trong tủ.'
             : section === 'calorie'
-              ? 'Chụp bữa ăn hoặc tìm tên món để xem dinh dưỡng bữa ăn và điều chỉnh khẩu phần.'
-              : 'Tra cứu calo và thành phần dinh dưỡng của mì gói, sữa, bánh kẹo theo mã vạch.'}
+              ? 'Chụp đĩa cơm, tô phở hoặc chọn món quen để xem calo và ghi nhanh vào Nhật ký.'
+              : 'Chụp ảnh mã vạch hoặc nhập dãy số trên bao bì mì gói, sữa, bánh kẹo để xem calo.'}
         </T>
       </View>
 
@@ -1053,7 +1260,14 @@ export default function Scan() {
 
       {section === 'ingredients' ? (
         <>
-          <Segmented options={[['fridge', 'Toàn tủ lạnh'], ['haul', 'Đồ vừa mua']]} value={mode} onChange={setMode} />
+          <Segmented
+            options={[
+              ['haul', 'Thêm đồ mới / đồ lẻ'],
+              ['fridge', 'Kiểm kê toàn tủ lạnh'],
+            ]}
+            value={mode}
+            onChange={setMode}
+          />
 
           {images.length > 0 ? (
             <Row gap={space.md}>
@@ -1160,7 +1374,7 @@ export default function Scan() {
             />
             <Row gap={space.sm}>
               <Button
-                label="Tra cứu mã vạch"
+                label="Tra cứu"
                 icon={<Icon name="search" color={bcBusy ? c.muted : c.onAccent} />}
                 onPress={() => lookupBarcode()}
                 loading={bcBusy}
@@ -1168,9 +1382,16 @@ export default function Scan() {
                 testID="barcode-lookup-btn"
               />
               <Button
-                label="Quét ảnh mã vạch"
+                label="Chụp mã vạch"
                 kind="secondary"
                 icon={<Icon name="camera" color={c.text} />}
+                onPress={() => scanBarcodePhoto(true)}
+                disabled={bcBusy}
+                testID="barcode-camera-btn"
+              />
+              <Button
+                label="Chọn ảnh mã vạch"
+                kind="secondary"
                 onPress={() => scanBarcodePhoto(false)}
                 disabled={bcBusy}
                 testID="barcode-photo-btn"
@@ -1228,7 +1449,7 @@ export default function Scan() {
               }}
               testID="barcode-result-card">
               <Row style={{ justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }} gap={space.xs}>
-                <T v="label" tone="accent" style={{ flexShrink: 1 }}>
+                <T v="label" tone="muted" style={{ flexShrink: 1 }}>
                   {sanitizeProvenanceText(bcOut.source)}{bcOut.brand ? `, ${bcOut.brand}` : ''}
                 </T>
                 {(bcOut.nutrition_grade != null || bcOut.nutrition_score != null) ? (
@@ -1241,8 +1462,8 @@ export default function Scan() {
                       maxWidth: '100%',
                       flexShrink: 1,
                     }}>
-                    <T v="small" tabular tone={gradeTone(bcOut.nutrition_grade).fgKey}>
-                      Chỉ số dinh dưỡng Mỹ Vị: {gradeTone(bcOut.nutrition_grade).label}
+                    <T v="small" tabular tone={gradeTone(bcOut.nutrition_grade).fgKey} style={{ fontWeight: '600' }}>
+                      {gradeTone(bcOut.nutrition_grade).label}
                     </T>
                   </View>
                 ) : null}

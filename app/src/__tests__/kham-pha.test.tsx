@@ -175,7 +175,7 @@ describe('kham-pha (ExploreRecipes)', () => {
     await renderWithProviders(<ExploreRecipes />);
 
     await waitFor(() => {
-      expect(screen.getByText('Đang xem từ bộ nhớ đệm ngoại tuyến.')).toBeTruthy();
+      expect(screen.getByText('Đang xem ngoại tuyến (chưa có mạng).')).toBeTruthy();
     });
     expect(screen.getByText('Cá thu kho tộ')).toBeTruthy();
     expect(screen.getByText('Rau muống xào tỏi')).toBeTruthy();

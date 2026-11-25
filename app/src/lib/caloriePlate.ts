@@ -11,6 +11,8 @@ export type SuggestedModifier = {
   mass_delta_g?: number;
 };
 
+export type DetectedPlateView = Schemas['DetectedPlateOut'];
+
 export type MealCalorieEstimateView = Omit<Schemas['MealCalorieEstimateOut'], 'source'> & {
   source: Schemas['MealCalorieEstimateOut']['source'] | string;
   disambiguation_required?: boolean;
@@ -78,12 +80,16 @@ function normLabel(s: string): string {
     .replace(/\s+/g, ' ');
 }
 
+/**
+ * Use backend per-dish modifiers without appending duplicate generic VN modifiers when backend already provided tailored options.
+ */
 export function mergeModifiers(apiModifiers?: SuggestedModifier[] | null): SuggestedModifier[] {
+  const sourceList = apiModifiers && apiModifiers.length > 0 ? apiModifiers : [...VN_MEAL_MODIFIERS];
   const out: SuggestedModifier[] = [];
   const seenIds = new Set<string>();
   const seenLabels = new Set<string>();
 
-  for (const mod of [...(apiModifiers ?? []), ...VN_MEAL_MODIFIERS]) {
+  for (const mod of sourceList) {
     const nLabel = normLabel(mod.label_vi);
     if (seenIds.has(mod.id) || seenLabels.has(nLabel)) continue;
     seenIds.add(mod.id);

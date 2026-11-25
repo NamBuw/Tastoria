@@ -85,6 +85,10 @@ class DetectedPlateOut(BaseModel):
     y1: float
     x2: float
     y2: float
+    dish_id: str | None = None
+    dish_name_vi: str | None = None
+    dish_confidence: float | None = None
+    estimated_kcal_vua: float | None = None
 
 
 class MealCalorieEstimateOut(BaseModel):

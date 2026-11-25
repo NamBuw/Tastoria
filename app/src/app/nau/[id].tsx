@@ -226,23 +226,23 @@ export default function Cooking() {
         s.status === 'in_progress' ? (
           <>
             <Button label="Nấu xong" testID="cook-finish" onPress={() => router.push({ pathname: '/nau-xong/[id]', params: { id } })} />
-            <Button label="Bỏ phiên nấu" kind="ghost" onPress={() => abandon.mutate()} loading={abandon.isPending} />
+            <Button label="Huỷ nấu" kind="ghost" onPress={() => abandon.mutate()} loading={abandon.isPending} />
           </>
         ) : undefined
       }>
       <View style={{ gap: space.xs }}>
         <T v="h1" accessibilityRole="header">
-          Nấu cả mâm
+          Hướng dẫn nấu mâm cơm
         </T>
         <T tone="muted" tabular>
-          Dọn mâm lúc {fmtClock(serveAt)}. Món lâu nhất bắt đầu trước, màn hình luôn sáng khi nấu.
+          Dự kiến dọn mâm lúc {fmtClock(serveAt)}. Món nấu lâu bắt đầu trước, màn hình tự giữ sáng.
         </T>
       </View>
 
       {s.status !== 'in_progress' ? (
         <Notice tone="warn">
-          <T>Phiên nấu này {s.status === 'abandoned' ? 'đã bỏ' : s.status === 'reverted' ? 'đã hoàn tác' : 'đã kết thúc'}.</T>
-          <Button label="Về Mâm cơm hôm nay" kind="secondary" onPress={() => goTab('/mam')} />
+          <T>Lần nấu này {s.status === 'abandoned' ? 'đã huỷ' : s.status === 'reverted' ? 'đã hoàn tác' : 'đã xong'}.</T>
+          <Button label="Về Nấu ăn" kind="secondary" onPress={() => goTab('/mam')} />
         </Notice>
       ) : null}
 

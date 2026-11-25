@@ -59,9 +59,10 @@ def build_context(settings: Settings, sm, queue: ScanQueue) -> job.WorkerContext
     serving = det.metrics.get("serving") or {}
     raw_ag = serving.get("agnostic_iou")
     agnostic_iou = float(raw_ag) if raw_ag is not None else None
-    class_conf = resolve_class_conf(
-        serving.get("class_conf"), det.class_map, {vid: vc.code for vid, vc in vclasses.items()}
-    )
+    code_by_vid = {vid: vc.code for vid, vc in vclasses.items()}
+    class_conf = resolve_class_conf(serving.get("class_conf"), det.class_map, code_by_vid)
+    class_count_conf = resolve_class_conf(serving.get("class_count_conf"), det.class_map, code_by_vid)
+    zoom_rescue = serving.get("zoom_rescue") if isinstance(serving.get("zoom_rescue"), dict) else None
     session = mlops.load_onnx(storage, det, intra_op_threads=INTRA_OP_THREADS)  # verifies sha256 (SD10)
     detector = Detector(
         session,
@@ -70,6 +71,8 @@ def build_context(settings: Settings, sm, queue: ScanQueue) -> job.WorkerContext
         preprocess_version=det.preprocess_version,
         agnostic_iou=agnostic_iou,
         class_conf=class_conf,
+        class_count_conf=class_count_conf,
+        zoom_rescue=zoom_rescue,
     )
     classifier: FreshnessClassifier | None = None
     if fresh is not None:
@@ -121,6 +124,8 @@ def run(settings: Settings, *, burst: bool = False) -> int:
             "iou": ctx.detector.iou,
             "agnostic_iou": ctx.detector.agnostic_iou,
             "n_class_conf": len(ctx.detector.class_conf or {}),
+            "n_class_count_conf": len(ctx.detector.class_count_conf or {}),
+            "zoom_rescue_enabled": bool(ctx.detector.zoom_rescue and ctx.detector.zoom_rescue.get("enabled")),
             "mushroom_classifier": ctx.mushroom_classifier is not None,
             "threads": INTRA_OP_THREADS,
         },

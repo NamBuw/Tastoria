@@ -152,3 +152,104 @@ def test_resolve_class_conf_maps_codes_and_ignores_unknown() -> None:
     assert resolved == {0: 0.47, 1: 0.33, 2: 1.0}
     assert resolve_class_conf(None, class_map, code_by_vid) is None
     assert resolve_class_conf({}, class_map, code_by_vid) is None
+
+
+def test_hysteresis_counting_keeps_secondary_boxes_only_when_presence_confirmed() -> None:
+    # Class 0 has 3 eggs: [0.80, 0.70, 0.52]; presence thr=0.55, count thr=0.25 -> keeps all 3!
+    # Class 1 has 2 items: [0.40, 0.35]; presence thr=0.50, count thr=0.20 -> dropped completely (0 absent-class FPs!).
+    # Class 2 is disabled (class_conf=1.0, score=0.95) at anchor overlapping class 0 -> must not steal anchor!
+    out = np.zeros((4 + 3, 5), np.float32)
+    out[:4, 0], out[4 + 0, 0], out[4 + 2, 0] = (100, 100, 50, 50), 0.80, 0.95
+    out[:4, 1], out[4 + 0, 1] = (200, 100, 50, 50), 0.70
+    out[:4, 2], out[4 + 0, 2] = (300, 100, 50, 50), 0.52
+    out[:4, 3], out[4 + 1, 3] = (100, 300, 60, 60), 0.40
+    out[:4, 4], out[4 + 1, 4] = (250, 300, 60, 60), 0.35
+    boxes = decode(
+        out[None],
+        IDENT,
+        conf=0.35,
+        iou=0.45,
+        class_conf={0: 0.55, 1: 0.50, 2: 1.0},
+        class_count_conf={0: 0.25, 1: 0.20, 2: 0.20},
+    )
+    assert [(b.class_index, round(b.confidence, 2)) for b in boxes] == [(0, 0.80), (0, 0.70), (0, 0.52)]
+
+
+def test_hysteresis_unconfirmed_class_cannot_agnostic_suppress_confirmed_class() -> None:
+    # Unconfirmed class 0 (0.48 < pres 0.50) overlaps confirmed class 1 (0.45 >= pres 0.40) -> class 1 must survive!
+    out = np.zeros((4 + 2, 2), np.float32)
+    out[:4, 0], out[4 + 0, 0] = (100, 100, 50, 50), 0.48
+    out[:4, 1], out[4 + 1, 1] = (101, 100, 50, 50), 0.45
+    boxes = decode(
+        out[None],
+        IDENT,
+        conf=0.40,
+        iou=0.45,
+        agnostic_iou=0.65,
+        class_conf={0: 0.50, 1: 0.40},
+        class_count_conf={0: 0.25, 1: 0.25},
+    )
+    assert [(b.class_index, round(b.confidence, 2)) for b in boxes] == [(1, 0.45)]
+
+
+def test_guarded_zoom_rescue_behavior_on_synthetic_sessions() -> None:
+    from tastoria.modules.scan.detector import Detector
+
+    class _FakeInput:
+        name = "images"
+        shape = [1, 3, 640, 640]
+
+    class _SeqSession:
+        def __init__(self, outputs: list[np.ndarray]) -> None:
+            self._outputs = outputs
+            self.calls = 0
+
+        def get_inputs(self) -> list[_FakeInput]:
+            return [_FakeInput()]
+
+        def run(self, *_args: object, **_kwargs: object) -> list[np.ndarray]:
+            out = self._outputs[min(self.calls, len(self._outputs) - 1)]
+            self.calls += 1
+            return [out]
+
+    # Case 1: full frame empty & below full_min -> zoom MUST NOT fire (calls == 1)
+    empty_full = np.zeros((1, 4 + 2, 1), dtype=np.float32)
+    empty_full[0, :4, 0] = (320, 320, 80, 80)
+    empty_full[0, 4, 0] = 0.03
+    s_skip = _SeqSession([empty_full])
+    det_skip = Detector(
+        s_skip,
+        conf=0.40,
+        iou=0.45,
+        zoom_rescue={"enabled": True, "crop_frac": 0.60, "full_min": 0.08, "conf_floor": 0.62},
+    )
+    assert det_skip.detect(Image.new("RGB", (600, 800), (10, 20, 30))) == []
+    assert s_skip.calls == 1
+
+    # Case 2: full frame confirms class 0 at 0.15 (>=0.08), zoom finds valid box + oversized box (filtered!)
+    warm_full = np.zeros((1, 4 + 2, 1), dtype=np.float32)
+    warm_full[0, :4, 0] = (320, 320, 80, 80)
+    warm_full[0, 4 + 0, 0] = 0.15  # class 0 warmed
+    warm_full[0, 4 + 1, 0] = 0.02  # class 1 unconfirmed
+    zoom_out = np.zeros((1, 4 + 2, 3), dtype=np.float32)
+    # Anchor 0: valid centered 200x200 box on class 0 (crop_frac=0.6 on 600x800 -> crop=(360,480), lb scale=640/480=4/3, pad_x=80)
+    zoom_out[0, :4, 0] = (320, 320, 160, 160)
+    zoom_out[0, 4 + 0, 0] = 0.78
+    # Anchor 1: oversized crop-filling box on class 0 -> rejected by max_crop_area=0.85
+    zoom_out[0, :4, 1] = (320, 320, 470, 620)
+    zoom_out[0, 4 + 0, 1] = 0.90
+    # Anchor 2: class 1 strong in zoom but full_max=0.02 < full_min -> rejected!
+    zoom_out[0, :4, 2] = (320, 320, 120, 120)
+    zoom_out[0, 4 + 1, 2] = 0.85
+    s_rescue = _SeqSession([warm_full, zoom_out])
+    det_rescue = Detector(
+        s_rescue,
+        conf=0.40,
+        iou=0.45,
+        zoom_rescue={"enabled": True, "crop_frac": 0.60, "full_min": 0.08, "conf_floor": 0.62, "max_crop_area": 0.85},
+    )
+    rescued = det_rescue.detect(Image.new("RGB", (600, 800), (10, 20, 30)))
+    assert s_rescue.calls == 2
+    assert len(rescued) == 1
+    assert rescued[0].class_index == 0 and rescued[0].confidence == pytest.approx(0.78, abs=1e-4)
+    assert 0.30 < rescued[0].x1 < 0.45 and 0.55 < rescued[0].x2 < 0.70

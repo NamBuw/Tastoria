@@ -63,10 +63,12 @@ export function FreshBadge({
 
 export function fmtG(min: number, max: number): string {
   const r = (x: number) => (x >= 100 ? Math.round(x / 10) * 10 : Math.round(x));
-  const a = r(min);
-  const b = r(max);
+  const a = Math.max(0, r(min));
+  const b = Math.max(a, r(max));
+  if (a === 0 && b === 0) return 'Sắp hết';
+  if (a === 0) return `Còn ít (≤ ${b} g)`;
   if (a === b) return `${a} g`;
-  return `${a} đến ${b} g`;
+  return `${a}–${b} g`;
 }
 
 export const SLOT_LABEL: Record<'man' | 'rau' | 'canh', string> = { man: 'Mặn', rau: 'Rau', canh: 'Canh' };

@@ -327,12 +327,24 @@ def gate(session: Session, *, storage_dir: Path, name: str, version: str) -> tup
         ag = serving.get("agnostic_iou")
         if ag is not None and (isinstance(ag, bool) or not isinstance(ag, int | float) or not 0 < ag < 1):
             reasons.append("metrics.serving.agnostic_iou ngoài (0, 1)")
-        cc = serving.get("class_conf")
-        if cc is not None and (
-            not isinstance(cc, dict)
-            or any(isinstance(v, bool) or not isinstance(v, int | float) or not 0 < v <= 1 for v in cc.values())
-        ):
-            reasons.append("metrics.serving.class_conf phải là object {code: (0, 1]}")
+        for cc_key in ("class_conf", "class_count_conf"):
+            cc = serving.get(cc_key)
+            if cc is not None and (
+                not isinstance(cc, dict)
+                or any(isinstance(v, bool) or not isinstance(v, int | float) or not 0 < v <= 1 for v in cc.values())
+            ):
+                reasons.append(f"metrics.serving.{cc_key} phải là object {{code: (0, 1]}}")
+        zr = serving.get("zoom_rescue")
+        if zr is not None:
+            if not isinstance(zr, dict):
+                reasons.append("metrics.serving.zoom_rescue phải là object")
+            else:
+                cf = zr.get("crop_frac", 0.60)
+                fl = zr.get("conf_floor", 0.62)
+                if isinstance(cf, bool) or not isinstance(cf, int | float) or not 0.2 < float(cf) < 1.0:
+                    reasons.append("metrics.serving.zoom_rescue.crop_frac ngoài (0.2, 1.0)")
+                if isinstance(fl, bool) or not isinstance(fl, int | float) or not 0.0 < float(fl) < 1.0:
+                    reasons.append("metrics.serving.zoom_rescue.conf_floor ngoài (0, 1)")
     elif name == "freshness":
         serving = view.metrics.get("serving") or {}
         abst = serving.get("abstention")

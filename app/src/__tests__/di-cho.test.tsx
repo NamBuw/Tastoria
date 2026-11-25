@@ -67,7 +67,7 @@ describe('di-cho (Shopping)', () => {
         body: {},
       });
     });
-    expect(await screen.findByText('Đã thêm Thịt lợn vào Kho bếp')).toBeTruthy();
+    expect(await screen.findByText('Đã cho Thịt lợn vào Tủ lạnh')).toBeTruthy();
   });
 
   it('opens AddLotSheet fallback when qty_g == null and submits resolved qty_g', async () => {
@@ -111,7 +111,7 @@ describe('di-cho (Shopping)', () => {
 
     expect(mockedPost).not.toHaveBeenCalled();
     expect(await screen.findByTestId('sheet-add-lot')).toBeTruthy();
-    expect(screen.getByText('Đưa Cà chua vào kho')).toBeTruthy();
+    expect(screen.getByText('Cho Cà chua vào Tủ lạnh')).toBeTruthy();
 
     await fireEvent.changeText(screen.getByTestId('qty-grams'), '250');
     await waitFor(() => {
@@ -128,7 +128,7 @@ describe('di-cho (Shopping)', () => {
         }),
       );
     });
-    expect(await screen.findByText('Đã thêm Cà chua vào Kho bếp')).toBeTruthy();
+    expect(await screen.findByText('Đã cho Cà chua vào Tủ lạnh')).toBeTruthy();
   });
 
   it('summarizes partial failure when batch moving bought items to pantry', async () => {
@@ -169,10 +169,10 @@ describe('di-cho (Shopping)', () => {
 
     await renderWithProviders(<Shopping />);
 
-    const batchBtn = await screen.findByText('Đưa tất cả vào kho');
+    const batchBtn = await screen.findByText('Cất tất cả vào tủ');
     await fireEvent.press(batchBtn);
 
-    expect(await screen.findByText('Đã đưa 1 món vào Kho bếp, 1 món chưa đưa được.')).toBeTruthy();
+    expect(await screen.findByText('Đã cho 1 món vào Tủ lạnh, 1 món chưa chuyển được.')).toBeTruthy();
   });
 
   it('paginates /shopping-items past 100 items via next_cursor, validates AddSheet qty > 0, and resets error on fallback', async () => {

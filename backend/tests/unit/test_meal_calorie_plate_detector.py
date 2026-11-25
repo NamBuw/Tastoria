@@ -162,6 +162,76 @@ def test_estimate_meal_calories_runs_plate_detector_only_when_multidish(tmp_path
     assert "2 đĩa/bát" in (out_multi.domain_shift_note or "")
 
 
+def test_multidish_classifies_qualifying_plates_and_skips_drinks_and_tiny_fragments(tmp_path: Path) -> None:
+    from tastoria.modules.meal_calorie.plate_detector import DetectedPlate
+
+    cal_dir = _write_synthetic_bundle(tmp_path / "meal_calorie_mp")
+    cls_dir = _write_synthetic_classifier_bundle(tmp_path / "dish_classifier_mp")
+    kb = KBDishCatalog.from_dirs(REPO_ROOT / "data" / "kb", REPO_ROOT / "data" / "processed" / "kb")
+    buf = io.BytesIO()
+    Image.new("RGB", (640, 480), (120, 140, 110)).save(buf, format="JPEG", quality=90)
+    img_bytes = buf.getvalue()
+
+    class _Est45:
+        domain_shift_note = None
+
+        def predict(self, _img):  # noqa: ANN001
+            return VisualPrediction(
+                kcal=680.0, mass_g=520.0, fat_g=22.0, carb_g=75.0, protein_g=35.0,
+                latency_ms=3.0, multi_dish_score=0.45,
+            )
+
+    class _PlateAwareCls:
+        def __init__(self) -> None:
+            self.crop_calls = 0
+
+        def predict(self, img, top_k=3):  # noqa: ANN001
+            if img.size == (640, 480):
+                return DishClassification(
+                    top_k=[DishCandidate("bun_thit_nuong", "Bún thịt nướng", "Grilled Pork Vermicelli", 0.78, None, "man")],
+                    top1_id="bun_thit_nuong", top1_name_vi="Bún thịt nướng", top1_confidence=0.78,
+                    confident=True, conf_threshold=0.42, latency_ms=5.0, top_margin=0.60,
+                )
+            self.crop_calls += 1
+            if self.crop_calls == 1:
+                return DishClassification(
+                    top_k=[DishCandidate("bun_cha", "Bún chả", "Bun Cha", 0.85, None, "man")],
+                    top1_id="bun_cha", top1_name_vi="Bún chả", top1_confidence=0.85,
+                    confident=True, conf_threshold=0.42, latency_ms=4.0, top_margin=0.70,
+                )
+            return DishClassification(
+                top_k=[DishCandidate("ca_kho_to", "Cá kho tộ", "Caramelized Fish", 0.74, "ca-kho-to", "man")],
+                top1_id="ca_kho_to", top1_name_vi="Cá kho tộ", top1_confidence=0.74,
+                confident=True, conf_threshold=0.42, latency_ms=4.0, top_margin=0.50,
+            )
+
+    class _MultiPlateDet:
+        def detect(self, _img):  # noqa: ANN001
+            return [
+                DetectedPlate("bowl", 0.90, 0.05, 0.10, 0.45, 0.55),        # qualifies -> bun_cha
+                DetectedPlate("dish_plate", 0.84, 0.50, 0.15, 0.90, 0.75),  # qualifies -> ca_kho_to
+                DetectedPlate("drink_cup", 0.82, 0.80, 0.05, 0.95, 0.30),   # skipped: drink_cup
+                DetectedPlate("dish_plate", 0.70, 0.96, 0.90, 0.99, 0.95),  # skipped: tiny fragment
+            ], 55.0
+
+    cls_inst = _PlateAwareCls()
+    deps = MealCalorieDeps(
+        model_dir=cal_dir, kb_dir=REPO_ROOT / "data" / "kb", kb_processed_dir=REPO_ROOT / "data" / "processed" / "kb",
+        dish_classifier_model_dir=cls_dir, estimator=_Est45(), dish_classifier=cls_inst,
+        plate_detector=_MultiPlateDet(), kb_catalog=kb,
+    )  # type: ignore[arg-type]
+    out = estimate_meal_calories(deps, image_bytes=img_bytes)
+    assert cls_inst.crop_calls == 2
+    assert len(out.detected_plates) == 4
+    assert out.detected_plates[0].dish_id == "bun_cha"
+    assert out.detected_plates[0].dish_name_vi == "Bún chả"
+    assert out.detected_plates[0].estimated_kcal_vua is not None and out.detected_plates[0].estimated_kcal_vua > 200
+    assert out.detected_plates[1].dish_id == "ca_kho_to"
+    assert out.detected_plates[2].dish_id is None
+    assert out.detected_plates[3].dish_id is None
+    assert "Bún chả, Cá kho tộ" in (out.domain_shift_note or "")
+
+
 def test_real_plate_detector_on_vietnamese_table_if_present() -> None:
     p_dir = REPO_ROOT / "deploy" / "models" / "plate_detector"
     img_path = REPO_ROOT / "app" / "assets" / "food" / "vietnamese-table.webp"

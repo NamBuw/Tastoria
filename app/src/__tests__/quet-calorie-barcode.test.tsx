@@ -120,7 +120,8 @@ describe('Scan triple-mode (Món ăn & Calo + Mã vạch)', () => {
     expect(screen.getByTestId('macro-pie-chart')).toBeTruthy();
     expect(screen.getByText('350 kcal')).toBeTruthy();
     expect(screen.getByTestId('calorie-range-bar')).toBeTruthy();
-    expect(screen.getByText(/Chỉ số dinh dưỡng Mỹ Vị: Năng lượng vừa/)).toBeTruthy();
+    expect(screen.getByText('Năng lượng vừa')).toBeTruthy();
+    expect(screen.queryByText(/Chỉ số dinh dưỡng Mỹ Vị/)).toBeNull();
     expect(screen.queryByText(/\/100/)).toBeNull();
     expect(screen.queryByText(/Độ tin cậy/)).toBeNull();
     expect(screen.queryByText(new RegExp('nutrition' + '5k', 'i'))).toBeNull();
@@ -138,7 +139,7 @@ describe('Scan triple-mode (Món ăn & Calo + Mã vạch)', () => {
     expect(screen.getByTestId('macro-pie-chart')).toBeTruthy();
     expect(screen.getByText('350 kcal / phần')).toBeTruthy();
     expect(screen.getByText('Mì Hảo Hảo Tôm Chua Cay (gói 75g–77g)')).toBeTruthy();
-    expect(screen.getByText(/Chỉ số dinh dưỡng Mỹ Vị: Năng lượng vừa/)).toBeTruthy();
+    expect(screen.getByText('Năng lượng vừa')).toBeTruthy();
     expect(screen.queryByText(new RegExp('yu' + 'ka', 'i'))).toBeNull();
   });
 
@@ -505,16 +506,35 @@ describe('Scan triple-mode (Món ăn & Calo + Mã vạch)', () => {
         expect(screen.queryByTestId('calorie-result-card')).toBeNull();
       });
 
-      // Barcode photo scan must NOT call launchImageLibraryAsync when BarcodeDetector is unsupported
+      // Barcode photo scan launches picker and falls back cleanly to POST /meal-calorie/barcode-image when BarcodeDetector is absent
       await fireEvent.press(screen.getByText('Mã vạch'));
-      (ImagePicker.launchImageLibraryAsync as jest.Mock).mockClear();
+      (ImagePicker.launchImageLibraryAsync as jest.Mock).mockResolvedValueOnce({
+        canceled: false,
+        assets: [{ uri: 'file:///barcode-photo.jpg', width: 800, height: 600 }],
+      });
+      mockedPost.mockResolvedValueOnce(
+        okRes({
+          barcode: '8930000000011',
+          product_name: 'Sữa hạt đóng hộp',
+          brand: null,
+          serving_size: null,
+          serving_g: null,
+          kcal_per_serving: null,
+          protein_g_per_serving: null,
+          carbs_g_per_serving: null,
+          fat_g_per_serving: null,
+          fiber_g_per_serving: null,
+          kcal_per_100g: 250,
+          protein_g_per_100g: 8,
+          carbs_g_per_100g: 30,
+          fat_g_per_100g: 10,
+          fiber_g_per_100g: 2,
+          nutrition_score: 40,
+          nutrition_grade: 'B',
+          source: 'Nhãn sản phẩm',
+        }),
+      );
       await fireEvent.press(screen.getByTestId('barcode-photo-btn'));
-      expect(await screen.findByText(/chưa hỗ trợ tự đọc mã vạch từ ảnh/)).toBeTruthy();
-      expect(ImagePicker.launchImageLibraryAsync).not.toHaveBeenCalled();
-
-      // Unified 100g fallback when serving fields are null
-      await fireEvent.changeText(screen.getByTestId('barcode-input'), '8930000000011');
-      await fireEvent.press(screen.getByTestId('barcode-lookup-btn'));
       expect(await screen.findByTestId('barcode-result-card')).toBeTruthy();
       expect(screen.getByText('250 kcal / 100g')).toBeTruthy();
 
@@ -526,5 +546,42 @@ describe('Scan triple-mode (Món ăn & Calo + Mã vạch)', () => {
     } finally {
       imgPartSpy.mockRestore();
     }
+  });
+
+  it('renders detected_plates multi-dish panel and updates live kcal when plates are toggled', async () => {
+    setupDefaultGets();
+    mockedPost.mockResolvedValueOnce(
+      okRes({
+        dish_name_vi: 'Bún thịt nướng',
+        portion: 'vua',
+        portion_multiplier: 1.0,
+        estimated_kcal: 800,
+        kcal_low: 680,
+        kcal_high: 920,
+        protein_g: 30,
+        carbs_g: 90,
+        fat_g: 28,
+        fiber_g: 4,
+        source: 'hybrid',
+        calibrated: true,
+        half_width_rel: 0.15,
+        latency_ms: 9,
+        top_candidates: [],
+        detected_plates: [
+          { label: 'plate_1', confidence: 0.91, x1: 0.1, y1: 0.1, x2: 0.5, y2: 0.5, dish_id: 'cha_gio_ran', dish_name_vi: 'Chả giò rán', estimated_kcal_vua: 410 },
+          { label: 'plate_2', confidence: 0.87, x1: 0.5, y1: 0.1, x2: 0.9, y2: 0.5, dish_id: 'banh_hoi', dish_name_vi: 'Bánh hỏi', estimated_kcal_vua: 390 },
+        ],
+      }),
+    );
+
+    await renderWithProviders(<Scan />);
+    await fireEvent.press(screen.getByText('Món ăn & Calo'));
+    await fireEvent.press(screen.getByText('Bún thịt nướng'));
+
+    expect(await screen.findByTestId('detected-plates-panel')).toBeTruthy();
+    expect(screen.getByText('800 kcal')).toBeTruthy();
+
+    await fireEvent.press(screen.getByTestId('detected-plate-1'));
+    expect(screen.getByText('410 kcal')).toBeTruthy();
   });
 });

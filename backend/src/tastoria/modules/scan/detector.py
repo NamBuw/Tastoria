@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 from PIL import Image
@@ -79,6 +80,15 @@ def nms(boxes: np.ndarray, scores: np.ndarray, iou: float) -> np.ndarray:
     return np.asarray(keep, dtype=np.int64)
 
 
+def _class_thresh_array(nc: int, default_conf: float, mapping: dict[int, float] | None) -> np.ndarray:
+    thresh = np.full(nc, default_conf, dtype=np.float32)
+    if mapping:
+        for ci, t in mapping.items():
+            if 0 <= ci < nc:
+                thresh[ci] = float(t)
+    return thresh
+
+
 def decode(
     output: np.ndarray,
     lb: Letterbox,
@@ -88,18 +98,24 @@ def decode(
     max_det: int = 300,
     agnostic_iou: float | None = None,
     class_conf: dict[int, float] | None = None,
+    class_count_conf: dict[int, float] | None = None,
 ) -> list[Box]:
     """Raw head output [1, 4 + C, N] (or [4 + C, N]) -> boxes on the original image, best first."""
     out = np.asarray(output, dtype=np.float32)
     if out.ndim == 3:
         out = out[0]
     scores_all = out[4:]
-    if class_conf is not None:
-        thresh = np.full(scores_all.shape[0], conf, dtype=np.float32)
-        for ci, t in class_conf.items():
-            if 0 <= ci < scores_all.shape[0]:
-                thresh[ci] = float(t)
-        valid = (thresh[:, None] < 1.0) & (scores_all >= thresh[:, None])
+    nc = scores_all.shape[0]
+    if out.shape[1] == 0 or nc == 0:
+        return []
+    pres_thresh = _class_thresh_array(nc, conf, class_conf)
+    if class_count_conf is not None or class_conf is not None:
+        thresh = pres_thresh.copy()
+        if class_count_conf is not None:
+            for ci, tc in class_count_conf.items():
+                if 0 <= ci < nc:
+                    thresh[ci] = 1.0 if pres_thresh[ci] >= 1.0 else min(pres_thresh[ci], max(1e-6, float(tc)))
+        valid = (pres_thresh[:, None] < 1.0) & (scores_all >= thresh[:, None])
         masked = np.where(valid, scores_all, -1.0)
         cls = masked.argmax(axis=0)
         best = masked[cls, np.arange(out.shape[1])]
@@ -116,6 +132,20 @@ def decode(
     # per-class NMS through a coordinate offset per class (as ultralytics): boxes of different classes never overlap
     offset = cl[:, None].astype(np.float32) * 7680.0
     keep = nms(xyxy + offset, sc, iou)
+    # Apply hysteresis presence gate before cross-class NMS so unconfirmed candidates never suppress valid boxes.
+    if class_count_conf is not None and keep.size:
+        confirmed: dict[int, float] = {}
+        for k in keep:
+            ci = int(cl[k])
+            score = float(sc[k])
+            if score > confirmed.get(ci, -1.0):
+                confirmed[ci] = score
+        keep = np.asarray(
+            [k for k in keep if confirmed.get(int(cl[k]), -1.0) >= float(pres_thresh[int(cl[k])])],
+            dtype=np.int64,
+        )
+        if not keep.size:
+            return []
     if agnostic_iou is not None and keep.size > 1:
         keep = keep[nms(xyxy[keep], sc[keep], agnostic_iou)]
     keep = keep[:max_det]
@@ -131,6 +161,7 @@ def decode(
         if x2 - x1 <= 1e-6 or y2 - y1 <= 1e-6:
             continue  # degenerate after clipping (box entirely in the padding)
         res.append(Box(int(cl[k]), float(min(max(sc[k], 0.0), 1.0)), x1, y1, x2, y2))
+    res.sort(key=lambda b: -b.confidence)
     return res
 
 
@@ -157,6 +188,8 @@ class Detector:
         preprocess_version: str | None = None,
         agnostic_iou: float | None = None,
         class_conf: dict[int, float] | None = None,
+        class_count_conf: dict[int, float] | None = None,
+        zoom_rescue: dict[str, Any] | None = None,
     ) -> None:
         self.session = session
         self.conf = conf
@@ -164,12 +197,14 @@ class Detector:
         self.preprocess_version = preprocess_version
         self.agnostic_iou = agnostic_iou
         self.class_conf = class_conf
+        self.class_count_conf = class_count_conf
+        self.zoom_rescue = dict(zoom_rescue) if isinstance(zoom_rescue, dict) else None
         inp = session.get_inputs()[0]
         self.input_name = inp.name
         self.size = int(inp.shape[2])
 
-    def detect(self, img: Image.Image) -> list[Box]:
-        x, lb = letterbox(preprocess(img, self.preprocess_version), self.size)
+    def _run_raw(self, img: Image.Image) -> tuple[np.ndarray, Letterbox]:
+        x, lb = letterbox(img, self.size)
         t0 = time.perf_counter()
         outcome = "ok"
         try:
@@ -179,12 +214,79 @@ class Detector:
             raise
         finally:
             metrics.observe_onnx("detector", time.perf_counter() - t0, outcome=outcome)
-        return decode(
-            out,
-            lb,
+        return out, lb
+
+    def _guarded_zoom_rescue(self, img_p: Image.Image, raw_full: np.ndarray) -> list[Box]:
+        cfg = self.zoom_rescue
+        if not cfg or not cfg.get("enabled"):
+            return []
+        out = np.asarray(raw_full, dtype=np.float32)
+        if out.ndim == 3:
+            out = out[0]
+        if out.shape[0] <= 4 or out.shape[1] == 0:
+            return []
+        full_max = out[4:].max(axis=1)
+        nc = int(full_max.shape[0])
+        pres_thresh = _class_thresh_array(nc, self.conf, self.class_conf)
+        full_min = float(cfg.get("full_min", 0.08))
+        if not np.any((pres_thresh < 1.0) & (full_max >= full_min)):
+            return []
+        crop_frac = float(cfg.get("crop_frac", 0.60))
+        conf_floor = float(cfg.get("conf_floor", 0.62))
+        conf_delta = float(cfg.get("conf_delta", 0.12))
+        min_crop_area = float(cfg.get("min_crop_area", 0.025))
+        max_crop_area = float(cfg.get("max_crop_area", 0.85))
+        w, h = img_p.size
+        cw, ch = max(1, round(w * crop_frac)), max(1, round(h * crop_frac))
+        if cw < 32 or ch < 32 or (cw >= w and ch >= h):
+            return []
+        x0, y0 = (w - cw) // 2, (h - ch) // 2
+        crop = img_p.crop((x0, y0, x0 + cw, y0 + ch))
+        raw_zoom, lb_zoom = self._run_raw(crop)
+        rescue_cc = {
+            c: (1.0 if pres_thresh[c] >= 1.0 else max(conf_floor, min(0.95, float(pres_thresh[c]) + conf_delta)))
+            for c in range(nc)
+        }
+        z_boxes = decode(
+            raw_zoom,
+            lb_zoom,
+            conf=max(conf_floor, self.conf),
+            iou=self.iou,
+            max_det=MAX_DETECTIONS_PER_PHOTO,
+            agnostic_iou=self.agnostic_iou,
+            class_conf=rescue_cc,
+            class_count_conf=self.class_count_conf,
+        )
+        rescued: list[Box] = []
+        for b in z_boxes:
+            if b.class_index >= nc or float(full_max[b.class_index]) < full_min:
+                continue
+            crop_area = (b.x2 - b.x1) * (b.y2 - b.y1)
+            if not (min_crop_area <= crop_area <= max_crop_area):
+                continue
+            fx1 = float(np.clip((x0 + b.x1 * cw) / w, 0.0, 1.0))
+            fy1 = float(np.clip((y0 + b.y1 * ch) / h, 0.0, 1.0))
+            fx2 = float(np.clip((x0 + b.x2 * cw) / w, 0.0, 1.0))
+            fy2 = float(np.clip((y0 + b.y2 * ch) / h, 0.0, 1.0))
+            if fx2 - fx1 <= 1e-6 or fy2 - fy1 <= 1e-6:
+                continue
+            rescued.append(Box(b.class_index, b.confidence, fx1, fy1, fx2, fy2))
+        rescued.sort(key=lambda b: -b.confidence)
+        return rescued[:MAX_DETECTIONS_PER_PHOTO]
+
+    def detect(self, img: Image.Image) -> list[Box]:
+        img_p = preprocess(img, self.preprocess_version)
+        raw_full, lb_full = self._run_raw(img_p)
+        boxes = decode(
+            raw_full,
+            lb_full,
             conf=self.conf,
             iou=self.iou,
             max_det=MAX_DETECTIONS_PER_PHOTO,
             agnostic_iou=self.agnostic_iou,
             class_conf=self.class_conf,
+            class_count_conf=self.class_count_conf,
         )
+        if boxes or not (self.zoom_rescue and self.zoom_rescue.get("enabled")):
+            return boxes
+        return self._guarded_zoom_rescue(img_p, raw_full)

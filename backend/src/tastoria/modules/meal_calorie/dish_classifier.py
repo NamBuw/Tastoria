@@ -239,7 +239,7 @@ class DishClassifier:
             len(raw_outs) >= 2
             and self._open_emb is not None
             and not zero_var_ood
-            and not (closed_confident and top_margin >= self.margin_threshold)
+            and not closed_confident
         ):
             ov = self._open_vocab_fallback(raw_outs[1], top_k=top_k, flat_ood=flat_ood)
             if ov is not None:

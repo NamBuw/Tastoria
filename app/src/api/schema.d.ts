@@ -1291,6 +1291,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/meal-calorie/barcode-image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Giải mã vạch từ ảnh chụp và tra cứu dinh dưỡng */
+        post: operations["meal_calorie_lookup_barcode_image"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/meal-calorie/estimate": {
         parameters: {
             query?: never;
@@ -3108,6 +3125,18 @@ export interface components {
             kb_slug?: string | null;
             kcal_vua?: number | null;
         };
+        DetectedPlateOut: {
+            label: string;
+            confidence: number;
+            x1: number;
+            y1: number;
+            x2: number;
+            y2: number;
+            dish_id?: string | null;
+            dish_name_vi?: string | null;
+            dish_confidence?: number | null;
+            estimated_kcal_vua?: number | null;
+        };
         ModifierSuggestionOut: {
             id: string;
             label_vi: string;
@@ -3164,6 +3193,8 @@ export interface components {
             fusion_mode?: "kb_exact" | "variance_weighted" | "top3_blend" | "visual_fallback";
             /** @default [] */
             suggested_modifiers?: components["schemas"]["ModifierSuggestionOut"][];
+            /** @default [] */
+            detected_plates?: components["schemas"]["DetectedPlateOut"][];
         };
         /** @enum {string} */
         MealSlot: "sang" | "trua" | "toi" | "phu";
@@ -6429,6 +6460,59 @@ export interface operations {
             404: components["responses"]["NotFound"];
             412: components["responses"]["AppTooOld"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    meal_calorie_lookup_barcode_image: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Phiên bản app (semver). Thấp hơn bản tối thiểu server còn hỗ trợ → 412 app_too_old. Trình duyệt trang khảo sát không gửi thì bỏ qua kiểm tra. */
+                "X-App-Version"?: components["parameters"]["AppVersion"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    image: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Thành công */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BarcodeNutritionOut"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["AppTooOld"];
+            /** @description Ảnh vượt quá 3 MB — code: `image_too_large` */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Định dạng ảnh không hỗ trợ — code: `unsupported_media_type` */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            422: components["responses"]["Unprocessable"];
+            503: components["responses"]["ServiceUnavailable"];
         };
     };
     meal_calorie_estimate: {

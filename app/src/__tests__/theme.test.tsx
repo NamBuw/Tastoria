@@ -22,33 +22,33 @@ describe('tokens & Light-only ThemeProvider', () => {
     jest.restoreAllMocks();
   });
 
-  it('exposes the Light "Sổ Bếp Mỹ Vị" antique honey-parchment palette tokens', () => {
-    expect(light.bg).toBe('#E3CFA6');
-    expect(light.surface).toBe('#FAF2E0');
-    expect(light.surfaceCard).toBe('rgba(250, 242, 224, 0.84)');
-    expect(light.surfaceAlt).toBe('#EADAB8');
-    expect(light.text).toBe('#19120B');
-    expect(light.muted).toBe('#4E3E2F');
-    expect(light.accent).toBe('#9E2F1E');
-    expect(light.accentDisplay).toBe('#7F2315');
-    expect(light.herb).toBe('#2E4F33');
-    expect(light.border).toBe('#5A432B');
-    expect(light.borderDashed).toBe('#6E5438');
-    expect(light.hairline).toBe('#BFA982');
-    expect(light.warn).toBe('#734609');
-    expect(light.info).toBe('#32424A');
-    expect(light.editorialSurface).toBe('#1A1510');
-    expect(light.trayRim).toBe('#D8B979');
+  it('exposes the clean high-contrast warm-kitchen light palette tokens', () => {
+    expect(light.bg).toBe('#FAF8F5');
+    expect(light.surface).toBe('#FFFFFF');
+    expect(light.surfaceCard).toBe('#FFFFFF');
+    expect(light.surfaceAlt).toBe('#F3EFE9');
+    expect(light.text).toBe('#1C1917');
+    expect(light.muted).toBe('#57534E');
+    expect(light.accent).toBe('#B53827');
+    expect(light.accentDisplay).toBe('#8F291B');
+    expect(light.herb).toBe('#23633A');
+    expect(light.border).toBe('#8A8178');
+    expect(light.borderDashed).toBe('#9B9289');
+    expect(light.hairline).toBe('#E7E2DA');
+    expect(light.warn).toBe('#92400E');
+    expect(light.info).toBe('#1D4ED8');
+    expect(light.editorialSurface).toBe('#1C1917');
+    expect(light.trayRim).toBe('#D6CFC7');
     expect(Object.keys(light.macroChart).sort()).toEqual(['carb', 'fiber', 'lipid', 'protein']);
     expect(light.macroChart).toEqual({
-      carb: '#B97A20',
-      protein: '#9E2F1E',
-      lipid: '#2E4F33',
-      fiber: '#5F7D57',
+      carb: '#D97706',
+      protein: '#B53827',
+      lipid: '#23633A',
+      fiber: '#3D6B0B',
     });
   });
 
-  it('uses Light newsprint when OS preference is light', async () => {
+  it('uses crisp warm-kitchen canvas when OS preference is light', async () => {
     jest.spyOn(RN, 'useColorScheme').mockReturnValue('light');
     await render(
       <ThemeProvider>
@@ -60,11 +60,11 @@ describe('tokens & Light-only ThemeProvider', () => {
       expect(screen.getByTestId('scheme').props.children).toBe('light');
     });
     expect(screen.getByTestId('bg').props.children).toBe(light.bg);
-    expect(screen.getByTestId('border').props.children).toBe('#5A432B');
-    expect(screen.getByTestId('borderDashed').props.children).toBe('#6E5438');
+    expect(screen.getByTestId('border').props.children).toBe('#8A8178');
+    expect(screen.getByTestId('borderDashed').props.children).toBe('#9B9289');
   });
 
-  it('stays locked to Light newsprint even when OS useColorScheme() returns dark', async () => {
+  it('stays locked to Light theme even when OS useColorScheme() returns dark', async () => {
     jest.spyOn(RN, 'useColorScheme').mockReturnValue('dark');
     await render(
       <ThemeProvider>
@@ -75,7 +75,7 @@ describe('tokens & Light-only ThemeProvider', () => {
     await waitFor(() => {
       expect(screen.getByTestId('scheme').props.children).toBe('light');
     });
-    expect(screen.getByTestId('bg').props.children).toBe('#E3CFA6');
+    expect(screen.getByTestId('bg').props.children).toBe('#FAF8F5');
   });
 
   it('sets Be Vietnam Pro body fontFamily and light colorScheme on web', async () => {

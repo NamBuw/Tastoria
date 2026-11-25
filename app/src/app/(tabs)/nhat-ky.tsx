@@ -11,6 +11,9 @@ import { MacroPieLedger } from '@/components/MacroPieLedger';
 import { Button, Card, Empty, ErrorBox, Loading, Notice, Row, Screen, Section, T } from '@/components/ui';
 import { hamiltonMacroShares } from '@/lib/caloriePlate';
 import {
+  addQuickMealLog,
+  defaultMealSlot,
+  isoWeekKey,
   localDateString,
   MEAL_SLOT_LABEL,
   mealLogOutToEntry,
@@ -20,20 +23,11 @@ import {
 } from '@/lib/mealLog';
 import { goTab } from '@/lib/nav';
 import { MEAL_LABEL, qk, useProfile } from '@/lib/queries';
-import { font, radius, space, TOUCH, useLayout, useTheme } from '@/theme';
-
-function isoWeek(d: Date): string {
-  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const day = t.getUTCDay() || 7;
-  t.setUTCDate(t.getUTCDate() + 4 - day);
-  const y = t.getUTCFullYear();
-  const w = Math.ceil(((t.getTime() - Date.UTC(y, 0, 1)) / 86400000 + 1) / 7);
-  return `${y}-W${String(w).padStart(2, '0')}`;
-}
+import { radius, space, TOUCH, useLayout, useTheme } from '@/theme';
 
 const WD = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
-/** Nhật ký tuần (UC22): today macro/calorie budget + cooked trays + quick-logged scans + weekly summary. */
+/** Nhật ký ăn uống (UC22): theo dõi calo/ngày, món đã ghi, và lịch sử nấu ăn. */
 export default function Journal() {
   const { c } = useTheme();
   const { status, user } = useSession();
@@ -43,7 +37,7 @@ export default function Journal() {
   const { isDesktop, isMobile } = useLayout();
   const [offset, setOffset] = useState(0);
   const [nowTs, setNowTs] = useState(() => Date.now());
-  const week = isoWeek(new Date(nowTs + offset * 7 * 86400000));
+  const week = isoWeekKey(new Date(nowTs + offset * 7 * 86400000));
 
   useEffect(() => {
     const refreshNow = () => {
@@ -207,6 +201,31 @@ export default function Journal() {
     ]);
   };
 
+  const quickRelog = async (entry: QuickMealLogEntry) => {
+    await addQuickMealLog(
+      {
+        meal_slot: defaultMealSlot(),
+        title_vi: entry.title_vi,
+        source_kind: entry.source_kind,
+        portion_label: entry.portion_label,
+        modifiers_vi: entry.modifiers_vi,
+        kcal: entry.kcal,
+        kcal_low: entry.kcal_low,
+        kcal_high: entry.kcal_high,
+        protein_g: entry.protein_g,
+        carbs_g: entry.carbs_g,
+        fat_g: entry.fat_g,
+        fiber_g: entry.fiber_g,
+        provenance_label_vi: entry.provenance_label_vi,
+      },
+      user?.id,
+    );
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ['quick-logs'] }),
+      qc.invalidateQueries({ queryKey: ['journal'] }),
+    ]);
+  };
+
   const showContent = Boolean(q.data || quickEntries.length > 0);
 
   const leftCol = showContent ? (
@@ -219,7 +238,7 @@ export default function Journal() {
                 Hôm nay
               </T>
               <T v="h2" accessibilityRole="header">
-                Năng lượng &amp; đa lượng trong ngày
+                Bạn đã ăn hôm nay
               </T>
             </View>
             <T v={isMobile ? 'h1' : 'huge'} tabular tone="accent" style={{ flexShrink: 0 }}>
@@ -260,7 +279,7 @@ export default function Journal() {
 
           {showTodayMacroLedger ? (
             <MacroPieLedger
-              title="Tổng hợp đa lượng hôm nay"
+              title="Tinh bột · Đạm · Chất béo"
               proteinG={todayCombinedMacros.protein_g}
               carbsG={todayCombinedMacros.carbs_g}
               fatG={todayCombinedMacros.fat_g}
@@ -272,7 +291,7 @@ export default function Journal() {
           ) : (
             <View testID="journal-today-macro-note" style={{ backgroundColor: c.surfaceAlt, borderRadius: radius.sm, padding: space.md }}>
               <T v="small" tone="muted">
-                Chỉ số đa lượng chi tiết hiển thị cho các bữa ghi nhanh từ mục Quét món.
+                Chi tiết Tinh bột, Đạm, Béo hiển thị cho các bữa ghi từ mục Quét món hoặc Nấu nhanh.
               </T>
             </View>
           )}
@@ -282,8 +301,8 @@ export default function Journal() {
       <View
         style={{
           flexDirection: 'row',
-          borderWidth: 1.5,
-          borderColor: c.border,
+          borderWidth: 1,
+          borderColor: c.hairline,
           borderRadius: radius.md,
           backgroundColor: c.surface,
           overflow: 'hidden',
@@ -298,13 +317,13 @@ export default function Journal() {
           <T v="huge" tabular tone="info">
             {quickEntries.length}
           </T>
-          <T v="small" tone="muted">bữa quét nhanh</T>
+          <T v="small" tone="muted">món ghi nhanh</T>
         </View>
         <View style={{ flex: 1, minWidth: 96, padding: space.md, borderLeftWidth: 1, borderLeftColor: c.hairline }}>
           <T v="huge" tabular tone="herb">
             {urgent}
           </T>
-          <T v="small" tone="muted">lô dùng kịp</T>
+          <T v="small" tone="muted">đồ kịp nấu</T>
         </View>
       </View>
 
@@ -387,9 +406,9 @@ export default function Journal() {
             style={{ borderTopWidth: 1, borderTopColor: c.hairline, paddingTop: space.sm, gap: space.xs }}>
             <Row style={{ backgroundColor: c.surfaceAlt, borderRadius: radius.sm, paddingHorizontal: space.sm, paddingVertical: 6, flexWrap: 'nowrap' }}>
               <T v="small" style={{ flex: 2, fontWeight: '600' }}>Ngày</T>
-              <T v="small" style={{ flex: 1, textAlign: 'right', fontWeight: '600' }}>Số mâm</T>
+              <T v="small" style={{ flex: 1, textAlign: 'right', fontWeight: '600' }}>Số bữa</T>
               <T v="small" style={{ flex: 2, textAlign: 'right', fontWeight: '600' }}>Calo</T>
-              <T v="small" style={{ flex: 1, textAlign: 'right', fontWeight: '600' }}>Lô kịp</T>
+              <T v="small" style={{ flex: 1, textAlign: 'right', fontWeight: '600' }}>Kịp nấu</T>
             </Row>
             {dayKcalTotals.map((d) => {
               const date = new Date(`${d.date}T00:00:00`);
@@ -533,13 +552,21 @@ export default function Journal() {
                       <T v="small" tone="muted" tabular>
                         Đạm {entry.protein_g}g, Tinh bột {entry.carbs_g}g, Béo {entry.fat_g}g
                       </T>
-                      <Button
-                        kind="ghost"
-                        compact
-                        label="Xoá"
-                        testID={`quick-log-delete-${entry.id}`}
-                        onPress={() => void handleDeleteQuickLog(entry.id)}
-                      />
+                      <Row gap={space.xs}>
+                        <Button
+                          kind="ghost"
+                          compact
+                          label="+ Ăn lại"
+                          onPress={() => void quickRelog(entry)}
+                        />
+                        <Button
+                          kind="ghost"
+                          compact
+                          label="Xoá"
+                          testID={`quick-log-delete-${entry.id}`}
+                          onPress={() => void handleDeleteQuickLog(entry.id)}
+                        />
+                      </Row>
                     </Row>
                   </View>
                 );
@@ -620,15 +647,20 @@ export default function Journal() {
 
   return (
     <Screen testID="screen-journal">
-      <View style={{ gap: 2 }}>
-        <T v="small" style={{ color: c.herb, fontFamily: font.semibold }}>
-          Sổ dinh dưỡng gia đình
-        </T>
-        <T v="huge" accessibilityRole="header">
-          Nhật ký bữa ăn
-        </T>
-        <T tone="muted">Theo dõi calo, đa lượng từng ngày từ mâm đã nấu và món ăn quét nhanh trong tuần.</T>
-      </View>
+      <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }} gap={space.sm}>
+        <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+          <T v="huge" accessibilityRole="header">
+            Nhật ký ăn uống
+          </T>
+          <T tone="muted">Theo dõi calo, tinh bột · đạm · béo từng ngày trong tuần.</T>
+        </View>
+        <Button
+          label="+ Ghi bữa"
+          testID="journal-quick-add"
+          compact
+          onPress={() => router.push({ pathname: '/quet', params: { tab: 'calorie' } })}
+        />
+      </Row>
 
       <View
         style={{

@@ -7,7 +7,7 @@ import { errorText } from '@/api/errors';
 import { useSession } from '@/auth/session';
 import { Icon } from '@/components/domain';
 import { AddLotSheet, IngredientSearch } from '@/components/pantryForms';
-import { Button, Card, Checkbox, Empty, ErrorBox, Field, Loading, Notice, Row, Screen, Section, Sheet, T } from '@/components/ui';
+import { Button, Card, Checkbox, Chip, Empty, ErrorBox, Field, Loading, Notice, Row, Screen, Section, Sheet, T } from '@/components/ui';
 import { useCatalog } from '@/lib/catalog';
 import { fetchAllPages, qk, useReference } from '@/lib/queries';
 import { radius, space, TOUCH, useTheme } from '@/theme';
@@ -30,8 +30,8 @@ function quantityToGrams(
   return qty.qty_level === 'it' ? 100 : qty.qty_level === 'nhieu' ? 400 : 200;
 }
 
-/** Danh sách đi chợ (UC18 + 1-tap to-pantry + AddLotSheet fallback + batch). */
-export default function Shopping() {
+/** Shared body for Đi chợ (usable standalone at /di-cho and inline inside Tủ lạnh). */
+export function ShoppingListBody({ showPageTitle = true }: { showPageTitle?: boolean }) {
   const { c } = useTheme();
   const { width } = useWindowDimensions();
   const desktop = width >= 1024;
@@ -69,7 +69,7 @@ export default function Shopping() {
     onSuccess: (_res, vars) => {
       qc.invalidateQueries({ queryKey: qk.shopping });
       qc.invalidateQueries({ queryKey: ['lots'] });
-      setToast(`Đã thêm ${vars.item.ingredient_name_vi} vào Kho bếp`);
+      setToast(`Đã cho ${vars.item.ingredient_name_vi} vào Tủ lạnh`);
     },
     onSettled: () => setBusyId(null),
   });
@@ -82,7 +82,7 @@ export default function Shopping() {
       const found = r.items.find((x) => x.id === item.ingredient_id) ?? r.items[0];
       if (found) return found;
     } catch {
-      // fall through to minimal descriptor
+      // fall through
     }
     return {
       id: item.ingredient_id,
@@ -140,8 +140,8 @@ export default function Shopping() {
       qc.invalidateQueries({ queryKey: ['lots'] });
       setToast(
         fail > 0
-          ? `Đã đưa ${ok} món vào Kho bếp, ${fail} món chưa đưa được.`
-          : `Đã đưa tất cả ${ok} món vào Kho bếp.`,
+          ? `Đã cho ${ok} món vào Tủ lạnh, ${fail} món chưa chuyển được.`
+          : `Đã cho tất cả ${ok} món vào Tủ lạnh.`,
       );
     } finally {
       setBatchBusy(false);
@@ -177,7 +177,7 @@ export default function Shopping() {
               </View>
               <Row gap={space.xs} style={{ flexWrap: 'nowrap' }}>
                 <Button
-                  label="Đưa vào kho"
+                  label="Cất vào tủ"
                   kind="secondary"
                   testID={`shop-to-pantry-${i.ingredient_name_vi}`}
                   loading={busyId === i.id && toPantry.isPending}
@@ -211,11 +211,11 @@ export default function Shopping() {
       title={`Đã mua (${bought.length})`}
       right={
         batchable.length > 1 ? (
-          <Button label="Đưa tất cả vào kho" kind="secondary" loading={batchBusy} onPress={() => void handleBatch()} />
+          <Button label="Cất tất cả vào tủ" kind="secondary" loading={batchBusy} onPress={() => void handleBatch()} />
         ) : null
       }>
       <T v="small" tone="muted">
-        Bấm &quot;Đưa vào kho&quot; để chuyển thẳng thành lô mới trong Kho bếp.
+        Bấm &quot;Cất vào tủ&quot; để chuyển thẳng thành nguyên liệu mới trong Tủ lạnh.
       </T>
       <Card style={{ gap: space.sm }}>
         {bought.map((i, idx) => (
@@ -243,7 +243,7 @@ export default function Shopping() {
                 />
               </View>
               <Button
-                label="Đưa vào kho"
+                label="Cất vào tủ"
                 kind="secondary"
                 testID={`shop-to-pantry-${i.ingredient_name_vi}`}
                 loading={busyId === i.id && toPantry.isPending}
@@ -258,11 +258,17 @@ export default function Shopping() {
   ) : null;
 
   return (
-    <Screen testID="screen-shopping">
+    <View style={{ gap: space.lg }}>
       <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-        <T v="huge" accessibilityRole="header">
-          Đi chợ
-        </T>
+        {showPageTitle ? (
+          <T v="huge" accessibilityRole="header">
+            Đi chợ
+          </T>
+        ) : (
+          <T v="h2" accessibilityRole="header">
+            Danh sách cần mua
+          </T>
+        )}
         <Button
           label="Thêm đồ cần mua"
           testID="shop-add"
@@ -287,7 +293,7 @@ export default function Shopping() {
       {list.data && !items.length ? (
         <Empty
           title="Danh sách đi chợ đang trống"
-          body='Thêm nguyên liệu cần mua tại đây, hoặc chuyển thẳng từ mục "Thiếu gì?" trong Mâm cơm hôm nay.'
+          body="Thêm nguyên liệu cần mua tại đây, hoặc bấm + Đi chợ trực tiếp trên trang chi tiết món ăn."
           action={<Button label="Thêm đồ cần mua" onPress={() => setAdding(true)} />}
         />
       ) : null}
@@ -309,7 +315,7 @@ export default function Shopping() {
       {fallback ? (
         <AddLotSheet
           visible
-          title={`Đưa ${fallback.item.ingredient_name_vi} vào kho`}
+          title={`Cho ${fallback.item.ingredient_name_vi} vào Tủ lạnh`}
           initialIngredient={fallback.ingredient}
           onClose={() => setFallback(null)}
           onCustomSubmit={async (body) => {
@@ -322,11 +328,20 @@ export default function Shopping() {
             );
             qc.invalidateQueries({ queryKey: qk.shopping });
             qc.invalidateQueries({ queryKey: ['lots'] });
-            setToast(`Đã thêm ${fallback.item.ingredient_name_vi} vào Kho bếp`);
+            setToast(`Đã cho ${fallback.item.ingredient_name_vi} vào Tủ lạnh`);
             setFallback(null);
           }}
         />
       ) : null}
+    </View>
+  );
+}
+
+/** Danh sách đi chợ (/di-cho). */
+export default function Shopping() {
+  return (
+    <Screen testID="screen-shopping">
+      <ShoppingListBody showPageTitle />
     </Screen>
   );
 }
@@ -365,7 +380,17 @@ function AddSheet({ visible, onClose }: { visible: boolean; onClose: () => void 
         inputMode="numeric"
         error={invalidGrams ? 'Khối lượng phải lớn hơn 0 gam.' : undefined}
       />
-      <Field label="Ghi chú (không bắt buộc)" value={note} onChangeText={setNote} maxLength={500} />
+      <Row gap={space.xs}>
+        {(['100', '250', '500', '1000'] as const).map((preset) => (
+          <Chip
+            key={preset}
+            label={preset === '1000' ? '1 kg' : `${preset} g`}
+            selected={grams === preset}
+            onPress={() => setGrams(preset)}
+          />
+        ))}
+      </Row>
+      <Field label="Ghi chú (không bắt buộc)" value={note} onChangeText={setNote} maxLength={500} placeholder="VD: 1 bó nhỏ, loại ngon…" />
       {add.error ? <ErrorBox message={errorText(add.error)} /> : null}
       <Button label="Thêm" onPress={() => add.mutate()} disabled={!ing || invalidGrams} loading={add.isPending} />
     </Sheet>

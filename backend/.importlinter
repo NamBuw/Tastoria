@@ -643,6 +643,7 @@ name = M17 meal_calorie: internals are private (all but service, schemas)
 type = protected
 protected_modules =
     tastoria.modules.meal_calorie.barcode
+    tastoria.modules.meal_calorie.barcode_decode
     tastoria.modules.meal_calorie.dish_classifier
     tastoria.modules.meal_calorie.estimator
     tastoria.modules.meal_calorie.kb_lookup

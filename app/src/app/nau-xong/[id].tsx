@@ -83,9 +83,9 @@ export default function Finished() {
           Đã hoàn tác
         </T>
         <Notice>
-          <T>Bữa này đã được hoàn tác; kho đã được trả lại.</T>
+          <T>Bữa này đã được hoàn tác; nguyên liệu đã được trả lại Tủ lạnh.</T>
         </Notice>
-        <Button label="Về Mâm cơm hôm nay" onPress={() => goTab('/mam')} />
+        <Button label="Về Nấu ăn" onPress={() => goTab('/mam')} />
       </Screen>
     );
   }
@@ -99,18 +99,18 @@ export default function Finished() {
           outcome?.state === 'pending' && outcome.authRequired ? undefined : outcome?.state === 'pending' ? (
             <>
               <Notice>
-                <T>Đã ghi, sẽ đồng bộ khi có mạng. Kho chỉ bị trừ khi máy chủ nhận được.</T>
+                <T>Đã lưu tạm, sẽ đồng bộ khi có mạng. Tủ lạnh chỉ trừ khi máy chủ nhận được.</T>
               </Notice>
               <Button label="Gửi lại ngay" kind="secondary" onPress={() => flush(user?.id)} />
             </>
           ) : (
-            <Button label="Nấu xong, trừ kho" testID="finish-submit" onPress={finish} />
+            <Button label="Hoàn tất &amp; trừ nguyên liệu" testID="finish-submit" onPress={finish} />
           )
         }>
         <T v="h1" accessibilityRole="header">
           Bữa nay thế nào?
         </T>
-        <T tone="muted">Không bắt buộc. Chấm từng món giúp lần sau ghép mâm hợp gu hơn (chỉ lưu khi bạn đã đồng ý cá nhân hoá).</T>
+        <T tone="muted">Không bắt buộc. Đánh giá giúp lần sau gợi ý món hợp nhà bạn hơn.</T>
         {plan.isLoading ? <Loading /> : null}
         {items.map((i) => (
           <Card key={i.id}>
@@ -118,10 +118,10 @@ export default function Finished() {
               {SLOT_LABEL[i.slot]}: {i.recipe_name_vi}
             </T>
             <Row>
-              <Radio label="Hợp gu" selected={liked[i.id] === true} onPress={() => setLiked((x) => ({ ...x, [i.id]: true }))} />
-              <Radio label="Không hợp" selected={liked[i.id] === false} onPress={() => setLiked((x) => ({ ...x, [i.id]: false }))} />
+              <Radio label="Ngon, sẽ nấu lại" selected={liked[i.id] === true} onPress={() => setLiked((x) => ({ ...x, [i.id]: true }))} />
+              <Radio label="Không thích" selected={liked[i.id] === false} onPress={() => setLiked((x) => ({ ...x, [i.id]: false }))} />
               {liked[i.id] !== undefined && liked[i.id] !== null ? (
-                <Button kind="ghost" label="Bỏ chấm" onPress={() => setLiked((x) => ({ ...x, [i.id]: null }))} />
+                <Button kind="ghost" label="Bỏ chọn" onPress={() => setLiked((x) => ({ ...x, [i.id]: null }))} />
               ) : null}
             </Row>
           </Card>
@@ -164,7 +164,7 @@ export default function Finished() {
           {canUndo ? (
             confirmUndo ? (
               <Notice tone="warn">
-                <T>Hoàn tác trừ kho của bữa này?</T>
+                <T>Hoàn tác việc trừ nguyên liệu của bữa này?</T>
                 <Row>
                   <Button label="Hoàn tác" kind="danger" testID="undo-confirm" onPress={() => undo.mutate()} loading={undo.isPending} />
                   <Button label="Thôi" kind="ghost" onPress={() => setConfirmUndo(false)} />
@@ -181,25 +181,25 @@ export default function Finished() {
           ) : (
             <Notice tone="warn">
               <T v="small">
-                Đã quá 10 phút để hoàn tác. Sửa từng lô trong Kho nếu trừ sai.
+                Đã quá 10 phút để hoàn tác. Bạn có thể chỉnh lại số lượng trực tiếp trong Tủ lạnh.
               </T>
-              {undoExpired ? <Button label="Mở Kho bếp" kind="secondary" onPress={() => goTab('/kho')} /> : null}
+              {undoExpired ? <Button label="Mở Tủ lạnh" kind="secondary" onPress={() => goTab('/kho')} /> : null}
             </Notice>
           )}
           {undo.error && !undoExpired ? <ErrorBox message={errorText(undo.error)} /> : null}
-          <Button label="Xem nhật ký tuần" onPress={() => goTab('/nhat-ky')} />
+          <Button label="Xem Nhật ký" onPress={() => goTab('/nhat-ky')} />
         </>
       }>
       <T v="h1" accessibilityRole="header">
-        Hoàn tất bữa nấu
+        Đã hoàn tất bữa ăn
       </T>
       <Notice tone="ok">
-        <T v="title">Đã trừ khỏi kho</T>
-        <T>Mâm đã ghi vào nhật ký.</T>
+        <T v="title">Đã trừ khỏi Tủ lạnh</T>
+        <T>Bữa ăn đã được ghi vào Nhật ký.</T>
       </Notice>
       {canUndo ? (
         <T v="small" tone="muted" tabular testID="timer-value">
-          Cửa sổ hoàn tác còn {fmtLeft(left)}
+          Có thể hoàn tác trong {fmtLeft(left)} nữa
         </T>
       ) : null}
       {result ? (
@@ -211,12 +211,11 @@ export default function Finished() {
                   <T style={{ flexShrink: 1 }}>{ingName(iid)}</T>
                   <T v="label" tabular>
                     {fmtG(v.min, v.max)}
-                    {v.lots > 1 ? `, ${v.lots} lô` : ''}
                   </T>
                 </Row>
               ))
             ) : (
-              <T tone="muted">Không trừ lô nào (mâm chỉ dùng gia vị không theo dõi trong kho).</T>
+              <T tone="muted">Không trừ nguyên liệu nào trong tủ (chỉ dùng gia vị có sẵn).</T>
             )}
           </Card>
         </Section>
@@ -224,7 +223,7 @@ export default function Finished() {
         <T tone="muted">Bữa này đã hoàn tất trước đó.</T>
       )}
       {result?.shortfalls?.length ? (
-        <Section title="Kho thiếu so với công thức">
+        <Section title="Tủ thiếu so với công thức">
           <View style={{ gap: space.xs }}>
             {result.shortfalls.map((sf) => (
               <T key={sf.ingredient_id} tabular>

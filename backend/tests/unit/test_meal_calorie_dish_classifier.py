@@ -887,16 +887,17 @@ def test_dual_head_open_vocab_prototype_fallback() -> None:
         "classes": [
             {"id": "pho", "name_vi": "Phở", "name_en": "Pho", "category": "vn"},
             {"id": "com_tam", "name_vi": "Cơm tấm", "name_en": "Broken Rice", "category": "vn"},
+            {"id": "bun_bo_hue", "name_vi": "Bún bò Huế", "name_en": "Hue Beef Noodle Soup", "category": "vn"},
         ],
     }
     textured = Image.open(io.BytesIO(_textured_jpeg_bytes()))
 
-    # Low-margin closed head cascades into 768-d open-vocab prototypes
+    # Low-confidence closed head (<0.42) cascades into 768-d open-vocab prototypes
     emb_tofu = np.zeros((1, 768), dtype=np.float32)
     emb_tofu[0, 0] = 0.99
     emb_tofu[0, 1] = 0.14
     clf_ambig = DishClassifier(
-        _DualSession(np.array([[0.10, 0.09]], dtype=np.float32), emb_tofu),  # type: ignore[arg-type]
+        _DualSession(np.array([[0.10, 0.09, 0.08]], dtype=np.float32), emb_tofu),  # type: ignore[arg-type]
         serving=serving,
         open_vocab_embeddings=open_embs,
         open_vocab_meta=open_meta,
@@ -920,7 +921,7 @@ def test_dual_head_open_vocab_prototype_fallback() -> None:
 
     # High-margin confident closed prediction stays on closed head
     clf_conf = DishClassifier(
-        _DualSession(np.array([[12.0, 0.0]], dtype=np.float32), emb_tofu),  # type: ignore[arg-type]
+        _DualSession(np.array([[12.0, 0.0, 0.0]], dtype=np.float32), emb_tofu),  # type: ignore[arg-type]
         serving=serving,
         open_vocab_embeddings=open_embs,
         open_vocab_meta=open_meta,
@@ -929,6 +930,19 @@ def test_dual_head_open_vocab_prototype_fallback() -> None:
     assert res_closed.top1_id == "pho"
     assert res_closed.confident is True
     assert res_closed.from_open_vocab is False
+
+    # Confident low-margin closed prediction (conf=0.55 >= 0.42, margin=0.10 < 0.15) MUST NOT be hijacked by open-vocab
+    clf_close_tie = DishClassifier(
+        _DualSession(np.array([[2.0, 1.80, -10.0]], dtype=np.float32), emb_tofu),  # type: ignore[arg-type]
+        serving={**serving, "margin_threshold": 0.15},
+        open_vocab_embeddings=open_embs,
+        open_vocab_meta=open_meta,
+    )
+    res_tie = clf_close_tie.predict(textured, top_k=2)
+    assert res_tie.top1_id == "pho"
+    assert res_tie.confident is True
+    assert res_tie.from_open_vocab is False
+    assert res_tie.top_margin < 0.15
 
     # Flat solid-color OOD input never triggers open-vocab rescue
     res_flat = clf_ambig.predict(Image.new("RGB", (224, 224), (120, 90, 60)), top_k=2)

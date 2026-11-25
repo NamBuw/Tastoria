@@ -1,32 +1,51 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { type Href, useNavigation, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { AppState, Pressable, ScrollView, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { AppState, Pressable, View } from 'react-native';
 
+import { api, call } from '@/api/client';
 import { errorText } from '@/api/errors';
 import { useSession } from '@/auth/session';
-import { BotanicalCornerMark, FOOD_PHOTOS, recipePhotoFor, SLOGAN, StarAniseDivider, VermilionSeal, Wordmark } from '@/components/Brand';
-import { fmtG, FreshBadge, Icon, SLOT_LABEL } from '@/components/domain';
-import { Button, BroadsheetLedgerFrame, Card, ErrorBox, Loading, Rise, Row, Screen, Section, Skeleton, T } from '@/components/ui';
+import { recipePhotoFor } from '@/components/Brand';
+import { FreshBadge, Icon, type IconName, SLOT_LABEL } from '@/components/domain';
+import { QUICK_STAPLES } from '@/components/pantryForms';
+import { BroadsheetLedgerFrame, Button, Card, Chip, ErrorBox, Loading, Rise, Row, Screen, Section, Skeleton, T } from '@/components/ui';
+import { useCatalog } from '@/lib/catalog';
+import { isoWeekKey, localDateString, useQuickMealLogs } from '@/lib/mealLog';
 import { getProgress } from '@/lib/onboarding';
-import { currentMeal, MEAL_LABEL, useLatestPlan, useLots, useProfile } from '@/lib/queries';
+import { formatFriendlyQty, groupLotsByIngredient } from '@/lib/pantryDisplay';
+import { currentMeal, MEAL_LABEL, qk, useLatestPlan, useLots, useProfile } from '@/lib/queries';
 import { font, radius, space, TOUCH, useLayout, useTheme } from '@/theme';
 
 const SLOT_ORDER = { man: 0, rau: 1, canh: 2 } as const;
 
+const STARTER_POOL = [...QUICK_STAPLES, 'Cải ngọt', 'Nấm rơm'] as const;
+
 export default function Home() {
   const router = useRouter();
+  const qc = useQueryClient();
   const nav = useNavigation() as { addListener?: (ev: string, cb: () => void) => () => void };
   const { c } = useTheme();
   const { isDesktop, isMobile, isTinyPhone } = useLayout();
-  const { user } = useSession();
+  const { user, status } = useSession();
+  const catalog = useCatalog();
   const profile = useProfile();
   const lots = useLots();
   const [nowTs, setNowTs] = useState(() => Date.now());
   const today = new Date(nowTs);
   const meal = currentMeal(today);
   const plan = useLatestPlan(meal);
+  const week = isoWeekKey(today);
+  const journalQ = useQuery({
+    queryKey: qk.journal(week),
+    queryFn: () => call(api.GET('/journal', { params: { query: { week } } })),
+    enabled: status === 'signedIn',
+  });
+  const quickLogsQ = useQuickMealLogs(week);
   const [checked, setChecked] = useState(false);
+  const [starterBusy, setStarterBusy] = useState<string | null>(null);
+  const [starterMsg, setStarterMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const bump = () => setNowTs(Date.now());
@@ -40,7 +59,6 @@ export default function Home() {
     };
   }, [nav]);
 
-  // first login without a finished "Hồ sơ 60 giây" -> onboarding (UC09 trigger)
   useEffect(() => {
     if (!user || !profile.data || checked) return;
     const p = profile.data;
@@ -51,34 +69,109 @@ export default function Home() {
     });
   }, [user, profile.data, checked, router]);
 
-  const allLots = lots.data?.items ?? [];
-  const soon = allLots.filter((l) => ['dung_ngay', 'dung_som', 'kiem_tra'].includes(l.freshness_label));
+  const allLots = useMemo(() => lots.data?.items ?? [], [lots.data]);
+  const groupedLots = useMemo(() => groupLotsByIngredient(allLots), [allLots]);
+  const soon = useMemo(
+    () => groupedLots.filter((g) => ['dung_ngay', 'dung_som', 'kiem_tra'].includes(g.freshness_label)),
+    [groupedLots],
+  );
   const isStaff = user?.role === 'admin' || user?.role === 'ml_operator';
   const active = plan.data ? plan.data.items.filter((i) => i.status === 'active') : [];
   const ordered = [...active].sort((a, b) => SLOT_ORDER[a.slot] - SLOT_ORDER[b.slot]);
   const dateLine = `${['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'][today.getDay()]}, ${today.getDate()} tháng ${today.getMonth() + 1}`;
 
+  // Compute live kcal eaten today cleanly (deduplicated against server journal)
+  const todayStr = localDateString(today);
+  const serverIds = new Set((journalQ.data?.meal_logs ?? []).map((m) => m.id));
+  const todayDay = (journalQ.data?.days ?? []).find((d) => d.date === todayStr);
+  const uncountedKcal = (quickLogsQ.data ?? [])
+    .filter((e) => e.date === todayStr && !serverIds.has(e.id))
+    .reduce((s, e) => s + e.kcal, 0);
+  const todayTotalKcal = Math.round((todayDay?.kcal_per_person ?? 0) + uncountedKcal);
+  const todayTarget = todayDay?.e_target_kcal ?? profile.data?.kcal_target ?? null;
+  const todayPct = todayTarget && todayTarget > 0 ? Math.min(100, Math.round((todayTotalKcal / todayTarget) * 100)) : 0;
+
+  const quickAddStarter = async (name: string) => {
+    setStarterBusy(name);
+    setStarterMsg(null);
+    try {
+      const res = await call(api.GET('/ingredients', { params: { query: { q: name, limit: 5 } } }));
+      const ing = res.items.find((i) => i.name_vi.toLowerCase() === name.toLowerCase()) ?? res.items[0];
+      if (!ing) return;
+      const quantity = ing.units.length
+        ? { count: 1, unit_code: ing.units[0].unit_code }
+        : ing.countable
+          ? { g_min: 200, g_max: 200 }
+          : { qty_level: 'vua' as const };
+      await call(api.POST('/pantry/lots', { body: { ingredient_id: ing.id, quantity } }));
+      await qc.invalidateQueries({ queryKey: ['lots'] });
+      setStarterMsg(`Đã thêm ${ing.name_vi} vào Tủ lạnh.`);
+    } finally {
+      setStarterBusy(null);
+    }
+  };
+
+  const todayNutritionCard = (
+    <Card testID="home-today-kcal" style={{ gap: space.sm }}>
+      <Row style={{ justifyContent: 'space-between', alignItems: 'center' }} gap={space.sm}>
+        <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+          <T v="label">Hôm nay đã ăn</T>
+          <Row gap={space.xs} style={{ alignItems: 'baseline' }}>
+            <T v="h1" tabular tone="accent">
+              {todayTotalKcal} kcal
+            </T>
+            {todayTarget ? (
+              <T v="small" tone="muted" tabular>
+                / mục tiêu {Math.round(todayTarget)} kcal
+              </T>
+            ) : null}
+          </Row>
+        </View>
+        <Button
+          label="+ Ghi bữa"
+          kind="secondary"
+          compact
+          testID="home-quick-log-btn"
+          onPress={() => router.push({ pathname: '/quet', params: { tab: 'calorie' } })}
+        />
+      </Row>
+      {todayTarget ? (
+        <View style={{ height: 8, borderRadius: radius.pill, backgroundColor: c.surfaceAlt, overflow: 'hidden' }}>
+          <View
+            style={{
+              width: `${todayPct}%`,
+              height: 8,
+              borderRadius: radius.pill,
+              backgroundColor: todayTotalKcal > todayTarget * 1.1 ? c.warn : c.herb,
+            }}
+          />
+        </View>
+      ) : (
+        <T v="small" tone="muted">
+          Chưa đặt mục tiêu calo/ngày — cài đặt bất cứ lúc nào nếu bạn muốn theo dõi cân nặng.
+        </T>
+      )}
+    </Card>
+  );
+
   const mealHero = (
     <View>
-      {plan.isLoading ? <Skeleton height={240} r={radius.lg} /> : null}
+      {plan.isLoading ? <Skeleton height={220} r={radius.lg} /> : null}
       {plan.error ? <ErrorBox message={errorText(plan.error)} onRetry={() => plan.refetch()} /> : null}
       {plan.data ? (
         <Rise>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Mở mâm ${MEAL_LABEL[meal].toLowerCase()}: ${ordered.map((i) => i.recipe_name_vi).join(', ')}`}
+            accessibilityLabel={`Mở ${MEAL_LABEL[meal].toLowerCase()}: ${ordered.map((i) => i.recipe_name_vi).join(', ')}`}
             onPress={() => router.push('/mam')}
             testID="home-latest-plan">
             {({ pressed }) => (
               <BroadsheetLedgerFrame
-                title={`${plan.data!.status === 'accepted' ? 'Mâm đã chốt' : 'Mâm đề xuất'}, ${plan.data!.persons} người`}
-                rightText="Mở mâm cơm →"
+                title={`${plan.data!.status === 'accepted' ? 'Mâm đã chọn' : 'Gợi ý mâm cơm'}, ${plan.data!.persons} người`}
+                rightText="Mở Nấu ăn →"
                 accentTone="herb"
                 style={{ transform: [{ scale: pressed ? 0.99 : 1 }] }}
                 innerStyle={{ padding: 0, gap: 0 }}>
-                <View style={{ paddingHorizontal: space.lg, paddingVertical: space.xs, backgroundColor: c.surfaceAlt }}>
-                  <StarAniseDivider label="Mâm cơm hôm nay: Mặn, Rau, Canh" />
-                </View>
                 <View>
                   {ordered.map((i, idx) => {
                     const dishPhoto = recipePhotoFor(i.recipe_name_vi, i.slot);
@@ -100,14 +193,14 @@ export default function Home() {
                             <Image
                               source={dishPhoto}
                               contentFit="cover"
-                              style={{ width: 56, height: 56, borderRadius: radius.sm, backgroundColor: c.surfaceAlt, borderWidth: 1, borderColor: c.hairline }}
+                              style={{ width: 52, height: 52, borderRadius: radius.sm, backgroundColor: c.surfaceAlt }}
                               accessibilityLabel={i.recipe_name_vi}
                             />
                           ) : (
                             <View
                               style={{
-                                width: 56,
-                                height: 56,
+                                width: 52,
+                                height: 52,
                                 borderRadius: radius.sm,
                                 backgroundColor: c.accentSoft,
                                 alignItems: 'center',
@@ -122,13 +215,13 @@ export default function Home() {
                             <T v="small" tone="herb" style={{ fontFamily: font.semibold }}>
                               Món {SLOT_LABEL[i.slot].toLowerCase()}
                             </T>
-                            <T v="title" style={{ fontFamily: font.displaySemibold }} numberOfLines={2}>
+                            <T v="title" style={{ fontFamily: font.semibold }} numberOfLines={2}>
                               {i.recipe_name_vi}
                             </T>
                           </View>
                         </Row>
                         {i.kcal_per_person != null ? (
-                          <View style={{ backgroundColor: c.surfaceAlt, borderWidth: 1, borderColor: c.hairline, paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.sm }}>
+                          <View style={{ backgroundColor: c.surfaceAlt, paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.sm }}>
                             <T v="small" tone="text" tabular>
                               {Math.round(i.kcal_per_person)} kcal
                             </T>
@@ -152,7 +245,7 @@ export default function Home() {
                     <T v="small" tone="muted" tabular>
                       {plan.data!.rice_bowls_per_person != null
                         ? `Cơm ${String(plan.data!.rice_bowls_per_person).replace('.', ',')} bát / người`
-                        : 'Cơm trắng ăn kèm'}
+                        : 'Ăn kèm cơm trắng'}
                     </T>
                   </Row>
                 </View>
@@ -161,68 +254,87 @@ export default function Home() {
           </Pressable>
         </Rise>
       ) : plan.data === null ? (
-        <BroadsheetLedgerFrame
-          title={`Chưa có mâm cho ${MEAL_LABEL[meal].toLowerCase()}`}
-          accentTone="herb"
-          innerStyle={{ padding: 0, gap: 0, overflow: 'hidden' }}>
-          <Image
-            source={FOOD_PHOTOS.bunDau}
-            contentFit="cover"
-            style={{ width: '100%', height: isDesktop ? 210 : 168 }}
-            accessibilityLabel="Mâm cơm đậu rán, thịt luộc, rau thơm và dưa leo"
-          />
-          <View style={{ padding: space.lg, gap: space.md }}>
-            <T tone="muted">
-              Kiểm tra đồ còn trong tủ, ưu tiên món sắp hết hạn rồi ghép sẵn mâm 3 món mặn, rau, canh vừa miệng cả nhà.
+        <Card style={{ gap: space.md }}>
+          <View style={{ gap: 4 }}>
+            <T v="h2" accessibilityRole="header">
+              {meal === 'lunch' ? 'Trưa nay ăn gì?' : 'Tối nay nấu gì?'}
             </T>
-            <Row gap={space.sm}>
-              <Button label="Ra mâm từ đồ đang có" testID="home-make-plan" onPress={() => router.push('/mam')} />
-              <Button
-                kind="secondary"
-                label="Quét tủ lạnh trước"
-                onPress={() => router.push({ pathname: '/quet', params: { mode: 'fridge' } })}
-              />
-            </Row>
+            <T tone="muted">
+              Xem ngay các món nấu nhanh trong 15–30 phút từ nguyên liệu đang có trong tủ, hoặc ghép đủ mâm cơm 3 món.
+            </T>
           </View>
-        </BroadsheetLedgerFrame>
+          <Row gap={space.sm}>
+            <Button label="Nấu nhanh 1–2 món" testID="home-make-plan" onPress={() => router.push('/mam')} />
+            <Button
+              kind="secondary"
+              label="Tìm công thức"
+              onPress={() => router.push('/kham-pha' as Href)}
+            />
+          </Row>
+        </Card>
       ) : null}
     </View>
   );
 
   const scanTiles = (
-    <Row style={{ flexWrap: isTinyPhone ? 'wrap' : 'nowrap', alignItems: 'stretch' }} gap={space.md}>
-      <ScanTile
+    <View style={{ gap: space.md }}>
+      <ActionTile
         primary
-        title="Chụp tủ lạnh"
-        sub="1 đến 2 ảnh, tự điền tên và số lượng"
+        title="Chụp món tính calo"
+        sub="Nhận diện món ăn, nhiều đĩa trên mâm, chỉnh suất & ghi Nhật ký"
         icon="camera"
-        testID="home-scan-fridge"
-        onPress={() => router.push({ pathname: '/quet', params: { mode: 'fridge' } })}
+        testID="home-scan-calorie"
+        onPress={() => router.push({ pathname: '/quet', params: { tab: 'calorie' } })}
       />
-      <ScanTile
-        title="Chụp đồ vừa mua"
-        sub="Tự động ghi ngày mua hôm nay"
-        icon="bag"
-        testID="home-scan-haul"
-        onPress={() => router.push({ pathname: '/quet', params: { mode: 'haul' } })}
-      />
-    </Row>
+      <Row style={{ flexWrap: isTinyPhone ? 'wrap' : 'nowrap', alignItems: 'stretch' }} gap={space.md}>
+        <ActionTile
+          title="Thêm đồ tủ lạnh"
+          sub="Chụp đồ mới mua, tự điền tên & số lượng"
+          icon="bag"
+          testID="home-scan-haul"
+          onPress={() => router.push({ pathname: '/quet', params: { mode: 'haul' } })}
+        />
+        <ActionTile
+          title="Kiểm kê tủ lạnh"
+          sub="Chụp cả ngăn tủ để rà đồ sắp hỏng"
+          icon="sliders"
+          testID="home-scan-fridge"
+          onPress={() => router.push({ pathname: '/quet', params: { mode: 'fridge' } })}
+        />
+      </Row>
+    </View>
   );
 
-  const urgentSection = (
+  const priorityOrStarterSection = (
     <Section
-      title="Nguyên liệu cần ưu tiên"
-      right={<Button kind="ghost" label="Mở kho bếp" onPress={() => router.push('/kho')} style={{ paddingHorizontal: space.sm }} />}>
+      title={groupedLots.length === 0 ? 'Bắt đầu nhanh Tủ lạnh' : 'Sắp hỏng cần dùng trước'}
+      right={<Button kind="ghost" label="Mở Tủ lạnh" onPress={() => router.push('/kho')} style={{ paddingHorizontal: space.sm }} />}>
       {lots.isLoading ? <Loading rows={1} /> : null}
       {lots.error ? <ErrorBox message={errorText(lots.error)} onRetry={() => lots.refetch()} /> : null}
-      {lots.data && soon.length === 0 ? (
-        <View style={{ backgroundColor: c.surfaceAlt, borderRadius: radius.lg, borderWidth: 1, borderColor: c.hairline, padding: space.lg }}>
+      {lots.data && groupedLots.length === 0 ? (
+        <Card testID="home-starter-pantry" style={{ gap: space.md }}>
           <T tone="muted">
-            {allLots.length
-              ? `Cả ${allLots.length} lô trong kho đều đang tươi mới, chưa có nguyên liệu nào cần dùng gấp.`
-              : 'Kho bếp đang trống. Hãy chụp ảnh tủ lạnh hoặc thêm nguyên liệu để bắt đầu lên mâm.'}
+            Chạm chọn vài đồ quen thuộc đang có sẵn trong nhà để nhận ngay gợi ý món tối nay:
           </T>
-        </View>
+          <Row gap={space.sm}>
+            {STARTER_POOL.map((name) => (
+              <Chip
+                key={name}
+                label={starterBusy === name ? `${name}…` : `+ ${name}`}
+                disabled={Boolean(starterBusy)}
+                onPress={() => void quickAddStarter(name)}
+              />
+            ))}
+          </Row>
+          {starterMsg ? <T v="small" tone="herb">{starterMsg}</T> : null}
+        </Card>
+      ) : null}
+      {lots.data && groupedLots.length > 0 && soon.length === 0 ? (
+        <Card style={{ backgroundColor: c.surfaceAlt }}>
+          <T tone="muted">
+            Tất cả {groupedLots.length} nguyên liệu trong tủ đều đang tươi mới.
+          </T>
+        </Card>
       ) : null}
       {soon.length ? (
         isDesktop ? (
@@ -231,9 +343,9 @@ export default function Home() {
               const pair = soon.slice(0, 6).slice(rowIdx * 2, rowIdx * 2 + 2);
               return (
                 <View key={`soon-row-${rowIdx}`} style={{ flexDirection: 'row', gap: space.md }}>
-                  {pair.map((l) => (
+                  {pair.map((g) => (
                     <Pressable
-                      key={l.id}
+                      key={g.ingredient_id}
                       accessibilityRole="button"
                       onPress={() => router.push('/kho')}
                       style={{
@@ -249,13 +361,13 @@ export default function Home() {
                       }}>
                       <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
                         <T v="title" numberOfLines={1} style={{ flexShrink: 1 }}>
-                          {l.ingredient_name_vi}
+                          {g.ingredient_name_vi}
                         </T>
                         <T v="small" tone="muted" tabular>
-                          {fmtG(l.balance_g_min, l.balance_g_max)}
+                          {formatFriendlyQty(g.balance_g_min, g.balance_g_max, catalog.ingredients.get(g.ingredient_id))}
                         </T>
                       </Row>
-                      <FreshBadge value={l.freshness_label} small />
+                      <FreshBadge value={g.freshness_label} small />
                     </Pressable>
                   ))}
                   {pair.length === 1 ? <View style={{ flex: 1, flexBasis: 0, minWidth: 0 }} pointerEvents="none" /> : null}
@@ -264,10 +376,10 @@ export default function Home() {
             })}
           </View>
         ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm, paddingRight: space.lg }}>
-            {soon.slice(0, 10).map((l) => (
+          <View style={{ gap: space.sm }}>
+            {soon.slice(0, 4).map((g) => (
               <Pressable
-                key={l.id}
+                key={g.ingredient_id}
                 accessibilityRole="button"
                 onPress={() => router.push('/kho')}
                 style={{
@@ -276,31 +388,34 @@ export default function Home() {
                   borderWidth: 1,
                   borderRadius: radius.md,
                   padding: space.md,
-                  width: 176,
-                  gap: 8,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: space.sm,
                 }}>
-                <T v="title" numberOfLines={1}>
-                  {l.ingredient_name_vi}
+                <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+                  <T v="title" numberOfLines={1}>
+                    {g.ingredient_name_vi}
+                  </T>
+                  <FreshBadge value={g.freshness_label} small />
+                </View>
+                <T v="label" tone="muted" tabular>
+                  {formatFriendlyQty(g.balance_g_min, g.balance_g_max, catalog.ingredients.get(g.ingredient_id))}
                 </T>
-                <T v="small" tone="muted" tabular>
-                  Còn {fmtG(l.balance_g_min, l.balance_g_max)}
-                </T>
-                <FreshBadge value={l.freshness_label} small />
               </Pressable>
             ))}
-          </ScrollView>
+          </View>
         )
       ) : null}
     </Section>
   );
 
   const exploreShortcut = (
-    <Card style={{ gap: space.md, position: 'relative', overflow: 'hidden' }}>
-      <BotanicalCornerMark />
+    <Card style={{ gap: space.md }}>
       <View style={{ gap: 4 }}>
-        <T v="title" style={{ fontFamily: font.displaySemibold }}>Món cơm nhà quen thuộc</T>
+        <T v="title">Kho công thức cơm nhà</T>
         <T v="body" tone="muted">
-          Tìm món theo nguyên liệu đang có sẵn, thời gian nấu và thành phần dinh dưỡng từng khẩu phần.
+          Tìm món theo nguyên liệu có sẵn, thời gian nấu 15–45 phút và dinh dưỡng từng khẩu phần.
         </T>
       </View>
       <Row>
@@ -318,58 +433,13 @@ export default function Home() {
   return (
     <Screen testID="screen-home">
       {isMobile ? (
-        <View style={{ gap: space.sm, marginTop: space.xs }}>
-          <View style={{ borderBottomWidth: 1.5, borderBottomColor: c.border, paddingBottom: space.sm, gap: space.xs }}>
-            <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap', alignItems: 'center' }} gap={space.sm}>
-              <Wordmark size="md" masthead />
-              <Row gap={space.xs} style={{ flexWrap: 'nowrap' }}>
-                <Button
-                  kind="secondary"
-                  compact
-                  label="Khám phá"
-                  testID="home-open-explore"
-                  icon={<Icon name="compass" size={16} color={c.accent} />}
-                  onPress={() => router.push('/kham-pha' as Href)}
-                />
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Cài đặt"
-                  testID="open-settings"
-                  onPress={() => router.push('/cai-dat')}
-                  style={({ pressed }) => ({
-                    width: TOUCH,
-                    height: TOUCH,
-                    borderRadius: radius.sm,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: pressed ? c.surfaceAlt : c.surfaceCard,
-                    borderWidth: 1,
-                    borderColor: c.border,
-                  })}>
-                  <Icon name="gear" color={c.text} size={20} />
-                </Pressable>
-              </Row>
-            </Row>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: space.sm,
-                backgroundColor: c.border,
-                paddingHorizontal: space.sm,
-                paddingVertical: 3,
-                borderRadius: radius.sm,
-              }}>
-              <T v="small" style={{ color: c.surface, fontFamily: font.medium, fontSize: 11, lineHeight: 15 }}>
-                {SLOGAN.toUpperCase()}
-              </T>
-              <VermilionSeal label="BẾP VIỆT" />
-            </View>
+        <Row style={{ justifyContent: 'space-between', alignItems: 'center', flexWrap: 'nowrap' }} gap={space.sm}>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <T v="small" tone="muted">{dateLine}</T>
+            <T v="h1" accessibilityRole="header">{MEAL_LABEL[meal]} hôm nay</T>
           </View>
-          <View style={{ height: 1, backgroundColor: c.hairline, marginTop: -6 }} />
-          {isStaff ? (
-            <Row gap={space.sm}>
+          <Row gap={space.xs} style={{ flexWrap: 'nowrap' }}>
+            {isStaff ? (
               <Button
                 kind="secondary"
                 compact
@@ -378,9 +448,34 @@ export default function Home() {
                 icon={<Icon name="shield" size={16} color={c.info} />}
                 onPress={() => router.push('/quan-tri' as Href)}
               />
-            </Row>
-          ) : null}
-        </View>
+            ) : null}
+            <Button
+              kind="secondary"
+              compact
+              label="Khám phá"
+              testID="home-open-explore"
+              icon={<Icon name="compass" size={16} color={c.accent} />}
+              onPress={() => router.push('/kham-pha' as Href)}
+            />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Cài đặt"
+              testID="open-settings"
+              onPress={() => router.push('/cai-dat')}
+              style={({ pressed }) => ({
+                width: TOUCH,
+                height: TOUCH,
+                borderRadius: radius.sm,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: pressed ? c.surfaceAlt : c.surfaceCard,
+                borderWidth: 1,
+                borderColor: c.hairline,
+              })}>
+              <Icon name="gear" color={c.text} size={20} />
+            </Pressable>
+          </Row>
+        </Row>
       ) : null}
 
       {isDesktop ? (
@@ -395,9 +490,9 @@ export default function Home() {
               </T>
             </View>
             <Row gap={space.sm}>
-              <View style={{ backgroundColor: c.surface, borderColor: c.border, borderWidth: 1, borderRadius: radius.sm, paddingHorizontal: space.md, paddingVertical: 8, maxWidth: '100%', flexShrink: 1 }}>
+              <View style={{ backgroundColor: c.surface, borderColor: c.hairline, borderWidth: 1, borderRadius: radius.sm, paddingHorizontal: space.md, paddingVertical: 8, maxWidth: '100%', flexShrink: 1 }}>
                 <T v="small" tabular>
-                  Kho: <T v="label" tabular>{allLots.length} lô</T>, cần dùng sớm: <T v="label" tone="accent" tabular>{soon.length}</T>
+                  Tủ lạnh: <T v="label" tabular>{groupedLots.length} món</T> · Sắp hỏng: <T v="label" tone="accent" tabular>{soon.length}</T>
                 </T>
               </View>
               <Button
@@ -411,8 +506,9 @@ export default function Home() {
           </Row>
           <View style={{ flexDirection: 'row', gap: space.xl, alignItems: 'flex-start' }}>
             <View style={{ flex: 7, minWidth: 0, gap: space.xl }}>
+              {todayNutritionCard}
               {mealHero}
-              {urgentSection}
+              {priorityOrStarterSection}
             </View>
             <View style={{ flex: 5, minWidth: 0, gap: space.xl }}>
               {scanTiles}
@@ -422,24 +518,17 @@ export default function Home() {
         </View>
       ) : (
         <>
-          <View style={{ gap: 4 }}>
-            <T v="small" tone="muted">
-              {dateLine}
-            </T>
-            <T v="huge" accessibilityRole="header">
-              {MEAL_LABEL[meal]} hôm nay
-            </T>
-          </View>
+          {todayNutritionCard}
           {mealHero}
           {scanTiles}
-          {urgentSection}
+          {priorityOrStarterSection}
         </>
       )}
     </Screen>
   );
 }
 
-function ScanTile({
+function ActionTile({
   title,
   sub,
   icon,
@@ -449,7 +538,7 @@ function ScanTile({
 }: {
   title: string;
   sub: string;
-  icon: 'camera' | 'bag';
+  icon: IconName;
   primary?: boolean;
   onPress: () => void;
   testID: string;
@@ -465,36 +554,37 @@ function ScanTile({
       style={({ pressed }) => ({
         flex: 1,
         minWidth: 140,
-        minHeight: 124,
+        minHeight: primary ? 88 : 112,
         borderRadius: radius.md,
         padding: space.lg,
-        gap: space.md,
+        gap: space.sm,
         justifyContent: 'space-between',
         backgroundColor: primary ? c.accent : c.surface,
         borderWidth: 1,
         borderColor: primary ? c.accent : c.hairline,
         transform: [{ scale: pressed ? 0.98 : 1 }],
       })}>
-      <View
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: radius.sm,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: primary ? c.accentDisplay : c.accentSoft,
-        }}>
-        <Icon name={icon} color={primary ? c.onAccent : c.accent} size={20} />
-      </View>
-
-      <View style={{ gap: 2 }}>
-        <T v="title" style={{ color: fg }}>
-          {title}
-        </T>
-        <T v="small" style={{ color: fg }} tone={primary ? 'onAccent' : 'muted'}>
-          {sub}
-        </T>
-      </View>
+      <Row gap={space.sm} style={{ flexWrap: 'nowrap' }}>
+        <View
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: radius.sm,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: primary ? c.accentDisplay : c.accentSoft,
+          }}>
+          <Icon name={icon} color={primary ? c.onAccent : c.accent} size={20} />
+        </View>
+        <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+          <T v="title" style={{ color: fg }}>
+            {title}
+          </T>
+          <T v="small" style={{ color: fg }} tone={primary ? 'onAccent' : 'muted'}>
+            {sub}
+          </T>
+        </View>
+      </Row>
     </Pressable>
   );
 }

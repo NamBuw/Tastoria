@@ -58,6 +58,21 @@ def lookup_barcode(
     return service.lookup_barcode(_deps(request), barcode=barcode)
 
 
+def _limit_barcode_image(request: Request, user: CurrentUser) -> None:
+    enforce_rate_limit(request, bucket="meal_calorie_barcode", subject=str(user.id), limit=30, window_s=60)
+
+
+@router.post("/barcode-image", operation_id="meal_calorie_lookup_barcode_image")
+def lookup_barcode_image(
+    request: Request,
+    user: CurrentUser,
+    _: Annotated[None, Depends(_limit_barcode_image)],
+    image: Annotated[UploadFile, File()],
+) -> BarcodeNutritionOut:
+    raw = _read_optional(image) or b""
+    return service.lookup_barcode_image(_deps(request), image_bytes=raw)
+
+
 def _limit_estimate(request: Request, user: CurrentUser) -> None:
     enforce_rate_limit(request, bucket="meal_calorie_estimate", subject=str(user.id), limit=30, window_s=60)
 

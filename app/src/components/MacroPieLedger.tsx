@@ -1,10 +1,11 @@
-import { StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
 
 import { hamiltonMacroShares } from '@/lib/caloriePlate';
 import { font, radius, size, space, useTheme } from '@/theme';
 
-import { StarAniseMark } from './Brand';
+import { Icon } from './domain';
 import { Row, T } from './ui';
 
 export type MacroNutritionInput = {
@@ -158,9 +159,10 @@ export function MacroPieLedger({
   sugarG,
   nutritionGrade,
   context = 'meal',
-  title = 'Phân tích đa lượng & cân bằng dinh dưỡng',
+  title = 'Tinh bột · Đạm · Chất béo',
 }: MacroNutritionInput & { title?: string }) {
   const { c } = useTheme();
+  const [showTech, setShowTech] = useState(false);
   const analysis = analyzeMacroNutrition({
     proteinG,
     carbsG,
@@ -177,11 +179,11 @@ export function MacroPieLedger({
   const colorFor = (key: MacroSlice['key']) =>
     key === 'carb' ? c.macroChart.carb : key === 'protein' ? c.macroChart.protein : c.macroChart.lipid;
 
-  const svgSize = 124;
+  const svgSize = 112;
   const cx = svgSize / 2;
   const cy = svgSize / 2;
-  const r = 44;
-  const strokeWidth = 18;
+  const r = 40;
+  const strokeWidth = 16;
   const circumference = 2 * Math.PI * r;
 
   const activeSlices = analysis.slices.filter((s) => s.pct > 0);
@@ -191,54 +193,47 @@ export function MacroPieLedger({
     return acc;
   }, []);
 
+  const heading = context === 'daily' ? 'Tổng hợp hôm nay' : 'Dinh dưỡng bữa này';
+
   return (
     <View
       testID="macro-nutrition-ledger"
       style={[
         styles.outerFrame,
         {
-          borderColor: c.border,
-          backgroundColor: c.surfaceCard,
+          borderColor: c.hairline,
+          backgroundColor: c.surface,
         },
       ]}>
-      <View
-        style={[
-          styles.innerDashed,
-          {
-            borderColor: c.borderDashed,
-          },
-        ]}>
-        <View style={[styles.mastheadStrip, { borderBottomColor: c.borderDashed }]}>
-          <Row gap={space.xs} style={{ flexShrink: 1, minWidth: 210, flexWrap: 'nowrap' }}>
-            <StarAniseMark size={15} />
-            <T
-              v="h2"
-              accessibilityRole="header"
-              style={{ color: c.herb, fontFamily: font.displaySemibold, flexShrink: 1 }}>
-              Phiếu phân tích dinh dưỡng
-            </T>
-          </Row>
-          <T v="small" tone="muted" tabular style={{ flexShrink: 0 }}>
-            Chuẩn Viện Dinh dưỡng Quốc gia và WHO
+      <View style={[styles.headerRow, { borderBottomColor: c.hairline }]}>
+        <View style={{ gap: 2, flex: 1, minWidth: 160 }}>
+          <T v="label" style={{ color: c.text, fontFamily: font.semibold }}>
+            {heading}
+          </T>
+          <T v="small" tone="muted">
+            {title}
           </T>
         </View>
-
-        <View
-          style={[
-            styles.ledger,
-            {
-              borderTopColor: c.border,
-              borderBottomColor: c.border,
-            },
-          ]}>
-          <View style={[styles.headerRow, { borderBottomColor: c.hairline }]}>
-            <T v="label" style={{ flexShrink: 1, minWidth: 180 }}>
-              {title}
-            </T>
-            <T v="small" tone="muted" tabular style={{ flexShrink: 0 }}>
-              1g đạm, tinh bột ≈ 4 kcal, 1g béo ≈ 9 kcal
-            </T>
-          </View>
+        <Pressable
+          testID="macro-tech-toggle"
+          accessibilityRole="button"
+          accessibilityState={{ expanded: showTech }}
+          onPress={() => setShowTech((v) => !v)}
+          style={({ pressed }) => ({
+            paddingHorizontal: space.sm,
+            paddingVertical: 4,
+            borderRadius: radius.sm,
+            backgroundColor: pressed ? c.surfaceAlt : 'transparent',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 4,
+          })}>
+          <T v="small" tone="accent" style={{ fontFamily: font.semibold }}>
+            {showTech ? 'Ẩn chi tiết' : 'Chi tiết'}
+          </T>
+          <Icon name={showTech ? 'minus' : 'plus'} size={14} color={c.accent} />
+        </Pressable>
+      </View>
 
       {/* Chart + 3 Macro Breakdown Rows */}
       <View style={styles.chartAndRows}>
@@ -249,12 +244,12 @@ export function MacroPieLedger({
             height={svgSize}
             viewBox={`0 0 ${svgSize} ${svgSize}`}
             accessibilityRole="image"
-            accessibilityLabel={`Biểu đồ tròn đa lượng: Tinh bột ${analysis.slices[0].pct}%, Chất đạm ${analysis.slices[1].pct}%, Chất béo ${analysis.slices[2].pct}%`}>
+            accessibilityLabel={`Biểu đồ dinh dưỡng: Tinh bột ${analysis.slices[0].pct}%, Chất đạm ${analysis.slices[1].pct}%, Chất béo ${analysis.slices[2].pct}%`}>
             <Circle
               testID="macro-donut-outer-ring"
               cx={cx}
               cy={cy}
-              r={r + strokeWidth / 2 + 3}
+              r={r + strokeWidth / 2 + 2}
               fill="none"
               stroke={c.hairline}
               strokeWidth={1}
@@ -295,14 +290,14 @@ export function MacroPieLedger({
               testID="macro-donut-inner-ring"
               cx={cx}
               cy={cy}
-              r={r - strokeWidth / 2 - 3}
+              r={r - strokeWidth / 2 - 2}
               fill="none"
               stroke={c.hairline}
               strokeWidth={1}
             />
           </Svg>
           <View pointerEvents="none" style={styles.donutCenter}>
-            <T v="title" tabular style={{ fontFamily: font.displaySemibold, fontSize: size.lg, lineHeight: 22 }}>
+            <T v="title" tabular style={{ fontFamily: font.semibold, fontSize: size.lg, lineHeight: 22 }}>
               {analysis.displayKcal}
             </T>
             <T v="small" tone="muted" style={{ fontSize: 11, lineHeight: 14 }}>
@@ -326,9 +321,11 @@ export function MacroPieLedger({
                   <T v="label" numberOfLines={1}>
                     {s.label}
                   </T>
-                  <T v="small" tone="muted" tabular>
-                    Khuyến nghị {s.amdrRange}{s.inAmdr ? ', Đạt' : ''}
-                  </T>
+                  {s.inAmdr ? (
+                    <T v="small" tone="herb">
+                      Đạt mức cân đối
+                    </T>
+                  ) : null}
                 </View>
               </Row>
               <View style={{ alignItems: 'flex-end', flexShrink: 0 }}>
@@ -368,24 +365,11 @@ export function MacroPieLedger({
         </View>
       </View>
 
-      {/* Expanded Nutrition Facts Ledger: Energy Density + AMDR Insight + Quick Warnings */}
+      {/* Actionable Insight & Practical Warnings */}
       <View style={[styles.subSection, { borderTopColor: c.hairline, gap: space.xs }]}>
-        <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
-          <T v="small" tone="muted">
-            Mật độ năng lượng
-          </T>
-          <T v="label" tabular>
-            {analysis.densityKcalPer100g != null
-              ? `${analysis.densityKcalPer100g} kcal/100g, ${analysis.densityTagVi}`
-              : 'Chưa rõ khối lượng (g)'}
-          </T>
-        </Row>
-
-        <View style={[styles.insightRow, { borderTopColor: c.hairline }]}>
-          <T v="small" tone={analysis.amdrBalanced ? 'herb' : 'text'}>
-            {analysis.insightVi}
-          </T>
-        </View>
+        <T v="small" tone={analysis.amdrBalanced ? 'herb' : 'text'}>
+          {analysis.insightVi}
+        </T>
 
         {analysis.warningsVi.map((w, i) => (
           <View
@@ -401,8 +385,33 @@ export function MacroPieLedger({
             </T>
           </View>
         ))}
-      </View>
-        </View>
+
+        {showTech ? (
+          <View
+            testID="macro-tech-details"
+            style={{
+              marginTop: space.xs,
+              padding: space.sm,
+              borderRadius: radius.sm,
+              backgroundColor: c.surfaceAlt,
+              gap: 4,
+            }}>
+            <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+              <T v="small" tone="muted">Mật độ năng lượng</T>
+              <T v="small" tabular>
+                {analysis.densityKcalPer100g != null
+                  ? `${analysis.densityKcalPer100g} kcal/100g, ${analysis.densityTagVi}`
+                  : 'Chưa rõ khối lượng (g)'}
+              </T>
+            </Row>
+            <T v="small" tone="muted" tabular>
+              1g đạm, tinh bột ≈ 4 kcal, 1g béo ≈ 9 kcal
+            </T>
+            <T v="small" tone="muted">
+              Tham chiếu chuẩn Viện Dinh dưỡng Quốc gia và WHO (Tinh bột 45–65%, Đạm 15–25%, Béo 20–30%).
+            </T>
+          </View>
+        ) : null}
       </View>
     </View>
   );
@@ -410,36 +419,16 @@ export function MacroPieLedger({
 
 const styles = StyleSheet.create({
   outerFrame: {
-    borderWidth: 1.5,
-    borderRadius: radius.sm,
-    padding: 4,
-  },
-  innerDashed: {
     borderWidth: 1,
-    borderStyle: 'dashed',
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
     padding: space.md,
-    gap: space.sm,
-  },
-  mastheadStrip: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    paddingBottom: space.xs,
-    gap: space.sm,
-  },
-  ledger: {
-    borderTopWidth: 2,
-    borderBottomWidth: 1.5,
-    paddingVertical: space.md,
     gap: space.md,
   },
   headerRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    alignItems: 'baseline',
+    alignItems: 'center',
     paddingBottom: space.xs,
     borderBottomWidth: 1,
     gap: space.sm,
@@ -451,8 +440,8 @@ const styles = StyleSheet.create({
     gap: space.md,
   },
   chartWrap: {
-    width: 124,
-    height: 124,
+    width: 112,
+    height: 112,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -464,7 +453,7 @@ const styles = StyleSheet.create({
   },
   rowsCol: {
     flex: 1,
-    minWidth: 210,
+    minWidth: 200,
   },
   macroRow: {
     flexDirection: 'row',
@@ -485,15 +474,11 @@ const styles = StyleSheet.create({
   },
   fiberTrack: {
     height: 6,
-    borderRadius: 2,
+    borderRadius: 3,
     overflow: 'hidden',
   },
   fiberFill: {
     height: 6,
-    borderRadius: 2,
-  },
-  insightRow: {
-    borderTopWidth: 1,
-    paddingTop: 6,
+    borderRadius: 3,
   },
 });

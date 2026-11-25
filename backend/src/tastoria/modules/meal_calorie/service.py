@@ -14,6 +14,7 @@ from typing import Any
 
 from tastoria.core.errors import ApiError, ProblemCode
 from tastoria.modules.meal_calorie.barcode import BarcodeCatalog, BarcodeUpstreamError
+from tastoria.modules.meal_calorie.barcode_decode import decode_barcode_from_image
 from tastoria.modules.meal_calorie.dish_classifier import (
     DishClassification,
     DishClassifier,
@@ -422,6 +423,36 @@ def lookup_barcode(deps: MealCalorieDeps, *, barcode: str, allow_remote: bool = 
     )
 
 
+def lookup_barcode_image(
+    deps: MealCalorieDeps,
+    *,
+    image_bytes: bytes,
+    allow_remote: bool = True,
+) -> BarcodeNutritionOut:
+    """Decode an EAN-13/EAN-8/UPC-A barcode from image bytes and resolve its product nutrition."""
+    if not image_bytes:
+        raise ApiError(
+            422,
+            ProblemCode.validation_error,
+            "Chưa có ảnh mã vạch để đọc.",
+            errors=[{"pointer": "/image", "code": "required", "message": "thiếu ảnh"}],
+        )
+    code = decode_barcode_from_image(image_bytes)
+    if code is None:
+        raise ApiError(
+            422,
+            ProblemCode.validation_error,
+            "Chưa đọc được mã vạch rõ nét trong ảnh. Hãy chụp gần hơn, thẳng góc hoặc nhập tay dãy số.",
+            errors=[{"pointer": "/image", "code": "barcode_not_detected", "message": "không nhận ra mã vạch"}],
+        )
+    try:
+        return lookup_barcode(deps, barcode=code, allow_remote=allow_remote)
+    except ApiError as exc:
+        if exc.status == 404 and len(code) == 13 and code.startswith("0"):
+            return lookup_barcode(deps, barcode=code[1:], allow_remote=allow_remote)
+        raise
+
+
 def _provenance_label_vi(source_ref: str | None, *, with_image: bool) -> str:
     ref = (source_ref or "").upper()
     if "NIN" in ref or "FCT 2007" in ref:
@@ -794,22 +825,21 @@ def estimate_meal_calories(
 
     top_candidates: list[DishCandidateOut] = []
     cls_res = None
-    if kb_est is None:
-        classifier = deps.get_dish_classifier(required=False)
-        if classifier is not None:
-            cls_res = classifier.predict(img, top_k=3)
-            for c in cls_res.top_k:
-                rec_vua = kb.estimate_recognized(dish_id=c.dish_id, portion="vua") if kb else None
-                top_candidates.append(
-                    DishCandidateOut(
-                        dish_id=c.dish_id,
-                        name_vi=c.name_vi,
-                        name_en=c.name_en,
-                        confidence=c.confidence,
-                        kb_slug=c.kb_slug,
-                        kcal_vua=rec_vua.estimated_kcal if rec_vua else None,
-                    )
+    classifier = deps.get_dish_classifier(required=False) if kb_est is None else None
+    if classifier is not None:
+        cls_res = classifier.predict(img, top_k=3)
+        for c in cls_res.top_k:
+            rec_vua = kb.estimate_recognized(dish_id=c.dish_id, portion="vua") if kb else None
+            top_candidates.append(
+                DishCandidateOut(
+                    dish_id=c.dish_id,
+                    name_vi=c.name_vi,
+                    name_en=c.name_en,
+                    confidence=c.confidence,
+                    kb_slug=c.kb_slug,
+                    kcal_vua=rec_vua.estimated_kcal if rec_vua else None,
                 )
+            )
 
     raw_vis_kcal = round(vis.kcal * mult, 1)
     raw_vis_mass = round(vis.mass_g * mult, 1)
@@ -832,35 +862,14 @@ def estimate_meal_calories(
     )
     ood_clamped = vis.ood_clamped or post_mult_clamped
     base_note = estimator.domain_shift_note or DEFAULT_DOMAIN_SHIFT_NOTE
-    detected_plates: list[DetectedPlateOut] = []
-    plate_latency_ms = 0.0
-    if vis.multi_dish_score is not None and vis.multi_dish_score >= 0.55:
-        pdet = deps.get_plate_detector()
-        if pdet is not None:
-            try:
-                raw_plates, plate_latency_ms = pdet.detect(img)
-                detected_plates = [
-                    DetectedPlateOut(
-                        label=pl.label,
-                        confidence=pl.confidence,
-                        x1=pl.x1,
-                        y1=pl.y1,
-                        x2=pl.x2,
-                        y2=pl.y2,
-                    )
-                    for pl in raw_plates
-                ]
-            except Exception as exc:  # noqa: BLE001 — optional plate detector degrades cleanly
-                log.warning("plate_detector inference failed: %s", exc)
-    multi_dish_note = (
-        f" Phát hiện mâm nhiều món ({len(detected_plates)} đĩa/bát), bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
-        if len(detected_plates) >= 2
-        else (
-            " Phát hiện khẩu phần nhiều món, bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
-            if (vis.multi_dish_score is not None and vis.multi_dish_score >= 0.55)
-            else ""
-        )
+    detected_plates, plate_latency_ms = _detect_and_classify_plates(
+        deps=deps,
+        img=img,
+        multi_dish_score=vis.multi_dish_score,
+        classifier=classifier,
+        kb=kb,
     )
+    multi_dish_note = _format_multi_dish_note(detected_plates, vis.multi_dish_score)
     note = (f"{base_note} {OOD_WARNING_NOTE}" if ood_clamped else base_note) + multi_dish_note
     total_latency = round(vis.latency_ms + (cls_res.latency_ms if cls_res else 0.0) + plate_latency_ms, 3)
 
@@ -929,6 +938,98 @@ def estimate_meal_calories(
     )
 
 
+MULTI_DISH_TRIGGER_SCORE = 0.35
+MAX_PLATES_TO_CLASSIFY = 4
+
+
+def _detect_and_classify_plates(
+    *,
+    deps: MealCalorieDeps,
+    img: Any,
+    multi_dish_score: float | None,
+    classifier: DishClassifier | None,
+    kb: KBDishCatalog | None,
+) -> tuple[list[DetectedPlateOut], float]:
+    """Run plate_detector on likely multi-dish images and classify up to 4 main food plates."""
+    if multi_dish_score is None or multi_dish_score < MULTI_DISH_TRIGGER_SCORE:
+        return [], 0.0
+    pdet = deps.get_plate_detector()
+    if pdet is None:
+        return [], 0.0
+    try:
+        raw_plates, plate_latency_ms = pdet.detect(img)
+    except Exception as exc:  # noqa: BLE001 — optional plate detector degrades cleanly
+        log.warning("plate_detector inference failed: %s", exc)
+        return [], 0.0
+
+    plate_cls_by_idx: dict[int, tuple[str, str, float, float | None]] = {}
+    if len(raw_plates) >= 2 and classifier is not None:
+        w, h = img.size
+        qualifying = [
+            idx
+            for idx, pl in enumerate(raw_plates)
+            if pl.label != "drink_cup"
+            and (pl.x2 - pl.x1) * (pl.y2 - pl.y1) >= 0.025
+            and min(pl.x2 - pl.x1, pl.y2 - pl.y1) >= 0.08
+        ]
+        for idx in qualifying[:MAX_PLATES_TO_CLASSIFY]:
+            pl = raw_plates[idx]
+            bx1, by1 = max(0, int(round(pl.x1 * w))), max(0, int(round(pl.y1 * h)))
+            bx2, by2 = min(w, int(round(pl.x2 * w))), min(h, int(round(pl.y2 * h)))
+            if bx2 - bx1 < 32 or by2 - by1 < 32:
+                continue
+            try:
+                pcls = classifier.predict(img.crop((bx1, by1, bx2, by2)), top_k=1)
+                plate_latency_ms += float(pcls.latency_ms)
+                if pcls.confident and (not pcls.is_ood) and pcls.top1_id and pcls.top1_name_vi:
+                    rec_vua = kb.estimate_recognized(dish_id=pcls.top1_id, portion="vua") if kb else None
+                    plate_cls_by_idx[idx] = (
+                        pcls.top1_id,
+                        pcls.top1_name_vi,
+                        round(float(pcls.top1_confidence), 4),
+                        rec_vua.estimated_kcal if rec_vua else None,
+                    )
+            except Exception as exc:  # noqa: BLE001
+                log.warning("plate crop classification failed: %s", exc)
+
+    out_plates: list[DetectedPlateOut] = []
+    for idx, pl in enumerate(raw_plates):
+        cls_info = plate_cls_by_idx.get(idx)
+        out_plates.append(
+            DetectedPlateOut(
+                label=pl.label,
+                confidence=pl.confidence,
+                x1=pl.x1,
+                y1=pl.y1,
+                x2=pl.x2,
+                y2=pl.y2,
+                dish_id=cls_info[0] if cls_info else None,
+                dish_name_vi=cls_info[1] if cls_info else None,
+                dish_confidence=cls_info[2] if cls_info else None,
+                estimated_kcal_vua=cls_info[3] if cls_info else None,
+            )
+        )
+    return out_plates, round(float(plate_latency_ms), 3)
+
+
+def _format_multi_dish_note(plates: list[DetectedPlateOut], multi_dish_score: float | None) -> str:
+    if len(plates) >= 2:
+        unique_names = list(dict.fromkeys(p.dish_name_vi for p in plates if p.dish_name_vi))
+        if len(unique_names) >= 2:
+            joined = ", ".join(unique_names[:MAX_PLATES_TO_CLASSIFY])
+            return (
+                f" Phát hiện mâm nhiều món ({len(plates)} đĩa/bát: {joined}), "
+                "bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
+            )
+        return (
+            f" Phát hiện mâm nhiều món ({len(plates)} đĩa/bát), "
+            "bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
+        )
+    if multi_dish_score is not None and multi_dish_score >= MULTI_DISH_TRIGGER_SCORE:
+        return " Phát hiện khẩu phần nhiều món, bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
+    return ""
+
+
 def fuse_photo_estimate(
     *,
     kb: KBDishCatalog | None,
@@ -981,15 +1082,7 @@ def fuse_photo_estimate(
     ood_clamped = vis.ood_clamped or post_mult_clamped or bool(cls_res is not None and cls_res.is_ood)
     plates_out = list(detected_plates or ())
     base_note = domain_shift_note or DEFAULT_DOMAIN_SHIFT_NOTE
-    multi_dish_note = (
-        f" Phát hiện mâm nhiều món ({len(plates_out)} đĩa/bát), bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
-        if len(plates_out) >= 2
-        else (
-            " Phát hiện khẩu phần nhiều món, bạn có thể chọn thêm món phụ để cộng tổng calo chính xác hơn."
-            if (vis.multi_dish_score is not None and vis.multi_dish_score >= 0.55)
-            else ""
-        )
-    )
+    multi_dish_note = _format_multi_dish_note(plates_out, vis.multi_dish_score)
     note = (f"{base_note} {OOD_WARNING_NOTE}" if ood_clamped else base_note) + multi_dish_note
     total_latency = (
         round(total_latency_ms, 3)

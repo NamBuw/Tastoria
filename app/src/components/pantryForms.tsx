@@ -4,23 +4,12 @@ import { View } from 'react-native';
 
 import { api, call, type Schemas } from '@/api/client';
 import { errorText } from '@/api/errors';
+import { UNIT_LABEL } from '@/lib/pantryDisplay';
 import { useReference } from '@/lib/queries';
 import { space } from '@/theme';
 
 import { Button, Chip, ErrorBox, Field, Loading, Radio, Row, Sheet, Stepper, T } from './ui';
 
-const UNIT_LABEL: Record<string, string> = {
-  qua: 'quả',
-  bo: 'bó',
-  cu: 'củ',
-  nhanh: 'nhánh',
-  mieng: 'miếng',
-  goi: 'gói',
-  hop: 'hộp',
-  cay: 'cây',
-  tep: 'tép',
-  con: 'con',
-};
 export const LEVEL_LABEL = { it: 'Ít', vua: 'Vừa', nhieu: 'Nhiều' } as const;
 
 export const QUICK_STAPLES = ['Trứng gà', 'Đậu phụ', 'Thịt lợn', 'Rau muống', 'Cà chua', 'Hành lá'] as const;
@@ -203,7 +192,7 @@ export function AddLotSheet({
   onClose,
   initialIngredient = null,
   onCustomSubmit,
-  title = 'Thêm đồ vào kho',
+  title = 'Thêm đồ vào Tủ lạnh',
 }: {
   visible: boolean;
   onClose: () => void;
@@ -288,7 +277,7 @@ export function AddLotSheet({
       ) : null}
       {add.error ? <ErrorBox message={errorText(add.error)} /> : null}
       <Button
-        label="Thêm vào kho"
+        label="Lưu vào Tủ lạnh"
         testID="add-lot-submit"
         onPress={() => add.mutate()}
         loading={add.isPending}

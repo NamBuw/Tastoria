@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { type ReactNode } from 'react';
-import { ImageBackground, Platform, View, type StyleProp, type ViewStyle } from 'react-native';
+import { View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 
 import { font, radius, size as typeSize, space, useTheme } from '@/theme';
@@ -9,13 +9,8 @@ import { T } from './ui';
 
 export const SLOGAN = 'Cơm nhà mỗi ngày';
 
-export const PAPER_TEXTURES = {
-  light: require('../../assets/paper-bg-light.webp'),
-} as const;
-
 /**
- * Renders the repeating antique honey-parchment texture in Light mode
- * (1024×1024 seamless WebP from Wikimedia Commons CC BY 2.0) with subtle warm edge patina on web.
+ * Clean warm-kitchen canvas background with high text contrast and zero visual noise.
  */
 export function PaperBackground({
   children,
@@ -27,40 +22,10 @@ export function PaperBackground({
   testID?: string;
 }) {
   const { c } = useTheme();
-  const src = PAPER_TEXTURES.light;
-  const resolvedUri =
-    typeof src === 'string'
-      ? src
-      : typeof src === 'object' && src !== null && 'uri' in src
-        ? (src as { uri?: string }).uri
-        : undefined;
-
-  if (Platform.OS === 'web') {
-    const webBg = ({
-      ...(resolvedUri
-        ? {
-            backgroundImage: `url("${resolvedUri}")`,
-            backgroundRepeat: 'repeat',
-            backgroundSize: '1024px 1024px',
-          }
-        : {}),
-      boxShadow: 'inset 0 0 90px rgba(107, 78, 42, 0.14)',
-    }) as unknown as ViewStyle;
-    return (
-      <View testID={testID} style={[{ flex: 1, backgroundColor: c.bg }, webBg, style]}>
-        {children}
-      </View>
-    );
-  }
-
   return (
-    <ImageBackground
-      testID={testID}
-      source={src}
-      resizeMode="repeat"
-      style={[{ flex: 1, backgroundColor: c.bg }, style]}>
+    <View testID={testID} style={[{ flex: 1, backgroundColor: c.bg }, style]}>
       {children}
-    </ImageBackground>
+    </View>
   );
 }
 
@@ -93,83 +58,56 @@ function normDish(value: string): string {
     .trim();
 }
 
-const SLOT_FALLBACK_PHOTOS: Record<'man' | 'rau' | 'canh' | 'trang_mieng', readonly FoodPhotoSource[]> = {
-  man: [FOOD_PHOTOS.caramelTrout, FOOD_PHOTOS.caramelPork, FOOD_PHOTOS.seabassGinger, FOOD_PHOTOS.omelette, FOOD_PHOTOS.tomatoEgg],
-  rau: [FOOD_PHOTOS.morningGlory, FOOD_PHOTOS.tofuGreens, FOOD_PHOTOS.cabbageShrimp, FOOD_PHOTOS.silkenTofu],
-  canh: [FOOD_PHOTOS.freshBowl, FOOD_PHOTOS.cabbageShrimp, FOOD_PHOTOS.pho],
-  trang_mieng: [FOOD_PHOTOS.freshBowl, FOOD_PHOTOS.silkenTofu],
-};
-
-function hashIndex(text: string, mod: number): number {
-  let h = 0;
-  for (let i = 0; i < text.length; i += 1) {
-    h = (h * 31 + text.charCodeAt(i)) >>> 0;
-  }
-  return h % mod;
-}
-
 /**
- * Returns a local Vietnamese dish photograph matched to the dish name/slug,
- * with deterministic slot-appropriate fallback so dish cards and heroes never
- * show flat empty placeholder boxes.
+ * Returns a local Vietnamese dish photograph ONLY when it genuinely matches the dish
+ * (never substituting unrelated dish photos like water spinach on pumpkin or eggplant dishes).
  */
 export function recipePhotoFor(
   nameOrSlug?: string | null,
-  slot?: 'man' | 'rau' | 'canh' | 'trang_mieng' | string | null,
+  _slot?: 'man' | 'rau' | 'canh' | 'trang_mieng' | string | null,
 ): FoodPhotoSource | null {
-  if (!nameOrSlug && !slot) return null;
   const n = normDish(nameOrSlug ?? '');
+  if (!n) return null;
 
-  if (n) {
-    if (!n.includes('canh') && n.includes('trung') && (n.includes('ca chua') || n.includes('sot ca'))) {
-      return FOOD_PHOTOS.tomatoEgg;
-    }
-    if (n.includes('trung chien') || n.includes('trung ran') || n.includes('trung duc') || n.includes('omelette')) {
-      return FOOD_PHOTOS.omelette;
-    }
-    if (n.includes('ca ri')) return FOOD_PHOTOS.caramelPork;
-    if (n.includes('ca tim') || n.includes('ca phao')) return FOOD_PHOTOS.morningGlory;
-    if (n.includes('thit kho') || n.includes('thit rang') || n.includes('suon kho') || n.includes('suon rim') || n.includes('ba chi')) {
-      return FOOD_PHOTOS.caramelPork;
-    }
-    if (n.includes('bun thit nuong') || n.includes('thit nuong')) return FOOD_PHOTOS.bunThitNuong;
-    if (n.includes('bun dau')) return FOOD_PHOTOS.bunDau;
-    if (n.includes('com tam')) return FOOD_PHOTOS.table;
-    if (n.includes('dau phu non') || n.includes('dau hu non')) return FOOD_PHOTOS.silkenTofu;
-    if (!n.includes('canh') && (n.includes('dau phu') || n.includes('dau hu'))) {
-      return FOOD_PHOTOS.tofuGreens;
-    }
-    if (!n.includes('canh') && !n.includes('ca chua') && /\bca\b.*\b(kho|rim|sot)\b/.test(n)) {
-      return FOOD_PHOTOS.caramelTrout;
-    }
-    if (!n.includes('canh') && /\bca\b.*\b(hap|gung|chien|ran|nuong)\b/.test(n)) {
-      return FOOD_PHOTOS.seabassGinger;
-    }
-    if (!n.includes('canh') && n.includes('rau muong')) {
-      return FOOD_PHOTOS.morningGlory;
-    }
-    if (!n.includes('canh') && !n.includes('goi') && (n.includes('cai thao') || (n.includes('tom') && n.includes('xao')))) {
-      return FOOD_PHOTOS.cabbageShrimp;
-    }
-    if (n.includes('pho bo')) return FOOD_PHOTOS.beefPho;
-    if (n.includes('pho') || n.includes('hu tieu') || n.includes('bun')) return FOOD_PHOTOS.pho;
-    if (n.includes('canh') || n.includes('sup')) {
-      if (n.includes('tom') || n.includes('cai')) return FOOD_PHOTOS.cabbageShrimp;
-      return FOOD_PHOTOS.freshBowl;
-    }
-    if (/\b(ca chua)\b/.test(n)) return FOOD_PHOTOS.tomatoEgg;
-    if (/\b(rau|cai|muong|bi|bau|muop|su su)\b/.test(n)) {
-      return FOOD_PHOTOS.morningGlory;
-    }
-    if (/\b(ca)\b/.test(n)) return FOOD_PHOTOS.seabassGinger;
-    if (/\b(thit|ga|vit|bo|heo|lon)\b/.test(n)) return FOOD_PHOTOS.caramelPork;
+  if (!n.includes('canh') && n.includes('trung') && (n.includes('ca chua') || n.includes('sot ca'))) {
+    return FOOD_PHOTOS.tomatoEgg;
   }
-
-  if (slot === 'man' || slot === 'rau' || slot === 'canh' || slot === 'trang_mieng') {
-    const pool = SLOT_FALLBACK_PHOTOS[slot];
-    return pool[hashIndex(n || slot, pool.length)];
+  if (n.includes('trung chien') || n.includes('trung ran') || n.includes('trung duc') || n.includes('omelette')) {
+    return FOOD_PHOTOS.omelette;
   }
-  return n ? FOOD_PHOTOS.table : null;
+  if (n.includes('thit kho') || n.includes('thit rang') || n.includes('suon kho') || n.includes('suon rim') || n.includes('ba chi')) {
+    return FOOD_PHOTOS.caramelPork;
+  }
+  if (n.includes('bun thit nuong') || n.includes('thit nuong')) return FOOD_PHOTOS.bunThitNuong;
+  if (n.includes('bun dau')) return FOOD_PHOTOS.bunDau;
+  if (n.includes('com tam')) return FOOD_PHOTOS.table;
+  if (n.includes('dau phu non') || n.includes('dau hu non')) return FOOD_PHOTOS.silkenTofu;
+  if (!n.includes('canh') && (n.includes('dau phu') || n.includes('dau hu'))) {
+    return FOOD_PHOTOS.tofuGreens;
+  }
+  const isPlantCa = /\bca (tim|rot|chua|phao|ri|phe)\b/.test(n);
+  if (!n.includes('canh') && !isPlantCa && /\bca\b.*\b(kho|rim|sot)\b/.test(n)) {
+    return FOOD_PHOTOS.caramelTrout;
+  }
+  if (!n.includes('canh') && !isPlantCa && /\bca\b.*\b(hap|gung|chien|ran|nuong)\b/.test(n)) {
+    return FOOD_PHOTOS.seabassGinger;
+  }
+  if (!n.includes('canh') && n.includes('rau muong')) {
+    return FOOD_PHOTOS.morningGlory;
+  }
+  if (!n.includes('canh') && !n.includes('goi') && (n.includes('cai thao') || (n.includes('tom') && n.includes('xao')))) {
+    return FOOD_PHOTOS.cabbageShrimp;
+  }
+  if (n.includes('pho bo')) return FOOD_PHOTOS.beefPho;
+  if (n.includes('pho') || n.includes('hu tieu') || n.includes('bun')) return FOOD_PHOTOS.pho;
+  if (n.includes('canh') || n.includes('sup')) {
+    if (n.includes('tom') || n.includes('cai')) return FOOD_PHOTOS.cabbageShrimp;
+    return FOOD_PHOTOS.freshBowl;
+  }
+  if (/\b(thit|ga|vit|bo|heo|lon)\b/.test(n) && !n.includes('ca tim') && !n.includes('bi')) {
+    return FOOD_PHOTOS.caramelPork;
+  }
+  return null;
 }
 
 /**
