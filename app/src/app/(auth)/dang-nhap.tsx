@@ -38,7 +38,7 @@ export default function Login() {
   };
 
   return (
-    <AuthShell testID="screen-login" title="Đăng nhập sổ bếp" subtitle="Đăng nhập để xem mâm cơm, kho bếp và dinh dưỡng mỗi ngày.">
+    <AuthShell testID="screen-login" title="Đăng nhập Mỹ Vị" subtitle="Đăng nhập để quản lý tủ lạnh, gợi ý nấu ăn và theo dõi calo mỗi ngày.">
       <AuthField
         label="Email"
         placeholder="ban@example.com"

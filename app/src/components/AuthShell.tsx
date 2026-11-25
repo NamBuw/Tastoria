@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { font, radius, size, space, TOUCH, useLayout, useTheme } from '@/theme';
 
-import { FOOD_PHOTOS, SLOGAN, StarAniseDivider, VermilionSeal, Wordmark } from './Brand';
+import { FOOD_PHOTOS, SLOGAN, Wordmark } from './Brand';
 import { Icon } from './domain';
 import { T } from './ui';
 
@@ -41,7 +41,7 @@ export function AuthShell({
                 testID="auth-editorial"
                 style={[
                   styles.editorial,
-                  { backgroundColor: c.editorialSurface, borderColor: c.border },
+                  { backgroundColor: c.editorialSurface, borderColor: c.hairline },
                 ]}>
                 <Image
                   source={FOOD_PHOTOS.table}
@@ -49,12 +49,12 @@ export function AuthShell({
                   style={styles.photo}
                   accessibilityLabel="Mâm cơm Việt với bún, nem và rau thơm"
                 />
-                <View style={[styles.editorialCopy, { backgroundColor: c.editorialSurface, borderTopWidth: 1.5, borderTopColor: c.border }]}>
+                <View style={[styles.editorialCopy, { backgroundColor: c.editorialSurface, borderTopWidth: 1, borderTopColor: c.hairline }]}>
                   <T style={[styles.headline, { color: c.onEditorial }]}>
                     Tối nay nấu gì từ đồ{'\n'}còn trong tủ lạnh?
                   </T>
                   <T style={[styles.caption, { color: c.onStoryMuted }]}>
-                    Ghi nhanh nguyên liệu sẵn có, gợi ý mâm cơm 3 món hợp khẩu vị gia đình và canh giờ nấu xong cùng lúc.
+                    Chụp món tính calo, quản lý tủ lạnh và gợi ý món nấu nhanh từ đồ sẵn có.
                   </T>
                 </View>
               </View>
@@ -66,17 +66,14 @@ export function AuthShell({
                   styles.formCard,
                   {
                     backgroundColor: c.surfaceCard,
-                    borderColor: c.border,
-                    borderWidth: 1.5,
+                    borderColor: c.hairline,
+                    borderWidth: 1,
+                    borderRadius: radius.lg,
                     padding: isWide ? 40 : 24,
                   },
                 ]}>
-                <View style={{ gap: space.sm, marginBottom: 4 }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: space.sm }}>
-                    <Wordmark size="lg" masthead subtitle={SLOGAN} />
-                    <VermilionSeal />
-                  </View>
-                  <StarAniseDivider />
+                <View style={{ paddingBottom: space.md, borderBottomWidth: 1, borderBottomColor: c.hairline }}>
+                  <Wordmark size="lg" masthead subtitle={SLOGAN} />
                 </View>
 
                 <View style={{ marginTop: 24, marginBottom: 20, gap: 8 }}>

@@ -2,7 +2,7 @@
   'use strict';
 
   var SVG_NS = 'http://www.w3.org/2000/svg';
-  var ASSET_VER = 'editorial-v24';
+  var ASSET_VER = 'wave2-2026';
 
   var motionMql = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 
@@ -10,7 +10,7 @@
     return Boolean(motionMql && motionMql.matches);
   }
 
-  // 1. Light-Only Vintage Broadsheet Device Screenshot Sync
+  // 1. Warm Kitchen Light Preview Sync
   var themeMeta = document.getElementById('theme-color-meta');
   var previewImg = document.getElementById('device-preview-img');
 
@@ -20,7 +20,7 @@
     previewImg.setAttribute('src', '/gioi-thieu/img/' + screen + '-light.webp?v=' + ASSET_VER);
   }
 
-  if (themeMeta) themeMeta.setAttribute('content', '#E3CFA6');
+  if (themeMeta) themeMeta.setAttribute('content', '#FAF8F5');
   syncDeviceImg();
 
   // 2. Sticky Editorial Masthead & Mobile Drawer
@@ -964,8 +964,8 @@
 
   var downloadBtn = document.getElementById('android-download');
   if (downloadBtn) {
-    var apkHref = downloadBtn.getAttribute('data-apk-href') || '/tai-ve/tastoria-0.1.5.apk';
-    var apkLabel = downloadBtn.getAttribute('data-apk-label') || 'Tải bản Android (.apk)';
+    var apkHref = downloadBtn.getAttribute('data-apk-href') || '/tai-ve/tastoria-0.1.6.apk';
+    var apkLabel = downloadBtn.getAttribute('data-apk-label') || 'Tải bản Android 0.1.6 (.apk)';
     fetch(apkHref, { method: 'GET', headers: { Range: 'bytes=0-15' } })
       .then(function (resp) {
         if (resp.ok || resp.status === 206) {

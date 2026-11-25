@@ -2,17 +2,17 @@
   "expo": {
     "name": "Mỹ Vị",
     "slug": "tastoria",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "tastoria",
     "userInterfaceStyle": "light",
-    "backgroundColor": "#E3CFA6",
+    "backgroundColor": "#FAF8F5",
     "android": {
       "package": "net.ctslab.tastoria",
-      "versionCode": 6,
+      "versionCode": 7,
       "adaptiveIcon": {
-        "backgroundColor": "#FAF2E0",
+        "backgroundColor": "#FAF8F5",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
@@ -31,8 +31,8 @@
       "favicon": "./assets/images/favicon.png",
       "name": "Mỹ Vị",
       "lang": "vi",
-      "themeColor": "#E3CFA6",
-      "backgroundColor": "#E3CFA6"
+      "themeColor": "#FAF8F5",
+      "backgroundColor": "#FAF8F5"
     },
     "plugins": [
       "expo-router",
@@ -47,7 +47,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#E3CFA6",
+          "backgroundColor": "#FAF8F5",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 96
         }

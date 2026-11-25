@@ -34,7 +34,7 @@ export default function Register() {
   };
 
   return (
-    <AuthShell testID="screen-register" title="Tạo tài khoản mới" subtitle="Tạo tài khoản để lưu nguyên liệu trong kho, lên mâm cơm và theo dõi bữa ăn.">
+    <AuthShell testID="screen-register" title="Tạo tài khoản mới" subtitle="Tạo tài khoản để quản lý tủ lạnh, xem gợi ý món nấu nhanh và theo dõi bữa ăn mỗi ngày.">
       <AuthField
         label="Email"
         testID="register-email"
